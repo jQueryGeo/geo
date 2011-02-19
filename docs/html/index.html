@@ -1,0 +1,93 @@
+<!doctype html>  
+
+<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html lang="en" class="no-js ie9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>html | $.geo</title>
+  <meta name="description" content="AppGeo/geo html requirements">
+  <meta name="author" content="Ryan Westphal">
+
+  <link rel="stylesheet" href="../css/style.css?v=2">
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.css" />
+
+</head>
+
+<body>
+
+  <div id="html" data-role=page data-theme="b">
+    <div data-role="header">
+      <h1>html</h1>
+    </div>
+    
+    <div data-role="content">
+      <p>The AppGeo/geo plugin's only widget is a geographic map that you can create on any div with a computable width and height.</p>
+      <code><pre>&lt;div style=&quot;width: 640px; height: 480px;&quot;&gt;&lt;/div&gt;</pre></code>
+      <p>If the div is not already in relative, absolute or fixed position, the widget will force relative positioning.</p>
+      <p>The div size does not have to be so specific.</p>
+      <code><pre>&lt;div style=&quot;position: absolute; top: 0; right: 0; bottom: 0; left: 0;&quot;&gt;&lt;/div&gt;</pre></code>
+      <p>The map supports divs that have padding, borders and margins. The plugin will create the map where text would normally go in such a situation, i.e., the map content will be inset from the border by the padding amount.</p>
+      <code><pre>&lt;style type=&quot;text/css&quot;&gt;
+  #map {
+    width: 95%;
+    max-width: 640px;
+    height: 480px;
+    padding: 8px;
+    border: solid 3px #444;
+    margin: .5em 0;
+    background: #ddf;
+  }
+&lt;/style&gt;
+&lt;div id=map&gt;O HAI&lt;/div&gt;</pre></code>
+      <div style="width: 95%; max-width: 640px; height: 128px; padding: 8px; border: solid 3px #444; margin: .5em 0; background: #ddf;">O HAI</div>
+      <p>Any elements inside the map div can be absolutely positioned and will not interfere with map operation. Map images will appear below them. This is useful if you want to layout a scale bar for example.</p>
+      <code><pre>&lt;style type=&quot;text/css&quot;&gt;
+  #bar {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 96px;
+    height: 2px;
+    background: #444;
+  }
+&lt;/style&gt;
+&lt;div id=map&gt;&lt;div id=bar&gt;&lt;/div&gt;&lt;/div&gt;</pre></code>
+      <div style="position: relative; width: 95%; max-width: 640px; height: 128px; padding: 8px; border: solid 3px #444; margin: .5em 0; background: #ddf;"><div style="position: absolute; top: 10px; right: 10px; width: 96px; height: 2px; background: #444;"></div></div>
+    </div>
+  </div> <!-- end of #container -->
+
+
+  <script src="//code.jquery.com/jquery-1.5.1rc1.js"></script>
+  <script>
+    $(document).bind("mobileinit", function(){
+      $.mobile.gradeA = function() { return $.support.mediaquery || $("html").hasClass("ie8") };
+    });
+  </script>
+
+  <script src="//code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.js"></script>
+  
+  <!-- scripts concatenated and minified via ant build script-->
+  <script src="js/plugins.js"></script>
+  <script src="js/script.js"></script>
+  <!-- end concatenated and minified scripts-->
+  
+  <!-- change the UA-XXXXX-X to be your site's ID -->
+  <script>
+   var _gaq = [['_setAccount', 'UA-18348536-1'], ['_trackPageview']];
+   (function(d, t) {
+    var g = d.createElement(t),
+        s = d.getElementsByTagName(t)[0];
+    g.async = true;
+    g.src = ('https:' == location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    s.parentNode.insertBefore(g, s);
+   })(document, 'script');
+  </script>
+  
+</body>
+</html>
+
