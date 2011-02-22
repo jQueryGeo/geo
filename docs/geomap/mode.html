@@ -9,8 +9,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <title>geomap | $.geo</title>
-  <meta name="description" content="AppGeo/geo geomap method">
+  <title>mode | $.geo</title>
+  <meta name="description" content="AppGeo/geo mode property">
   <meta name="author" content="Ryan Westphal">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
@@ -20,29 +20,46 @@
 
 <body>
 
-  <div id="geomap" data-role=page data-theme="b">
+  <div id="mode" data-role=page data-theme="b">
     <div data-role="header">
-      <h1>geomap</h1>
+      <h1>mode</h1>
     </div>
     
     <div data-role="content">
-      <p>Once you have an HTML element to target, you can call the geographic map widget's function.</p>
-      <code><pre>.geomap( options )</pre></code>
-      <h2>overview</h2>
-      <p>The widget creates an interactive map. Users can pan and zoom on desktop and mobile browsers against many different cached tile sets or dynamic map servers. Developers can handle events triggered by user action.</p>
-      <img src="images/map.png" alt="Example image of geomap in use" />
-      <p>All event callbacks receive two arguments: the original browser event and an object specific to the map action.</p>
-      <h2>options</h2>
-      <p>The options argument is a JavaScript object that configures the map widget during the first instantiation on a div. No options are required. By default the map will show the extent of the world using the OpenStreetMap tile set.</p>
-      <ul data-role=listview data-inset=true>
-        <li>
-          <h3><a href="mode.html">mode</a></h3>
-        </li>
-      </ul>
-      <h2>theming</h2>
-      <p>The geomap widget itself does not create many DOM elements worth theming. The only exception is the marquee zoom box. It gets the ui-widget-content class but with the background set to transparent so users can see the map under where they are selecting.</p>
+      <table>
+        <tr>
+          <th>type</th>
+          <td>String</td>
+        </tr>
+        <tr>
+          <th>default</th>
+          <td>&quot;pan&quot;</td>
+        </tr>
+        <tr>
+          <th>init</th>
+          <td><code><pre>$( <i>selector</i> ).geomap( { mode: &quot;pan&quot; } );</pre></code></td>
+        <tr>
+          <th>get</th>
+          <td><code><pre>var mode = $( <i>selector</i> ).geomap( &quot;option&quot;, &quot;mode&quot; );</pre></code></td>
+        </tr>
+        <tr>
+          <th>set</th>
+          <td><code><pre>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;mode&quot;, &quot;zoom&quot; );</pre></code></td>
+        </tr>
+      </table>
+      <p>The mode property determines how the map responds to user interaction and which events the developer receives.</p>
+      
+      <p>There are two modes.</p>
+      <h2>pan</h2>
+      <h3>ux</h3>
+      <p>The user can drag the map to pan. The map will continue panning a little after the user lets go. They can zoom in or out with the scroll wheel. They can also double-click or double-tap to center on a location and zoom in one level.</p>
+      <h3>events</h3>
+      <p>The geomapmove event triggers when the user moves the mouse above the map but is not actively panning.</p>
+      <p>The geomapextent event triggers any time the user changes the extent by panning or zooming.</p>
+      <p>The geomapclick event triggers when the user clicks or taps a point on the map without initiating a pan, i.e., they let go of the map at the same point and within short time threshold.</p>
     </div>
   </div> <!-- end of #container -->
+
 
   <script src="//code.jquery.com/jquery-1.5.1rc1.js"></script>
   <script>

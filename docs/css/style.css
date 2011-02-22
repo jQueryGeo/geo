@@ -82,9 +82,11 @@ button {  width: auto; overflow: visible; }
     Author: Ryan Westphal
  */
 
-.ui-body-b { background: #eee !important; }
+body, .ui-body-b { background: #eee !important; }
+div>h2 { font-size: 1.1em; margin-bottom: .25em; }
 p { margin: .5em 0; }
-
+th { text-align: right; padding: .5em 1em .5em 0; }
+td { padding: .5em 0; }
 
 
 
