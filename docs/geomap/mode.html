@@ -49,14 +49,31 @@
       </table>
       <p>The mode property determines how the map responds to user interaction and which events the developer receives.</p>
       
-      <p>There are two modes.</p>
+      <p>There are currently two modes.</p>
       <h2>pan</h2>
       <h3>ux</h3>
+      <p>The default cursor is an open hand in browsers that support data URIs and a four point arrow otherwise.</p>
+
       <p>The user can drag the map to pan. The map will continue panning a little after the user lets go. They can zoom in or out with the scroll wheel. They can also double-click or double-tap to center on a location and zoom in one level.</p>
       <h3>events</h3>
       <p>The geomapmove event triggers when the user moves the mouse above the map but is not actively panning.</p>
       <p>The geomapextent event triggers any time the user changes the extent by panning or zooming.</p>
       <p>The geomapclick event triggers when the user clicks or taps a point on the map without initiating a pan, i.e., they let go of the map at the same point and within short time threshold.</p>
+
+      <h2>view</h2>
+
+      <h3>ux</h3>
+      <p>The default cursor is a crosshair.</p>
+
+      <p>In this mode the user can perform a marquee zoom by clicking and holding one point and dragging the mouse cursor. A box will form. When the user lets go of the mouse, the map will zoom to the closest approximation of the extent of the box.</p>
+      <p>Dynamic services are only limited by the ratio between the size of the drawn box and the map div's current size. Cached services are limited to those as well but also specific map zoom levels so the final extent will not be as close.</p>
+      <p>The user can also zoom in or out with the scroll wheel as well as double-click or double-tap to center on a location and zoom in one level.</p>
+      <p>This is not a very useful mode for mobile applications (only double-tap is available) but provides a more exact method of zooming into an area for desktop users who want it.</p>
+
+      <h3>events</h3>
+      <p>The geomapmove event triggers when the user moves the mouse above the map but is not actively performing a marquee zoom.</p>
+      <p>The geomapextent event triggers any time the user changes the extent by zooming.</p>
+      <p>The geomapclick event triggers when the user clicks or taps a point on the map without initiating a zoom, i.e., they let go of the map at the same point and within short time threshold.</p>
     </div>
   </div> <!-- end of #container -->
 

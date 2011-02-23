@@ -31,14 +31,16 @@
       <h2>overview</h2>
       <p>The widget creates an interactive map. Users can pan and zoom on desktop and mobile browsers against many different cached tile sets or dynamic map servers. Developers can handle events triggered by user action.</p>
       <img src="images/map.png" alt="Example image of geomap in use" />
-      <p>All event callbacks receive two arguments: the original browser event and an object specific to the map action.</p>
       <h2>options</h2>
       <p>The options argument is a JavaScript object that configures the map widget during the first instantiation on a div. No options are required. By default the map will show the extent of the world using the OpenStreetMap tile set.</p>
       <ul data-role=listview data-inset=true>
         <li>
           <h3><a href="mode.html">mode</a></h3>
+          <p>Determines how the map, user &amp; developer interact</p>
         </li>
       </ul>
+      <h2>events</h2>
+      <p>All event callbacks receive two arguments: the original browser event and an object specific to the map action.</p>
       <h2>theming</h2>
       <p>The geomap widget itself does not create many DOM elements worth theming. The only exception is the marquee zoom box. It gets the ui-widget-content class but with the background set to transparent so users can see the map under where they are selecting.</p>
     </div>
