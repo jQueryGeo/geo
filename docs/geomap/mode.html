@@ -10,7 +10,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
   <title>mode | $.geo</title>
-  <meta name="description" content="AppGeo/geo mode property">
+  <meta name="description" content="$.geo mode property">
   <meta name="author" content="Ryan Westphal">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
@@ -51,7 +51,7 @@
       
       <p>There are currently two modes.</p>
       <h2>pan</h2>
-      <h3>ux</h3>
+      <h3>user experience</h3>
       <p>The default cursor is an open hand in browsers that support data URIs and a four point arrow otherwise.</p>
 
       <p>The user can drag the map to pan. The map will continue panning a little after the user lets go. They can zoom in or out with the scroll wheel. They can also double-click or double-tap to center on a location and zoom in one level.</p>
@@ -62,13 +62,13 @@
 
       <h2>view</h2>
 
-      <h3>ux</h3>
+      <h3>user experience</h3>
       <p>The default cursor is a crosshair.</p>
 
       <p>In this mode the user can perform a marquee zoom by clicking and holding one point and dragging the mouse cursor. A box will form. When the user lets go of the mouse, the map will zoom to the closest approximation of the extent of the box.</p>
       <p>Dynamic services are only limited by the ratio between the size of the drawn box and the map div's current size. Cached services are limited to those as well but also specific map zoom levels so the final extent will not be as close.</p>
       <p>The user can also zoom in or out with the scroll wheel as well as double-click or double-tap to center on a location and zoom in one level.</p>
-      <p>This is not a very useful mode for mobile applications (only double-tap is available) but provides a more exact method of zooming into an area for desktop users who want it.</p>
+      <p>This is not a very useful mode for mobile applications (only double-tap is possible) but provides a more exact method of zooming into an area for desktop users who want it.</p>
 
       <h3>events</h3>
       <p>The geomapmove event triggers when the user moves the mouse above the map but is not actively performing a marquee zoom.</p>

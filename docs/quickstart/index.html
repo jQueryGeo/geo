@@ -10,7 +10,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
   <title>quickstart | $.geo</title>
-  <meta name="description" content="AppGeo/geo quickstart">
+  <meta name="description" content="$.geo quickstart">
   <meta name="author" content="Ryan Westphal">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
@@ -26,22 +26,27 @@
     </div>
     
     <div data-role="content">
-      <p>The AppGeo/geo plugin has one widget, geomap, that you can instantiate on any div with a computable width and height.</p>
-      <code><pre>$("#map").geomap();</pre></code>
+      <p>The $.geo plugin has one widget, geomap, that you can instantiate on any div with a computable width and height.</p>
+      <h2>html</h2>
+      <code><pre>&lt;div id=map style=&quot;width: 640px; height: 480px;&quot;&gt;&lt;/div&gt;</pre></code>
+      <h2>javascript</h2>
+      <code><pre>$(&quot;#map&quot;).geomap();</pre></code>
       <p>By default, this one line of code will create a fully functional map on your page showing the whole world and using the <a href="http://www.openstreetmap.org/" rel=external>OpenStreetMap</a> tile set.</p>
-      <p>The default units are <i>web mercator meters</i> which is the same unit type that Google, Bing and ESRI now use. You can set the center and zoom of the map at the same time you initialize it by passing a JavaScript object of options.</p>
+      <p>The default units are <i>longitude &amp; latitude degrees</i> which is the most common format for GPS and other online spatial data. <!--More advanced users can easilly switch to <i>web mercator meters</i> which is the same unit type that Google, Bing and ESRI now use.--> You can set the center and zoom of the map at the same time you initialize it by passing a JavaScript object of options.</p>
       <code><pre>$("#map").geomap({
-  center: { x: -7912531.856997, y: 5214932.836549 },
+  center: { [ -71.037598, 42.363281 ] },
   zoom: 10
 });</pre></code>
-      <p>The above example will show the City of Boston. If you need help determining the center point values the <a href="http://spatialreference.org/ref/sr-org/wgs-1984-web-mercator/" rel=external>Spatial Reference .org</a> website can help. Pan and zoom the map around until the marker is on the location you want and copy the Output Coordinates to you code.</p>
+      <p>The above example will show the City of Boston. The value passed to the center property is a <a href="http://geojson.org/geojson-spec.html#positions" rel=external>GeoJSON</a> position, which is an array with an x value followed by a y value.</p>
+      <p>If you need help determining the center point values the <a href="http://spatialreference.org/ref/epsg/wgs-84/" rel=external>Spatial Reference.org</a> website can help. Pan and zoom the map around until the marker is on the location you want and copy the Output Coordinates to you code.</p>
+      <p><b>Please note that longitude is the first value, x, even though it is commonly spoken second.</b> This plugin does not distinguish between lon/lat and any other x/y coordinate system.</p>
     </div>
   </div> <!-- end of #container -->
 
 
   <script src="//code.jquery.com/jquery-1.5.1rc1.js"></script>
   <script>
-    $(document).bind("mobileinit", function(){
+    $(document).bind(&quot;mobileinit&quot;, function(){
       $.mobile.gradeA = function() { return $.support.mediaquery || $("html").hasClass("ie8") };
     });
   </script>
