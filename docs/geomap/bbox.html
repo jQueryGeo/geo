@@ -9,8 +9,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <title>cursors | $.geo</title>
-  <meta name="description" content="$.geo cursors property">
+  <title>extent | $.geo</title>
+  <meta name="description" content="$.geo extent property">
   <meta name="author" content="Ryan Westphal">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
@@ -20,39 +20,39 @@
 
 <body>
 
-  <div id="cursors" data-role=page data-theme="b">
+  <div id="bbox" data-role=page data-theme="b">
     <div data-role="header">
-      <h1>cursors</h1>
+      <h1>bbox</h1>
     </div>
     
     <div data-role="content">
       <table>
         <tr>
           <th>type</th>
-          <td>Object (map of geomap mode to CSS cursor)</td>
+          <td>Array ( <a href="http://geojson.org/geojson-spec.html#bounding-boxes">GeoJSON bounding box</a> )</td>
         </tr>
         <tr>
           <th>default</th>
-          <td><pre><code>{
-  pan: &quot;move&quot;,
-  zoom: &quot;crosshair&quot;
-}</code></pre></td>
+          <td><i>calculated</i></td>
         </tr>
         <tr>
           <th>init</th>
-          <td><code><pre>$( <i>selector</i> ).geomap( { cursors: { pan: &quot;move&quot; } } );</pre></code></td>
+          <td><code><pre>$( <i>selector</i> ).geomap( { bbox: [ -71, 40, -69, 44 ] } );</pre></code></td>
         <tr>
           <th>get</th>
-          <td><code><pre>var cursors = $( <i>selector</i> ).geomap( &quot;option&quot;, &quot;cursors&quot; );</pre></code></td>
+          <td><code><pre>var bbox = $( <i>selector</i> ).geomap( &quot;option&quot;, &quot;bbox&quot; );</pre></code></td>
         </tr>
         <tr>
           <th>set</th>
-          <td><code><pre>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;cursors&quot;, { zoom: &quot;pointer&quot; } );</pre></code></td>
+          <td><code><pre>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;bbox&quot;, [ -122, 42, -118, 46 ] );</pre></code></td>
         </tr>
       </table>
-      <p>The cursors property controls which cursors appear when users move the mouse over the geomap div in any given mode. For example, if the developer switches the map widget to zoom mode the cursor will turn into a crosshair by default.</p>
-      <p>The developer may change each geomap mode's cursor separately during both initialization of the widget or any time after.</p>
-      <p>Sometimes the geomap widget will override the selected mode's cursor, e.g., when a user starts panning in zoom mode the cursor will switch to the pan mode cursor temporarily.</p>
+      <p>The bbox property calculates or modifies the bounding box of the map view the user currently sees. The geomap widget creates the bounding box based on the current center point, map zoom and size of the map view.</p>
+      <p>When you set a new bbox, the center and zoom properties are set as close as they can be based on the services you've added and the size of the map view.</p>
+      <p>For example, if you have a cached service with specific zoom levels, the map widget will have to pick a zoom level even though it may result in a bbox that is quite different from the one passed. When your services are fully dynamic, i.e., they allow arbitrary zoom levels, the final bbox will not likely match the one passed either due to ratio differences between the requested bbox and the map view's size. The map will attempt to pick a bounding box that best fits the one you request.</p>
+      <p>This property is a JavaScript array consisting of four values which can be thought of as: minx, miny, maxx and maxy of the current map view in map units and in that order.</p>
+      <p>With the default service: bbox[0] is the longitude of the left of the current map view, bbox[1] is the latitude of the bottom, bbox[2] is the longitude of the right and bbox[3] is the latitude of the top.</p>
+      <p>Setting a new bbox will refresh the map services.</p>
     </div>
   </div> <!-- end of #container -->
 

@@ -1,0 +1,141 @@
+<!doctype html>  
+
+<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html lang="en" class="no-js ie9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>services | $.geo</title>
+  <meta name="description" content="$.geo services property">
+  <meta name="author" content="Ryan Westphal">
+
+  <link rel="stylesheet" href="../css/style.css?v=2">
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.css" />
+
+</head>
+
+<body>
+
+  <div id="services" data-role=page data-theme="b">
+    <div data-role="header">
+      <h1>services</h1>
+    </div>
+    
+    <div data-role="content">
+      <table>
+        <tr>
+          <th>type</th>
+          <td>Array</td>
+        </tr>
+        <tr>
+          <th>default</th>
+        </tr>
+        <tr>
+          <td colspan=2><code><pre>[ {
+  id: &quot;OSM&quot;,
+  type: &quot;tiled&quot;,
+  getUrl: function( view ) {
+    return &quot;http://tile.openstreetmap.org/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png&quot;;
+  },
+  attr: &quot;&copy; OpenStreetMap &amp; contributors, CC-BY-SA&quot;,
+  visible: true
+} ]</pre></code></td>
+        </tr>
+        <tr>
+          <th>init</th>
+        </tr>
+        <tr>
+          <td colspan=2><code><pre>$( <i>selector</i> ).geomap( { services: [ {
+  id: &quot;OSM&quot;,
+  type: &quot;tiled&quot;,
+  getUrl: function( view ) {
+    return &quot;http://tile.openstreetmap.org/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png&quot;;
+  },
+  attr: &quot;&copy; OpenStreetMap &amp; contributors, CC-BY-SA&quot;,
+  visible: true
+} ] } );</pre></code></td>
+        <tr>
+          <th>get</th>
+          <td><code><pre>var services = $( <i>selector</i> ).geomap( &quot;option&quot;, &quot;services&quot; );</pre></code></td>
+        </tr>
+        <tr>
+          <th>set</th>
+        </tr>
+        <tr>
+          <td colspan=2><code><pre>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;services&quot;, [ {
+  id: &quot;OSM_MapQuest&quot;,
+  type: &quot;tiled&quot;,
+  getUrl: function( view ) {
+    return &quot;http://otile&quot; + ((view.server % 4) + 1) + &quot;.mqcdn.com/tiles/1.0.0/osm/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png&quot;;
+  },
+  attr: &quot;&lt;p&gt;Tiles Courtesy of &lt;a href=&quot;http://www.mapquest.com/&quot; target=&quot;_blank&quot;&gt;MapQuest&lt;/a&gt; &lt;img src=&quot;http://developer.mapquest.com/content/osm/mq_logo.png&quot;&gt;&lt;/p&gt;&quot;
+} ] );</pre></code></td>
+        </tr>
+      </table>
+      <p>The services property is an array of service objects. The service objects are plain JavaScript objects that control how the geomap widget displays map images.</p>
+      <p>By default, geomap will display OpenStreetMap tiles. You can change all services at once by setting this property with an entirely new array of service objects. You can set a specific part of of a specific service by getting the current array, modifying, adding or deleting one of the service objects and then re-setting the services property with the modified array.</p>
+      <h2>service object</h2>
+      <p>A service object has five properties, three of which are required.</p>
+      <p>Each service needs an id that distinguishes it from other service objects in the array. The id is a string.</p>
+      <p>A service has a type property which is either &quot;tiled&quot; or &quot;shingled&quot;. Tiled servies will get one image request per tile needed to fill a given view when the map refreshes. The tile request's bbox will only be the size of the given tile. Shingled services will get only one image request each time the map refreshes and the bbox will be the extent of the whole map view.</p>
+      <p>The getUrl property of a service object is a function that accepts an object specifying information about the current image request. It must return a URL to an image. The image is placed at the tile location specified. If the result of the URL is a 404 status the map will not show that tile. The argument to the getUrl function has the following properties:</p>
+      <table>
+        <tr>
+        <th>bbox (Array)</th><td>a <a href="http://geojson.org/geojson-spec.html#bounding-boxes">GeoJSON bounding box</a> of the current tile or image in map units</td>
+        </tr>
+        <tr>
+        <th>width (Number)</th><td>width of the tile or image in pixels</td>
+        </tr>
+        <tr>
+        <th>height (Number)</th><td>height of the tile or image in pixels</td>
+        </tr>
+        <tr>
+          <th>zoom (Number)</th><td>the current zoom level of the map during this request</td>
+        </tr>
+        <tr>
+        <th>tile (Object)</th><td>if the service is tiled, this object has column and row properties specifying the location of the tile of this request in the current zoom, otherwise it is null</td>
+        </tr>
+        <tr>
+        <th>server (Number)</th><td>a whole number which is usually different between requests that you can use to cycle image URLs to different servers</td>
+        </tr>
+      </table>
+      <p>The attr property is optional. It defaults to an empty string if not specified in a service object. When present, the map widget displays the HTML provided on the bottom-left corner of the map when the service is visible.</p>
+      <p>The visible property determines whether or not the map will show images from this service while refreshing. You can change the visibile property of a service by setting the whole service array or use the show/hide convenience methods of the geomap widget.</p>
+      <p>There is more information and examples in the services section off of the <a href="../index.html" rel=external>main page</a> of this documentation.</p>
+    </div>
+  </div> <!-- end of #container -->
+
+
+  <script src="//code.jquery.com/jquery-1.5.1rc1.js"></script>
+  <script>
+    $(document).bind("mobileinit", function(){
+      $.mobile.gradeA = function() { return $.support.mediaquery || $("html").hasClass("ie8") };
+    });
+  </script>
+
+  <script src="//code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.js"></script>
+  
+  <!-- scripts concatenated and minified via ant build script-->
+  <script src="js/plugins.js"></script>
+  <script src="js/script.js"></script>
+  <!-- end concatenated and minified scripts-->
+  
+  <!-- change the UA-XXXXX-X to be your site's ID -->
+  <script>
+   var _gaq = [['_setAccount', 'UA-18348536-1'], ['_trackPageview']];
+   (function(d, t) {
+    var g = d.createElement(t),
+        s = d.getElementsByTagName(t)[0];
+    g.async = true;
+    g.src = ('https:' == location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    s.parentNode.insertBefore(g, s);
+   })(document, 'script');
+  </script>
+  
+</body>
+</html>
+

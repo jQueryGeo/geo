@@ -32,11 +32,10 @@
       <p>The widget creates an interactive map. Users can pan and zoom on desktop and mobile browsers against many different cached tile sets or dynamic map servers. Developers can handle events triggered by user action.</p>
       <img src="images/map.png" alt="Example image of geomap in use" />
       <h2>options</h2>
-      <p>The options argument is a JavaScript object that configures the map widget during the first instantiation on a div. No options are required. By default the map will show the extent of the world using the OpenStreetMap tile set.</p>
+      <p>The options argument is a JavaScript object that configures the map widget during the first instantiation on a div. No options are required. By default the map will show the whole world using the OpenStreetMap tile set.</p>
       <ul data-role=listview data-inset=true>
         <li>
-          <h3><a href="mode.html">mode</a></h3>
-          <p>Determines how the map, user &amp; developer interact</p>
+          <h3><a href="bbox.html">bbox</a></h3>
         </li>
         <li>
           <h3><a href="center.html">center</a></h3>
@@ -44,14 +43,24 @@
         <li>
           <h3><a href="cursors.html">cursors</a></h3>
         </li>
-        <!--<li>
-          <h3><a href="extent.html">extent</a></h3>
-          </li>-->
+        <li>
+          <h3><a href="mode.html">mode</a></h3>
+          <p>Determines how the map, user &amp; developer interact</p>
+        </li>
+        <li>
+          <h3><a href="pixelSize.html">pixelSize</a></h3>
+        </li>
+        <li>
+          <h3><a href="services.html">services</a></h3>
+        </li>
+        <li>
+          <h3><a href="tilingScheme.html">tilingScheme</a></h3>
+        </li>
       </ul>
       <h2>events</h2>
       <p>All event callbacks receive two arguments: the original browser event and an object specific to the map action.</p>
       <p>The units in the map event depend on the way you initialize the map widget.</p>
-      <p>Like other jQuery plugins, $.geo triggers its events directly on the original map div.</p>
+      <p>Like jQuery UI widgets, geomap triggers events directly on the original map div.</p>
       <p>Programatic changes to properties do not trigger events.</p>
       <h2>theming</h2>
       <p>The geomap widget itself does not create many DOM elements worth theming. The only exception is the marquee zoom box. It gets the ui-widget-content class but with the background set to transparent so users can see the map under where they are selecting.</p>
