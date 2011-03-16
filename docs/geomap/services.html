@@ -41,7 +41,7 @@
   getUrl: function( view ) {
     return &quot;http://tile.openstreetmap.org/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png&quot;;
   },
-  attr: &quot;&copy; OpenStreetMap &amp; contributors, CC-BY-SA&quot;,
+  attr: &quot;&amp;copy; OpenStreetMap &amp;amp; contributors, CC-BY-SA&quot;,
   visible: true
 } ]</pre></code></td>
         </tr>
@@ -55,7 +55,7 @@
   getUrl: function( view ) {
     return &quot;http://tile.openstreetmap.org/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png&quot;;
   },
-  attr: &quot;&copy; OpenStreetMap &amp; contributors, CC-BY-SA&quot;,
+  attr: &quot;&amp;copy; OpenStreetMap &amp;amp; contributors, CC-BY-SA&quot;,
   visible: true
 } ] } );</pre></code></td>
         <tr>
@@ -70,7 +70,7 @@
   id: &quot;OSM_MapQuest&quot;,
   type: &quot;tiled&quot;,
   getUrl: function( view ) {
-    return &quot;http://otile&quot; + ((view.server % 4) + 1) + &quot;.mqcdn.com/tiles/1.0.0/osm/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png&quot;;
+    return &quot;http://otile&quot; + ((view.index % 4) + 1) + &quot;.mqcdn.com/tiles/1.0.0/osm/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png&quot;;
   },
   attr: &quot;&lt;p&gt;Tiles Courtesy of &lt;a href=&quot;http://www.mapquest.com/&quot; target=&quot;_blank&quot;&gt;MapQuest&lt;/a&gt; &lt;img src=&quot;http://developer.mapquest.com/content/osm/mq_logo.png&quot;&gt;&lt;/p&gt;&quot;
 } ] );</pre></code></td>
@@ -100,10 +100,10 @@
         <th>tile (Object)</th><td>if the service is tiled, this object has column and row properties specifying the location of the tile of this request in the current zoom, otherwise it is null</td>
         </tr>
         <tr>
-        <th>server (Number)</th><td>a whole number which is usually different between requests that you can use to cycle image URLs to different servers</td>
+        <th>index (Number)</th><td>a whole number which is usually incremented between requests that you can use to cycle image URLs to different index</td>
         </tr>
       </table>
-      <p>The attr property is optional. It defaults to an empty string if not specified in a service object. When present, the map widget displays the HTML provided on the bottom-left corner of the map when the service is visible.</p>
+      <p>The attr property is optional. It stands for attribution and is a way to give credit to the source of your map imagery. It defaults to an empty string if not specified in a service object. When present, the map widget displays the HTML provided on the bottom-left corner of the map when the service is visible. Users can click links but cannot interact with all other text or images.</p>
       <p>The visible property determines whether or not the map will show images from this service while refreshing. You can change the visibile property of a service by setting the whole service array or use the show/hide convenience methods of the geomap widget.</p>
       <p>There is more information and examples in the services section off of the <a href="../index.html" rel=external>main page</a> of this documentation.</p>
     </div>
