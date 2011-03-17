@@ -22,7 +22,7 @@
 
   <div id="geomap" data-role=page data-theme="b">
     <div data-role="header">
-      <h1>geomap</h1>
+      <h1>geomap widget</h1>
     </div>
     
     <div data-role="content">
@@ -65,9 +65,39 @@
       </ul>
       <h2>events</h2>
       <p>All event callbacks receive two arguments: the original browser event and an object specific to the map action.</p>
-      <p>The units in the map event depend on the way you initialize the map widget.</p>
+      <p>The units in the map event depend on the way you initialize the map widget and whether or not you set $.geo.proj to null.</p>
       <p>Like jQuery UI widgets, geomap triggers events directly on the original map div.</p>
       <p>Programatic changes to properties do not trigger events.</p>
+      <p>There are two geomap event <i>types</i>. The type of event determines what is sent to your event handler as the second argument, geo.</p>
+      <h3>position events</h3>
+      <p>With position events the geo argument to your callback is a JavaScript object having two properties: pixel &amp; map. Both are single <a href="http://geojson.org/geojson-spec.html#positions">GeoJSON positions</a>, i.e., an array containing the x and y value but geo.pixel is in pixel coordinates based on the current map view and geo.map in map coordinates based on the tilingScheme for tiled maps and bbox for shingled (dynamic) maps.</p>
+      <ul data-role=listview data-inset=true>
+        <li>
+            <h3><a href="geomapmove.html">move</a></h3>
+        </li>
+        <li>
+            <h3><a href="geomapclick.html">click</a></h3>
+        </li>
+      </ul>
+      <h3>bbox events</h3>
+      <p>With bbox events the geo argument to your callback is a single <a href="http://geojson.org/geojson-spec.html#bounding-boxes">GeoJSON bounding box</a> in map coordinates based on the tilingScheme for tiled maps and bbox for shingled (dynamic) maps.</p>
+      <!--<h3>geometry events</h3>
+      <p>With geometry events the geo argument to your callback is a JavaScript object having two properties: pixels &amp; geometry. Both are multi-dimensional <a href="http://geojson.org/geojson-spec.html#positions">GeoJSON positions</a>, i.e., an array containing the x and y value but pixel is in pixel coordinates based on the current map view and the other in map coordinates based on the tilingScheme for tiled maps and bbox for shingled (dynamic) maps.</p>-->
+      <ul data-role=listview data-inset=true>
+        <li>
+            <h3><a href="geomapbbox.html">bbox</a></h3>
+        </li>
+      </ul>
+      <h2>methods</h2>
+      <p>The geomap widget provides some methods to help make interacting map data a little easier.</p>
+      <ul data-role=listview data-inset=true>
+        <li>
+            <h3><a href="toMap.html">toMap</a></h3>
+        </li>
+        <li>
+            <h3><a href="toPixel.html">toPixel</a></h3>
+        </li>
+      </ul>
       <h2>theming</h2>
       <p>The geomap widget itself does not create many DOM elements worth theming. The only exception is the marquee zoom box. It gets the ui-widget-content class but with the background set to transparent so users can see the map under where they are selecting.</p>
     </div>

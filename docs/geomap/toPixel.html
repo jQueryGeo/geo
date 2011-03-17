@@ -9,8 +9,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <title>zoom | $.geo</title>
-  <meta name="description" content="$.geo zoom property">
+  <title>toPixel | $.geo</title>
+  <meta name="description" content="$.geo toPixel method">
   <meta name="author" content="Ryan Westphal">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
@@ -20,41 +20,34 @@
 
 <body>
 
-  <div id="zoom" data-role=page data-theme="b">
+  <div id="toPixel" data-role=page data-theme="b">
     <div data-role="header">
-      <h1>zoom</h1>
+      <h1>toPixel</h1>
     </div>
     
     <div data-role="content">
       <table>
         <tr>
-          <th>type</th>
-          <td>Number</td>
+          <th>return type</th>
+          <td>Array | Array^2 (<a href="http://geojson.org/geojson-spec.html#positions">GeoJSON position</a>)</td>
         </tr>
         <tr>
-          <th>default</th>
-          <td>&quot;0&quot;</td>
+          <th>syntax</th>
+          <td>.geomap( &quot;toPixel&quot;, Array mapPosition | Array^2 mapPositions )</td>
         </tr>
         <tr>
-          <th>init</th>
-          <td><code><pre>$( <i>selector</i> ).geomap( { zoom: &quot;0&quot; } );</pre></code></td>
-        <tr>
-          <th>get</th>
-          <td><code><pre>var zoom = $( <i>selector</i> ).geomap( &quot;option&quot;, &quot;zoom&quot; );</pre></code></td>
-        </tr>
-        <tr>
-          <th>set</th>
-          <td><code><pre>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;zoom&quot;, &quot;7&quot; );</pre></code></td>
+          <th>usage</th>
+          <td>var pixelPos = $(&quot;map&quot;).geomap( &quot;toPixel&quot;, [ -71.098709, 42.330322 ] )<br>
+              var pixelPositions = $(&quot;map&quot;).geomap( &quot;toPixel&quot;, [ [ -71.098709, 42.330322 ], [ -71.072617, 42.351608 ] ] )</td>
         </tr>
       </table>
-      <p>The zoom property gets or sets the current zoom of the map view.</p>
-      <p>For tiled services the zoom property's range is zero the current geomap tilingScheme's levels property minus one.</p>
-      <p>For shingled services, the zoom property is based on the ratio between sizes of the bbox and bboxmax properties. If they are equal, the zoom property is 0. Smaller bbox areas will have larger zoom values.</p>
+      <p>The toPixel method takes a single map position (which is an array of two values: x and y or longitude and latitude) or an array of map positions and returns the pixel coordinates for them.</p>
+      <p>If $.geo.proj is not null, the widget assumes the arguments are geodetic coordinates and converts them before calculating pixel positions. Otherwise, the widget assumes they are already in its internal projection as defined by tilingScheme for tiled map services or bbox for shingled (dynamic) map services.</p>
     </div>
   </div> <!-- end of #container -->
 
 
-  <script src="//code.jquery.com/jquery-1.5.1rc1.js"></script>
+  <script src="//code.jquery.com/jquery-1.5.1.js"></script>
   <script>
     $(document).bind("mobileinit", function(){
       $.mobile.gradeA = function() { return $.support.mediaquery || $("html").hasClass("ie8") };
@@ -64,8 +57,7 @@
   <script src="//code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.js"></script>
   
   <!-- scripts concatenated and minified via ant build script-->
-  <script src="js/plugins.js"></script>
-  <script src="js/script.js"></script>
+  <script src="../js/script.js"></script>
   <!-- end concatenated and minified scripts-->
   
   <!-- change the UA-XXXXX-X to be your site's ID -->
