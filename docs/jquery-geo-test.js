@@ -478,7 +478,7 @@ $.Widget.prototype = {
 
     _ieVersion = (function () {
       var v = 5, div = document.createElement('div'), a = div.all || [];
-      while (div.innerHTML = '<!--[if gt IE ' + (++v) + ']><br><![endif]-->', a[0]);
+      while (div.innerHTML = '<!--[if gt IE ' + (++v) + ']><br><![endif]-->', a[0]){}
       return v > 6 ? v : !v;
     } ()),
 
