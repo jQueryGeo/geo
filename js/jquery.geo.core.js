@@ -1,4 +1,4 @@
-﻿(function ($, window, undefined) {
+﻿ (function ($, window, undefined) {
   $.geo = {
     //
     // geometry functions
