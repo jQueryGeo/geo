@@ -42,7 +42,8 @@
     return &quot;http://tile.openstreetmap.org/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png&quot;;
   },
   attr: &quot;&amp;copy; OpenStreetMap &amp;amp; contributors, CC-BY-SA&quot;,
-  visible: true
+  visible: true,
+  opacity: 1.0
 } ]</pre></code></td>
         </tr>
         <tr>
@@ -56,7 +57,8 @@
     return &quot;http://tile.openstreetmap.org/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png&quot;;
   },
   attr: &quot;&amp;copy; OpenStreetMap &amp;amp; contributors, CC-BY-SA&quot;,
-  visible: true
+  visible: true,
+  opacity: 1.0
 } ] } );</pre></code></td>
         <tr>
           <th>get</th>
@@ -105,11 +107,12 @@
       </table>
       <p>The attr property is optional. It stands for attribution and is a way to give credit to the source of your map imagery. It defaults to an empty string if not specified in a service object. When present, the map widget displays the HTML provided on the bottom-left corner of the map when the service is visible. Users can click links but cannot interact with all other text or images.</p>
       <p>The visible property determines whether or not the map will show images from this service while refreshing. You can change the visibile property of a service by setting the whole service array or use the show/hide convenience methods of the geomap widget.</p>
+      <p>The opacity property determines how transparent a service is when it is visible. Valid values are floating point numbers between 0 and 1. Services with an opacity of 0 will not show on the map even if visible is true. If not specified, opacity is assumed to be 1.</p>
     </div>
   </div> <!-- end of #container -->
 
 
-  <script src="//code.jquery.com/jquery-1.5.1rc1.js"></script>
+  <script src="//code.jquery.com/jquery-1.5.1.js"></script>
   <script>
     $(document).bind("mobileinit", function(){
       $.mobile.gradeA = function() { return $.support.mediaquery || $("html").hasClass("ie8") };

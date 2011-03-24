@@ -1,0 +1,91 @@
+<!doctype html>  
+
+<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html lang="en" class="no-js ie9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>internals | $.geo</title>
+  <meta name="description" content="$.geo internals">
+  <meta name="author" content="Ryan Westphal">
+
+  <link rel="stylesheet" href="../css/style.css?v=2">
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.css" />
+
+</head>
+
+<body>
+
+  <div id="internals" data-role=page data-theme="b">
+    <div data-role="header">
+      <h1>internals</h1>
+    </div>
+    
+    <div data-role="content">
+      <p>We keep some plugin design decisions here.</p>
+      <h2>jQuery UI widget factory</h2>
+      <p>The geomap widget uses the same widget factory that all other jQuery UI and jQuery Mobile widgets use. Like jQuery Mobile, we include a copy of jquery.ui.widget.js in the project. While this adds 3k to the final compressed build it allows us to easilly follow the patterns designed by UI and better integrate into the jQuery plugin community.</p>
+      <pre><code>$.widget( "geo.geomap", { } );</code></pre>
+      <h2>Property name strings</h2>
+      <p>Because we have a lot of methods and event handlers in our internal widget, we store state as individual properties on the main widget object (this). This design has carried through to the open-source geomap widget but may be abandoned later if we can decrease the number of handlers and methods that require access to the properties. To allow for greater minification the property names are stored as string variables and referenced via: this[_propNameVar]. Internal properties have an extra underscore in the variable name.</p>
+      <h2>Virtual state</h2>
+      <p>The public properties bbox, bboxMax, center, pixelSize and zoom do not always match the internal state of the map widget. In fact internally, geomap only tracks center and pixelSize. This is why you will see two properties each for center and pixelSize. One is public, the other is private. For center, the internal position is always in internal map units (web mercator meters by default) even if $.geo.proj is not null and the developer sets the public center by longitude &amp; latitude.</p>
+      <h2>External libraries</h2>
+      <p>Apart from the jQuery UI widget factory, geomap includes a couple external libraries.</p>
+      <h3>Mouse wheel extension 3.0.2</h3>
+      <a href="http://plugins.jquery.com/node/7146">http://plugins.jquery.com/node/7146</a>
+      <p>We've found this to be a very stable mousewheel special event plugin and are using it to handle mouse wheel interaction. This plugin's license comment and source are included intact in the minified releases of $.geo.</p>
+      <h2>Service types</h2>
+      <p>Developers can set the services array used by the geomap widget. When it comes time to draw map images, the geomap widget uses an internal _serviceTypes object. The object contains one property for each service type geomap supports, e.g., tiled and shingled. The type property on each service object determines which serviceType object geomap uses to refresh the service. The following code snippet is a simplification of the relationship.</p>
+      <pre><code>options: {
+  services: [
+    {
+      id: 'OSM',
+      type: 'tiled' /* ... */
+    }
+  ]
+},
+
+_serviceTypes: {
+  tiled: {
+    refresh: function (map, service) {
+    },
+  }
+}</code></pre>
+      <p>In the future the _serviceTypes property will be public and developers can extend the service types geomap supports.</p>
+    </div>
+  </div> <!-- end of #container -->
+
+
+  <script src="//code.jquery.com/jquery-1.5.1.min.js"></script>
+  <script>
+    $(document).bind("mobileinit", function(){
+      $.mobile.gradeA = function() { return $.support.mediaquery || $("html").hasClass("ie8") };
+    });
+  </script>
+
+  <script src="//code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.js"></script>
+  
+  <!-- scripts concatenated and minified via ant build script-->
+  <script src="../js/script.js"></script>
+  <!-- end concatenated and minified scripts-->
+  
+  <!-- change the UA-XXXXX-X to be your site's ID -->
+  <script>
+   var _gaq = [['_setAccount', 'UA-18348536-1'], ['_trackPageview']];
+   (function(d, t) {
+    var g = d.createElement(t),
+        s = d.getElementsByTagName(t)[0];
+    g.async = true;
+    g.src = ('https:' == location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    s.parentNode.insertBefore(g, s);
+   })(document, 'script');
+  </script>
+  
+</body>
+</html>
+

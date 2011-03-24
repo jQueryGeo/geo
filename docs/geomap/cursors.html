@@ -33,9 +33,12 @@
         </tr>
         <tr>
           <th>default</th>
-          <td><pre><code>{
+          <!--<td><pre><code>{
   pan: &quot;move&quot;,
   zoom: &quot;crosshair&quot;
+}</code></pre></td>-->
+          <td><pre><code>{
+  pan: &quot;move&quot;
 }</code></pre></td>
         </tr>
         <tr>
@@ -47,17 +50,17 @@
         </tr>
         <tr>
           <th>set</th>
-          <td><code><pre>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;cursors&quot;, { zoom: &quot;pointer&quot; } );</pre></code></td>
+          <td><code><pre>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;cursors&quot;, { pan: &quot;pointer&quot; } );</pre></code></td>
         </tr>
       </table>
-      <p>The cursors property controls which cursors appear when users move the mouse over the geomap div in any given mode. For example, if the developer switches the map widget to zoom mode the cursor will turn into a crosshair by default.</p>
+      <p>The cursors property controls which cursors appear when users move the mouse over the geomap div in any given mode. <!--For example, if the developer switches the map widget to zoom mode the cursor will turn into a crosshair by default.--></p>
       <p>The developer may change each geomap mode's cursor separately during both initialization of the widget or any time after.</p>
-      <p>Sometimes the geomap widget will override the selected mode's cursor, e.g., when a user starts panning in zoom mode the cursor will switch to the pan mode cursor temporarily.</p>
+      <p>Sometimes the geomap widget will override the selected mode's cursor, e.g., when a user starts panning in other modes the cursor will switch to the pan mode cursor temporarily.</p>
     </div>
   </div> <!-- end of #container -->
 
 
-  <script src="//code.jquery.com/jquery-1.5.1rc1.js"></script>
+  <script src="//code.jquery.com/jquery-1.5.1.js"></script>
   <script>
     $(document).bind("mobileinit", function(){
       $.mobile.gradeA = function() { return $.support.mediaquery || $("html").hasClass("ie8") };

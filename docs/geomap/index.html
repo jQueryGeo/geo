@@ -33,12 +33,13 @@
       <img src="images/map.png" alt="Example image of geomap in use" />
       <h2>options</h2>
       <p>The options argument is a JavaScript object that configures the map widget during the first instantiation on a div. No options are required. By default the map will show the whole world using the OpenStreetMap tile set.</p>
+      <p>The map view refreshes when you change these properties: bbox, center, pixelSize, services, tilingScheme &amp; zoom.</p>
       <ul data-role=listview data-inset=true>
         <li>
           <h3><a href="bbox.html">bbox</a></h3>
         </li>
         <li>
-          <h3><a href="bboxmax.html">bboxmax</a></h3>
+          <h3><a href="bboxMax.html">bboxMax</a></h3>
         </li>
         <li>
           <h3><a href="center.html">center</a></h3>
@@ -99,11 +100,11 @@
         </li>
       </ul>
       <h2>theming</h2>
-      <p>The geomap widget itself does not create many DOM elements worth theming. The only exception is the marquee zoom box. It gets the ui-widget-content class but with the background set to transparent so users can see the map under where they are selecting.</p>
+      <p>The geomap widget itself does not create many DOM elements worth theming. There are exceptions but they are not included in this initial test release.<!--The only exception is the floating measure text. It gets the ui-widget, ui-widget-content and ui-corner-all classes.--></p>
     </div>
   </div> <!-- end of #container -->
 
-  <script src="//code.jquery.com/jquery-1.5.1rc1.js"></script>
+  <script src="//code.jquery.com/jquery-1.5.1.js"></script>
   <script>
     $(document).bind("mobileinit", function(){
       $.mobile.gradeA = function() { return $.support.mediaquery || $("html").hasClass("ie8") };
