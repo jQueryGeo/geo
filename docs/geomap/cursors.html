@@ -44,6 +44,7 @@
         <tr>
           <th>init</th>
           <td><code><pre>$( <i>selector</i> ).geomap( { cursors: { pan: &quot;move&quot; } } );</pre></code></td>
+        </tr>
         <tr>
           <th>get</th>
           <td><code><pre>var cursors = $( <i>selector</i> ).geomap( &quot;option&quot;, &quot;cursors&quot; );</pre></code></td>
@@ -60,7 +61,7 @@
   </div> <!-- end of #container -->
 
 
-  <script src="//code.jquery.com/jquery-1.5.1.js"></script>
+  <script src="//code.jquery.com/jquery-1.5.2.min.js"></script>
   <script>
     $(document).bind("mobileinit", function(){
       $.mobile.gradeA = function() { return $.support.mediaquery || $("html").hasClass("ie8") };
