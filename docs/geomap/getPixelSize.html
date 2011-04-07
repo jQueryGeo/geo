@@ -9,8 +9,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <title>pixelSize | $.geo</title>
-  <meta name="description" content="$.geo pixelSize property">
+  <title>getPixelSize | $.geo</title>
+  <meta name="description" content="$.geo getPixelSize method">
   <meta name="author" content="Ryan Westphal">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
@@ -20,39 +20,30 @@
 
 <body>
 
-  <div id="pixelSize" data-role=page data-theme="b">
+  <div id="getPixelSize" data-role=page data-theme="b">
     <div data-role="header">
-      <h1>pixelSize</h1>
+      <h1>getPixelSize</h1>
     </div>
     
     <div data-role="content">
       <table>
         <tr>
-          <th>type</th>
+          <th>return type</th>
           <td>Number</td>
         </tr>
         <tr>
-          <th>default</th>
-          <td>156543.03392799936 (meters)</td>
+          <th>syntax</th>
+          <td>.geomap( &quot;getPixelSize&quot; );</td>
         </tr>
         <tr>
-          <th>init</th>
-          <td><code><pre>$( <i>selector</i> ).geomap( { pixelSize: 156543.03392799936 } );</pre></code></td>
-        </tr>
-        <tr>
-          <th>get</th>
-          <td><code><pre>var pixelSize = $( <i>selector</i> ).geomap( &quot;option&quot;, &quot;pixelSize&quot; );</pre></code></td>
-        </tr>
-        <tr>
-          <th>set</th>
-          <td><code><pre>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;pixelSize&quot;, 78271.5169639968 );</pre></code></td>
+          <th>usage</th>
+          <td><code><pre>var pixelSize = $( <i>selector</i> ).geomap( &quot;getPixelSize&quot; );</pre></code></td>
         </tr>
       </table>
-      <p>The pixelSize is the number of map units a single pixel occupies in the current view. A more interesting way to think of it is the Earth-size of the pixel.</p>
-      <p>Because the default internal projection is web mercator meters, the default value for pixelSize is in meters even though you set other map values in lon/lat degrees. The unit type will always match the type you set on tilingScheme for tiled maps or bboxmax for shingled (dynamic) maps. For more information on how the plugin handles projections, please read the geo section of this documentation.</p>
-      <p>While it's possible to change the pixelSize directly, you should consider other methods first such as changing the bbox or zoom properties. This is because the pixel size you want may be hard to determine if you are used to geodetic coordinates (longitude &amp; latitude).</p>
-      <p>The default pixelSize is calculated based on the tilingScheme and zoom for tiled maps or bbox for shingled maps.</p>
-      <p>Setting a new pixelSize will refresh the map services.</p>
+      <p>The pixel size is the number of map units a single pixel occupies in the current view. A more interesting way to think of it is the Earth-size of the pixel.</p>
+      <p>Because the default internal projection is web mercator meters, the default return value for getPixelSize is in meters even though you set other map values in lon/lat degrees. The unit type will always match the type you set on tilingScheme for tiled maps or bboxmax for shingled (dynamic) maps. For more information on how the plugin handles projections, please read the geo section of this documentation.</p>
+      <p>The map's pixel size is read-only. To change it you will need to use one of the mutable properties such as bbox or zoom.</p>
+      <p>The default pixelSize is calculated based on the tilingScheme and zoom for tiled maps or bbox/bboxMax ratio for shingled maps.</p>
     </div>
   </div> <!-- end of #container -->
 

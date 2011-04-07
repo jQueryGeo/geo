@@ -598,7 +598,6 @@ $.Widget.prototype = {
   _center = "center",
   _cursors = "cursors",
   _mode = "mode",
-  _pixelSize = "pixelSize",
   _services = "services",
   _tilingScheme = "tilingScheme",
   _zoom = "zoom",
@@ -677,7 +676,6 @@ $.Widget.prototype = {
       pan: "move"
     },
     mode: "pan",
-    pixelSize: 156543.03392799936,
     services: [
         {
           id: "OSM",
@@ -1027,6 +1025,10 @@ $.Widget.prototype = {
       destroy: function () {
         $.Widget.prototype.destroy.apply(this, arguments);
         this.element.html("");
+      },
+
+      getPixelSize: function () {
+        return _pixelSize;
       },
 
       _getBbox: function () {
