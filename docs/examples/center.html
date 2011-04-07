@@ -1,0 +1,179 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>center/zoom test</title>
+  <style type="text/css">
+    body
+    {
+      font-family: Calibri,Arial;
+    }
+    label
+    {
+      display: block;
+      margin: .25em;
+    }
+    label span
+    {
+      display: inline-block;
+      font-weight: bold;
+      width: 8em;
+    }
+    input[type="text"]
+    {
+      width: 60%;
+    }
+    #lblStatus
+    {
+      background: #ee4;
+      border-radius: .5em;
+      padding: .5em;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h1>
+      center/zoom test</h1>
+    <p>
+      This page tests getting and setting the center &amp; zoom properties for a tiled service both during init and at runtime. The center property is a <a href="http://geojson.org/geojson-spec.html#positions" rel="external">GeoJSON position</a>. The zoom property for a tiled service a whole number from zero to the number of layers defined by the tilingScheme minus one. $.geo.proj does not affect the value of zoom.</p>
+    <h2>
+      init properties</h2>
+    <p>
+      Change the $.geo.proj or center/zoom values and click set to refresh the page and re-initialize the map.</p>
+    <form action="center.html" method="get">
+    <fieldset>
+      <legend>$.geo.proj</legend>
+      <label>
+        <input type="radio" name="proj" value="default" checked />
+        default (center is geodetic lon/lat)
+      </label>
+      <label>
+        <input type="radio" name="proj" value="null" />
+        null (center is web mercator)
+      </label>
+    </fieldset>
+    <label>
+      center
+      <input type="text" name="initCenter" value="[-71,42]" /></label>
+    <label>
+      zoom
+      <input type="text" name="initZoom" value="7" /></label>
+    <button type="submit">
+      set</button>
+    </form>
+    <h2>
+      runtime properties</h2>
+    <p>
+      Change the center/zoom properties and click set to update the map without refreshing the page.</p>
+    <p>
+      Be careful to make sure your array values match the $.geo.proj setting above.</p>
+    <label>
+      center
+      <input type="text" name="runtimeCenter" value="[-74.5,40.3]" /></label>
+    <button id="cmdRuntimeCenter" type="button">
+      set</button>
+    <label>
+      zoom
+      <input type="text" name="runtimeZoom" value="10" /></label>
+    <button id="cmdRuntimeZoom" type="button">
+      set</button>
+    <h2>
+      actual values</h2>
+    <p>
+      If $.geo.proj is not null, the public center is in lon/lat but the internal center is in map units, web mercator by default.</p>
+    <table>
+      <tr>
+        <th>
+          actual public
+        </th>
+        <td id="lblCenterPublic">
+        </td>
+      </tr>
+      <tr>
+        <th>
+          actual internal
+        </th>
+        <td id="lblCenterInternal">
+        </td>
+      </tr>
+    </table>
+    <div id="map" style="position: relative; width: 480px; height: 320px; background: #e88;">
+    </div>
+  </div>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js"></script>
+  <script src="../jquery-geo-test.js"></script>
+  <script>
+    $(function () {
+      var 
+      initCenterInput = $("input[name='initCenter']"),
+      initZoomInput = $("input[name='initZoom']"),
+      runtimeCenter = $("input[name='runtimeCenter']"),
+      runtimeZoom = $("input[name='runtimeZoom']"),
+      search = window.location.search,
+      searchParts = search.length && search[0] == "?" ? search.slice(1).split("&") : null,
+      initProj = "default",
+      initCenter = null,
+      initZoom = 7;
+
+      if (searchParts) {
+        $.each(searchParts, function () {
+          var kvp = this.split("=");
+          switch (kvp[0]) {
+            case "initCenter":
+              initCenter = decodeURIComponent(kvp[1]).replace(/\+/g, "");
+              break;
+
+            case "initZoom":
+              initZoom = parseInt(kvp[1]);
+              break;
+
+            case "proj":
+              initProj = kvp[1];
+              break;
+          }
+        });
+      }
+
+      $("input[name='proj'][value='" + initProj + "']").click();
+
+      if (initCenter) {
+        initCenterInput.val(initCenter);
+      }
+
+      initZoomInput.val(initZoom);
+
+      $("#cmdRuntimeCenter").click(function () {
+        $("#map").geomap("option", "center", $.parseJSON(runtimeCenter.val()));
+        refreshActual();
+      });
+
+      $("#cmdRuntimeZoom").click(function () {
+        $("#map").geomap("option", "zoom", parseInt(runtimeZoom.val()));
+      });
+
+      if (initProj == "null") {
+        $.geo.proj = null;
+      }
+
+      $("#map").geomap({ center: $.parseJSON(initCenterInput.val()), zoom: initZoom });
+
+      refreshActual();
+
+      function refreshActual() {
+        var actualCenter = $("#map").geomap("option", "center");
+        $("#lblCenterPublic").text("[" + actualCenter + "]");
+        if ($.geo.proj) {
+          var 
+          valuePoints = $.geo.proj.fromGeodetic([[actualCenter[0], actualCenter[1]]]),
+          internal = [valuePoints[0][0], valuePoints[0][1]];
+
+          $("#lblCenterInternal").text("[" + internal + "]");
+        } else {
+          $("#lblCenterInternal").text("[" + actualCenter + "]");
+        }
+
+      }
+    });  
+  </script>
+</body>
+</html>

@@ -54,6 +54,8 @@
       <p>This property is a JavaScript array consisting of four values which can be thought of as: minx, miny, maxx and maxy of the current map view in map units and in that order.</p>
       <p>With the default service: bbox[0] is the longitude of the left of the current map view, bbox[1] is the latitude of the bottom, bbox[2] is the longitude of the right and bbox[3] is the latitude of the top.</p>
       <p>Setting a new bbox will refresh the map services.</p>
+      <p>If you attempt to initialize both center and bbox at the same time when creating a geomap widget, center will override bbox.</p>
+      <p>If you attempt to initialize both zoom and bbox at the same time when creating a geomap widget, bbox will be applied and zoom will modify the final bbox.</p>
     </div>
   </div> <!-- end of #container -->
 
