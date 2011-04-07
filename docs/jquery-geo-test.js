@@ -669,8 +669,8 @@ $.Widget.prototype = {
   _options = {},
 
   _defaultOptions = {
-    bbox: [-180, -90, 180, 90],
-    bboxMax: [-180, -90, 180, 90],
+    bbox: [-180, -85, 180, 85],
+    bboxMax: [-180, -85, 180, 85],
     center: [0, 0],
     cursors: {
       pan: "move"
@@ -973,14 +973,16 @@ $.Widget.prototype = {
 
         _eventTarget.mousewheel($.proxy(this._eventTarget_mousewheel, this));
 
-        if (_initOptions.bbox) {
-          this._setOption("bbox", _initOptions.bbox, false);
-        }
-        if (_initOptions.center) {
-          this._setOption("center", _initOptions.center, false);
-        }
-        if (_initOptions.zoom) {
-          this._setZoom(_initOptions.zoom, false, false);
+        if (_initOptions) {
+          if (_initOptions.bbox) {
+            this._setOption("bbox", _initOptions.bbox, false);
+          }
+          if (_initOptions.center) {
+            this._setOption("center", _initOptions.center, false);
+          }
+          if (_initOptions.zoom) {
+            this._setZoom(_initOptions.zoom, false, false);
+          }
         }
 
         _eventTarget.css("cursor", _options[_cursors][_options[_mode]]);

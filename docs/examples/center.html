@@ -35,7 +35,7 @@
     <h1>
       center/zoom test</h1>
     <p>
-      This page tests getting and setting the center &amp; zoom properties for a tiled service both during init and at runtime. The center property is a <a href="http://geojson.org/geojson-spec.html#positions" rel="external">GeoJSON position</a>. The zoom property for a tiled service a whole number from zero to the number of layers defined by the tilingScheme minus one. $.geo.proj does not affect the value of zoom.</p>
+      This page tests getting and setting the center &amp; zoom properties for a tiled service both during init and at runtime. The center property is a <a href="http://geojson.org/geojson-spec.html#positions" rel="external">GeoJSON position</a>. The zoom property for a tiled service a whole number from zero to the number of levels defined by the tilingScheme minus one. $.geo.proj does not affect the value of zoom.</p>
     <h2>
       init properties</h2>
     <p>
@@ -84,14 +84,14 @@
     <table>
       <tr>
         <th>
-          actual public
+          actual public center
         </th>
         <td id="lblCenterPublic">
         </td>
       </tr>
       <tr>
         <th>
-          actual internal
+          actual internal center
         </th>
         <td id="lblCenterInternal">
         </td>

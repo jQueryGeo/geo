@@ -18,6 +18,6 @@ java -jar build\google-compiler-20100917.jar --js docs\jquery-geo-%1.js --js_out
 goto end
 
 :usage
-echo Usage: Makedos version [min]
+echo Usage: Makedos version
 
 :end
