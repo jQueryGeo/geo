@@ -35,6 +35,8 @@
 
   _dpi = 96,
 
+  _currentServices = [], //< internal copy
+
   _center,
   _pixelSize,
   _centerMax,
@@ -92,8 +94,7 @@
           getUrl: function (view) {
             return "http://tile.openstreetmap.org/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
           },
-          attr: "&copy; OpenStreetMap &amp; contributors, CC-BY-SA",
-          visible: true
+          attr: "&copy; OpenStreetMap &amp; contributors, CC-BY-SA"
         }
       ],
     tilingScheme: {
@@ -106,51 +107,50 @@
     zoom: 0,
 
     _serviceTypes: {
-      tiled: {
-        create: function (map, service, index) {
-          if (this[service.id] == null) {
-            this[service.id] = {
-              loadCount: 0,
-              reloadTiles: false,
-              serviceContainer: null
-            };
+      tiled: (function () {
+        var tiledServicesState = {};
 
-            var scHtml = "<div data-service='" + service.id + "' style='position:absolute; left:0; top:0; width:8px; height:8px; margin:0; padding:0; display:" + (service.visible ? "block" : "none") + ";'></div>";
-            if (index != null) {
-              $(_servicesContainer.children()[index]).before(scHtml);
-            } else {
+        return {
+          create: function (map, service, index) {
+            if (tiledServicesState[service.id] == null) {
+              tiledServicesState[service.id] = {
+                loadCount: 0,
+                reloadTiles: false,
+                serviceContainer: null
+              };
+
+              var scHtml = "<div data-service='" + service.id + "' style='position:absolute; left:0; top:0; width:8px; height:8px; margin:0; padding:0; display:" + (service.visible === undefined || service.visible ? "block" : "none") + ";'></div>";
               _servicesContainer.append(scHtml);
+
+              tiledServicesState[service.id].serviceContainer = _servicesContainer.children("[data-service='" + service.id + "']");
             }
+          },
 
-            this[service.id].serviceContainer = _servicesContainer.children("[data-service='" + service.id + "']");
-          }
-        },
+          destroy: function (map, service) {
+            tiledServicesState[service.id].serviceContainer.remove();
+            delete tiledServicesState[service.id];
+          },
 
-        destroy: function (map, service) {
-          this[service.id].serviceContainer.remove();
-          delete this[service.id];
-        },
-
-        interactivePan: function (map, service, dx, dy) {
-          this._cancelUnloaded(map, service);
-          this[service.id].serviceContainer.children().css({
-            left: function (index, value) {
-              return parseInt(value) + dx;
-            },
-            top: function (index, value) {
-              return parseInt(value) + dy;
-            }
-          });
-        },
-
-        interactiveScale: function (map, service, center, pixelSize) {
-        },
-
-        refresh: function (map, service) {
-          if (service != null && this[service.id] != null && service.visible) {
+          interactivePan: function (map, service, dx, dy) {
             this._cancelUnloaded(map, service);
+            tiledServicesState[service.id].serviceContainer.children().css({
+              left: function (index, value) {
+                return parseInt(value) + dx;
+              },
+              top: function (index, value) {
+                return parseInt(value) + dy;
+              }
+            });
+          },
 
-            var serviceState = this[service.id],
+          interactiveScale: function (map, service, center, pixelSize) {
+          },
+
+          refresh: function (map, service) {
+            if (service != null && tiledServicesState[service.id] != null && (service.visible === undefined || service.visible)) {
+              this._cancelUnloaded(map, service);
+
+              var serviceState = tiledServicesState[service.id],
 
               serviceContainer = serviceState.serviceContainer,
 
@@ -183,44 +183,45 @@
               scaleContainers = serviceContainer.children().show(),
               scaleContainer = scaleContainers.filter("[data-pixelSize='" + pixelSize + "']").appendTo(serviceContainer),
 
-              opacity = (service.opacity == null ? 1 : service.opacity);
+              opacity = (service.opacity === undefined ? 1 : service.opacity);
 
-            if (serviceState.reloadTiles) {
-              scaleContainers.find("img").attr("data-dirty", "true");
-            }
+              if (serviceState.reloadTiles) {
+                scaleContainers.find("img").attr("data-dirty", "true");
+              }
 
-            if (scaleContainer.size() === 0) {
-              serviceContainer.append("<div style='position:absolute; left:" + serviceLeft % tileWidth + "px; top:" + serviceTop % tileHeight + "px; width:" + tileWidth + "px; height:" + tileHeight + "px; margin:0; padding:0;' data-pixelSize='" + pixelSize + "'></div>");
-              scaleContainer = serviceContainer.children(":last").data("scaleOrigin", (serviceLeft % tileWidth) + "," + (serviceTop % tileHeight));
-            } else {
-              scaleContainer.css({
-                left: (serviceLeft % tileWidth) + "px",
-                top: (serviceTop % tileHeight) + "px"
-              }).data("scaleOrigin", (serviceLeft % tileWidth) + "," + (serviceTop % tileHeight));
+              if (scaleContainer.size() === 0) {
+                serviceContainer.append("<div style='position:absolute; left:" + serviceLeft % tileWidth + "px; top:" + serviceTop % tileHeight + "px; width:" + tileWidth + "px; height:" + tileHeight + "px; margin:0; padding:0;' data-pixelSize='" + pixelSize + "'></div>");
+                scaleContainer = serviceContainer.children(":last").data("scaleOrigin", (serviceLeft % tileWidth) + "," + (serviceTop % tileHeight));
+              } else {
+                scaleContainer.css({
+                  left: (serviceLeft % tileWidth) + "px",
+                  top: (serviceTop % tileHeight) + "px"
+                }).data("scaleOrigin", (serviceLeft % tileWidth) + "," + (serviceTop % tileHeight));
 
-              scaleContainer.children().each(function (i) {
-                var $img = $(this);
-                var tile = $img.attr("data-tile").split(",");
-                $img.css({
-                  left: Math.round(((parseInt(tile[0]) - fullXAtScale) * 100) + (serviceLeft - (serviceLeft % tileWidth)) / tileWidth * 100) + "%",
-                  top: Math.round(((parseInt(tile[1]) - fullYAtScale) * 100) + (serviceTop - (serviceTop % tileHeight)) / tileHeight * 100) + "%"
+                scaleContainer.children().each(function (i) {
+                  var $img = $(this);
+                  var tile = $img.attr("data-tile").split(",");
+                  $img.css({
+                    left: Math.round(((parseInt(tile[0]) - fullXAtScale) * 100) + (serviceLeft - (serviceLeft % tileWidth)) / tileWidth * 100) + "%",
+                    top: Math.round(((parseInt(tile[1]) - fullYAtScale) * 100) + (serviceTop - (serviceTop % tileHeight)) / tileHeight * 100) + "%"
+                  });
+
+                  if (opacity < 1) {
+                    $img.fadeTo(0, opacity);
+                  }
                 });
+              }
 
-                if (opacity < 1) {
-                  $img.fadeTo(0, opacity);
-                }
-              });
-            }
-
-            for (var x = tileX; x < tileX2; x++) {
-              for (var y = tileY; y < tileY2; y++) {
-                var tileStr = "" + x + "," + y,
+              for (var x = tileX; x < tileX2; x++) {
+                for (var y = tileY; y < tileY2; y++) {
+                  var 
+                  tileStr = "" + x + "," + y,
                   $image = scaleContainer.children("[data-tile='" + tileStr + "']");
 
-                $image.removeAttr("data-dirty");
+                  $image.removeAttr("data-dirty");
 
-                if ($image.size() === 0 || serviceState.reloadTiles) {
-                  var bottomLeft = [
+                  if ($image.size() === 0 || serviceState.reloadTiles) {
+                    var bottomLeft = [
                       tilingScheme.origin[0] + (x * tileWidth) * pixelSize,
                       tilingScheme.origin[1] - (y * tileHeight) * pixelSize
                     ],
@@ -240,73 +241,75 @@
                       tile: {
                         row: y,
                         column: x
-                      }
+                      },
+                      index: Math.abs(y + x)
                     });
 
-                  serviceState.loadCount++;
+                    serviceState.loadCount++;
 
-                  if (serviceState.reloadTiles && $image.size() > 0) {
-                    $image.attr("src", imageUrl);
-                  } else {
-                    var imgMarkup = "<img style='position:absolute; " +
+                    if (serviceState.reloadTiles && $image.size() > 0) {
+                      $image.attr("src", imageUrl);
+                    } else {
+                      var imgMarkup = "<img style='position:absolute; " +
                       "left:" + (((x - fullXAtScale) * 100) + (serviceLeft - (serviceLeft % tileWidth)) / tileWidth * 100) + "%; " +
                       "top:" + (((y - fullYAtScale) * 100) + (serviceTop - (serviceTop % tileHeight)) / tileHeight * 100) + "%; ";
 
-                    if ($("body")[0].filters === undefined) {
-                      imgMarkup += "width: 100%; height: 100%;";
+                      if ($("body")[0].filters === undefined) {
+                        imgMarkup += "width: 100%; height: 100%;";
+                      }
+
+                      imgMarkup += "margin:0; padding:0; -moz-user-select:none; display:none;' unselectable='on' data-tile='" + tileStr + "' />";
+
+                      scaleContainer.append(imgMarkup);
+                      $image = scaleContainer.children(":last");
+                      $image.load(function (e) {
+                        if (opacity < 1) {
+                          $(e.target).fadeTo(0, opacity);
+                        } else {
+                          $(e.target).show();
+                        }
+
+                        serviceState.loadCount--;
+
+                        if (serviceState.loadCount <= 0) {
+                          serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+                          serviceState.loadCount = 0;
+                        }
+                      }).error(function (e) {
+                        $(e.target).remove();
+                        serviceState.loadCount--;
+
+                        if (serviceState.loadCount <= 0) {
+                          serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+                          serviceState.loadCount = 0;
+                        }
+                      }).attr("src", imageUrl);
                     }
-
-                    imgMarkup += "margin:0; padding:0; -moz-user-select:none; display:none;' unselectable='on' data-tile='" + tileStr + "' />";
-
-                    scaleContainer.append(imgMarkup);
-                    $image = scaleContainer.children(":last");
-                    $image.load(function (e) {
-                      if (opacity < 1) {
-                        $(e.target).fadeTo(0, opacity);
-                      } else {
-                        $(e.target).show();
-                      }
-
-                      serviceState.loadCount--;
-
-                      if (serviceState.loadCount <= 0) {
-                        serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-                        serviceState.loadCount = 0;
-                      }
-                    }).error(function (e) {
-                      $(e.target).remove();
-                      serviceState.loadCount--;
-
-                      if (serviceState.loadCount <= 0) {
-                        serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-                        serviceState.loadCount = 0;
-                      }
-                    }).attr("src", imageUrl);
                   }
                 }
               }
+
+              scaleContainers.find("[data-dirty]").remove();
+              serviceState.reloadTiles = false;
             }
+          },
 
-            scaleContainers.find("[data-dirty]").remove();
-            serviceState.reloadTiles = false;
-          }
-        },
-
-        _cancelUnloaded: function (map, service) {
-          var serviceState = this[service.id],
+          _cancelUnloaded: function (map, service) {
+            var serviceState = tiledServicesState[service.id],
             serviceContainer = serviceState.serviceContainer;
 
-          if (serviceState.loadCount > 0) {
-            serviceContainer.find("img:hidden").remove();
-            while (serviceState.loadCount > 0) {
-              serviceState.loadCount--;
+            if (serviceState.loadCount > 0) {
+              serviceContainer.find("img:hidden").remove();
+              while (serviceState.loadCount > 0) {
+                serviceState.loadCount--;
+              }
             }
-          }
-        },
+          },
 
-        _onOpacityChanged: function () {
-        }
-      }
+          _onOpacityChanged: function () {
+          }
+        };
+      })()
     }
   };
 
@@ -431,6 +434,14 @@
 
         $.Widget.prototype._setOption.apply(this, arguments);
 
+        switch (key) {
+          case "services":
+            this._createServices();
+            if (refresh) {
+              this._refresh();
+            }
+            break;
+        }
       },
 
       destroy: function () {
@@ -515,9 +526,16 @@
       },
 
       _createServices: function () {
-        for (var i = 0; i < _options[_services].length; i++) {
-          _options[__serviceTypes][_options[_services][i].type].create(this, _options[_services][i]);
+        var i;
+        for (i = 0; i < _currentServices.length; i++) {
+          _options[__serviceTypes][_currentServices[i].type].destroy(this, _currentServices[i]);
         }
+
+        for (i = 0; i < _options[_services].length; i++) {
+          _options[__serviceTypes][_options[_services][i].type].create(this, _options[_services][i], i);
+        }
+
+        _currentServices = _options[_services];
       },
 
       _findMapSize: function () {
