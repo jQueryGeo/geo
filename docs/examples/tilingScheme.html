@@ -1,0 +1,213 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>tilingScheme test</title>
+  <style type="text/css">
+    body
+    {
+      font-family: Calibri,Arial;
+    }
+    label
+    {
+      display: block;
+      margin: .25em;
+    }
+    label span
+    {
+      display: inline-block;
+      font-weight: bold;
+      width: 8em;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h1>
+      tilingScheme test</h1>
+    <p>
+      This page tests initializing geomap with services requiring different tilingSchemes.</p>
+    <p>
+      Dynamic services are not yet implemented but will be able to be layered on top of tiled services as they don't require a tilingScheme at all.</p>
+    <p>
+      For this example, I have set $.geo.proj to null and am setting the center in real map units. This is because the second service, New Jersey, is not in web mercator and geomap does not provide a built-in conversion from lon/lat.</p>
+    <p>
+      The New Jersey service is a tiled service with an ArcGIS Server REST endpoint. The level stops of an ArcGIS Server tile cache are often not a power of two and therefore cannot be calculated. We list them all out by using the pixelSizes property of the tilingScheme instead of specifying basePixelSize and levels properties.</p>
+    <h2>
+      examples</h2>
+    <p>
+      Choose a service/tilingScheme combo and click <b>set</b> to refresh the page and re-initialize the map<!-- (including center &amp; zoom properties) or <b>set via property</b> to change only the services property at runtime-->.</p>
+    <form action="tilingScheme.html" method="get">
+    <fieldset>
+      <label>
+        <input type="radio" name="initService" value="defaultOsm" />
+        default OSM (web mercator via hosted images)
+      </label>
+      <pre><code>services: [
+  {
+    id: &quot;OSM&quot;,
+    type: &quot;tiled&quot;,
+    getUrl: function (view) {
+      return &quot;http://tile.openstreetmap.org/&quot;
+       + view.zoom + &quot;/&quot;
+       + view.tile.column + &quot;/&quot;
+       + view.tile.row
+       + &quot;.png&quot;;
+    },
+    attr: &quot;&copy; OpenStreetMap &amp; contributors, CC-BY-SA&quot;
+  }
+],
+tilingScheme: {
+  tileWidth: 256,
+  tileHeight: 256,
+  levels: 18,
+  basePixelSize: 156543.03392799936,
+  origin: [-20037508.342787, 20037508.342787]
+}</code></pre>
+      <label>
+        <input type="radio" name="initService" value="newjersey" />
+        New Jersey (NAD83 / New Jersey (ft US); ESPG 3424 via ArcGIS Server REST API)
+      </label>
+      <pre><code>services: [
+  {
+    id: &quot;NewJersey&quot;,
+    type: &quot;tiled&quot;,
+    getUrl: function (view) {
+      return &quot;http://njwebmaptest.state.nj.us/ArcGIS/rest/services/basemap_v4/MapServer/tile/&quot;
+       + view.zoom + &quot;/&quot;
+       + view.tile.row + &quot;/&quot;
+       + view.tile.column;
+    }
+  }
+],
+tilingScheme: {
+  tileWidth: 512,
+  tileHeight: 512,
+  pixelSizes: [
+    3472.22222222222,
+    2604.16666666667,
+    2170.13888888889,
+    1562.5,
+    976.5625,
+    494.791666666667,
+    260.416666666667,
+    130.208333333333,
+    65.1041666666667,
+    32.5520833333333,
+    21.7013888888889,
+    10.8506944444444,
+    5.20833333333333,
+    2.08333333333333,
+    1.04166666666667
+  ],
+  origin: [-842000, 1440000]
+}</code></pre>
+    </fieldset>
+    <button type="submit">
+      set</button>
+    <!--<button type="button">
+      set via property</button>-->
+    </form>
+    <div id="map" style="position: relative; width: 480px; height: 320px; background: #e88;">
+    </div>
+  </div>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js"></script>
+  <script src="../jquery-geo-test.js"></script>
+  <script>
+    $(function () {
+
+      var selectionOptions = {
+        defaultOsm: {
+          services: [
+            {
+              id: "OSM",
+              type: "tiled",
+              getUrl: function (view) {
+                return "http://tile.openstreetmap.org/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
+              },
+              attr: "&copy; OpenStreetMap &amp; contributors, CC-BY-SA"
+            }
+          ],
+          tilingScheme: {
+            tileWidth: 256,
+            tileHeight: 256,
+            levels: 18,
+            basePixelSize: 156543.03392799936,
+            origin: [-20037508.342787, 20037508.342787]
+          },
+          center: [-8299838.279318, 4853754.340195],
+          zoom: 7
+        },
+
+        newjersey: {
+          services: [
+            {
+              id: "NewJersey",
+              type: "tiled",
+              getUrl: function (view) {
+                return "http://njwebmaptest.state.nj.us/ArcGIS/rest/services/basemap_v4/MapServer/tile/" + view.zoom + "/" + view.tile.row + "/" + view.tile.column;
+              }
+            }
+          ],
+          tilingScheme: {
+            tileWidth: 512,
+            tileHeight: 512,
+            pixelSizes: [
+              3472.22222222222,
+              2604.16666666667,
+              2170.13888888889,
+              1562.5,
+              976.5625,
+              494.791666666667,
+              260.416666666667,
+              130.208333333333,
+              65.1041666666667,
+              32.5520833333333,
+              21.7013888888889,
+              10.8506944444444,
+              5.20833333333333,
+              2.08333333333333,
+              1.04166666666667
+            ],
+            origin: [-842000, 1440000]
+          },
+          center: [458240.213369, 458773.907696],
+          zoom: 1
+        }
+      };
+
+
+      var 
+      search = window.location.search,
+      searchParts = search.length && search[0] == "?" ? search.slice(1).split("&") : null,
+      initService = "defaultOsm",
+      serviceChanged = false;
+
+      if (searchParts) {
+        $.each(searchParts, function () {
+          var kvp = this.split("=");
+          switch (kvp[0]) {
+            case "initService":
+              initService = kvp[1];
+              serviceChanged = true;
+              break;
+          }
+        });
+      }
+
+      $("input[value='" + initService + "']").click();
+
+//      $("button[type='button']").click(function () {
+//        initService = $("input[name='initService']:checked").val();
+//        $("#map").geomap("option", "services", selectionOptions[initService].services);
+//      });
+
+      if (serviceChanged) {
+        window.scrollTo(0, $(document).height());
+      }
+
+      $.geo.proj = null;
+      $("#map").geomap(selectionOptions[initService]);
+    });  
+  </script>
+</body>
+</html>
