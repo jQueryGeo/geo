@@ -75,7 +75,7 @@
   getUrl: function( view ) {
     return &quot;http://otile&quot; + ((view.index % 4) + 1) + &quot;.mqcdn.com/tiles/1.0.0/osm/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png&quot;;
   },
-  attr: &quot;&lt;p&gt;Tiles Courtesy of &lt;a href=&quot;http://www.mapquest.com/&quot; target=&quot;_blank&quot;&gt;MapQuest&lt;/a&gt; &lt;img src=&quot;http://developer.mapquest.com/content/osm/mq_logo.png&quot;&gt;&lt;/p&gt;&quot;
+  attr: &quot;&lt;p&gt;Tiles Courtesy of &lt;a href='http://www.mapquest.com/' target='_blank'&gt;MapQuest&lt;/a&gt; &lt;img src='http://developer.mapquest.com/content/osm/mq_logo.png'&gt;&lt;/p&gt;&quot;
 } ] );</pre></code></td>
         </tr>
       </table>
@@ -107,8 +107,8 @@
         </tr>
       </table>
       <p>The attr property is optional. It stands for attribution and is a way to give credit to the source of your map imagery. It defaults to an empty string if not specified in a service object. When present, the map widget displays the HTML provided on the bottom-left corner of the map when the service is visible. Users can click links but cannot interact with all other text or images.</p>
-      <p>The visible property determines whether or not the map will show images from this service while refreshing. You can change the visibile property of a service by setting the whole service array or use the show/hide convenience methods of the geomap widget.</p>
-      <p>The opacity property determines how transparent a service is when it is visible. Valid values are floating point numbers between 0 and 1. Services with an opacity of 0 will not show on the map even if visible is true. If not specified, opacity is assumed to be 1.</p>
+      <p>The visible property is optional and defaults to true. It determines whether or not the map will show images from this service while refreshing. You can change the visibile property of a service by setting the whole service array or use the show/hide convenience methods of the geomap widget.</p>
+      <p>The opacity property is optional and defaults to 1.0. It determines how transparent a service is when it is visible. Valid values are floating point numbers between 0 and 1 inclusive. Services with an opacity of 0 will not show on the map even if visible is true.</p>
     </div>
   </div> <!-- end of #container -->
 
