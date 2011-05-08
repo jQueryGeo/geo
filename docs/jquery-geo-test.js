@@ -569,21 +569,27 @@ $.Widget.prototype = {
 
       return {
         fromGeodetic: function (positions) {
-          var result = [], i = 0, cur;
+          var isArray = $.isArray(positions[0]), result = [], i = 0, cur;
+          if (!isArray) {
+            positions = [positions];
+          }
           for (; i < positions.length; i++) {
             cur = webMercator.toProjected({ x: positions[i][0], y: positions[i][1] });
             result[i] = [cur.x, cur.y];
           }
-          return result;
+          return isArray ? result : result[0];
         },
 
         toGeodetic: function (positions) {
-          var result = [], i = 0, cur;
+          var isArray = $.isArray(positions[0]), result = [], i = 0, cur;
+          if (!isArray) {
+            positions = [positions];
+          }
           for (; i < positions.length; i++) {
             cur = webMercator.toGeodetic({ x: positions[i][0], y: positions[i][1] });
             result[i] = [cur.x, cur.y];
           }
-          return result;
+          return isArray ? result : result[0];
         }
       }
     })()
@@ -1223,6 +1229,16 @@ $.Widget.prototype = {
         return _pixelSize;
       },
 
+      toMap: function (p) {
+        p = this._toMap(p);
+        return $.geo.proj ? $.geo.proj.toGeodetic(p) : p;
+      },
+
+      toPixel: function (p) {
+        p = $.geo.proj ? $.geo.proj.fromGeodetic(p) : p;
+        return this._toPixel(p);
+      },
+
       _getBbox: function () {
         // calculate the internal bbox
         var halfWidth = _contentBounds[_width] / 2 * _pixelSize,
@@ -1390,7 +1406,6 @@ $.Widget.prototype = {
           _wheelLevel = 0;
 
           this._setCenterAndSize(wheelCenterAndSize.center, wheelCenterAndSize.pixelSize, true, true);
-          //this._onExtentChanged();
         } else {
           this._refresh();
         }
@@ -1425,10 +1440,7 @@ $.Widget.prototype = {
           dxMap = -dx * _pixelSize,
           dyMap = dy * _pixelSize;
 
-          //console.log('panFinalize: ' + dx + ', ' + dy);
-
           this._setCenterAndSize([_center[0] + dxMap, _center[1] + dyMap], _pixelSize, true, true);
-          // trigger("geomapbbox")
 
           _inOp = false;
           _anchor = _current;
@@ -1501,6 +1513,10 @@ $.Widget.prototype = {
 
         _options[_zoom] = this._getZoom();
 
+        if (trigger) {
+          this._trigger("bboxchange", event, { bbox: _options[_bbox] });
+        }
+
         if (refresh) {
           this._refresh();
         }
@@ -1564,19 +1580,19 @@ $.Widget.prototype = {
         return isArray ? result : result[0];
       },
 
-      _zoomTo: function (coord, zoom) {
+      _zoomTo: function (coord, zoom, trigger, refresh) {
         zoom = zoom < 0 ? 0 : zoom;
 
         var tiledPixelSize = this._getTiledPixelSize(zoom);
 
         if (!isNaN(tiledPixelSize)) {
-          this._setCenterAndSize(coord, tiledPixelSize, false, true);
+          this._setCenterAndSize(coord, tiledPixelSize, trigger, refresh);
         } else {
           var 
           bboxMax = $.geo._scaleBy(this._getBboxMax(), 1 / Math.pow(_zoomFactor, zoom)),
           pixelSize = Math.max($.geo._width(bboxMax) / _contentBounds[_width], $.geo._height(bboxMax) / _contentBounds[_height]);
 
-          this._setCenterAndSize(coord, pixelSize, false, true);
+          this._setCenterAndSize(coord, pixelSize, trigger, refresh);
         }
       },
 
@@ -1587,7 +1603,10 @@ $.Widget.prototype = {
 
         switch (_options[_mode]) {
           case "pan":
-            this._zoomTo(this._toMap(_current), this._getZoom() + 1);
+            this._trigger("dblclick", e, { pixels: _current, coordinates: this.toMap(_current) });
+            if (!e.isDefaultPrevented()) {
+              this._zoomTo(this._toMap(_current), this._getZoom() + 1, true, true);
+            }
             break;
         }
 
@@ -1677,10 +1696,10 @@ $.Widget.prototype = {
 
         switch (mode) {
           case "pan":
-            if (_mouseDown) {
+            if (_mouseDown || _toolPan) {
               this._panMove();
             } else {
-              // trigger geomapmove
+              this._trigger("move", e, { pixels: current, coordinates: this.toMap(current) });
             }
             break;
         }
@@ -1728,10 +1747,13 @@ $.Widget.prototype = {
 
           switch (mode) {
             case "pan":
-              if (clickDate - _moveDate > 500) {
-                this._panFinalize();
-              } else {
+              if (wasToolPan) {
                 this._panEnd();
+              } else {
+                if (clickDate - _clickDate > 100) {
+                  this._trigger("click", e, { pixels: current, coordinates: this.toMap(current) });
+                  _inOp = false;
+                }
               }
               break;
           }
@@ -1746,6 +1768,8 @@ $.Widget.prototype = {
       },
 
       _eventTarget_mousewheel: function (e, delta) {
+        e.preventDefault();
+
         this._panFinalize();
 
         if (_mouseDown) {
@@ -1787,6 +1811,7 @@ $.Widget.prototype = {
             that._mouseWheelFinish();
           }, 1000);
         }
+        return false;
       }
     };
   })()
