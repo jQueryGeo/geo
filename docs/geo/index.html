@@ -33,10 +33,10 @@
       <p>If you set $.geo.proj to null then plugin functions will not convert incoming geometry. They will assume the incoming geometry is in the same projection as your map widget. For example, you can set $.geo.proj to null and work directly in web mercator meters which is the projection of the default tiling scheme.</p>
       <p>The default $.geo.proj object comes pre-built with functions that quickly convert between geodetic coordinates and web mercator meters, the default internal projection, so you can start using lon/lat right away with the default OpenStreetMap tiles. If your map service uses a different projection you need to set $.geo.proj to null or roll your own proj object. Read <a data-href=otherprojections href="javascript:void(0);">Other projections</a> below for information on how to do that.</p>
       <h3>Usage</h3>
-      <p>As a compromise between efficiency and simplicity of modification, both methods take and return an array of GeoJSON positions instead of single positions. This means that to convert a geodetic <a href="http://geojson.org/geojson-spec.html#point" rel=external>GeoJSON point</a>, you must wrap the point's coordinates property in an outer array before passing it to $.geo.proj.fromGeodetic.</p>
-      <pre><code>var projected = $.geo.proj.fromGeodetic( [ myPoint.coordinates ] );</code></pre>
-      <p>However, a LineString's coordinates property is already an array of positions so you do not need an extra array wrapper.</p>
-      <pre><code>var projected = $.geo.proj.fromGeodetic( myLineString.coordinates );</code></pre>
+      <p>Both methods can take and return either a single GeoJSON position or an array of GeoJSON positions. For example you can use the following to convert the position contained in a GeoJSON point object:</p>
+      <pre><code>var projectedCoords = $.geo.proj.fromGeodetic( myPoint.coordinates );</code></pre>
+      <p>However, a LineString's coordinates property is an array of positions which you can also pass to the fromGeodetic method to get an array converted positions</p>
+      <pre><code>var projectedCoords = $.geo.proj.fromGeodetic( myLineString.coordinates );</code></pre>
       <p>Finally, for any geometry you want to manually convert that is greater than two dimensions, you must manually iterate over the outer arrays until you can pass the $.geo.proj method two-dimensional arrays, i.e., arrays of GeoJSON positions.</p>
       <h3 id=otherprojections>Other projections</h3>
       <p>The $.geo.proj property allows you to use whichever coordinate system or projection you want. By setting it to null you can directly use other projected coordinates, e.g., Massachusetts Mainland State Plane meters, in any plugin function, e.g., bbox.</p>

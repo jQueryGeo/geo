@@ -208,21 +208,27 @@
 
       return {
         fromGeodetic: function (positions) {
-          var result = [], i = 0, cur;
+          var isArray = $.isArray(positions[0]), result = [], i = 0, cur;
+          if (!isArray) {
+            positions = [positions];
+          }
           for (; i < positions.length; i++) {
             cur = webMercator.toProjected({ x: positions[i][0], y: positions[i][1] });
             result[i] = [cur.x, cur.y];
           }
-          return result;
+          return isArray ? result : result[0];
         },
 
         toGeodetic: function (positions) {
-          var result = [], i = 0, cur;
+          var isArray = $.isArray(positions[0]), result = [], i = 0, cur;
+          if (!isArray) {
+            positions = [positions];
+          }
           for (; i < positions.length; i++) {
             cur = webMercator.toGeodetic({ x: positions[i][0], y: positions[i][1] });
             result[i] = [cur.x, cur.y];
           }
-          return result;
+          return isArray ? result : result[0];
         }
       }
     })()

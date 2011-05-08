@@ -632,6 +632,11 @@
         return _pixelSize;
       },
 
+      toMap: function(p) {
+        p = this._toMap(p);
+        return $.geo.proj ? $.geo.proj.toGeodetic(p) : p;
+      },
+
       _getBbox: function () {
         // calculate the internal bbox
         var halfWidth = _contentBounds[_width] / 2 * _pixelSize,
@@ -1089,7 +1094,7 @@
             if (_mouseDown) {
               this._panMove();
             } else {
-              // trigger geomapmove
+              this._trigger("move", e, {pixel: current, map: this.toMap(current)});
             }
             break;
         }
