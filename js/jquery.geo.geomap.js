@@ -141,23 +141,194 @@
                 return parseInt(value) + dy;
               }
             });
+
+
+
+            if (service != null && tiledServicesState[service.id] != null && (service.visible === undefined || service.visible)) {
+
+              var
+              pixelSize = _pixelSize,
+
+              serviceState = tiledServicesState[service.id],
+              serviceContainer = serviceState.serviceContainer,
+              scaleContainer = serviceContainer.children("[data-pixelSize='" + pixelSize + "']"),
+
+              /* same as refresh 1 */
+              mapWidth = _contentBounds[_width],
+              mapHeight = _contentBounds[_height],
+
+              tilingScheme = map.options[_tilingScheme],
+              tileWidth = tilingScheme.tileWidth,
+              tileHeight = tilingScheme.tileHeight,
+              /* end same as refresh 1 */
+
+              halfWidth = mapWidth / 2 * pixelSize,
+              halfHeight = mapHeight / 2 * pixelSize,
+
+              currentPosition = scaleContainer.position(),
+              scaleOriginParts = scaleContainer.data("scaleOrigin").split(","),
+              totalDx = parseInt(scaleOriginParts[0]) - currentPosition.left,
+              totalDy = parseInt(scaleOriginParts[1]) - currentPosition.top,
+
+              mapCenterOriginal = _center,
+              mapCenter = [mapCenterOriginal[0] + totalDx * pixelSize, mapCenterOriginal[1] - totalDy * pixelSize],
+
+              /* same as refresh 2 */
+              tileX = Math.floor(((mapCenter[0] - halfWidth) - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
+              tileY = Math.floor((tilingScheme.origin[1] - (mapCenter[1] + halfHeight)) / (pixelSize * tileHeight)),
+              tileX2 = Math.ceil(((mapCenter[0] + halfWidth) - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
+              tileY2 = Math.ceil((tilingScheme.origin[1] - (mapCenter[1] - halfHeight)) / (pixelSize * tileHeight)),
+
+              bboxMax = map._getBboxMax(),
+              pixelSizeAtZero = map._getTiledPixelSize(0),
+              ratio = pixelSizeAtZero / pixelSize,
+              fullXAtScale = Math.floor((bboxMax[0] - tilingScheme.origin[0]) / (pixelSizeAtZero * tileWidth)) * ratio,
+              fullYAtScale = Math.floor((tilingScheme.origin[1] - bboxMax[3]) / (pixelSizeAtZero * tileHeight)) * ratio,
+
+              fullXMinX = tilingScheme.origin[0] + (fullXAtScale * tileWidth) * pixelSize,
+              fullYMaxY = tilingScheme.origin[1] - (fullYAtScale * tileHeight) * pixelSize,
+              /* end same as refresh 2 */
+
+              serviceLeft = Math.round((fullXMinX - (mapCenterOriginal[0] - halfWidth)) / pixelSize),
+              serviceTop = Math.round(((mapCenterOriginal[1] + halfHeight) - fullYMaxY) / pixelSize),
+
+              opacity = (service.opacity === undefined ? 1 : service.opacity),
+
+              x, y;
+
+              for (x = tileX; x < tileX2; x++) {
+                for (y = tileY; y < tileY2; y++) {
+                  var 
+                  tileStr = "" + x + "," + y,
+                  $image = scaleContainer.children("[data-tile='" + tileStr + "']").removeAttr("data-dirty");
+
+                  if ($image.size() === 0) {
+                    /* same as refresh 3 */
+                    var bottomLeft = [
+                      tilingScheme.origin[0] + (x * tileWidth) * pixelSize,
+                      tilingScheme.origin[1] - (y * tileHeight) * pixelSize
+                    ],
+
+                    topRight = [
+                      tilingScheme.origin[0] + ((x + 1) * tileWidth - 1) * pixelSize,
+                      tilingScheme.origin[1] - ((y + 1) * tileHeight - 1) * pixelSize
+                    ],
+
+                    tileBbox = [bottomLeft[0], bottomLeft[1], topRight[0], topRight[1]],
+
+                    imageUrl = service.getUrl({
+                      bbox: tileBbox,
+                      width: tileWidth,
+                      height: tileHeight,
+                      zoom: map._getZoom(),
+                      tile: {
+                        row: y,
+                        column: x
+                      },
+                      index: Math.abs(y + x)
+                    });
+                    /* end same as refresh 3 */
+
+                    serviceState.loadCount++;
+                    //this._map._requestQueued();
+
+                    if (serviceState.reloadTiles && $image.size() > 0) {
+                      $image.attr("src", imageUrl);
+                    } else {
+                      /* same as refresh 4 */
+                      var imgMarkup = "<img style='position:absolute; " +
+                        "left:" + (((x - fullXAtScale) * 100) + (serviceLeft - (serviceLeft % tileWidth)) / tileWidth * 100) + "%; " +
+                        "top:" + (((y - fullYAtScale) * 100) + (serviceTop - (serviceTop % tileHeight)) / tileHeight * 100) + "%; ";
+
+                      if ($("body")[0].filters === undefined) {
+                        imgMarkup += "width: 100%; height: 100%;";
+                      }
+
+                      imgMarkup += "margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;' unselectable='on' data-tile='" + tileStr + "' />";
+
+                      scaleContainer.append(imgMarkup);
+                      $image = scaleContainer.children(":last");
+                      $image.load(function (e) {
+                        if (opacity < 1) {
+                          $(e.target).fadeTo(0, opacity);
+                        } else {
+                          $(e.target).show();
+                        }
+
+                        serviceState.loadCount--;
+
+                        if (serviceState.loadCount <= 0) {
+                          serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+                          serviceState.loadCount = 0;
+                        }
+                      }).error(function (e) {
+                        $(e.target).remove();
+                        serviceState.loadCount--;
+
+                        if (serviceState.loadCount <= 0) {
+                          serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+                          serviceState.loadCount = 0;
+                        }
+                      }).attr("src", imageUrl);
+                      /* end same as refresh 4 */
+                    }
+                  }
+                }
+              }
+            }
           },
 
           interactiveScale: function (map, service, center, pixelSize) {
+            this._cancelUnloaded(map, service);
+
+            var 
+            serviceContainer = tiledServicesState[service.id].serviceContainer,
+
+            tilingScheme = map.options[_tilingScheme],
+            tileWidth = tilingScheme.tileWidth,
+            tileHeight = tilingScheme.tileHeight;
+
+
+            serviceContainer.children().each(function (i) {
+              var 
+              $scaleContainer = $(this),
+              scaleRatio = $scaleContainer.attr("data-pixelSize") / pixelSize;
+
+              scaleRatio = Math.round(scaleRatio * 1000) / 1000;
+
+              var 
+              scaleOriginParts = $scaleContainer.data("scaleOrigin").split(","),
+              oldMapCoord = map._toMap([scaleOriginParts[0], scaleOriginParts[1]]),
+              newPixelPoint = map._toPixel(oldMapCoord, center, pixelSize);
+
+              $scaleContainer.css({
+                left: Math.round(newPixelPoint[0]) + "px",
+                top: Math.round(newPixelPoint[1]) + "px",
+                width: tileWidth * scaleRatio,
+                height: tileHeight * scaleRatio
+              });
+
+              if ($("body")[0].filters !== undefined) {
+                $scaleContainer.children().each(function (i) {
+                  $(this).css("filter", "progid:DXImageTransform.Microsoft.Matrix(FilterType=bilinear,M11=" + scaleRatio + ",M22=" + scaleRatio + ",sizingmethod='auto expand')");
+                });
+              }
+            });
           },
 
           refresh: function (map, service) {
             if (service != null && tiledServicesState[service.id] != null && (service.visible === undefined || service.visible)) {
               this._cancelUnloaded(map, service);
 
-              var serviceState = tiledServicesState[service.id],
+              var 
+              bbox = map._getBbox(),
+              pixelSize = _pixelSize,
 
+              serviceState = tiledServicesState[service.id],
               serviceContainer = serviceState.serviceContainer,
 
-              pixelSize = _pixelSize,
               mapWidth = _contentBounds[_width],
               mapHeight = _contentBounds[_height],
-              bbox = map._getBbox(),
 
               tilingScheme = map.options[_tilingScheme],
               tileWidth = tilingScheme.tileWidth,
@@ -183,7 +354,9 @@
               scaleContainers = serviceContainer.children().show(),
               scaleContainer = scaleContainers.filter("[data-pixelSize='" + pixelSize + "']").appendTo(serviceContainer),
 
-              opacity = (service.opacity === undefined ? 1 : service.opacity);
+              opacity = (service.opacity === undefined ? 1 : service.opacity),
+
+              x, y;
 
               if (serviceState.reloadTiles) {
                 scaleContainers.find("img").attr("data-dirty", "true");
@@ -212,13 +385,11 @@
                 });
               }
 
-              for (var x = tileX; x < tileX2; x++) {
-                for (var y = tileY; y < tileY2; y++) {
+              for (x = tileX; x < tileX2; x++) {
+                for (y = tileY; y < tileY2; y++) {
                   var 
                   tileStr = "" + x + "," + y,
-                  $image = scaleContainer.children("[data-tile='" + tileStr + "']");
-
-                  $image.removeAttr("data-dirty");
+                  $image = scaleContainer.children("[data-tile='" + tileStr + "']").removeAttr("data-dirty");
 
                   if ($image.size() === 0 || serviceState.reloadTiles) {
                     var bottomLeft = [
@@ -246,19 +417,20 @@
                     });
 
                     serviceState.loadCount++;
+                    //this._map._requestQueued();
 
                     if (serviceState.reloadTiles && $image.size() > 0) {
                       $image.attr("src", imageUrl);
                     } else {
                       var imgMarkup = "<img style='position:absolute; " +
-                      "left:" + (((x - fullXAtScale) * 100) + (serviceLeft - (serviceLeft % tileWidth)) / tileWidth * 100) + "%; " +
-                      "top:" + (((y - fullYAtScale) * 100) + (serviceTop - (serviceTop % tileHeight)) / tileHeight * 100) + "%; ";
+                        "left:" + (((x - fullXAtScale) * 100) + (serviceLeft - (serviceLeft % tileWidth)) / tileWidth * 100) + "%; " +
+                        "top:" + (((y - fullYAtScale) * 100) + (serviceTop - (serviceTop % tileHeight)) / tileHeight * 100) + "%; ";
 
                       if ($("body")[0].filters === undefined) {
                         imgMarkup += "width: 100%; height: 100%;";
                       }
 
-                      imgMarkup += "margin:0; padding:0; -moz-user-select:none; display:none;' unselectable='on' data-tile='" + tileStr + "' />";
+                      imgMarkup += "margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;' unselectable='on' data-tile='" + tileStr + "' />";
 
                       scaleContainer.append(imgMarkup);
                       $image = scaleContainer.children(":last");
@@ -592,6 +764,40 @@
         }
       },
 
+      _getWheelCenterAndSize: function () {
+        var pixelSize, zoomLevel, scale;
+        if (_options[_tilingScheme]) {
+          zoomLevel = this._getTiledZoom(_pixelSize) + _wheelLevel;
+          pixelSize = this._getTiledPixelSize(zoomLevel);
+        } else {
+          scale = Math.pow(_wheelZoomFactor, -_wheelLevel);
+          pixelSize = _pixelSize * scale;
+        }
+
+        var 
+        ratio = pixelSize / _pixelSize,
+        anchorMapCoord = this._toMap(_anchor),
+        centerDelta = [(_center[0] - anchorMapCoord[0]) * ratio, (_center[1] - anchorMapCoord[1]) * ratio],
+        scaleCenter = [anchorMapCoord[0] + centerDelta[0], anchorMapCoord[1] + centerDelta[1]];
+
+        return { pixelSize: pixelSize, center: scaleCenter };
+      },
+
+      _mouseWheelFinish: function () {
+        _wheelTimer = null;
+
+        if (_wheelLevel != 0) {
+          var wheelCenterAndSize = this._getWheelCenterAndSize();
+
+          _wheelLevel = 0;
+
+          this._setCenterAndSize(wheelCenterAndSize.center, wheelCenterAndSize.pixelSize, true, true);
+          //this._onExtentChanged();
+        } else {
+          this._refresh();
+        }
+      },
+
       _panEnd: function () {
         _velocity = [
         (_velocity[0] > 0 ? Math.floor(_velocity[0] * _friction[0]) : Math.ceil(_velocity[0] * _friction[0])),
@@ -712,7 +918,8 @@
         center = center || _center;
         pixelSize = pixelSize || _pixelSize;
 
-        var width = _contentBounds[_width],
+        var 
+        width = _contentBounds[_width],
         height = _contentBounds[_height],
         halfWidth = width / 2 * pixelSize,
         halfHeight = height / 2 * pixelSize,
@@ -726,11 +933,37 @@
           result[i] = [bbox[0] + (this[0] * xRatio), bbox[3] - yOffset];
         });
 
-        if (isArray) {
-          return result;
-        } else {
-          return result[0];
+        return isArray ? result : result[0];
+      },
+
+      _toPixel: function (p, center, pixelSize) {
+        // ignores $.geo.proj
+        var isArray = $.isArray(p[0]);
+        if (!isArray) {
+          p = [p];
         }
+
+        center = center || _center;
+        pixelSize = pixelSize || _pixelSize;
+
+        var 
+        width = _contentBounds[_width],
+        height = _contentBounds[_height],
+        halfWidth = width / 2 * pixelSize,
+        halfHeight = height / 2 * pixelSize,
+        bbox = [center[0] - halfWidth, center[1] - halfHeight, center[0] + halfWidth, center[1] + halfHeight],
+        bboxWidth = $.geo._width(bbox),
+        bboxHeight = $.geo._height(bbox),
+        result = [];
+
+        $.each(p, function (i) {
+          result[i] = [
+            (this[0] - bbox[0]) * width / bboxWidth,
+            (bbox[3] - this[1]) * height / bboxHeight
+          ];
+        });
+
+        return isArray ? result : result[0];
       },
 
       _zoomTo: function (coord, zoom) {
@@ -741,8 +974,10 @@
         if (!isNaN(tiledPixelSize)) {
           this._setCenterAndSize(coord, tiledPixelSize, false, true);
         } else {
-          var bboxMax = $.geo._scaleBy(this._getBboxMax(), 1 / Math.pow(_zoomFactor, zoom)),
+          var 
+          bboxMax = $.geo._scaleBy(this._getBboxMax(), 1 / Math.pow(_zoomFactor, zoom)),
           pixelSize = Math.max($.geo._width(bboxMax) / _contentBounds[_width], $.geo._height(bboxMax) / _contentBounds[_height]);
+
           this._setCenterAndSize(coord, pixelSize, false, true);
         }
       },
@@ -750,7 +985,7 @@
       _eventTarget_dblclick: function (e) {
         this._panFinalize();
 
-        offset = $(e.currentTarget).offset();
+        var offset = $(e.currentTarget).offset();
 
         switch (_options[_mode]) {
           case "pan":
@@ -784,7 +1019,7 @@
         e.preventDefault();
 
         this._panFinalize();
-        //this._mouseWheelFinish();
+        this._mouseWheelFinish();
 
         var offset = $(e.currentTarget).offset();
 
@@ -913,7 +1148,47 @@
       },
 
       _eventTarget_mousewheel: function (e, delta) {
+        this._panFinalize();
 
+        if (_mouseDown) {
+          return;
+        }
+
+        if (delta != 0) {
+          if (_wheelTimer) {
+            window.clearTimeout(_wheelTimer);
+            _wheelTimer = null;
+          } else {
+            var offset = $(e.currentTarget).offset();
+            _anchor = [e.pageX - offset.left, e.pageY - offset.top];
+          }
+
+          _wheelLevel += delta;
+
+          var wheelCenterAndSize = this._getWheelCenterAndSize();
+
+          for (i = 0; i < _options[_services].length; i++) {
+            var service = _options[_services][i];
+            _options[__serviceTypes][service.type].interactiveScale(this, service, wheelCenterAndSize.center, wheelCenterAndSize.pixelSize);
+          }
+
+          //          if (this._imageShape != null && this._mapShape != null) {
+          //            for (var i = 0; i < this._mapShapeCoords.length; i++) {
+          //              this._imageShapeCoords[i] = this.toPixelPoint(this._mapShapeCoords[i], scaleCenter, pixelSize);
+          //            }
+
+          //            this._redrawShape();
+
+          //            if (this._clickMode == Ag.UI.ClickMode.measureLength || this._clickMode == Ag.UI.ClickMode.measureArea) {
+          //              this._labelShape();
+          //            }
+          //          }
+
+          var that = this;
+          this._wheelTimer = window.setTimeout(function () {
+            that._mouseWheelFinish();
+          }, 1000);
+        }
       }
     };
   })()
