@@ -132,6 +132,10 @@
           },
 
           interactivePan: function (map, service, dx, dy) {
+            if (!tiledServicesState[service.id]) {
+              return;
+            }
+
             this._cancelUnloaded(map, service);
             tiledServicesState[service.id].serviceContainer.children().css({
               left: function (index, value) {
@@ -146,7 +150,7 @@
 
             if (service != null && tiledServicesState[service.id] != null && (service.visible === undefined || service.visible)) {
 
-              var
+              var 
               pixelSize = _pixelSize,
 
               serviceState = tiledServicesState[service.id],
@@ -279,6 +283,10 @@
           },
 
           interactiveScale: function (map, service, center, pixelSize) {
+            if (!tiledServicesState[service.id]) {
+              return;
+            }
+
             this._cancelUnloaded(map, service);
 
             var 
@@ -467,11 +475,10 @@
           },
 
           _cancelUnloaded: function (map, service) {
-            var serviceState = tiledServicesState[service.id],
-            serviceContainer = serviceState.serviceContainer;
+            var serviceState = tiledServicesState[service.id];
 
-            if (serviceState.loadCount > 0) {
-              serviceContainer.find("img:hidden").remove();
+            if (serviceState && serviceState.loadCount > 0) {
+              serviceState.serviceContainer.find("img:hidden").remove();
               while (serviceState.loadCount > 0) {
                 serviceState.loadCount--;
               }
