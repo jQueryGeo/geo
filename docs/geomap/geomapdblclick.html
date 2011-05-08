@@ -9,8 +9,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <title>move | $.geo</title>
-  <meta name="description" content="$.geo move event">
+  <title>dblclick | $.geo</title>
+  <meta name="description" content="$.geo dblclick event">
   <meta name="author" content="Ryan Westphal">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
@@ -20,9 +20,9 @@
 
 <body>
 
-  <div id="move" data-role=page data-theme="b">
+  <div id="dblclick" data-role=page data-theme="b">
     <div data-role="header">
-      <h1>move</h1>
+      <h1>dblclick</h1>
     </div>
     
     <div data-role="content">
@@ -34,17 +34,21 @@
         <tr>
           <th>init</th>
           <td><code><pre>$( <i>selector</i> ).geomap( {
-  move: function( e, geo ) { }
+  dblclick: function( e, geo ) { }
 } );</pre></code></td>
         </tr>
         <tr>
           <th>bind</th>
-          <td><code><pre>$( <i>selector</i> ).bind( &quot;geomapmove&quot;, function( e, geo ) { } );
+          <td><code><pre>$( <i>selector</i> ).bind( &quot;geomapdblclick&quot;, function( e, geo ) { } );
 } );</pre></code></td>
         </tr>
       </table>
-      <p>The move event triggers when the user moves the mouse cursor while the cursor is over the map. However, it only triggers if the user is not currently performing some other action such as panning.</p>
+      <p>The dblclick event triggers when the user double-clicks or double-taps a point on the map. However, it only triggers if the user is not currently performing some other action which might be handled internally by the widget.</p>
       <p>The geo argument contains two properties, pixels and coordinates. Both are <a href="http://geojson.org/geojson-spec.html#positions">GeoJSON positions</a>. The former is in pixel coordinates and the latter is in map coordinates.</p>
+      <p>The default action for a double-click/tap is to zoom the map in one level. However, as a developer you can override this by calling e.preventDefault() in your callback.</p>
+      <code><pre>$( &quot;#map&quot; ).geomap( {
+  dblclick: function( e, geo ) { e.preventDefault(); }
+} );</pre></code>
     </div>
   </div> <!-- end of #container -->
 
