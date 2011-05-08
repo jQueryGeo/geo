@@ -1,0 +1,117 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>Events test</title>
+  <style type="text/css">
+    th
+    {
+      text-align: left;
+    }
+    th, td
+    {
+      margin: 0;
+      padding: 4px;
+      border-left: solid 2px #dedede;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h1>
+      Events test</h1>
+    <div id="map" style="position: relative; width: 320px; height: 240px;">
+    </div>
+    <fieldset>
+      <legend>$.geo.proj</legend>
+      <label>
+        <input type="radio" name="proj" value="default" checked />
+        default (map values are geodetic lon,lat)
+      </label>
+      <label>
+        <input type="radio" name="proj" value="null" />
+        null (map values are web mercator)
+      </label>
+    </fieldset>
+    <table cellspacing="0">
+      <thead>
+        <tr>
+          <th>
+            event (time)
+          </th>
+          <th>
+            geo argument
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            move (<span class="movedate"></span>)
+          </td>
+          <td class="movedata">
+          </td>
+        </tr>
+        <tr>
+          <td>
+            click (<span class="clickdate"></span>)
+          </td>
+          <td class="clickdata">
+          </td>
+        </tr>
+        <tr>
+          <td>
+            dblclick (<span class="dblclickdate"></span>)
+          </td>
+          <td class="dblclickdata">
+          </td>
+        </tr>
+        <tr>
+          <td>
+            bboxchange (<span class="bboxdate"></span>)
+          </td>
+          <td class="bboxdata">
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.js"></script>
+  <script src="../jquery-geo-test.js"></script>
+  <script>
+    $(function () {
+      var defaultProj = $.geo.proj;
+
+      $("#map").geomap({
+        move: function (e, geo) {
+          $(".movedate").text($.now());
+          $(".movedata").text("pixels: [ " + geo.pixels + " ], coordinates: [ " + geo.coordinates + " ]");
+        },
+        click: function (e, geo) {
+          $(".clickdate").text($.now());
+          $(".clickdata").text("pixels: [ " + geo.pixels + " ], coordinates: [ " + geo.coordinates + " ]");
+        },
+        dblclick: function (e, geo) {
+          $(".dblclickdate").text($.now());
+          $(".dblclickdata").text("pixels: [ " + geo.pixels + " ], coordinates: [ " + geo.coordinates + " ]");
+        },
+        bboxchange: function (e, geo) {
+          $(".bboxdate").text($.now());
+          $(".bboxdata").text("[ " + geo.bbox + " ]");
+        }
+      });
+
+      $("input[name='proj']").click(function () {
+        switch ($(this).val()) {
+          case "null":
+            $.geo.proj = null;
+            break;
+
+          default:
+            $.geo.proj = defaultProj;
+            break;
+        }
+      });
+    });  
+  </script>
+</body>
+</html>
