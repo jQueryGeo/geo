@@ -1514,7 +1514,7 @@ $.Widget.prototype = {
         _options[_zoom] = this._getZoom();
 
         if (trigger) {
-          this._trigger("bboxchange", event, { bbox: _options[_bbox] });
+          this._trigger("bboxchange", window.event, { bbox: _options[_bbox] });
         }
 
         if (refresh) {
