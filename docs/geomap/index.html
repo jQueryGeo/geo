@@ -13,8 +13,9 @@
   <meta name="description" content="$.geo geomap method">
   <meta name="author" content="Ryan Westphal">
 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.css" />
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a4.1/jquery.mobile-1.0a4.1.min.css" />
 
 </head>
 
@@ -36,29 +37,28 @@
       <p>The map view refreshes when you change these properties: bbox, center, services, tilingScheme &amp; zoom.</p>
       <ul data-role=listview data-inset=true>
         <li>
-          <h3><a href="bbox.html">bbox</a></h3>
+          <a href="bbox.html">bbox</a>
         </li>
         <li>
-          <h3><a href="bboxMax.html">bboxMax</a></h3>
+          <a href="bboxMax.html">bboxMax</a>
         </li>
         <li>
-          <h3><a href="center.html">center</a></h3>
+          <a href="center.html">center</a>
         </li>
         <li>
-          <h3><a href="cursors.html">cursors</a></h3>
+          <a href="cursors.html">cursors</a>
         </li>
         <li>
-          <h3><a href="mode.html">mode</a></h3>
-          <p>Determines how the map, user &amp; developer interact</p>
+          <a href="mode.html"><h3>mode</h3><p class="ui-li-desc">determines how the map, user &amp; developer interact</p></a>          
         </li>
         <li>
-          <h3><a href="services.html">services</a></h3>
+          <a href="services.html"><h3>services</h3><p class="ui-li-desc">determine the content of the map</p></a>
         </li>
         <li>
-          <h3><a href="tilingScheme.html">tilingScheme</a></h3>
+          <a href="tilingScheme.html">tilingScheme</a>
         </li>
         <li>
-          <h3><a href="zoom.html">zoom</a></h3>
+          <a href="zoom.html">zoom</a>
         </li>
       </ul>
       <h2>events</h2>
@@ -73,13 +73,13 @@
       <p>In the geo argument we named the coordinates property as such so that the geo object itself matches the specification of a <a href="http://geojson.org/geojson-spec.html#point">GeoJSON Point</a> and can be used in other functions requiring such a structure. The pixels property is plural to match the tense of coordinates.</p>
       <ul data-role=listview data-inset=true>
         <li>
-            <h3><a href="geomapmove.html">move</a></h3>
+            <a href="geomapmove.html">move</a>
         </li>
         <li>
-            <h3><a href="geomapclick.html">click</a></h3>
+            <a href="geomapclick.html">click</a>
         </li>
         <li>
-            <h3><a href="geomapdblclick.html">dblclick</a></h3>
+            <a href="geomapdblclick.html">dblclick</a>
         </li>
       </ul>
       <h3>bbox events</h3>
@@ -88,20 +88,20 @@
       <p>With geometry events the geo argument to your callback is a JavaScript object having two properties: pixels &amp; geometry. Both are multi-dimensional <a href="http://geojson.org/geojson-spec.html#positions">GeoJSON positions</a>, i.e., an array containing the x and y value but pixel is in pixel coordinates based on the current map view and the other in map coordinates based on the tilingScheme for tiled maps and bboxMax for shingled (dynamic) maps.</p>-->
       <ul data-role=listview data-inset=true>
         <li>
-            <h3><a href="geomapbbox.html">bbox</a></h3>
+            <a href="geomapbbox.html">bbox</a>
         </li>
       </ul>
       <h2>methods</h2>
       <p>The geomap widget provides some methods to help make interacting map data a little easier.</p>
       <ul data-role=listview data-inset=true>
         <li>
-          <h3><a href="getPixelSize.html">getPixelSize</a></h3>
+          <a href="getPixelSize.html">getPixelSize</a>
         </li>
         <li>
-          <h3><a href="toMap.html">toMap</a></h3>
+          <a href="toMap.html">toMap</a>
         </li>
         <li>
-          <h3><a href="toPixel.html">toPixel</a></h3>
+          <a href="toPixel.html">toPixel</a>
         </li>
       </ul>
       <h2>theming</h2>
@@ -110,18 +110,10 @@
   </div> <!-- end of #container -->
 
   <script src="//code.jquery.com/jquery-1.5.2.min.js"></script>
-  <script>
-    $(document).bind("mobileinit", function(){
-      $.mobile.gradeA = function() { return $.support.mediaquery || $("html").hasClass("ie8") };
-    });
-  </script>
 
-  <script src="//code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.js"></script>
+  <script src="../js/script.js"></script>
   
-  <!-- scripts concatenated and minified via ant build script-->
-  <script src="js/plugins.js"></script>
-  <script src="js/script.js"></script>
-  <!-- end concatenated and minified scripts-->
+  <script src="//code.jquery.com/mobile/1.0a4.1/jquery.mobile-1.0a4.1.min.js"></script>
   
   <!-- change the UA-XXXXX-X to be your site's ID -->
   <script>
