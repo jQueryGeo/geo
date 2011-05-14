@@ -13,8 +13,9 @@
   <meta name="description" content="$.geo mode property">
   <meta name="author" content="Ryan Westphal">
 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.css" />
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a4.1/jquery.mobile-1.0a4.1.min.css" />
 
 </head>
 
@@ -91,18 +92,10 @@
 
 
   <script src="//code.jquery.com/jquery-1.5.2.min.js"></script>
-  <script>
-    $(document).bind("mobileinit", function(){
-      $.mobile.gradeA = function() { return $.support.mediaquery || $("html").hasClass("ie8") };
-    });
-  </script>
 
-  <script src="//code.jquery.com/mobile/1.0a3/jquery.mobile-1.0a3.min.js"></script>
+  <script src="../js/script.js"></script>
   
-  <!-- scripts concatenated and minified via ant build script-->
-  <script src="js/plugins.js"></script>
-  <script src="js/script.js"></script>
-  <!-- end concatenated and minified scripts-->
+  <script src="//code.jquery.com/mobile/1.0a4.1/jquery.mobile-1.0a4.1.min.js"></script>
   
   <!-- change the UA-XXXXX-X to be your site's ID -->
   <script>
