@@ -1,26 +1,6 @@
 ﻿(function ($, undefined) {
 
   var 
-  // public property name strings
-  _bbox = "bbox",
-  _bboxMax = "bboxMax",
-  _center = "center",
-  _cursors = "cursors",
-  _mode = "mode",
-  _services = "services",
-  _tilingScheme = "tilingScheme",
-  _zoom = "zoom",
-
-  // private property name strings
-  __serviceTypes = "_serviceTypes",
-
-  // misc other strings (strings must be used more than once
-  // before adding them to this list)
-  _position = "position",
-  _relative = "relative",
-  _width = "width",
-  _height = "height",
-
   // private widget members
   _elem,
 
@@ -112,7 +92,7 @@
 
         return {
           create: function (map, service, index) {
-            if (tiledServicesState[service.id] == null) {
+            if (!tiledServicesState[service.id]) {
               tiledServicesState[service.id] = {
                 loadCount: 0,
                 reloadTiles: false,
@@ -146,9 +126,7 @@
               }
             });
 
-
-
-            if (service != null && tiledServicesState[service.id] != null && (service.visible === undefined || service.visible)) {
+            if (service && tiledServicesState[service.id] != null && (service.visible === undefined || service.visible)) {
 
               var 
               pixelSize = _pixelSize,
@@ -158,10 +136,10 @@
               scaleContainer = serviceContainer.children("[data-pixelSize='" + pixelSize + "']"),
 
               /* same as refresh 1 */
-              mapWidth = _contentBounds[_width],
-              mapHeight = _contentBounds[_height],
+              mapWidth = _contentBounds["width"],
+              mapHeight = _contentBounds["height"],
 
-              tilingScheme = map.options[_tilingScheme],
+              tilingScheme = map.options["tilingScheme"],
               tileWidth = tilingScheme.tileWidth,
               tileHeight = tilingScheme.tileHeight,
               /* end same as refresh 1 */
@@ -204,9 +182,9 @@
                 for (y = tileY; y < tileY2; y++) {
                   var 
                   tileStr = "" + x + "," + y,
-                  $image = scaleContainer.children("[data-tile='" + tileStr + "']").removeAttr("data-dirty");
+                  $img = scaleContainer.children("[data-tile='" + tileStr + "']").removeAttr("data-dirty");
 
-                  if ($image.size() === 0) {
+                  if ($img.size() === 0) {
                     /* same as refresh 3 */
                     var bottomLeft = [
                       tilingScheme.origin[0] + (x * tileWidth) * pixelSize,
@@ -236,8 +214,8 @@
                     serviceState.loadCount++;
                     //this._map._requestQueued();
 
-                    if (serviceState.reloadTiles && $image.size() > 0) {
-                      $image.attr("src", imageUrl);
+                    if (serviceState.reloadTiles && $img.size() > 0) {
+                      $img.attr("src", imageUrl);
                     } else {
                       /* same as refresh 4 */
                       var imgMarkup = "<img style='position:absolute; " +
@@ -251,8 +229,8 @@
                       imgMarkup += "margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;' unselectable='on' data-tile='" + tileStr + "' />";
 
                       scaleContainer.append(imgMarkup);
-                      $image = scaleContainer.children(":last");
-                      $image.load(function (e) {
+                      $img = scaleContainer.children(":last");
+                      $img.load(function (e) {
                         if (opacity < 1) {
                           $(e.target).fadeTo(0, opacity);
                         } else {
@@ -292,7 +270,7 @@
             var 
             serviceContainer = tiledServicesState[service.id].serviceContainer,
 
-            tilingScheme = map.options[_tilingScheme],
+            tilingScheme = map.options["tilingScheme"],
             tileWidth = tilingScheme.tileWidth,
             tileHeight = tilingScheme.tileHeight;
 
@@ -325,7 +303,7 @@
           },
 
           refresh: function (map, service) {
-            if (service != null && tiledServicesState[service.id] != null && (service.visible === undefined || service.visible)) {
+            if (service && tiledServicesState[service.id] && (service.visible === undefined || service.visible)) {
               this._cancelUnloaded(map, service);
 
               var 
@@ -335,10 +313,10 @@
               serviceState = tiledServicesState[service.id],
               serviceContainer = serviceState.serviceContainer,
 
-              mapWidth = _contentBounds[_width],
-              mapHeight = _contentBounds[_height],
+              mapWidth = _contentBounds["width"],
+              mapHeight = _contentBounds["height"],
 
-              tilingScheme = map.options[_tilingScheme],
+              tilingScheme = map.options["tilingScheme"],
               tileWidth = tilingScheme.tileWidth,
               tileHeight = tilingScheme.tileHeight,
 
@@ -370,7 +348,7 @@
                 scaleContainers.find("img").attr("data-dirty", "true");
               }
 
-              if (scaleContainer.size() === 0) {
+              if (!scaleContainer.size()) {
                 serviceContainer.append("<div style='position:absolute; left:" + serviceLeft % tileWidth + "px; top:" + serviceTop % tileHeight + "px; width:" + tileWidth + "px; height:" + tileHeight + "px; margin:0; padding:0;' data-pixelSize='" + pixelSize + "'></div>");
                 scaleContainer = serviceContainer.children(":last").data("scaleOrigin", (serviceLeft % tileWidth) + "," + (serviceTop % tileHeight));
               } else {
@@ -380,8 +358,10 @@
                 }).data("scaleOrigin", (serviceLeft % tileWidth) + "," + (serviceTop % tileHeight));
 
                 scaleContainer.children().each(function (i) {
-                  var $img = $(this);
-                  var tile = $img.attr("data-tile").split(",");
+                  var 
+                  $img = $(this),
+                  tile = $img.attr("data-tile").split(",");
+
                   $img.css({
                     left: Math.round(((parseInt(tile[0]) - fullXAtScale) * 100) + (serviceLeft - (serviceLeft % tileWidth)) / tileWidth * 100) + "%",
                     top: Math.round(((parseInt(tile[1]) - fullYAtScale) * 100) + (serviceTop - (serviceTop % tileHeight)) / tileHeight * 100) + "%"
@@ -397,9 +377,9 @@
                 for (y = tileY; y < tileY2; y++) {
                   var 
                   tileStr = "" + x + "," + y,
-                  $image = scaleContainer.children("[data-tile='" + tileStr + "']").removeAttr("data-dirty");
+                  $img = scaleContainer.children("[data-tile='" + tileStr + "']").removeAttr("data-dirty");
 
-                  if ($image.size() === 0 || serviceState.reloadTiles) {
+                  if ($img.size() === 0 || serviceState.reloadTiles) {
                     var bottomLeft = [
                       tilingScheme.origin[0] + (x * tileWidth) * pixelSize,
                       tilingScheme.origin[1] - (y * tileHeight) * pixelSize
@@ -427,8 +407,8 @@
                     serviceState.loadCount++;
                     //this._map._requestQueued();
 
-                    if (serviceState.reloadTiles && $image.size() > 0) {
-                      $image.attr("src", imageUrl);
+                    if (serviceState.reloadTiles && $img.size() > 0) {
+                      $img.attr("src", imageUrl);
                     } else {
                       var imgMarkup = "<img style='position:absolute; " +
                         "left:" + (((x - fullXAtScale) * 100) + (serviceLeft - (serviceLeft % tileWidth)) / tileWidth * 100) + "%; " +
@@ -441,8 +421,8 @@
                       imgMarkup += "margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;' unselectable='on' data-tile='" + tileStr + "' />";
 
                       scaleContainer.append(imgMarkup);
-                      $image = scaleContainer.children(":last");
-                      $image.load(function (e) {
+                      $img = scaleContainer.children(":last");
+                      $img.load(function (e) {
                         if (opacity < 1) {
                           $(e.target).fadeTo(0, opacity);
                         } else {
@@ -483,11 +463,207 @@
                 serviceState.loadCount--;
               }
             }
-          },
-
-          _onOpacityChanged: function () {
           }
         };
+      })(),
+
+      shingled: (function () {
+        var shingledServicesState = {};
+
+        return {
+          create: function (map, service, index) {
+            if (!shingledServicesState[service.id]) {
+              shingledServicesState[service.id] = {
+                loadCount: 0
+              };
+
+              var scHtml = '<div data-service="' + service.id + '" style="position:absolute; left:0; top:0; width:16px; height:16px; margin:0; padding:0; display:' + (service.visible === undefined || service.visible ? "block" : "none") + ';"></div>';
+              _servicesContainer.append(scHtml);
+
+              shingledServicesState[service.id].serviceContainer = _servicesContainer.children('[data-service="' + service.id + '"]');
+            }
+          },
+
+          destroy: function (map, service) {
+            shingledServicesState[service.id].serviceContainer.remove();
+            delete shingledServicesState[service.id];
+          },
+
+          interactivePan: function (map, service, dx, dy) {
+            if (!shingledServicesState[service.id]) {
+              return;
+            }
+
+            this._cancelUnloaded(map, service);
+
+            var 
+            serviceState = shingledServicesState[service.id],
+            serviceContainer = serviceState.serviceContainer,
+            scaleContainer = serviceContainer.children("[data-pixelSize='" + _pixelSize + "']"),
+            panContainer = scaleContainer.children("div");
+
+            if (!panContainer.length) {
+              scaleContainer.children("img").wrap('<div style="position:absolute; left:0; top:0; width:100%; height:100%;"></div>');
+              panContainer = scaleContainer.children("div");
+            }
+
+            panContainer.css({
+              left: function (index, value) {
+                return parseInt(value) + dx;
+              },
+              top: function (index, value) {
+                return parseInt(value) + dy;
+              }
+            });
+          },
+
+          interactiveScale: function (map, service, center, pixelSize) {
+            if (!shingledServicesState[service.id]) {
+              return;
+            }
+
+            this._cancelUnloaded(map, service);
+
+            var
+            serviceState = shingledServicesState[service.id],
+            serviceContainer = serviceState.serviceContainer,
+
+            mapWidth = _contentBounds["width"],
+            mapHeight = _contentBounds["height"],
+
+            halfWidth = mapWidth / 2,
+            halfHeight = mapHeight / 2,
+
+            bbox = [center[0] - halfWidth, center[1] - halfHeight, center[0] + halfWidth, center[1] + halfHeight];
+
+            serviceContainer.children().each(function (i) {
+              var 
+              $scaleContainer = $(this),
+              scalePixelSize = $scaleContainer.attr("data-pixelSize"),
+              ratio = scalePixelSize / pixelSize;
+
+              $scaleContainer.css({ width: mapWidth * ratio, height: mapHeight * ratio }).children("img").each(function (i) {
+                var
+                $img = $(this),
+                imgCenter = $img.data("center"),
+                x = (Math.round((imgCenter[0] - center[0]) / scalePixelSize) - halfWidth) * ratio,
+                y = (Math.round((center[1] - imgCenter[1]) / scalePixelSize) - halfHeight) * ratio;
+
+                $img.css({ left: x + "px", top: y + "px" });
+              });
+            });
+          },
+
+          refresh: function (map, service) {
+            if (service && shingledServicesState[service.id] && (service.visible === undefined || service.visible)) {
+              this._cancelUnloaded(map, service);
+
+              var 
+              bbox = map._getBbox(),
+              pixelSize = _pixelSize,
+
+              serviceState = shingledServicesState[service.id],
+              serviceContainer = serviceState.serviceContainer,
+
+              mapWidth = _contentBounds["width"],
+              mapHeight = _contentBounds["height"],
+
+              halfWidth = mapWidth / 2,
+              halfHeight = mapHeight / 2,
+
+              scaleContainer = serviceContainer.children('[data-pixelSize="' + pixelSize + '"]'),
+
+              opacity = (service.opacity === undefined ? 1 : service.opacity),
+
+              $img;
+
+              if (!scaleContainer.size()) {
+                serviceContainer.append('<div style="position:absolute; left:' + halfWidth + 'px; top:' + halfHeight + 'px; width:' + mapWidth + 'px; height:' + mapHeight + 'px; margin:0; padding:0;" data-pixelSize="' + pixelSize + '"></div>');
+                scaleContainer = serviceContainer.children(":last");
+              }
+
+              scaleContainer.children("img").each(function (i) {
+                var 
+                $thisimg = $(this),
+                imgCenter = $thisimg.data("center"),
+                x = Math.round((imgCenter[0] - _center[0]) / pixelSize) - halfWidth,
+                y = Math.round((_center[1] - imgCenter[1]) / pixelSize) - halfHeight;
+
+                $thisimg.css({ left: x + "px", top: y + "px" });
+              });
+
+              if (opacity < 1) {
+                serviceContainer.find("img").attr("data-keepAlive", "0");
+              }
+
+              var 
+              imageUrl = service.getUrl({
+                bbox: bbox,
+                width: mapWidth,
+                height: mapHeight,
+                zoom: map._getZoom(),
+                tile: null,
+                index: 0
+              });
+
+              serviceState.loadCount++;
+              //this._map._requestQueued();
+
+              scaleContainer.append('<img style="position:absolute; left:-' + halfWidth + 'px; top:-' + halfHeight + 'px; width:100%; height:100%; margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;" unselectable="on" />');
+              $img = scaleContainer.children(":last").data("center", _center);
+              $img.load(function (e) {
+                if (opacity < 1) {
+                  $(e.target).fadeTo(0, opacity);
+                } else {
+                  $(e.target).show();
+                }
+
+                serviceState.loadCount--;
+
+                if (serviceState.loadCount <= 0) {
+                  serviceContainer.children(':not([data-pixelSize="' + pixelSize + '"])').remove();
+
+                  var panContainer = serviceContainer.find('[data-pixelSize="' + pixelSize + '"]>div');
+                  if (panContainer.size() > 0) {
+                    var panContainerPos = panContainer.position();
+
+                    panContainer.children("img").each(function (i) {
+                      var 
+                      $thisimg = $(this),
+                      x = panContainerPos.left + parseInt($thisimg.css("left")),
+                      y = panContainerPos.top + parseInt($thisimg.css("top"));
+
+                      $thisimg.css({ left: x + "px", top: y + "px" });
+                    }).unwrap();
+
+                    panContainer.remove();
+                  }
+
+                  serviceState.loadCount = 0;
+                }
+              }).error(function (e) {
+                $(e.target).remove();
+                serviceState.loadCount--;
+
+                if (serviceState.loadCount <= 0) {
+                  serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+                  serviceState.loadCount = 0;
+                }
+              }).attr("src", imageUrl);
+            }
+          },
+
+          _cancelUnloaded: function (map, service) {
+            var serviceState = shingledServicesState[service.id];
+
+            if (serviceState && serviceState.loadCount > 0) {
+              serviceState.serviceContainer.find("img:hidden").remove();
+              while (serviceState.loadCount > 0) {
+                serviceState.loadCount--;
+              }
+            }
+          }
+        }
       })()
     }
   };
@@ -500,11 +676,11 @@
         _initOptions = options;
         _elem = $(element);
 
-        var cssPosition = _elem.css(_position),
+        var cssPosition = _elem.css("position"),
           size;
 
-        if (cssPosition != _relative && cssPosition != "absolute" && cssPosition != "fixed") {
-          _elem.css(_position, _relative);
+        if (cssPosition != "relative" && cssPosition != "absolute" && cssPosition != "fixed") {
+          _elem.css("position", "relative");
         }
 
         _elem.css("text-align", "left");
@@ -513,8 +689,8 @@
         _contentBounds = {
           x: parseInt(_elem.css("padding-left")),
           y: parseInt(_elem.css("padding-top")),
-          width: size[_width],
-          height: size[_height]
+          width: size["width"],
+          height: size["height"]
         };
 
         this._createChildren();
@@ -576,7 +752,7 @@
           }
         }
 
-        _eventTarget.css("cursor", _options[_cursors][_options[_mode]]);
+        _eventTarget.css("cursor", _options["cursors"][_options["mode"]]);
 
         this._createServices();
 
@@ -644,8 +820,8 @@
 
       _getBbox: function () {
         // calculate the internal bbox
-        var halfWidth = _contentBounds[_width] / 2 * _pixelSize,
-        halfHeight = _contentBounds[_height] / 2 * _pixelSize;
+        var halfWidth = _contentBounds["width"] / 2 * _pixelSize,
+        halfHeight = _contentBounds["height"] / 2 * _pixelSize;
         return [_center[0] - halfWidth, _center[1] - halfHeight, _center[0] + halfWidth, _center[1] + halfHeight];
       },
 
@@ -653,7 +829,7 @@
         var center = [value[0] + (value[2] - value[0]) / 2, value[1] + (value[3] - value[1]) / 2],
           pixelSize = Math.max($.geo._width(value) / _contentBounds.width, $.geo._height(value) / _contentBounds.height);
 
-        if (_options[_tilingScheme]) {
+        if (_options["tilingScheme"]) {
           var zoom = this._getTiledZoom(pixelSize);
           pixelSize = this._getTiledPixelSize(zoom);
         }
@@ -662,17 +838,17 @@
 
       _getBboxMax: function () {
         // calculate the internal bboxMax
-        var halfWidth = _contentBounds[_width] / 2 * _pixelSizeMax,
-        halfHeight = _contentBounds[_height] / 2 * _pixelSizeMax;
+        var halfWidth = _contentBounds["width"] / 2 * _pixelSizeMax,
+        halfHeight = _contentBounds["height"] / 2 * _pixelSizeMax;
         return [_centerMax[0] - halfWidth, _centerMax[1] - halfHeight, _centerMax[0] + halfWidth, _centerMax[1] + halfHeight];
       },
 
       _getZoom: function () {
         // calculate the internal zoom level, vs. public zoom property
-        if (_options[_tilingScheme]) {
+        if (_options["tilingScheme"]) {
           return this._getTiledZoom(_pixelSize);
         } else {
-          var ratio = _contentBounds[_width] / _contentBounds[_height],
+          var ratio = _contentBounds["width"] / _contentBounds["height"],
           bbox = $.geo._reaspect(this._getBbox(), ratio),
           bboxMax = $.geo._reaspect(this._getBboxMax(), ratio);
 
@@ -683,7 +859,7 @@
       _setZoom: function (value, trigger, refresh) {
         value = Math.max(value, 0);
 
-        if (_options[_tilingScheme]) {
+        if (_options["tilingScheme"]) {
           this._setCenterAndSize(_center, this._getTiledPixelSize(value), trigger, refresh);
         } else {
           var 
@@ -698,13 +874,13 @@
 
         existingChildren.css("-moz-user-select", "none");
 
-        _elem.prepend("<div style='position:absolute; left:" + _contentBounds.x + "px; top:" + _contentBounds.y + "px; width:" + _contentBounds[_width] + "px; height:" + _contentBounds[_height] + "px; margin:0; padding:0; overflow:hidden; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none;' unselectable='on'></div>");
+        _elem.prepend("<div style='position:absolute; left:" + _contentBounds.x + "px; top:" + _contentBounds.y + "px; width:" + _contentBounds["width"] + "px; height:" + _contentBounds["height"] + "px; margin:0; padding:0; overflow:hidden; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none;' unselectable='on'></div>");
         _eventTarget = _contentFrame = _elem.children(':first');
 
-        _contentFrame.append('<div style="position:absolute; left:0; top:0; width:' + _contentBounds[_width] + 'px; height:' + _contentBounds[_height] + 'px; margin: 0; padding: 0;"></div>');
+        _contentFrame.append('<div style="position:absolute; left:0; top:0; width:' + _contentBounds["width"] + 'px; height:' + _contentBounds["height"] + 'px; margin: 0; padding: 0;"></div>');
         _servicesContainer = _contentFrame.children(':last');
 
-        _contentFrame.append('<div style="position:absolute; left:0; top:0; width:' + _contentBounds[_width] + 'px; height:' + _contentBounds[_height] + 'px; margin: 0; padding: 0;"></div>');
+        _contentFrame.append('<div style="position:absolute; left:0; top:0; width:' + _contentBounds["width"] + 'px; height:' + _contentBounds["height"] + 'px; margin: 0; padding: 0;"></div>');
         _graphicsContainer = _contentFrame.children(':last');
 
         _contentFrame.append('<div class="ui-widget ui-widget-content ui-corner-all" style="position:absolute; left:0; top:0px; max-width:128px; display:none;"><div style="margin:.2em;"></div></div>');
@@ -717,14 +893,14 @@
       _createServices: function () {
         var i;
         for (i = 0; i < _currentServices.length; i++) {
-          _options[__serviceTypes][_currentServices[i].type].destroy(this, _currentServices[i]);
+          _options["_serviceTypes"][_currentServices[i].type].destroy(this, _currentServices[i]);
         }
 
-        for (i = 0; i < _options[_services].length; i++) {
-          _options[__serviceTypes][_options[_services][i].type].create(this, _options[_services][i], i);
+        for (i = 0; i < _options["services"].length; i++) {
+          _options["_serviceTypes"][_options["services"][i].type].create(this, _options["services"][i], i);
         }
 
-        _currentServices = _options[_services];
+        _currentServices = _options["services"];
       },
 
       _findMapSize: function () {
@@ -733,10 +909,10 @@
         var size = { width: 0, height: 0 },
         sizeContainer = _elem;
 
-        while (sizeContainer.size() && !(size[_width] > 0 && size[_height] > 0)) {
+        while (sizeContainer.size() && !(size["width"] > 0 && size["height"] > 0)) {
           size = { width: sizeContainer.width(), height: sizeContainer.height() };
-          if (size[_width] <= 0 || size[_height] <= 0) {
-            size = { width: parseInt(sizeContainer.css(_width)), height: parseInt(sizeContainer.css(_height)) };
+          if (size["width"] <= 0 || size["height"] <= 0) {
+            size = { width: parseInt(sizeContainer.css("width")), height: parseInt(sizeContainer.css("height")) };
           }
           sizeContainer = sizeContainer.parent();
         }
@@ -744,7 +920,7 @@
       },
 
       _getTiledPixelSize: function (zoom) {
-        var tilingScheme = _options[_tilingScheme];
+        var tilingScheme = _options["tilingScheme"];
         if (tilingScheme != null) {
           if (zoom === 0) {
             return tilingScheme.pixelSizes != null ? tilingScheme.pixelSizes[0] : tilingScheme.basePixelSize;
@@ -766,7 +942,7 @@
       },
 
       _getTiledZoom: function (pixelSize) {
-        var tilingScheme = _options[_tilingScheme];
+        var tilingScheme = _options["tilingScheme"];
         if (tilingScheme.pixelSizes != null) {
           var roundedPixelSize = Math.round(pixelSize),
           levels = tilingScheme.pixelSizes != null ? tilingScheme.pixelSizes.length : tilingScheme.levels;
@@ -783,7 +959,7 @@
 
       _getWheelCenterAndSize: function () {
         var pixelSize, zoomLevel, scale;
-        if (_options[_tilingScheme]) {
+        if (_options["tilingScheme"]) {
           zoomLevel = this._getTiledZoom(_pixelSize) + _wheelLevel;
           pixelSize = this._getTiledPixelSize(zoomLevel);
         } else {
@@ -849,7 +1025,7 @@
           _anchor = _current;
           _toolPan = _panning = false;
 
-          _eventTarget.css("cursor", _options[_cursors][_options[_mode]]);
+          _eventTarget.css("cursor", _options["cursors"][_options["mode"]]);
         }
       },
 
@@ -861,7 +1037,7 @@
         if (_toolPan || dx > 3 || dx < -3 || dy > 3 || dy < -3) {
           if (!_toolPan) {
             _toolPan = true;
-            _eventTarget.css("cursor", _options[_cursors]["pan"]);
+            _eventTarget.css("cursor", _options["cursors"]["pan"]);
           }
 
           if (_mouseDown) {
@@ -872,19 +1048,19 @@
             _panning = true;
             _lastDrag = _current;
 
-            for (i = 0; i < _options[_services].length; i++) {
-              var service = _options[_services][i];
-              _options[__serviceTypes][service.type].interactivePan(this, service, dx, dy);
+            for (i = 0; i < _options["services"].length; i++) {
+              var service = _options["services"][i];
+              _options["_serviceTypes"][service.type].interactivePan(this, service, dx, dy);
             }
           }
         }
       },
 
       _refresh: function () {
-        for (var i = 0; i < _options[_services].length; i++) {
-          var service = _options[_services][i];
-          if (!_mouseDown && _options[__serviceTypes][service.type] != null) {
-            _options[__serviceTypes][service.type].refresh(this, service);
+        for (var i = 0; i < _options["services"].length; i++) {
+          var service = _options["services"][i];
+          if (!_mouseDown && _options["_serviceTypes"][service.type] != null) {
+            _options["_serviceTypes"][service.type].refresh(this, service);
           }
         }
       },
@@ -892,9 +1068,9 @@
       _setCenterAndSize: function (center, pixelSize, trigger, refresh) {
         // the final call during any extent change
         if (_pixelSize != pixelSize) {
-          for (var i = 0; i < _options[_services].length; i++) {
-            var service = _options[_services][i];
-            _options[__serviceTypes][service.type].interactiveScale(this, service, center, pixelSize);
+          for (var i = 0; i < _options["services"].length; i++) {
+            var service = _options["services"][i];
+            _options["_serviceTypes"][service.type].interactiveScale(this, service, center, pixelSize);
           }
         }
 
@@ -905,19 +1081,19 @@
           var bbox = this._getBbox();
           bbox = $.geo.proj.toGeodetic([[bbox[0], bbox[1]], [bbox[2], bbox[3]]]);
           bbox = [bbox[0][0], bbox[0][1], bbox[1][0], bbox[1][1]];
-          _options[_bbox] = bbox;
+          _options["bbox"] = bbox;
 
-          _options[_center] = $.geo.proj.toGeodetic([[_center[0], _center[1]]])[0];
+          _options["center"] = $.geo.proj.toGeodetic([[_center[0], _center[1]]])[0];
         } else {
-          _options[_bbox] = this._getBbox();
+          _options["bbox"] = this._getBbox();
 
-          _options[_center] = _center;
+          _options["center"] = _center;
         }
 
-        _options[_zoom] = this._getZoom();
+        _options["zoom"] = this._getZoom();
 
         if (trigger) {
-          this._trigger("bboxchange", window.event, { bbox: _options[_bbox] });
+          this._trigger("bboxchange", window.event, { bbox: _options["bbox"] });
         }
 
         if (refresh) {
@@ -936,8 +1112,8 @@
         pixelSize = pixelSize || _pixelSize;
 
         var 
-        width = _contentBounds[_width],
-        height = _contentBounds[_height],
+        width = _contentBounds["width"],
+        height = _contentBounds["height"],
         halfWidth = width / 2 * pixelSize,
         halfHeight = height / 2 * pixelSize,
         bbox = [center[0] - halfWidth, center[1] - halfHeight, center[0] + halfWidth, center[1] + halfHeight],
@@ -964,8 +1140,8 @@
         pixelSize = pixelSize || _pixelSize;
 
         var 
-        width = _contentBounds[_width],
-        height = _contentBounds[_height],
+        width = _contentBounds["width"],
+        height = _contentBounds["height"],
         halfWidth = width / 2 * pixelSize,
         halfHeight = height / 2 * pixelSize,
         bbox = [center[0] - halfWidth, center[1] - halfHeight, center[0] + halfWidth, center[1] + halfHeight],
@@ -993,7 +1169,7 @@
         } else {
           var 
           bboxMax = $.geo._scaleBy(this._getBboxMax(), 1 / Math.pow(_zoomFactor, zoom)),
-          pixelSize = Math.max($.geo._width(bboxMax) / _contentBounds[_width], $.geo._height(bboxMax) / _contentBounds[_height]);
+          pixelSize = Math.max($.geo._width(bboxMax) / _contentBounds["width"], $.geo._height(bboxMax) / _contentBounds["height"]);
 
           this._setCenterAndSize(coord, pixelSize, trigger, refresh);
         }
@@ -1004,7 +1180,7 @@
 
         var offset = $(e.currentTarget).offset();
 
-        switch (_options[_mode]) {
+        switch (_options["mode"]) {
           case "pan":
             this._trigger("dblclick", e, { pixels: _current, coordinates: this.toMap(_current) });
             if (!e.isDefaultPrevented()) {
@@ -1054,10 +1230,10 @@
 
         if (!_inOp && e.shiftKey) {
           _shiftZoom = true;
-          _eventTarget.css("cursor", _options[_cursors]["zoom"]);
+          _eventTarget.css("cursor", _options["cursors"]["zoom"]);
         } else {
           _inOp = true;
-          switch (_options[_mode]) {
+          switch (_options["mode"]) {
             case "pan":
               _lastDrag = _current;
 
@@ -1095,7 +1271,7 @@
           _moveDate = $.now();
         }
 
-        var mode = _shiftZoom ? "zoom" : _options[_mode];
+        var mode = _shiftZoom ? "zoom" : _options["mode"];
 
         switch (mode) {
           case "pan":
@@ -1129,9 +1305,9 @@
           current = [e.pageX - offset.left, e.pageY - offset.top];
         }
 
-        var mode = _shiftZoom ? "zoom" : _options[_mode];
+        var mode = _shiftZoom ? "zoom" : _options["mode"];
 
-        _eventTarget.css("cursor", _options[_cursors][mode]);
+        _eventTarget.css("cursor", _options["cursors"][mode]);
 
         _shiftZoom =
         _mouseDown =
@@ -1192,9 +1368,9 @@
 
           var wheelCenterAndSize = this._getWheelCenterAndSize();
 
-          for (i = 0; i < _options[_services].length; i++) {
-            var service = _options[_services][i];
-            _options[__serviceTypes][service.type].interactiveScale(this, service, wheelCenterAndSize.center, wheelCenterAndSize.pixelSize);
+          for (i = 0; i < _options["services"].length; i++) {
+            var service = _options["services"][i];
+            _options["_serviceTypes"][service.type].interactiveScale(this, service, wheelCenterAndSize.center, wheelCenterAndSize.pixelSize);
           }
 
           //          if (this._imageShape != null && this._mapShape != null) {
