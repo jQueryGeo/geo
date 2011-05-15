@@ -1,0 +1,159 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>shingled services test</title>
+  <style type="text/css">
+    body
+    {
+      font-family: Calibri,Arial;
+    }
+    label
+    {
+      display: block;
+      margin: .25em;
+    }
+    label span
+    {
+      cursor: pointer;
+      display: inline-block;
+      font-weight: bold;
+      width: 8em;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h1>
+      shingled services test</h1>
+    <p>
+      This page tests geomap with shingled services, i.e., fully dynamic services that to not use a tilingScheme. Dynamic services can be set to any scale.</p>
+    <p>
+      If all shingled services are in the same projection, they can be layered and turned on and off at any time by updating the services property of the geomap widget.</p>
+    <p>
+      For this example, I have set $.geo.proj to null and am setting the center in real map units. This is because the WMS services are not in web mercator and geomap does not provide a built-in conversion from lon/lat.</p>
+    <p>
+      These services are hosted by MassGIS.</p>
+    <h2>
+      examples</h2>
+    <p>
+      The map below is initialized to some WMS services as shown here. We also have to set $.proj to null, turn off the tilingScheme and set a bboxMax when initializing the map. After that, the checkboxes update the visible property of one of the service objects and then update the services option.</p>
+      <pre><code>{
+  services: [
+    {
+      id: &quot;massgis_basemap&quot;,
+      type: &quot;shingled&quot;,
+      getUrl: function (view) {
+        return &quot;http://giswebservices.massgis.state.ma.us/geoserver/wms&quot;
+         + &quot;?LAYERS=massgis_basemap&quot;
+         + &quot;&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&quot;
+         + &quot;&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX=&quot;
+         + view.bbox + &quot;&WIDTH=&quot; + view.width + &quot;&HEIGHT=&quot; + view.height;
+      },
+      attr: &quot;&amp;copy; 2011 Commonwealth of Massachusetts&quot;
+    },
+    {
+      id: &quot;massgis_interiorforest&quot;,
+      type: &quot;shingled&quot;,
+      getUrl: function (view) {
+        return &quot;http://giswebservices.massgis.state.ma.us/geoserver/wms&quot;
+         + &quot;?LAYERS=massgis%3AGISDATA.INTERIORFOREST_POLY&quot;
+         + &quot;&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&quot;
+         + &quot;&STYLES=GISDATA.INTERIORFOREST_POLY%3A%3ADefault&TRANSPARENT=true&quot;
+         + &quot;&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX=&quot;
+         + view.bbox + &quot;&WIDTH=&quot; + view.width + &quot;&HEIGHT=&quot; + view.height;
+      },
+      attr: &quot;&amp;copy; 2011 Commonwealth of Massachusetts&quot;,
+      visible: false
+    },
+    {
+      id: &quot;massgis_hydrography&quot;,
+      type: &quot;shingled&quot;,
+      getUrl: function (view) {
+        return &quot;http://giswebservices.massgis.state.ma.us/geoserver/wms&quot;
+         + &quot;?LAYERS=massgis%3AGISDATA.MAJPOND_POLY,massgis%3AGISDATA.MAJSTRM_ARC&quot;
+         + &quot;&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&quot;
+         + &quot;&STYLES=GISDATA.INTERIORFOREST_POLY%3A%3ADefault&TRANSPARENT=true&quot;
+         + &quot;&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX=&quot;
+         + view.bbox + &quot;&WIDTH=&quot; + view.width + &quot;&HEIGHT=&quot; + view.height;
+      },
+      attr: &quot;&amp;copy; 2011 Commonwealth of Massachusetts&quot;,
+      visible: false
+    }
+  ],
+  bboxMax: [31789.1658, 790194.4183, 337250.8970, 961865.1338],
+  tilingScheme: null,
+  center: [184670.21967, 859771.290247],
+  zoom: 8
+}</code></pre>
+    <fieldset>
+      <legend>toggle services!</legend>
+      <label><input type="checkbox" name="service" value="massgis_interiorforest" /> <span>Interior Forest</span></label>
+      <label><input type="checkbox" name="service" value="massgis_hydrography" /> <span>Hydrography</span></label>
+    </fieldset>
+    <div id="map" style="position: relative; width: 480px; height: 320px; background: #bacfe8;">
+    </div>
+  </div>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.js"></script>
+  <script src="../jquery-geo-test.min.js"></script>
+  <script>
+    $(function () {
+
+      var options = {
+        services: [
+          {
+            id: "massgis_basemap",
+            type: "shingled",
+            getUrl: function (view) {
+              return "http://giswebservices.massgis.state.ma.us/geoserver/wms?LAYERS=massgis_basemap&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX=" + view.bbox + "&WIDTH=" + view.width + "&HEIGHT=" + view.height;
+            },
+            attr: "&copy; 2011 Commonwealth of Massachusetts"
+          },
+          {
+            id: "massgis_interiorforest",
+            type: "shingled",
+            getUrl: function (view) {
+              return "http://giswebservices.massgis.state.ma.us/geoserver/wms?LAYERS=massgis%3AGISDATA.INTERIORFOREST_POLY&STYLES=GISDATA.INTERIORFOREST_POLY%3A%3ADefault&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX=" + view.bbox + "&WIDTH=" + view.width + "&HEIGHT=" + view.height;
+            },
+            attr: "&copy; 2011 Commonwealth of Massachusetts",
+            visible: false
+          },
+          {
+            id: "massgis_hydrography",
+            type: "shingled",
+            getUrl: function (view) {
+              return "http://giswebservices.massgis.state.ma.us/geoserver/wms?LAYERS=massgis%3AGISDATA.MAJPOND_POLY,massgis%3AGISDATA.MAJSTRM_ARC&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX=" + view.bbox + "&WIDTH=" + view.width + "&HEIGHT=" + view.height;
+            },
+            attr: "&copy; 2011 Commonwealth of Massachusetts",
+            visible: false
+          }
+        ],
+        bboxMax: [31789.1658, 790194.4183, 337250.8970, 961865.1338],
+        tilingScheme: null,
+        center: [184670.21967, 859771.290247],
+        zoom: 8
+      };
+
+      $.geo.proj = null;
+
+      $("input:checkbox[name='service']").click(function () {
+        var $optService = $(this);
+
+        var service = null;
+        $.each(options.services, function (i) {
+          if (this.id == $optService.val()) {
+            service = this;
+            return false;
+          }
+        });
+
+        if (service) {
+          service.visible = $optService.is(":checked");
+          $("#map").geomap("option", "services", options.services);
+        }
+      });
+
+      $("#map").geomap(options);
+    });  
+  </script>
+</body>
+</html>

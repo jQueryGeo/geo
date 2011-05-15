@@ -39,7 +39,7 @@
         dx = dy * ratio;
       }
 
-      return [c[0] - dx, c[1] - dy, c[0] + dx, c[1] + dy];
+      return [center[0] - dx, center[1] - dy, center[0] + dx, center[1] + dy];
     },
 
     _scaleBy: function (bbox, scale) {

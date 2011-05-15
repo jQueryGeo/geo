@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-  <title>services test</title>
+  <title>tiled services test</title>
   <style type="text/css">
     body
     {
@@ -23,13 +23,13 @@
 <body>
   <div>
     <h1>
-      services test</h1>
+      tiled services test</h1>
     <p>
       This page tests initializing geomap with different services that support the same tilingScheme.</p>
     <p>
       So long as all services support the current tiling scheme, they are interchangeabe without worrying about the tilingScheme property.</p>
     <p>
-      Dynamic services are not yet implemented but will be able to be layered on top of tiled services as they don't require a tilingScheme at all.</p>
+      Dynamic services can be layered on top of tiled services as they don't require a tilingScheme at all, however you have to make sure the map units match, e.g., the dynamic service accepts a geodetic (lon/lat) bounding box or you set $.proj to null and work entirely in a specific projection's map units.</p>
     <h2>
       service examples</h2>
     <p>
