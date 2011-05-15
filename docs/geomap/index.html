@@ -1,10 +1,6 @@
 <!doctype html>  
 
-<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
-<!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
-<!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
-<!--[if IE 9 ]>    <html lang="en" class="no-js ie9"> <![endif]-->
-<!--[if (gt IE 9)|!(IE)]><!--> <html lang="en" class="no-js"> <!--<![endif]-->
+<html lang="en" class="no-js">
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -12,11 +8,6 @@
   <title>geomap | $.geo</title>
   <meta name="description" content="$.geo geomap method">
   <meta name="author" content="Ryan Westphal">
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0a4.1/jquery.mobile-1.0a4.1.min.css" />
-
 </head>
 
 <body>
@@ -88,15 +79,20 @@
       <p>With geometry events the geo argument to your callback is a JavaScript object having two properties: pixels &amp; geometry. Both are multi-dimensional <a href="http://geojson.org/geojson-spec.html#positions">GeoJSON positions</a>, i.e., an array containing the x and y value but pixel is in pixel coordinates based on the current map view and the other in map coordinates based on the tilingScheme for tiled maps and bboxMax for shingled (dynamic) maps.</p>-->
       <ul data-role=listview data-inset=true>
         <li>
-            <a href="geomapbbox.html">bbox</a>
+            <a href="geomapbbox.html">bboxchange</a>
         </li>
       </ul>
       <h2>methods</h2>
       <p>The geomap widget provides some methods to help make interacting map data a little easier.</p>
+      <h3>information</h3>
       <ul data-role=listview data-inset=true>
         <li>
           <a href="getPixelSize.html">getPixelSize</a>
         </li>
+      </ul>
+      <h3>unit conversion</h3>
+      <p>Convert positions between pixel and map coordinates.</p>
+      <ul data-role="listview" data-inset="true">
         <li>
           <a href="toMap.html">toMap</a>
         </li>
@@ -104,29 +100,20 @@
           <a href="toPixel.html">toPixel</a>
         </li>
       </ul>
+      <h3>service modification</h3>
+      <p>Convenience methods that help update objects in the services array.</p>
+      <ul data-role="listview" data-inset="true">
+        <li>
+          <a href="toggle.html">toggle</a>
+        </li>
+        <li>
+          <a href="opacity.html">opacity</a>
+        </li>
+      </ul>
       <h2>theming</h2>
       <p>The geomap widget itself does not create many DOM elements worth theming. There are exceptions but they are not included in this initial test release.<!--The only exception is the floating measure text. It gets the ui-widget, ui-widget-content and ui-corner-all classes.--></p>
     </div>
   </div> <!-- end of #container -->
-
-  <script src="//code.jquery.com/jquery-1.5.2.min.js"></script>
-
-  <script src="../js/script.js"></script>
-  
-  <script src="//code.jquery.com/mobile/1.0a4.1/jquery.mobile-1.0a4.1.min.js"></script>
-  
-  <!-- change the UA-XXXXX-X to be your site's ID -->
-  <script>
-   var _gaq = [['_setAccount', 'UA-18348536-1'], ['_trackPageview']];
-   (function(d, t) {
-    var g = d.createElement(t),
-        s = d.getElementsByTagName(t)[0];
-    g.async = true;
-    g.src = ('https:' == location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    s.parentNode.insertBefore(g, s);
-   })(document, 'script');
-  </script>
-  
 </body>
 </html>
 
