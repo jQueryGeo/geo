@@ -63,26 +63,124 @@ input:invalid, textarea:invalid { border-radius: 1px; -moz-box-shadow: 0px 0px 5
 .no-boxshadow input:invalid, .no-boxshadow textarea:invalid { background-color: #f0dddd; }
 
 
+a:link { -webkit-tap-highlight-color: #FF5E99; }
 button {  width: auto; overflow: visible; }
 .ie7 img { -ms-interpolation-mode: bicubic; }
 
 body, select, input, textarea { color: #444; }
 h1, h2, h3, h4, h5, h6 { font-weight: bold; }
+a, a:active, a:visited { color: #607890; }
+a:hover { color: #036; }
 
 
- /* Primary Styles
-    Author: Ryan Westphal
+/**
+ * Primary styles
+ *
+ * Author: Ryan Westphal
  */
 
-div>h2 { font-size: 1.1em; margin: .5em 0; }
-p { margin: .5em 0; }
-th { text-align: right; padding: .5em 1em .5em 0; }
-td { padding: .5em 0; }
-b { font-weight: bold; }
-h4 { font-style: italic; font-weight: normal; }
+body { background: #ccc; }
+#index { bottom: 0; left: 32px; min-width: 800px; position: absolute; right: 32px; top: 0; }
+header
+{
+  background: #fdfdfd;
+  -moz-border-radius-bottomright: 16px;
+  -moz-border-radius-bottomleft: 16px;
+  -webkit-border-bottom-right-radius: 16px;
+  -webkit-border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  border-bottom-left-radius: 16px;
+  padding: 16px 12px 32px 12px;
+}
+h1 { color: #1C56A3; display: inline; font-family: Georgia; font-size: 32px; }
+#basemapButtons { float: right; }
+span.selector { background: url(../img/BaseMapSelectorSprite-v1.1.png) no-repeat scroll; display: block; height: 49px; width: 50px; }
+span.Lite { background-position: -90px -276px; }
+span.Hybrid { background-position: -15px -276px; }
+span.Hillshade { background-position: -15px -213px; }
+span.Terrain { background-position: -91px -18px; }
+span.Vector { background-position: -15px -84px; }
+span.Imagery2009 { background-position: -15px -149px; }
+span.Topo { background-position: -15px -18px; }
 
+#pnlInfoAndSearch
+{
+  left: 12px;
+  position: relative;
+  top: 12px;
+}
 
+#lblCoords 
+{
+  color: #1C56A3;
+  display: inline-block;
+  font-size: 14px;
+  font-weight: bold;
+  width: 512px;
+}
 
+.ie7 #lblCoords
+{
+  float: left;
+}
+
+#pnlSearch
+{
+  display: inline-block;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.ie7 #pnlSearch
+{
+  float: left;
+}
+
+#pnlSearch label span
+{
+  color: #1C56A3;
+  margin-right: 4px;
+}
+
+#pnlSearch input
+{
+  width: 192px;
+}
+
+#pnlSearch button
+{
+  display: none;
+}
+
+#map 
+{
+  background: #ccc;
+  -moz-border-radius-topleft: 16px;
+  -moz-border-radius-topright: 16px;
+  -webkit-border-top-left-radius: 16px;
+  -webkit-border-top-right-radius: 16px;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  position: absolute;
+  right: 0;
+  top: 128px;
+}
+
+#infoBar
+{
+  background: #ccc;
+  bottom: 0;
+  color: #1C56A3;
+  font-size: 14px;
+  font-weight: bold;
+  left: 0;
+  padding: 16px;
+  position: absolute;
+  right: 0;
+}
 
 .ir { display: block; text-indent: -999em; overflow: hidden; background-repeat: no-repeat; text-align: left; direction: ltr; }
 .hidden { display: none; visibility: hidden; }
