@@ -1,0 +1,44 @@
+<!doctype html>  
+
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>addShape | $.geo</title>
+  <meta name="description" content="$.geo addShape method">
+  <meta name="author" content="Ryan Westphal">
+</head>
+
+<body>
+
+  <div id="addShape" data-role=page data-theme="b">
+    <div data-role="header">
+      <h1>addShape</h1>
+    </div>
+    
+    <div data-role="content">
+      <table>
+        <tr>
+          <th>return type</th>
+          <td>undefined</td>
+        </tr>
+        <tr>
+          <th>syntax</th>
+          <td>.geomap( &quot;addShape&quot; <!--[ , String serviceId ]--> , Object ( <a href="http://geojson.org/geojson-spec.html" rel="external">GeoJSON object</a> ) [ , Object ( geomap style ) ] )</td>
+        </tr>
+        <tr>
+          <th>usage</th>
+          <td><pre><code>$(&quot;map&quot;).geomap( &quot;addShape&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] } )
+$(&quot;map&quot;).geomap( &quot;addShape&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, { width: &quot;16px&quot;, height: &quot;16px&quot; } )</code></pre></td>
+        </tr>
+      </table>
+      <p>The addShape method adds a GeoJSON geometry, feature or feature collection to the map. Only basic geometry types are supported, even for features. For example, you can add a GeoJSON Point, LineString, Polygon, a Feature with one of those three geometry types or a FeatureCollection where all the features are one of those three geometry types.</p>
+      <p>Unsupported geometry types are ignored so you <i>can</i> call addShape with a FeatureCollection that has some MultiLineString geometry mixed in. The MultiLineString features will not be added, the others will.</p>
+      <p>If $.geo.proj is not null, all coordinates of all geometry (whether plain or part of a feature) must be in as geodetic coordinates, e.g., for a Point object coordinates[0] is longitude and coordinates[1] is latitude. Otherwise, all coordinates must be in the widget's internal projection as defined by tilingScheme for tiled map services or bbox for shingled (dynamic) map services.</p>
+      <p>The optional style argument modifies how geomap draws the geometry you just added. This style will override the style set on the geomap widget via shapeStyle method calls. Please see the shapeStyle method documentation for information about what properties are valid for this object.</p>
+    </div>
+  </div> <!-- end of #container -->
+</body>
+</html>
+

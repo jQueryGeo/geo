@@ -6,3 +6,19 @@ After years of internal development, we are pleased to bring our JavaScript map 
 
 Documentation is hosted at http://host.appgeo.com/libs/geo/test/
 
+== TO DO ==
+
+* Change getPixelSize docs to mention that it's a read-only method property (is there a better way in jQuery UI)
+* Change getPixelSize to pixelSize but leave it as a method
+* [BUG] geomap does not initialize if jQuery UI is already included
+* Auto-handle window resize events
+* [BUG] Mouse wheel on bad or missing tile doesn't zoom out on first rotate
+
+== CHANGELOG ==
+
+=== Version alpha2 ===
+* Support dynamic map services
+
+=== Version alpha1 ===
+* Create interactive map widget
+* Support tiled map services

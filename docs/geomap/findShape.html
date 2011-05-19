@@ -1,0 +1,42 @@
+<!doctype html>  
+
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>toMap | $.geo</title>
+  <meta name="description" content="$.geo toMap method">
+  <meta name="author" content="Ryan Westphal">
+</head>
+
+<body>
+
+  <div id="toMap" data-role=page data-theme="b">
+    <div data-role="header">
+      <h1>toMap</h1>
+    </div>
+    
+    <div data-role="content">
+      <table>
+        <tr>
+          <th>return type</th>
+          <td>Array | Array^2 (<a href="http://geojson.org/geojson-spec.html#positions">GeoJSON position</a>)</td>
+        </tr>
+        <tr>
+          <th>syntax</th>
+          <td>.geomap( &quot;toMap&quot;, Array pixelPosition | Array^2 pixelPositions )</td>
+        </tr>
+        <tr>
+          <th>usage</th>
+          <td>var mapPos = $(&quot;map&quot;).geomap( &quot;toMap&quot;, [ 120, 240 ] )<br>
+              var mapPositions = $(&quot;map&quot;).geomap( &quot;toMap&quot;, [ [ 120, 240 ], [ 192, 48 ] ] )</td>
+        </tr>
+      </table>
+      <p>The toMap method takes a single pixel position (which is an array of two values: the x and y of the pixel) or an array of pixel positions and returns the map coordinates for the pixels.</p>
+      <p>If $.geo.proj is not null, the widget returns the positions as geodetic coordinates. Otherwise, the widget returns positions in its internal projection as defined by tilingScheme for tiled map services or bbox for shingled (dynamic) map services.</p>
+    </div>
+  </div> <!-- end of #container -->
+</body>
+</html>
+
