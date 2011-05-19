@@ -27,6 +27,7 @@
  *
  * http://docs.jquery.com/UI/Widget
  */
+if (!$.widget) {
 (function( $, undefined ) {
 
 var slice = Array.prototype.slice;
@@ -359,7 +360,7 @@ $.Widget.prototype = {
 };
 
 })( jQuery );
-﻿(function ($, window, undefined) {
+}﻿(function ($, window, undefined) {
   $.geo = {
     //
     // geometry functions
