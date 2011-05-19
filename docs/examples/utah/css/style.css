@@ -90,7 +90,7 @@ header
   -webkit-border-bottom-left-radius: 16px;
   border-bottom-right-radius: 16px;
   border-bottom-left-radius: 16px;
-  padding: 16px 12px 32px 12px;
+  padding: 16px 12px 16px 12px;
 }
 h1 { color: #1C56A3; display: inline; font-family: Georgia; font-size: 32px; }
 #basemapButtons { float: right; }
