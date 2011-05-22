@@ -1,0 +1,105 @@
+<!doctype html>  
+
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>shapeStyle | $.geo</title>
+  <meta name="description" content="$.geo shapeStyle method">
+  <meta name="author" content="Ryan Westphal">
+</head>
+
+<body>
+
+  <div id="shapeStyle" data-role=page data-theme="b">
+    <div data-role="header">
+      <h1>shapeStyle</h1>
+    </div>
+    
+    <div data-role="content">
+      <table>
+        <tr>
+          <th>return type</th>
+          <td>Object ( geomap style ) | jQuery</td>
+        </tr>
+        <tr>
+          <th>syntax</th>
+          <td>.geomap( &quot;shapeStyle&quot;, Object style )</td>
+        </tr>
+        <tr>
+          <th>usage</th>
+          <td><pre><code>var currentStyle = $(&quot;#map&quot;).geomap( &quot;shapeStyle&quot; )
+$(&quot;#map&quot;).geomap( &quot;shapeStyle&quot;, { width: &quot;16px&quot;, height: &quot;16px&quot; } )</code></pre></td>
+        </tr>
+      </table>
+      <p>The shapeStyle method retrieves or updates the <i>default</i> style of geomap graphics. The reasons that this is a method instead of a property will be clearer in a future release.</p>
+      <p>This method changes specific properties of the internal default style. If you send an incomplete style object, only the style properties you reference are updated.</p>
+      <p>You can override this style with every call to addShape.</p>
+      <p>Changing this default style will update the style of any existing shape that has been added with addShape but not given its own style. For example, if you add two GeoJSON Point objects and in the first addShape call you do not pass a style but in the second one you do. In this situation, future calls to shapeStyle will only update how geomap draws the first shape.</p>
+      <p>When called with a second argument to set the shapeStyle, this method returns the original jQuery collection to maintain call chaining.</p>
+      <h2>geomap style</h2>
+      <p>A geomap style is an object whose properties follow a subset of <a href="http://www.w3.org/TR/SVG/styling.html">SVG styling</a> properties. The specific styles that geomap recognizes and to which geometry they apply are listed below.</p>
+      <table>
+        <tr>
+          <th>property</th>
+          <th>default</th>
+          <th>description</th>
+        </tr>
+        <tr>
+          <td>color</td>
+          <td>black</td>
+          <td>An indirect, fallback value for the fill and stroke properties if they are not set.</td>
+        </tr>
+        <tr>
+          <td>fill</td>
+          <td>undefined</td>
+          <td>Draws the interior of a shape. The area to be drawn consists of any areas inside the outline of the shape. By default, fill will use the value of the color property.</td>
+        </tr>
+        <tr>
+          <td>fillOpacity</td>
+          <td>undefined</td>
+          <td>Specifies the opacity of the drawing operation used to draw the interior of a shape. By default, fillOpacity will use the value of the opacity property.</td>
+        </tr>
+        <tr>
+          <td>height</td>
+          <td>&quot;8px&quot;</td>
+          <td>The height of an oval drawn around Point shapes. Currently only pixel values are allowed.</td>
+        </tr>
+        <tr>
+          <td>opacity</td>
+          <td>1</td>
+          <td>An indirect, fallback value for the fillOpacity and strokeOpacity properties if they are not set.</td>
+        </tr>
+        <tr>
+          <td>stroke</td>
+          <td>undefined</td>
+          <td>Draws along the outline of a shape. By default, stroke will use the value of the color property.</td>
+        </tr>
+        <tr>
+          <td>strokeOpacity</td>
+          <td>undefined</td>
+          <td>Specifies the opacity of the drawing operation used to draw the outline of a shape. By default, strokeOpacity will use the value of the opacity property.</td>
+        </tr>
+        <tr>
+          <td>strokeWidth</td>
+          <td>&quot;1px&quot;</td>
+          <td>The width of the stroke of a shape. A zero value causes no stroke to be drawn.</td>
+        </tr>
+        <tr>
+          <td>visibility</td>
+          <td>&quot;visible&quot;</td>
+          <td>Determines if the shape is drawn (&quot;visible&quot;) or not drawn (&quot;hidden&quot;) on the map. Shapes that are hidden can still be returned by the findShape method.</td>
+        </tr>
+        <tr>
+          <td>width</td>
+          <td>&quot;8px&quot;</td>
+          <td>The width of an oval drawn around Point shapes. Currently only pixel values are allowed.</td>
+        </tr>
+      </table>
+      <p>All properties apply to Point shapes which means that you can adjust the stroke and fill of the oval surrounding the point location.</p>
+    </div>
+  </div> <!-- end of #container -->
+</body>
+</html>
+
