@@ -29,12 +29,12 @@
         </tr>
         <tr>
           <th>usage</th>
-          <td>var pixelPos = $(&quot;map&quot;).geomap( &quot;toPixel&quot;, [ -71.098709, 42.330322 ] )<br>
-              var pixelPositions = $(&quot;map&quot;).geomap( &quot;toPixel&quot;, [ [ -71.098709, 42.330322 ], [ -71.072617, 42.351608 ] ] )</td>
+          <td>var pixelPos = $(&quot;#map&quot;).geomap( &quot;toPixel&quot;, [ -71.098709, 42.330322 ] )<br>
+              var pixelPositions = $(&quot;#map&quot;).geomap( &quot;toPixel&quot;, [ [ -71.098709, 42.330322 ], [ -71.072617, 42.351608 ] ] )</td>
         </tr>
       </table>
       <p>The toPixel method takes a single map position (which is an array of two values: x and y or longitude and latitude) or an array of map positions and returns the pixel coordinates for them.</p>
-      <p>If $.geo.proj is not null, the widget assumes the arguments are geodetic coordinates and converts them before calculating pixel positions. Otherwise, the widget assumes they are already in its internal projection as defined by tilingScheme for tiled map services or bbox for shingled (dynamic) map services.</p>
+      <p>If $.geo.proj is not null, the widget assumes the arguments are geodetic coordinates and converts them before calculating pixel positions. Otherwise, the widget assumes they are already in its internal projection as defined by tilingScheme for tiled map services or bboxMax for shingled (dynamic) map services.</p>
     </div>
   </div> <!-- end of #container -->
 </body>
