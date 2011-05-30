@@ -6,12 +6,12 @@
 
   _contentBounds = {},
 
-  _contentFrame,
-  _servicesContainer,
-  _graphicsContainer,
-  _textContainer,
-  _textContent,
-  _eventTarget,
+  _$contentFrame,
+  _$servicesContainer,
+  _$graphicsContainer,
+  _$textContainer,
+  _$textContent,
+  _$eventTarget,
 
   _dpi = 96,
 
@@ -51,9 +51,24 @@
   } ()),
 
   _supportTouch,
-  _softDblClick = this._supportTouch || this._ieVersion == 7,
+  _softDblClick,
   _isTap,
   _isDbltap,
+
+  _graphicStyle = {
+    color: "#000",
+    //fill: undefined,
+    //fillOpacity: undefined,
+    height: "8px",
+    opacity: 1,
+    //stroke: undefined,
+    //strokeOpacity: undefined,
+    strokeWidth: "1px",
+    visibility: "visible",
+    width: "8px"
+  },
+  _graphicTiles = [],
+  _graphicShapes = [],
 
   _initOptions = {},
 
@@ -100,9 +115,9 @@
               };
 
               var scHtml = "<div data-service='" + service.id + "' style='position:absolute; left:0; top:0; width:8px; height:8px; margin:0; padding:0; display:" + (service.visible === undefined || service.visible ? "block" : "none") + ";'></div>";
-              _servicesContainer.append(scHtml);
+              _$servicesContainer.append(scHtml);
 
-              tiledServicesState[service.id].serviceContainer = _servicesContainer.children("[data-service='" + service.id + "']");
+              tiledServicesState[service.id].serviceContainer = _$servicesContainer.children("[data-service='" + service.id + "']");
             }
           },
 
@@ -478,9 +493,9 @@
               };
 
               var scHtml = '<div data-service="' + service.id + '" style="position:absolute; left:0; top:0; width:16px; height:16px; margin:0; padding:0; display:' + (service.visible === undefined || service.visible ? "block" : "none") + ';"></div>';
-              _servicesContainer.append(scHtml);
+              _$servicesContainer.append(scHtml);
 
-              shingledServicesState[service.id].serviceContainer = _servicesContainer.children('[data-service="' + service.id + '"]');
+              shingledServicesState[service.id].serviceContainer = _$servicesContainer.children('[data-service="' + service.id + '"]');
             }
           },
 
@@ -524,7 +539,7 @@
 
             this._cancelUnloaded(map, service);
 
-            var
+            var 
             serviceState = shingledServicesState[service.id],
             serviceContainer = serviceState.serviceContainer,
 
@@ -543,7 +558,7 @@
               ratio = scalePixelSize / pixelSize;
 
               $scaleContainer.css({ width: mapWidth * ratio, height: mapHeight * ratio }).children("img").each(function (i) {
-                var
+                var 
                 $img = $(this),
                 imgCenter = $img.data("center"),
                 x = (Math.round((imgCenter[0] - center[0]) / scalePixelSize) - halfWidth) * ratio,
@@ -676,16 +691,11 @@
         _initOptions = options;
         _elem = $(element);
 
-        var cssPosition = _elem.css("position"),
-          size;
-
-        if (cssPosition != "relative" && cssPosition != "absolute" && cssPosition != "fixed") {
-          _elem.css("position", "relative");
-        }
+        this._forcePosition(_elem);
 
         _elem.css("text-align", "left");
 
-        size = this._findMapSize();
+        var size = this._findMapSize();
         _contentBounds = {
           x: parseInt(_elem.css("padding-left")),
           y: parseInt(_elem.css("padding-top")),
@@ -726,19 +736,21 @@
         _options = this.options;
 
         _supportTouch = "ontouchend" in document;
+        _softDblClick = _supportTouch || _ieVersion == 7;
 
-        var touchStartEvent = _supportTouch ? "touchstart" : "mousedown",
+        var 
+        touchStartEvent = _supportTouch ? "touchstart" : "mousedown",
     	  touchStopEvent = _supportTouch ? "touchend touchcancel" : "mouseup",
     	  touchMoveEvent = _supportTouch ? "touchmove" : "mousemove";
 
-        _eventTarget.dblclick($.proxy(this._eventTarget_dblclick, this));
-        _eventTarget.bind(touchStartEvent, $.proxy(this._eventTarget_touchstart, this));
+        _$eventTarget.dblclick($.proxy(this._eventTarget_dblclick, this));
+        _$eventTarget.bind(touchStartEvent, $.proxy(this._eventTarget_touchstart, this));
 
-        var dragTarget = (_eventTarget[0].setCapture) ? _eventTarget : $(document);
+        var dragTarget = (_$eventTarget[0].setCapture) ? _$eventTarget : $(document);
         dragTarget.bind(touchMoveEvent, $.proxy(this._dragTarget_touchmove, this));
         dragTarget.bind(touchStopEvent, $.proxy(this._dragTarget_touchstop, this));
 
-        _eventTarget.mousewheel($.proxy(this._eventTarget_mousewheel, this));
+        _$eventTarget.mousewheel($.proxy(this._eventTarget_mousewheel, this));
 
         if (_initOptions) {
           if (_initOptions.bbox) {
@@ -752,7 +764,7 @@
           }
         }
 
-        _eventTarget.css("cursor", _options["cursors"][_options["mode"]]);
+        _$eventTarget.css("cursor", _options["cursors"][_options["mode"]]);
 
         this._createServices();
 
@@ -818,6 +830,30 @@
         return this._toPixel(p);
       },
 
+      addShape: function (shape, style) {
+        //var graphicTile = _graphicTiles.length ? _graphicTiles[_graphicTiles.length - 1] : null;
+        style = style || _graphicStyle;
+        if (shape) {
+          var shapes;
+          if (shape.type == "FeatureCollection") {
+            shapes = shape.features;
+          } else {
+            shapes = [shape];
+          }
+
+          $.each(shapes, function () {
+            _graphicShapes[_graphicShapes.length] = {
+              shape: this,
+              style: style
+            };
+          });
+          if (_graphicTiles.length > 0) {
+            this._refresh();
+          }
+        }
+      },
+
+
       _getBbox: function () {
         // calculate the internal bbox
         var halfWidth = _contentBounds["width"] / 2 * _pixelSize,
@@ -872,22 +908,24 @@
       _createChildren: function () {
         var existingChildren = _elem.children().detach();
 
+        this._forcePosition(existingChildren);
+
         existingChildren.css("-moz-user-select", "none");
 
         _elem.prepend("<div style='position:absolute; left:" + _contentBounds.x + "px; top:" + _contentBounds.y + "px; width:" + _contentBounds["width"] + "px; height:" + _contentBounds["height"] + "px; margin:0; padding:0; overflow:hidden; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none;' unselectable='on'></div>");
-        _eventTarget = _contentFrame = _elem.children(':first');
+        _$eventTarget = _$contentFrame = _elem.children(':first');
 
-        _contentFrame.append('<div style="position:absolute; left:0; top:0; width:' + _contentBounds["width"] + 'px; height:' + _contentBounds["height"] + 'px; margin: 0; padding: 0;"></div>');
-        _servicesContainer = _contentFrame.children(':last');
+        _$contentFrame.append('<div style="position:absolute; left:0; top:0; width:' + _contentBounds["width"] + 'px; height:' + _contentBounds["height"] + 'px; margin: 0; padding: 0;"></div>');
+        _$servicesContainer = _$contentFrame.children(':last');
 
-        _contentFrame.append('<div style="position:absolute; left:0; top:0; width:' + _contentBounds["width"] + 'px; height:' + _contentBounds["height"] + 'px; margin: 0; padding: 0;"></div>');
-        _graphicsContainer = _contentFrame.children(':last');
+        _$contentFrame.append('<div style="position:absolute; left:0; top:0; width:' + _contentBounds["width"] + 'px; height:' + _contentBounds["height"] + 'px; margin: 0; padding: 0;"></div>');
+        _$graphicsContainer = _$contentFrame.children(':last');
 
-        _contentFrame.append('<div class="ui-widget ui-widget-content ui-corner-all" style="position:absolute; left:0; top:0px; max-width:128px; display:none;"><div style="margin:.2em;"></div></div>');
-        _textContainer = _contentFrame.children(':last');
-        _textContent = _textContainer.children();
+        _$contentFrame.append('<div class="ui-widget ui-widget-content ui-corner-all" style="position:absolute; left:0; top:0px; max-width:128px; display:none;"><div style="margin:.2em;"></div></div>');
+        _$textContainer = _$contentFrame.children(':last');
+        _$textContent = _$textContainer.children();
 
-        _contentFrame.append(existingChildren);
+        _$contentFrame.append(existingChildren);
       },
 
       _createServices: function () {
@@ -917,6 +955,13 @@
           sizeContainer = sizeContainer.parent();
         }
         return size;
+      },
+
+      _forcePosition: function (elem) {
+        var cssPosition = elem.css("position");
+        if (cssPosition != "relative" && cssPosition != "absolute" && cssPosition != "fixed") {
+          elem.css("position", "relative");
+        }
       },
 
       _getTiledPixelSize: function (zoom) {
@@ -1025,7 +1070,7 @@
           _anchor = _current;
           _toolPan = _panning = false;
 
-          _eventTarget.css("cursor", _options["cursors"][_options["mode"]]);
+          _$eventTarget.css("cursor", _options["cursors"][_options["mode"]]);
         }
       },
 
@@ -1037,7 +1082,7 @@
         if (_toolPan || dx > 3 || dx < -3 || dy > 3 || dy < -3) {
           if (!_toolPan) {
             _toolPan = true;
-            _eventTarget.css("cursor", _options["cursors"]["pan"]);
+            _$eventTarget.css("cursor", _options["cursors"]["pan"]);
           }
 
           if (_mouseDown) {
@@ -1230,7 +1275,7 @@
 
         if (!_inOp && e.shiftKey) {
           _shiftZoom = true;
-          _eventTarget.css("cursor", _options["cursors"]["zoom"]);
+          _$eventTarget.css("cursor", _options["cursors"]["zoom"]);
         } else {
           _inOp = true;
           switch (_options["mode"]) {
@@ -1249,7 +1294,7 @@
 
       _dragTarget_touchmove: function (e) {
         var 
-        offset = _eventTarget.offset(),
+        offset = _$eventTarget.offset(),
         current, i, dx, dy;
 
         if (_supportTouch) {
@@ -1288,7 +1333,7 @@
 
       _dragTarget_touchstop: function (e) {
         if (!_mouseDown && _ieVersion == 7) {
-          // ie7 doesn't appear to trigger dblclick on _eventTarget,
+          // ie7 doesn't appear to trigger dblclick on _$eventTarget,
           // we fake regular click here to cause soft dblclick
           this._eventTarget_touchstart(e);
         }
@@ -1296,7 +1341,7 @@
         var 
         mouseWasDown = _mouseDown,
         wasToolPan = _toolPan,
-        offset = _eventTarget.offset(),
+        offset = _$eventTarget.offset(),
         current, i;
 
         if (_supportTouch) {
@@ -1307,7 +1352,7 @@
 
         var mode = _shiftZoom ? "zoom" : _options["mode"];
 
-        _eventTarget.css("cursor", _options["cursors"][mode]);
+        _$eventTarget.css("cursor", _options["cursors"][mode]);
 
         _shiftZoom =
         _mouseDown =
@@ -1341,7 +1386,7 @@
 
           if (_softDblClick && _isDbltap) {
             _isDbltap = _isTap = false;
-            _eventTarget.trigger("dblclick", e);
+            _$eventTarget.trigger("dblclick", e);
           }
         }
       },
@@ -1386,7 +1431,7 @@
           //          }
 
           var that = this;
-          this._wheelTimer = window.setTimeout(function () {
+          _wheelTimer = window.setTimeout(function () {
             that._mouseWheelFinish();
           }, 1000);
         }

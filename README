@@ -8,7 +8,7 @@ Documentation is hosted at http://host.appgeo.com/libs/geo/test/
 
 == TO DO ==
 
-* geomap - [BUG] Soft double-click does not work
+* geographics - Document graphics widget
 * geomap - Document and implement the refresh method
 * docs/internal - Document how geomap draws shapes
 * geomap - Change getPixelSize docs to mention that it's a read-only method property (is there a better way in jQuery UI?) then rename it to pixelSize
@@ -24,6 +24,9 @@ Documentation is hosted at http://host.appgeo.com/libs/geo/test/
 * geomap - Support dynamic map services
 * geomap - [BUG] geomap causes a script error if jQuery UI is already included
 * geomap - Document graphic methods
+* geomap - [BUG] Soft double-click does not work
+* geomap - [BUG] Cannot see dev-supplied inner content if not set to rel/abs position
+* geomap - Add mobile test page
 
 === Version alpha1 ===
 * Create interactive map widget
