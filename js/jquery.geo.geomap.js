@@ -2,7 +2,7 @@
 
   var 
   // private widget members
-  _elem,
+  _$elem,
 
   _contentBounds = {},
 
@@ -55,20 +55,7 @@
   _isTap,
   _isDbltap,
 
-  _graphicStyle = {
-    color: "#000",
-    //fill: undefined,
-    //fillOpacity: undefined,
-    height: "8px",
-    opacity: 1,
-    //stroke: undefined,
-    //strokeOpacity: undefined,
-    strokeWidth: "1px",
-    visibility: "visible",
-    width: "8px"
-  },
-  _graphicTiles = [],
-  _graphicShapes = [],
+  _graphicShapes = [], //< an array of objects containing style object refs & GeoJSON object refs
 
   _initOptions = {},
 
@@ -689,16 +676,16 @@
 
       _createWidget: function (options, element) {
         _initOptions = options;
-        _elem = $(element);
+        _$elem = $(element);
 
-        this._forcePosition(_elem);
+        this._forcePosition(_$elem);
 
-        _elem.css("text-align", "left");
+        _$elem.css("text-align", "left");
 
         var size = this._findMapSize();
         _contentBounds = {
-          x: parseInt(_elem.css("padding-left")),
-          y: parseInt(_elem.css("padding-top")),
+          x: parseInt(_$elem.css("padding-left")),
+          y: parseInt(_$elem.css("padding-top")),
           width: size["width"],
           height: size["height"]
         };
@@ -751,6 +738,8 @@
         dragTarget.bind(touchStopEvent, $.proxy(this._dragTarget_touchstop, this));
 
         _$eventTarget.mousewheel($.proxy(this._eventTarget_mousewheel, this));
+
+        _$graphicsContainer.geographics();
 
         if (_initOptions) {
           if (_initOptions.bbox) {
@@ -830,24 +819,29 @@
         return this._toPixel(p);
       },
 
-      addShape: function (shape, style) {
-        //var graphicTile = _graphicTiles.length ? _graphicTiles[_graphicTiles.length - 1] : null;
-        style = style || _graphicStyle;
+      addShape: function (shape, style, refresh /* internal */) {
+        refresh = (refresh === undefined || refresh);
+
         if (shape) {
-          var shapes;
+          var shapes, map = this;
           if (shape.type == "FeatureCollection") {
             shapes = shape.features;
           } else {
-            shapes = [shape];
+            shapes = $.isArray(shape) ? shape : [shape];
           }
 
           $.each(shapes, function () {
-            _graphicShapes[_graphicShapes.length] = {
-              shape: this,
-              style: style
-            };
+            if (this.type == "GeometryCollection") {
+              map.addShape(this.geometries, style, false);
+            } else {
+              _graphicShapes[_graphicShapes.length] = {
+                shape: this,
+                style: style
+              };
+            }
           });
-          if (_graphicTiles.length > 0) {
+
+          if (refresh) {
             this._refresh();
           }
         }
@@ -906,19 +900,19 @@
       },
 
       _createChildren: function () {
-        var existingChildren = _elem.children().detach();
+        var existingChildren = _$elem.children().detach();
 
         this._forcePosition(existingChildren);
 
         existingChildren.css("-moz-user-select", "none");
 
-        _elem.prepend("<div style='position:absolute; left:" + _contentBounds.x + "px; top:" + _contentBounds.y + "px; width:" + _contentBounds["width"] + "px; height:" + _contentBounds["height"] + "px; margin:0; padding:0; overflow:hidden; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none;' unselectable='on'></div>");
-        _$eventTarget = _$contentFrame = _elem.children(':first');
+        _$elem.prepend("<div style='position:absolute; left:" + _contentBounds.x + "px; top:" + _contentBounds.y + "px; width:" + _contentBounds["width"] + "px; height:" + _contentBounds["height"] + "px; margin:0; padding:0; overflow:hidden; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none;' unselectable='on'></div>");
+        _$eventTarget = _$contentFrame = _$elem.children(':first');
 
-        _$contentFrame.append('<div style="position:absolute; left:0; top:0; width:' + _contentBounds["width"] + 'px; height:' + _contentBounds["height"] + 'px; margin: 0; padding: 0;"></div>');
+        _$contentFrame.append('<div style="position:absolute; left:0; top:0; width:' + _contentBounds["width"] + 'px; height:' + _contentBounds["height"] + 'px; margin:0; padding:0;"></div>');
         _$servicesContainer = _$contentFrame.children(':last');
 
-        _$contentFrame.append('<div style="position:absolute; left:0; top:0; width:' + _contentBounds["width"] + 'px; height:' + _contentBounds["height"] + 'px; margin: 0; padding: 0;"></div>');
+        _$contentFrame.append('<div style="position:absolute; left:0; top:0; width:' + _contentBounds["width"] + 'px; height:' + _contentBounds["height"] + 'px; margin:0; padding:0;"></div>');
         _$graphicsContainer = _$contentFrame.children(':last');
 
         _$contentFrame.append('<div class="ui-widget ui-widget-content ui-corner-all" style="position:absolute; left:0; top:0px; max-width:128px; display:none;"><div style="margin:.2em;"></div></div>');
@@ -941,11 +935,55 @@
         _currentServices = _options["services"];
       },
 
+      _drawGraphics: function (geographics, shapes) {
+        var i, mgi, shape, style, pixelPositions, map = this;
+        for (i = 0; i < shapes.length; i++) {
+          // Either a GeoJSON Feature or a GeoJSON Geometry object are allowed
+          shape = shapes[i].shape.geometry ? shapes[i].shape.geometry : shapes[i].shape;
+          style = _graphicShapes[i].style;
+
+          switch (shape.type) {
+            case "Point":
+              _$graphicsContainer.geographics("drawArc", this.toPixel(shape.coordinates), 0, 360, style);
+              break;
+            case "LineString":
+              _$graphicsContainer.geographics("drawLineString", this.toPixel(shape.coordinates), style);
+              break;
+            case "Polygon":
+              pixelPositions = [];
+              $.each(shape.coordinates, function (i) {
+                pixelPositions[i] = map.toPixel(this);
+              });
+              _$graphicsContainer.geographics("drawPolygon", pixelPositions, style);
+              break;
+            case "MultiPoint":
+              for (mgi = 0; mgi < shape.coordinates; mgi++) {
+                _$graphicsContainer.geographics("drawArc", this.toPixel(shape.coordinates[mgi]), 0, 360, style);
+              }
+              break;
+            case "MultiLineString":
+              for (mgi = 0; mgi < shape.coordinates; mgi++) {
+                _$graphicsContainer.geographics("drawLineString", this.toPixel(shape.coordinates[mgi]), style);
+              }
+              break;
+            case "MultiPolygon":
+              for (mgi = 0; mgi < shape.coordinates; mgi++) {
+                pixelPositions = [];
+                $.each(shape.coordinates[mgi], function (i) {
+                  pixelPositions[i] = map.toPixel(this);
+                });
+                _$graphicsContainer.geographics("drawPolygon", pixelPositions, style);
+              }
+              break;
+          }
+        }
+      },
+
       _findMapSize: function () {
         // really, really attempt to find a size for this thing
         // even if it's hidden (look at parents)
         var size = { width: 0, height: 0 },
-        sizeContainer = _elem;
+        sizeContainer = _$elem;
 
         while (sizeContainer.size() && !(size["width"] > 0 && size["height"] > 0)) {
           size = { width: sizeContainer.width(), height: sizeContainer.height() };
@@ -1064,6 +1102,8 @@
           dxMap = -dx * _pixelSize,
           dyMap = dy * _pixelSize;
 
+          _$graphicsContainer.css({ left: 0, top: 0 });
+
           this._setCenterAndSize([_center[0] + dxMap, _center[1] + dyMap], _pixelSize, true, true);
 
           _inOp = false;
@@ -1097,6 +1137,15 @@
               var service = _options["services"][i];
               _options["_serviceTypes"][service.type].interactivePan(this, service, dx, dy);
             }
+
+            _$graphicsContainer.css({
+              left: function (index, value) {
+                return parseInt(value) + dx;
+              },
+              top: function (index, value) {
+                return parseInt(value) + dy;
+              }
+            });
           }
         }
       },
@@ -1108,11 +1157,17 @@
             _options["_serviceTypes"][service.type].refresh(this, service);
           }
         }
+
+        if (_graphicShapes.length > 0) {
+          _$graphicsContainer.geographics("clear");
+          this._drawGraphics(_$graphicsContainer, _graphicShapes);
+        }
       },
 
       _setCenterAndSize: function (center, pixelSize, trigger, refresh) {
         // the final call during any extent change
         if (_pixelSize != pixelSize) {
+          _$graphicsContainer.geographics("clear");
           for (var i = 0; i < _options["services"].length; i++) {
             var service = _options["services"][i];
             _options["_serviceTypes"][service.type].interactiveScale(this, service, center, pixelSize);
@@ -1412,6 +1467,8 @@
           _wheelLevel += delta;
 
           var wheelCenterAndSize = this._getWheelCenterAndSize();
+
+          _$graphicsContainer.geographics("clear");
 
           for (i = 0; i < _options["services"].length; i++) {
             var service = _options["services"][i];
