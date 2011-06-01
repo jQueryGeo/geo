@@ -40,7 +40,7 @@ $(&quot;#map&quot;).geomap( &quot;shapeStyle&quot;, { width: &quot;16px&quot;, h
       <p>When called with a second argument to set the shapeStyle, this method returns the original jQuery collection to maintain call chaining.</p>
       <h2>geomap style</h2>
       <p>A geomap style is an object whose properties follow a subset of <a href="http://www.w3.org/TR/SVG/styling.html">SVG styling</a> properties. The specific styles that geomap recognizes and to which geometry they apply are listed below.</p>
-      <table>
+      <table class="objectProperties">
         <tr>
           <th>property</th>
           <th>default</th>
@@ -48,18 +48,18 @@ $(&quot;#map&quot;).geomap( &quot;shapeStyle&quot;, { width: &quot;16px&quot;, h
         </tr>
         <tr>
           <td>color</td>
-          <td>black</td>
+          <td>#7f0000</td>
           <td>An indirect, fallback value for the fill and stroke properties if they are not set.</td>
         </tr>
         <tr>
           <td>fill</td>
           <td>undefined</td>
-          <td>Draws the interior of a shape. The area to be drawn consists of any areas inside the outline of the shape. By default, fill will use the value of the color property.</td>
+          <td>Color to use when drawing the interior of a shape. The area to be drawn consists of any areas inside the outline of the shape. By default, fill will use the value of the color property.</td>
         </tr>
         <tr>
           <td>fillOpacity</td>
-          <td>undefined</td>
-          <td>Specifies the opacity of the drawing operation used to draw the interior of a shape. By default, fillOpacity will use the value of the opacity property.</td>
+          <td>.2</td>
+          <td>Specifies the opacity of the drawing operation used to draw the interior of a shape. The final fill opacity also depends on the value of the opacity property.</td>
         </tr>
         <tr>
           <td>height</td>
@@ -69,7 +69,7 @@ $(&quot;#map&quot;).geomap( &quot;shapeStyle&quot;, { width: &quot;16px&quot;, h
         <tr>
           <td>opacity</td>
           <td>1</td>
-          <td>An indirect, fallback value for the fillOpacity and strokeOpacity properties if they are not set.</td>
+          <td>The object opacity of the entire shape. This is a multiplicative operation when determining the final fillOpacity and strokeOpacity where any fill or stroke operation is made even more translucent if this values is below 1.0.</td>
         </tr>
         <tr>
           <td>stroke</td>
@@ -79,12 +79,12 @@ $(&quot;#map&quot;).geomap( &quot;shapeStyle&quot;, { width: &quot;16px&quot;, h
         <tr>
           <td>strokeOpacity</td>
           <td>undefined</td>
-          <td>Specifies the opacity of the drawing operation used to draw the outline of a shape. By default, strokeOpacity will use the value of the opacity property.</td>
+          <td>Specifies the opacity of the drawing operation used to draw the outline of a shape. The final stroke opacity also depends on the value of the opacity property.</td>
         </tr>
         <tr>
           <td>strokeWidth</td>
-          <td>&quot;1px&quot;</td>
-          <td>The width of the stroke of a shape. A zero value causes no stroke to be drawn.</td>
+          <td>&quot;2px&quot;</td>
+          <td>The width of the stroke of a shape. A zero value causes no stroke to be drawn. Currently only pixel values are allowed.</td>
         </tr>
         <tr>
           <td>visibility</td>

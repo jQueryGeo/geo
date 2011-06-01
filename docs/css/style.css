@@ -81,6 +81,9 @@ td { padding: .5em 0; }
 b { font-weight: bold; }
 h4 { font-style: italic; font-weight: normal; }
 
+.objectProperties th { text-align: left; }
+.objectProperties td { padding: .25em .5em; }
+.objectProperties tr:nth-child(2n+1) { background: #bbb; }
 
 
 

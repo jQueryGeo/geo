@@ -2,16 +2,16 @@
 
   var 
   // private widget members
-  _elem,
+  _$elem,
 
   _contentBounds = {},
 
-  _contentFrame,
-  _servicesContainer,
-  _graphicsContainer,
-  _textContainer,
-  _textContent,
-  _eventTarget,
+  _$contentFrame,
+  _$servicesContainer,
+  _$graphicsContainer,
+  _$textContainer,
+  _$textContent,
+  _$eventTarget,
 
   _dpi = 96,
 
@@ -51,9 +51,11 @@
   } ()),
 
   _supportTouch,
-  _softDblClick = this._supportTouch || this._ieVersion == 7,
+  _softDblClick,
   _isTap,
   _isDbltap,
+
+  _graphicShapes = [], //< an array of objects containing style object refs & GeoJSON object refs
 
   _initOptions = {},
 
@@ -100,9 +102,9 @@
               };
 
               var scHtml = "<div data-service='" + service.id + "' style='position:absolute; left:0; top:0; width:8px; height:8px; margin:0; padding:0; display:" + (service.visible === undefined || service.visible ? "block" : "none") + ";'></div>";
-              _servicesContainer.append(scHtml);
+              _$servicesContainer.append(scHtml);
 
-              tiledServicesState[service.id].serviceContainer = _servicesContainer.children("[data-service='" + service.id + "']");
+              tiledServicesState[service.id].serviceContainer = _$servicesContainer.children("[data-service='" + service.id + "']");
             }
           },
 
@@ -478,9 +480,9 @@
               };
 
               var scHtml = '<div data-service="' + service.id + '" style="position:absolute; left:0; top:0; width:16px; height:16px; margin:0; padding:0; display:' + (service.visible === undefined || service.visible ? "block" : "none") + ';"></div>';
-              _servicesContainer.append(scHtml);
+              _$servicesContainer.append(scHtml);
 
-              shingledServicesState[service.id].serviceContainer = _servicesContainer.children('[data-service="' + service.id + '"]');
+              shingledServicesState[service.id].serviceContainer = _$servicesContainer.children('[data-service="' + service.id + '"]');
             }
           },
 
@@ -524,7 +526,7 @@
 
             this._cancelUnloaded(map, service);
 
-            var
+            var 
             serviceState = shingledServicesState[service.id],
             serviceContainer = serviceState.serviceContainer,
 
@@ -543,7 +545,7 @@
               ratio = scalePixelSize / pixelSize;
 
               $scaleContainer.css({ width: mapWidth * ratio, height: mapHeight * ratio }).children("img").each(function (i) {
-                var
+                var 
                 $img = $(this),
                 imgCenter = $img.data("center"),
                 x = (Math.round((imgCenter[0] - center[0]) / scalePixelSize) - halfWidth) * ratio,
@@ -674,21 +676,16 @@
 
       _createWidget: function (options, element) {
         _initOptions = options;
-        _elem = $(element);
+        _$elem = $(element);
 
-        var cssPosition = _elem.css("position"),
-          size;
+        this._forcePosition(_$elem);
 
-        if (cssPosition != "relative" && cssPosition != "absolute" && cssPosition != "fixed") {
-          _elem.css("position", "relative");
-        }
+        _$elem.css("text-align", "left");
 
-        _elem.css("text-align", "left");
-
-        size = this._findMapSize();
+        var size = this._findMapSize();
         _contentBounds = {
-          x: parseInt(_elem.css("padding-left")),
-          y: parseInt(_elem.css("padding-top")),
+          x: parseInt(_$elem.css("padding-left")),
+          y: parseInt(_$elem.css("padding-top")),
           width: size["width"],
           height: size["height"]
         };
@@ -726,19 +723,23 @@
         _options = this.options;
 
         _supportTouch = "ontouchend" in document;
+        _softDblClick = _supportTouch || _ieVersion == 7;
 
-        var touchStartEvent = _supportTouch ? "touchstart" : "mousedown",
+        var 
+        touchStartEvent = _supportTouch ? "touchstart" : "mousedown",
     	  touchStopEvent = _supportTouch ? "touchend touchcancel" : "mouseup",
     	  touchMoveEvent = _supportTouch ? "touchmove" : "mousemove";
 
-        _eventTarget.dblclick($.proxy(this._eventTarget_dblclick, this));
-        _eventTarget.bind(touchStartEvent, $.proxy(this._eventTarget_touchstart, this));
+        _$eventTarget.dblclick($.proxy(this._eventTarget_dblclick, this));
+        _$eventTarget.bind(touchStartEvent, $.proxy(this._eventTarget_touchstart, this));
 
-        var dragTarget = (_eventTarget[0].setCapture) ? _eventTarget : $(document);
+        var dragTarget = (_$eventTarget[0].setCapture) ? _$eventTarget : $(document);
         dragTarget.bind(touchMoveEvent, $.proxy(this._dragTarget_touchmove, this));
         dragTarget.bind(touchStopEvent, $.proxy(this._dragTarget_touchstop, this));
 
-        _eventTarget.mousewheel($.proxy(this._eventTarget_mousewheel, this));
+        _$eventTarget.mousewheel($.proxy(this._eventTarget_mousewheel, this));
+
+        _$graphicsContainer.geographics();
 
         if (_initOptions) {
           if (_initOptions.bbox) {
@@ -752,7 +753,7 @@
           }
         }
 
-        _eventTarget.css("cursor", _options["cursors"][_options["mode"]]);
+        _$eventTarget.css("cursor", _options["cursors"][_options["mode"]]);
 
         this._createServices();
 
@@ -818,6 +819,35 @@
         return this._toPixel(p);
       },
 
+      addShape: function (shape, style, refresh /* internal */) {
+        refresh = (refresh === undefined || refresh);
+
+        if (shape) {
+          var shapes, map = this;
+          if (shape.type == "FeatureCollection") {
+            shapes = shape.features;
+          } else {
+            shapes = $.isArray(shape) ? shape : [shape];
+          }
+
+          $.each(shapes, function () {
+            if (this.type == "GeometryCollection") {
+              map.addShape(this.geometries, style, false);
+            } else {
+              _graphicShapes[_graphicShapes.length] = {
+                shape: this,
+                style: style
+              };
+            }
+          });
+
+          if (refresh) {
+            this._refresh();
+          }
+        }
+      },
+
+
       _getBbox: function () {
         // calculate the internal bbox
         var halfWidth = _contentBounds["width"] / 2 * _pixelSize,
@@ -870,24 +900,26 @@
       },
 
       _createChildren: function () {
-        var existingChildren = _elem.children().detach();
+        var existingChildren = _$elem.children().detach();
+
+        this._forcePosition(existingChildren);
 
         existingChildren.css("-moz-user-select", "none");
 
-        _elem.prepend("<div style='position:absolute; left:" + _contentBounds.x + "px; top:" + _contentBounds.y + "px; width:" + _contentBounds["width"] + "px; height:" + _contentBounds["height"] + "px; margin:0; padding:0; overflow:hidden; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none;' unselectable='on'></div>");
-        _eventTarget = _contentFrame = _elem.children(':first');
+        _$elem.prepend("<div style='position:absolute; left:" + _contentBounds.x + "px; top:" + _contentBounds.y + "px; width:" + _contentBounds["width"] + "px; height:" + _contentBounds["height"] + "px; margin:0; padding:0; overflow:hidden; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none;' unselectable='on'></div>");
+        _$eventTarget = _$contentFrame = _$elem.children(':first');
 
-        _contentFrame.append('<div style="position:absolute; left:0; top:0; width:' + _contentBounds["width"] + 'px; height:' + _contentBounds["height"] + 'px; margin: 0; padding: 0;"></div>');
-        _servicesContainer = _contentFrame.children(':last');
+        _$contentFrame.append('<div style="position:absolute; left:0; top:0; width:' + _contentBounds["width"] + 'px; height:' + _contentBounds["height"] + 'px; margin:0; padding:0;"></div>');
+        _$servicesContainer = _$contentFrame.children(':last');
 
-        _contentFrame.append('<div style="position:absolute; left:0; top:0; width:' + _contentBounds["width"] + 'px; height:' + _contentBounds["height"] + 'px; margin: 0; padding: 0;"></div>');
-        _graphicsContainer = _contentFrame.children(':last');
+        _$contentFrame.append('<div style="position:absolute; left:0; top:0; width:' + _contentBounds["width"] + 'px; height:' + _contentBounds["height"] + 'px; margin:0; padding:0;"></div>');
+        _$graphicsContainer = _$contentFrame.children(':last');
 
-        _contentFrame.append('<div class="ui-widget ui-widget-content ui-corner-all" style="position:absolute; left:0; top:0px; max-width:128px; display:none;"><div style="margin:.2em;"></div></div>');
-        _textContainer = _contentFrame.children(':last');
-        _textContent = _textContainer.children();
+        _$contentFrame.append('<div class="ui-widget ui-widget-content ui-corner-all" style="position:absolute; left:0; top:0px; max-width:128px; display:none;"><div style="margin:.2em;"></div></div>');
+        _$textContainer = _$contentFrame.children(':last');
+        _$textContent = _$textContainer.children();
 
-        _contentFrame.append(existingChildren);
+        _$contentFrame.append(existingChildren);
       },
 
       _createServices: function () {
@@ -903,11 +935,55 @@
         _currentServices = _options["services"];
       },
 
+      _drawGraphics: function (geographics, shapes) {
+        var i, mgi, shape, style, pixelPositions, map = this;
+        for (i = 0; i < shapes.length; i++) {
+          // Either a GeoJSON Feature or a GeoJSON Geometry object are allowed
+          shape = shapes[i].shape.geometry ? shapes[i].shape.geometry : shapes[i].shape;
+          style = _graphicShapes[i].style;
+
+          switch (shape.type) {
+            case "Point":
+              _$graphicsContainer.geographics("drawArc", this.toPixel(shape.coordinates), 0, 360, style);
+              break;
+            case "LineString":
+              _$graphicsContainer.geographics("drawLineString", this.toPixel(shape.coordinates), style);
+              break;
+            case "Polygon":
+              pixelPositions = [];
+              $.each(shape.coordinates, function (i) {
+                pixelPositions[i] = map.toPixel(this);
+              });
+              _$graphicsContainer.geographics("drawPolygon", pixelPositions, style);
+              break;
+            case "MultiPoint":
+              for (mgi = 0; mgi < shape.coordinates; mgi++) {
+                _$graphicsContainer.geographics("drawArc", this.toPixel(shape.coordinates[mgi]), 0, 360, style);
+              }
+              break;
+            case "MultiLineString":
+              for (mgi = 0; mgi < shape.coordinates; mgi++) {
+                _$graphicsContainer.geographics("drawLineString", this.toPixel(shape.coordinates[mgi]), style);
+              }
+              break;
+            case "MultiPolygon":
+              for (mgi = 0; mgi < shape.coordinates; mgi++) {
+                pixelPositions = [];
+                $.each(shape.coordinates[mgi], function (i) {
+                  pixelPositions[i] = map.toPixel(this);
+                });
+                _$graphicsContainer.geographics("drawPolygon", pixelPositions, style);
+              }
+              break;
+          }
+        }
+      },
+
       _findMapSize: function () {
         // really, really attempt to find a size for this thing
         // even if it's hidden (look at parents)
         var size = { width: 0, height: 0 },
-        sizeContainer = _elem;
+        sizeContainer = _$elem;
 
         while (sizeContainer.size() && !(size["width"] > 0 && size["height"] > 0)) {
           size = { width: sizeContainer.width(), height: sizeContainer.height() };
@@ -917,6 +993,13 @@
           sizeContainer = sizeContainer.parent();
         }
         return size;
+      },
+
+      _forcePosition: function (elem) {
+        var cssPosition = elem.css("position");
+        if (cssPosition != "relative" && cssPosition != "absolute" && cssPosition != "fixed") {
+          elem.css("position", "relative");
+        }
       },
 
       _getTiledPixelSize: function (zoom) {
@@ -1019,13 +1102,15 @@
           dxMap = -dx * _pixelSize,
           dyMap = dy * _pixelSize;
 
+          _$graphicsContainer.css({ left: 0, top: 0 });
+
           this._setCenterAndSize([_center[0] + dxMap, _center[1] + dyMap], _pixelSize, true, true);
 
           _inOp = false;
           _anchor = _current;
           _toolPan = _panning = false;
 
-          _eventTarget.css("cursor", _options["cursors"][_options["mode"]]);
+          _$eventTarget.css("cursor", _options["cursors"][_options["mode"]]);
         }
       },
 
@@ -1037,7 +1122,7 @@
         if (_toolPan || dx > 3 || dx < -3 || dy > 3 || dy < -3) {
           if (!_toolPan) {
             _toolPan = true;
-            _eventTarget.css("cursor", _options["cursors"]["pan"]);
+            _$eventTarget.css("cursor", _options["cursors"]["pan"]);
           }
 
           if (_mouseDown) {
@@ -1052,6 +1137,15 @@
               var service = _options["services"][i];
               _options["_serviceTypes"][service.type].interactivePan(this, service, dx, dy);
             }
+
+            _$graphicsContainer.css({
+              left: function (index, value) {
+                return parseInt(value) + dx;
+              },
+              top: function (index, value) {
+                return parseInt(value) + dy;
+              }
+            });
           }
         }
       },
@@ -1063,11 +1157,17 @@
             _options["_serviceTypes"][service.type].refresh(this, service);
           }
         }
+
+        if (_graphicShapes.length > 0) {
+          _$graphicsContainer.geographics("clear");
+          this._drawGraphics(_$graphicsContainer, _graphicShapes);
+        }
       },
 
       _setCenterAndSize: function (center, pixelSize, trigger, refresh) {
         // the final call during any extent change
         if (_pixelSize != pixelSize) {
+          _$graphicsContainer.geographics("clear");
           for (var i = 0; i < _options["services"].length; i++) {
             var service = _options["services"][i];
             _options["_serviceTypes"][service.type].interactiveScale(this, service, center, pixelSize);
@@ -1230,7 +1330,7 @@
 
         if (!_inOp && e.shiftKey) {
           _shiftZoom = true;
-          _eventTarget.css("cursor", _options["cursors"]["zoom"]);
+          _$eventTarget.css("cursor", _options["cursors"]["zoom"]);
         } else {
           _inOp = true;
           switch (_options["mode"]) {
@@ -1249,7 +1349,7 @@
 
       _dragTarget_touchmove: function (e) {
         var 
-        offset = _eventTarget.offset(),
+        offset = _$eventTarget.offset(),
         current, i, dx, dy;
 
         if (_supportTouch) {
@@ -1288,7 +1388,7 @@
 
       _dragTarget_touchstop: function (e) {
         if (!_mouseDown && _ieVersion == 7) {
-          // ie7 doesn't appear to trigger dblclick on _eventTarget,
+          // ie7 doesn't appear to trigger dblclick on _$eventTarget,
           // we fake regular click here to cause soft dblclick
           this._eventTarget_touchstart(e);
         }
@@ -1296,7 +1396,7 @@
         var 
         mouseWasDown = _mouseDown,
         wasToolPan = _toolPan,
-        offset = _eventTarget.offset(),
+        offset = _$eventTarget.offset(),
         current, i;
 
         if (_supportTouch) {
@@ -1307,7 +1407,7 @@
 
         var mode = _shiftZoom ? "zoom" : _options["mode"];
 
-        _eventTarget.css("cursor", _options["cursors"][mode]);
+        _$eventTarget.css("cursor", _options["cursors"][mode]);
 
         _shiftZoom =
         _mouseDown =
@@ -1341,7 +1441,7 @@
 
           if (_softDblClick && _isDbltap) {
             _isDbltap = _isTap = false;
-            _eventTarget.trigger("dblclick", e);
+            _$eventTarget.trigger("dblclick", e);
           }
         }
       },
@@ -1368,6 +1468,8 @@
 
           var wheelCenterAndSize = this._getWheelCenterAndSize();
 
+          _$graphicsContainer.geographics("clear");
+
           for (i = 0; i < _options["services"].length; i++) {
             var service = _options["services"][i];
             _options["_serviceTypes"][service.type].interactiveScale(this, service, wheelCenterAndSize.center, wheelCenterAndSize.pixelSize);
@@ -1386,7 +1488,7 @@
           //          }
 
           var that = this;
-          this._wheelTimer = window.setTimeout(function () {
+          _wheelTimer = window.setTimeout(function () {
             that._mouseWheelFinish();
           }, 1000);
         }
