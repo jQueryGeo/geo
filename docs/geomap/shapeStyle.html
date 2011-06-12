@@ -33,11 +33,18 @@
 $(&quot;#map&quot;).geomap( &quot;shapeStyle&quot;, { width: &quot;16px&quot;, height: &quot;16px&quot; } )</code></pre></td>
         </tr>
       </table>
-      <p>The shapeStyle method retrieves or updates the <i>default</i> style of geomap graphics. The reasons that this is a method instead of a property will be clearer in a future release.</p>
-      <p>This method changes specific properties of the internal default style. If you send an incomplete style object, only the style properties you reference are updated.</p>
-      <p>You can override this style with every call to addShape.</p>
-      <p>Changing this default style will update the style of any existing shape that has been added with addShape but not given its own style. For example, if you add two GeoJSON Point objects and in the first addShape call you do not pass a style but in the second one you do. In this situation, future calls to shapeStyle will only update how geomap draws the first shape.</p>
-      <p>When called with a second argument to set the shapeStyle, this method returns the original jQuery collection to maintain call chaining.</p>
+      <p>The shapeStyle method retrieves or updates the <i>base</i> style of geomap graphics. The reasons that this is a method instead of a property will be clearer in a future section of the internals documenation.</p>
+      <p>This method changes specific properties of the internal base style. If you send an incomplete style object, only the style properties you reference are updated.</p>
+      <p>Similar to CSS, you can override this style on a per-shape basis by passing a different style to the append method.</p>
+      <p>Changing this base style will update all the style properties of existing shapes that do not have their own style. For shapes that do have their own style, changing the base shapeStyle will update any style properties not referenced in the shape-specific style. For example, assume the following:</p>
+      <ol>
+        <li>the base shapeStyle has a red stroke color and strokeWidth of 2px</li>
+        <li>you call append with a style that increases the stroke width to 4px but leaves the stroke color red</li>
+        <li>you later change the base shapeStyle's stroke color to blue</li>
+      </ol>
+      <p>
+        The current style for the shape in the above example will be a blue stroke color and a strokeWidth of 4px.</p>
+      <!--<p>When called with a second argument to set the shapeStyle, this method returns the original jQuery collection to maintain call chaining.</p>-->
       <h2>geomap style</h2>
       <p>A geomap style is an object whose properties follow a subset of <a href="http://www.w3.org/TR/SVG/styling.html">SVG styling</a> properties. The specific styles that geomap recognizes and to which geometry they apply are listed below.</p>
       <table class="objectProperties">
@@ -78,7 +85,7 @@ $(&quot;#map&quot;).geomap( &quot;shapeStyle&quot;, { width: &quot;16px&quot;, h
         </tr>
         <tr>
           <td>strokeOpacity</td>
-          <td>undefined</td>
+          <td>1</td>
           <td>Specifies the opacity of the drawing operation used to draw the outline of a shape. The final stroke opacity also depends on the value of the opacity property.</td>
         </tr>
         <tr>
@@ -97,7 +104,8 @@ $(&quot;#map&quot;).geomap( &quot;shapeStyle&quot;, { width: &quot;16px&quot;, h
           <td>The width of an oval drawn around Point shapes. Currently only pixel values are allowed.</td>
         </tr>
       </table>
-      <p>All properties apply to Point shapes which means that you can adjust the stroke and fill of the oval surrounding the point location.</p>
+      <p>
+        All properties apply to Point shapes which means that you can adjust the stroke and fill of the box surrounding the point location.</p>
     </div>
   </div> <!-- end of #container -->
 </body>

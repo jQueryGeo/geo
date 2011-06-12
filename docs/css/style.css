@@ -74,6 +74,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: bold; }
     Author: Ryan Westphal
  */
 
+h1 img { width: 24px; height: 24px; margin-right: 4px; vertical-align: middle; }
 div>h2 { font-size: 1.1em; margin: .5em 0; }
 p { margin: .5em 0; }
 th { text-align: right; padding: .5em 1em .5em 0; }
@@ -84,8 +85,6 @@ h4 { font-style: italic; font-weight: normal; }
 .objectProperties th { text-align: left; }
 .objectProperties td { padding: .25em .5em; }
 .objectProperties tr:nth-child(2n+1) { background: #bbb; }
-
-
 
 .ir { display: block; text-indent: -999em; overflow: hidden; background-repeat: no-repeat; text-align: left; direction: ltr; }
 .hidden { display: none; visibility: hidden; }

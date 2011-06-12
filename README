@@ -6,31 +6,23 @@ After years of internal development, we are pleased to bring our JavaScript map 
 
 Documentation is hosted at http://host.appgeo.com/libs/geo/test/
 
-== TO DO ==
-
-* geomap - Document and implement the refresh method
-* docs/internal - Document how geomap draws shapes
-* geomap - Auto-handle window resize events
-* geomap - [BUG] Mouse wheel on bad or missing tile doesn't zoom out on first rotate
-* geomap - Document and implement service-level shapes
-* geomap - Document and implement passing a function to shapeStyle and addShape that returns a geomap style object based on feature or geometry properties
-* geomap - Document and implement findShape's callback syntax
-* graphics - See Modernizr for comment on BB Storm & canvas detection
-* geographics - Document graphics widget
-
 == CHANGELOG ==
 
 === Version alpha2 ===
 * geomap - Support dynamic map services
 * geomap - [BUG] geomap causes a script error if jQuery UI is already included
-* geomap - Document shape methods
-* geomap - [BUG] Soft double-click does not work
+* docs - Document shape methods
+* geomap - [BUG] Port of soft double-click does not work
 * geomap - [BUG] Cannot see dev-supplied inner content if not set to rel/abs position
 * geomap - Add mobile test page
 * geographics - Port graphic code from internal control
 * geomap - Implement non-service addShape method
 * graphics - drawArc should use style's width and height and only take center as an argument
+* graphics - Allow ovals for points
+* geomap - Document and implement the public refresh method
+* docs - Rename findShape to find, addShape to append, removeShape to remove and clearShapes to empty
 
-=== Version alpha1 ===
-* Create interactive map widget
-* Support tiled map services
+=== Version alpha1 (2011-05-09) ===
+* docs - Document a new interface to our internal map control
+* geomap - Port interactive map widget base to jQuery UI widget factory
+* geomap - Support tiled map services
