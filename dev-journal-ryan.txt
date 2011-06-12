@@ -19,6 +19,11 @@
 == 2011-06-12 ==
 I'm finally pushing the renaming changes to the main project.
 
+=== On examples ===
+I talked to Boaz at Bocoup the other day. He suggested cleaning up the examples. I already had this in mind but I should probably do it sooner rather than later. Especially the simplest example. It will look nicer if I cut the div down to 256x256 to match the initial tile I think (done, it already feels better). I do need to keep the examples specific and don't want to add any HTML or JavaScript to them that does not directly relate to the feature I'm testing in the example.
+
+He also suggested unit tests and an API audit, both of which are great ideas and much needed by $.geo.
+
 == 2011-06-10 ==
 
 === On geographics ===

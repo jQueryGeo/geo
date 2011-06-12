@@ -127,6 +127,9 @@
       }
     },
 
+    drawPoint: function (coordinates, style) {
+    },
+
     drawLineString: function (coordinates, style) {
       this._drawLines([coordinates], false, style);
     },

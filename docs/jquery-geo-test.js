@@ -2157,6 +2157,9 @@ $.Widget.prototype = {
       }
     },
 
+    drawPoint: function (coordinates, style) {
+    },
+
     drawLineString: function (coordinates, style) {
       this._drawLines([coordinates], false, style);
     },
@@ -3091,7 +3094,7 @@ $.Widget.prototype = {
         }
       },
 
-      addShape: function (shape, style, refresh /* internal */) {
+      append: function (shape, style, refresh /* internal */) {
         refresh = (refresh === undefined || refresh);
 
         if (shape) {
@@ -3104,11 +3107,11 @@ $.Widget.prototype = {
 
           $.each(shapes, function () {
             if (this.type == "GeometryCollection") {
-              map.addShape(this.geometries, style, false);
+              map.append(this.geometries, style, false);
             } else {
               _graphicShapes[_graphicShapes.length] = {
                 shape: this,
-                style: style ? $.extend({}, _$shapesContainer.geographics("option", "style"), style) : undefined
+                style: style
               };
             }
           });

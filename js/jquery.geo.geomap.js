@@ -832,7 +832,7 @@
         }
       },
 
-      addShape: function (shape, style, refresh /* internal */) {
+      append: function (shape, style, refresh /* internal */) {
         refresh = (refresh === undefined || refresh);
 
         if (shape) {
@@ -845,11 +845,11 @@
 
           $.each(shapes, function () {
             if (this.type == "GeometryCollection") {
-              map.addShape(this.geometries, style, false);
+              map.append(this.geometries, style, false);
             } else {
               _graphicShapes[_graphicShapes.length] = {
                 shape: this,
-                style: style ? $.extend({}, _$shapesContainer.geographics("option", "style"), style) : undefined
+                style: style
               };
             }
           });
