@@ -1,0 +1,118 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>append test</title>
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+  <style type="text/css">
+    label
+    {
+      display: block;
+      margin: .25em;
+    }
+    label span
+    {
+      cursor: pointer;
+      display: inline-block;
+      font-weight: bold;
+      width: 8em;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <a href="../" class="docLink">&lt; docs</a>
+    <h1>
+      append test</h1>
+    <p>
+      This page tests geomap's append method and some style options.</p>
+    <p>
+      A geomap widget is initialized to the continental US and a point is placed in Massachusetts. A line extends from MA to South Jersey where a triangle covers an area. For points, geomap draws a pixel-based oval around the map coordinate. Since the size of the oval is based on pixels, it will be the same size at all scales. The pixel length of lines and size of polygons changes at different scales because each point that makes up the shapes is locked at specific map coordinates. The stroke width for all shapes will be the same number of pixels at all scales.</p>
+    <p>
+      All the geometry is stored in a single GeometryCollection. This example first draws the entire collection with a broad stroked, off-white style to create a halo effect behind the real shapes. This makes them a little easier to see on the map. Then we draw each individual shape again with color. The first two have the default style which is red. For the last one, we change the color to blue.</p>
+    <div id="map" style="float: left; width: 640px; height: 480px;">
+    </div>
+    <pre style="float: left;"><code>var map = $("#map").geomap({
+  center: [-75, 40],
+  zoom: 5
+});
+
+var gcol = {
+  type: &quot;GeometryCollection&quot;,
+  geometries: [
+    {
+      type: &quot;Point&quot;,
+      coordinates: [-71, 42]
+    },
+    {
+      type: &quot;LineString&quot;,
+      coordinates: [
+        [-71, 42],
+        [-75, 39.5]
+      ]
+    },
+    {
+      type: &quot;Polygon&quot;,
+      coordinates: [[
+        [-75, 39.7],
+        [-74.8, 39.3],
+        [-75.2, 39.3],
+        [-75, 39.7]
+      ]]
+    }
+  ]
+};
+
+map.geomap(&quot;append&quot;, gcol, { strokeWidth: &quot;8px&quot;, color: &quot;#dedede&quot; });
+
+map.geomap(&quot;append&quot;, gcol.geometries[0]);
+
+map.geomap(&quot;append&quot;, gcol.geometries[1]);
+
+map.geomap(&quot;append&quot;, gcol.geometries[2], { color: &quot;blue&quot; });</code></pre>
+  </div>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js"></script>
+  <script src="http://host.appgeo.com/libs/geo/test/jquery-geo-test.min.js"></script>
+  <script>
+    $(function () {
+      var map = $("#map").geomap({
+        center: [-75, 40],
+        zoom: 5
+      });
+
+      var gcol = {
+        type: "GeometryCollection",
+        geometries: [
+          {
+            type: "Point",
+            coordinates: [-71, 42]
+          },
+          {
+            type: "LineString",
+            coordinates: [
+              [-71, 42],
+              [-75, 39.5]
+            ]
+          },
+          {
+            type: "Polygon",
+            coordinates: [[
+              [-75, 39.7],
+              [-74.8, 39.3],
+              [-75.2, 39.3],
+              [-75, 39.7]
+            ]]
+          }
+        ]
+      };
+
+      map.geomap("append", gcol, { strokeWidth: "8px", color: "#dedede" });
+
+      map.geomap("append", gcol.geometries[0]);
+
+      map.geomap("append", gcol.geometries[1]);
+
+      map.geomap("append", gcol.geometries[2], { color: "#00d" });
+    });
+  </script>
+</body>
+</html>

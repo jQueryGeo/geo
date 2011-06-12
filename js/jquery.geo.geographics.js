@@ -3,6 +3,7 @@
   var 
   _$elem,
   _options,
+  _trueCanvas = true,
 
   _width,
   _height,
@@ -55,6 +56,7 @@
         _$canvas = _$elem.children(':last');
         _context = _$canvas[0].getContext("2d");
       } else if (_ieVersion <= 8) {
+        _trueCanvas = false;
         _$elem.append('<div width="' + _width + '" height="' + _height + '" style="position:absolute; left:0; top:0; width:' + _width + 'px; height:' + _height + 'px; margin:0; padding:0;"></div>');
         _$canvas = _$elem.children(':last');
 
@@ -65,6 +67,9 @@
     },
 
     _setOption: function (key, value) {
+      if (key == "style") {
+        value = $.extend({}, _options.style, value);
+      }
       $.Widget.prototype._setOption.apply(this, arguments);
     },
 
@@ -80,15 +85,26 @@
     drawArc: function (coordinates, startAngle, sweepAngle, style) {
       style = this._getGraphicStyle(style);
 
-      if (style.widthValue > 0 && style.heightValue > 0) {
+      if (style.visibility != "hidden" && style.widthValue > 0 && style.heightValue > 0) {
+        var r = Math.min(style.widthValue, style.heightValue) / 2;
 
         startAngle = (startAngle * Math.PI / 180);
         sweepAngle = (sweepAngle * Math.PI / 180);
 
-        var r = Math.round(Math.min(style.widthValue, style.heightValue) / 2);
+        _context.save();
+        _context.translate(coordinates[0], coordinates[1]);
+        if (style.widthValue > style.heightValue) {
+          _context.scale(style.widthValue / style.heightValue, 1);
+        } else {
+          _context.scale(1, style.heightValue / style.widthValue);
+        }
 
         _context.beginPath();
-        _context.arc(coordinates[0], coordinates[1], r, startAngle, sweepAngle, false);
+        _context.arc(0, 0, r, startAngle, sweepAngle, false);
+
+        if (_trueCanvas) {
+          _context.restore();
+        }
 
         if (style.doFill) {
           _context.fillStyle = style.fill;
@@ -103,6 +119,10 @@
 
           _context.globalAlpha = style.opacity * style.strokeOpacity;
           _context.stroke();
+        }
+
+        if (!_trueCanvas) {
+          _context.restore();
         }
       }
     },
@@ -153,50 +173,52 @@
       style = this._getGraphicStyle(style),
       i, j;
 
-      if (style.doFill) {
-        _context.fillStyle = style.fill;
-        _context.globalAlpha = style.opacity * style.fillOpacity;
-        _context.beginPath();
-        _context.moveTo(coordinates[0][0][0], coordinates[0][0][1]);
+      if (style.visibility != "hidden") {
+        if (style.doFill && close) {
+          _context.fillStyle = style.fill;
+          _context.globalAlpha = style.opacity * style.fillOpacity;
+          _context.beginPath();
+          _context.moveTo(coordinates[0][0][0], coordinates[0][0][1]);
 
-        var lastPoint = coordinates[0][coordinates[0].length - 1];
+          var lastPoint = coordinates[0][coordinates[0].length - 1];
 
-        for (i = 0; i < coordinates.length; i++) {
-          for (j = 0; j < coordinates[i].length; j++) {
-            _context.lineTo(coordinates[i][j][0], coordinates[i][j][1]);
+          for (i = 0; i < coordinates.length; i++) {
+            for (j = 0; j < coordinates[i].length; j++) {
+              _context.lineTo(coordinates[i][j][0], coordinates[i][j][1]);
+            }
+
+            if (i > 0) {
+              _context.lineTo(lastPoint[0], lastPoint[1]);
+            }
           }
 
-          if (i > 0) {
-            _context.lineTo(lastPoint[0], lastPoint[1]);
-          }
+          _context.closePath();
+
+          _context.globalAlpha = style.opacity * style.fillOpacity;
+          _context.fill();
         }
 
-        _context.closePath();
+        if (style.doStroke) {
+          _context.lineJoin = "round";
+          _context.lineWidth = style.strokeWidthValue;
+          _context.strokeStyle = style.stroke;
 
-        _context.globalAlpha = style.opacity * style.fillOpacity;
-        _context.fill();
-      }
+          _context.globalAlpha = style.opacity * style.strokeOpacity;
 
-      if (style.doStroke) {
-        _context.lineJoin = "round";
-        _context.lineWidth = style.strokeWidthValue;
-        _context.strokeStyle = style.stroke;
+          for (i = 0; i < coordinates.length; i++) {
+            _context.beginPath();
+            _context.moveTo(coordinates[i][0][0], coordinates[i][0][1]);
 
-        _context.globalAlpha = style.opacity * style.strokeOpacity;
+            for (j = 0; j < coordinates[i].length; j++) {
+              _context.lineTo(coordinates[i][j][0], coordinates[i][j][1]);
+            }
 
-        for (i = 0; i < coordinates.length; i++) {
-          _context.beginPath();
-          _context.moveTo(coordinates[i][0][0], coordinates[i][0][1]);
+            if (close) {
+              _context.lineTo(coordinates[i][0][0], coordinates[i][0][1]);
+            }
 
-          for (j = 0; j < coordinates[i].length; j++) {
-            _context.lineTo(coordinates[i][j][0], coordinates[i][j][1]);
+            _context.stroke();
           }
-
-          if (close) {
-            _context.lineTo(coordinates[i][0][0], coordinates[i][0][1]);
-          }
-
-          _context.stroke();
         }
       }
     }

@@ -8,7 +8,7 @@
 
   _$contentFrame,
   _$servicesContainer,
-  _$graphicsContainer,
+  _$shapesContainer,
   _$textContainer,
   _$textContent,
   _$eventTarget,
@@ -739,7 +739,7 @@
 
         _$eventTarget.mousewheel($.proxy(this._eventTarget_mousewheel, this));
 
-        _$graphicsContainer.geographics();
+        _$shapesContainer.geographics();
 
         if (_initOptions) {
           if (_initOptions.bbox) {
@@ -819,6 +819,19 @@
         return this._toPixel(p);
       },
 
+      refresh: function () {
+        this._refresh();
+      },
+
+      shapeStyle: function (style) {
+        if (style) {
+          _$shapesContainer.geographics("option", "style", style);
+          this._refresh();
+        } else {
+          return _$shapesContainer.geographics("option", "style");
+        }
+      },
+
       addShape: function (shape, style, refresh /* internal */) {
         refresh = (refresh === undefined || refresh);
 
@@ -836,7 +849,7 @@
             } else {
               _graphicShapes[_graphicShapes.length] = {
                 shape: this,
-                style: style
+                style: style ? $.extend({}, _$shapesContainer.geographics("option", "style"), style) : undefined
               };
             }
           });
@@ -846,7 +859,6 @@
           }
         }
       },
-
 
       _getBbox: function () {
         // calculate the internal bbox
@@ -913,7 +925,7 @@
         _$servicesContainer = _$contentFrame.children(':last');
 
         _$contentFrame.append('<div style="position:absolute; left:0; top:0; width:' + _contentBounds["width"] + 'px; height:' + _contentBounds["height"] + 'px; margin:0; padding:0;"></div>');
-        _$graphicsContainer = _$contentFrame.children(':last');
+        _$shapesContainer = _$contentFrame.children(':last');
 
         _$contentFrame.append('<div class="ui-widget ui-widget-content ui-corner-all" style="position:absolute; left:0; top:0px; max-width:128px; display:none;"><div style="margin:.2em;"></div></div>');
         _$textContainer = _$contentFrame.children(':last');
@@ -944,26 +956,26 @@
 
           switch (shape.type) {
             case "Point":
-              _$graphicsContainer.geographics("drawArc", this.toPixel(shape.coordinates), 0, 360, style);
+              _$shapesContainer.geographics("drawArc", this.toPixel(shape.coordinates), 0, 360, style);
               break;
             case "LineString":
-              _$graphicsContainer.geographics("drawLineString", this.toPixel(shape.coordinates), style);
+              _$shapesContainer.geographics("drawLineString", this.toPixel(shape.coordinates), style);
               break;
             case "Polygon":
               pixelPositions = [];
               $.each(shape.coordinates, function (i) {
                 pixelPositions[i] = map.toPixel(this);
               });
-              _$graphicsContainer.geographics("drawPolygon", pixelPositions, style);
+              _$shapesContainer.geographics("drawPolygon", pixelPositions, style);
               break;
             case "MultiPoint":
               for (mgi = 0; mgi < shape.coordinates; mgi++) {
-                _$graphicsContainer.geographics("drawArc", this.toPixel(shape.coordinates[mgi]), 0, 360, style);
+                _$shapesContainer.geographics("drawArc", this.toPixel(shape.coordinates[mgi]), 0, 360, style);
               }
               break;
             case "MultiLineString":
               for (mgi = 0; mgi < shape.coordinates; mgi++) {
-                _$graphicsContainer.geographics("drawLineString", this.toPixel(shape.coordinates[mgi]), style);
+                _$shapesContainer.geographics("drawLineString", this.toPixel(shape.coordinates[mgi]), style);
               }
               break;
             case "MultiPolygon":
@@ -972,7 +984,7 @@
                 $.each(shape.coordinates[mgi], function (i) {
                   pixelPositions[i] = map.toPixel(this);
                 });
-                _$graphicsContainer.geographics("drawPolygon", pixelPositions, style);
+                _$shapesContainer.geographics("drawPolygon", pixelPositions, style);
               }
               break;
           }
@@ -1102,7 +1114,7 @@
           dxMap = -dx * _pixelSize,
           dyMap = dy * _pixelSize;
 
-          _$graphicsContainer.css({ left: 0, top: 0 });
+          _$shapesContainer.css({ left: 0, top: 0 });
 
           this._setCenterAndSize([_center[0] + dxMap, _center[1] + dyMap], _pixelSize, true, true);
 
@@ -1138,7 +1150,7 @@
               _options["_serviceTypes"][service.type].interactivePan(this, service, dx, dy);
             }
 
-            _$graphicsContainer.css({
+            _$shapesContainer.css({
               left: function (index, value) {
                 return parseInt(value) + dx;
               },
@@ -1159,15 +1171,15 @@
         }
 
         if (_graphicShapes.length > 0) {
-          _$graphicsContainer.geographics("clear");
-          this._drawGraphics(_$graphicsContainer, _graphicShapes);
+          _$shapesContainer.geographics("clear");
+          this._drawGraphics(_$shapesContainer, _graphicShapes);
         }
       },
 
       _setCenterAndSize: function (center, pixelSize, trigger, refresh) {
         // the final call during any extent change
         if (_pixelSize != pixelSize) {
-          _$graphicsContainer.geographics("clear");
+          _$shapesContainer.geographics("clear");
           for (var i = 0; i < _options["services"].length; i++) {
             var service = _options["services"][i];
             _options["_serviceTypes"][service.type].interactiveScale(this, service, center, pixelSize);
@@ -1468,7 +1480,7 @@
 
           var wheelCenterAndSize = this._getWheelCenterAndSize();
 
-          _$graphicsContainer.geographics("clear");
+          _$shapesContainer.geographics("clear");
 
           for (i = 0; i < _options["services"].length; i++) {
             var service = _options["services"][i];

@@ -1,0 +1,122 @@
+﻿== TO DO ==
+
+* geomap - Port initial find functionality (position + pixel buffer)
+* geomap - Allow append to take an array of geometry objects, each one should be a new shape
+* geographics - Forgo ovals for borderRadius support and rectangles, rename drawArc to drawPoint
+* geo.proj - Update bundled projection code
+* docs/internal - Document how geomap draws shapes
+* docs/geomap - Use name instead of id for service objects
+* widgets - Verify that vars local to initial closure do not conflict when multiple maps are placed
+* geomap - Auto-handle window resize events
+* geomap - [BUG] Mouse wheel on bad or missing tile doesn't zoom out on first rotate
+* geomap - Document and implement service-level shapes
+* geomap - Document and implement passing a function to shapeStyle and append that returns a geomap style object based on feature or geometry properties
+* geomap - Document and implement find's callback syntax
+* graphics - See Modernizr for comment on BB Storm & canvas detection
+* geographics - Document graphics widget
+* geomap - [BUG] Android browser stops pan/zoom after 7 logos on logo demo
+
+== 2011-06-12 ==
+I'm finally pushing the renaming changes to the main project.
+
+== 2011-06-10 ==
+
+=== On geographics ===
+I am going to leave drawArc in the graphics widget. The drawPoint method will draw our default point shape (rounded rectangle) but, in the future, when custom drawing is in, a developer can use the drawArc if they want.
+
+=== On proj ===
+Peter has updated web mercator <=> geodetic code for me to drop into $.geo.proj.
+
+== 2011-06-06 ==
+
+=== On renaming shape functions ===
+Renamed the shape functions. That was annoying but I'm glad I only had addShape implemented.
+
+=== On jQuery UI widgets ===
+The widget factory does hide methods that start _ from being called. So much for renaming drawArc to _drawArc and still calling it from geomap.
+
+DEPRECATED SUGGESTION: Turn geographics into a NON-jQuery UI plugin
+
+Did I totally get the scoping wrong for the jQuery UI widget? I have local vars in my initial plugin closure. Will they conflict if there are more than one map?
+
+SUGGESTION: Verify that vars local to initial closure do not conflict when multiple maps are placed
+
+== 2011-06-04 ==
+
+=== drawArc ===
+I just realized that by dropping geographics.drawArc in favor of drawPoint I am losing the ability to draw the circles I need for digitization modes. I wonder if, before I turn DrawPoint into a box-like function, that I should copy it to _drawArc. Will jQueryUI.widget let me call it from geomap?
+
+=== shapes ===
+Chris and I were talking about merging append (previously addshape) and find into one call: shapes. If you pass a GeoJSON object or array of, it will add them. Otherwise, it will find them. Thinking about this today, I don't quite think that's the way to go. I mostly feel that calling geomap functions to manipulate shapes is closer to adding elements to a jQuery collection. In other words, to call the geomap functions you must have already wrapped an element with jQuery, $("#map").geomap("funcName"). When you wrap elements with jQuery normally, you have to call append, find, etc. Geomap will work the same with. Of course, I do still want the syntactic sugar later: $("#map").append(geoJsonObj);
+
+== 2011-06-02 ==
+Who needs a blog. I feel like the best place to keep a developer journal is in the project itself so here we go.
+
+=== On addShape's style argument ===
+I showed Peter the shapeStyle demo. He expected that the shape-specific style applied via addShape would only override properties set during addShape. Further manipulation of the base shapeStyle would cascade to the shapes for any properties not explictily set. You know, like CSS. This is obviously the correct way to go and I already forget what made me code it the other way last night. Likely that I was coding at 2am and thought that if a user was passing a style to addShape they would want ALL style properties set in stone for that shape. That is not the right idea. If they want all properties set in stone, they can override all properties in the style object sent to addShape.
+
+I changed the implementation before leaving work.
+
+=== On storing & modifying style ===
+My initial implementation drawing shapes in $.geo is very similar to how I did it with our internal control. I also showed Chris the shapeStyle demo and explained how you can add a style that's different from the base style on the map. He suggested that there be a way to change the style of an already added shape. I figured that I could make addShape update existing geometries instead of adding a new one but the syntax felt wrong. An updateShape method would work and could pass right through to addShape internally.
+
+He also suggested allowing access to the internal GeoJSON->style map (as a return value for addShape) so they can maybe change the existing styles that way. However, something doesn't feel correctly designed about that.
+
+We discussed attaching the style to the GeoJSON object. I already had supporting that in mind. If the user happens to have put a style property on the GeoJSON object before passing it to addShape, I would use that when drawing. A style passed to addShape would override that. The cascade would be: base style => GeoJSON object style => addShape style. A developer can keep the style property on the object even when it's stored, such as in GeoCouch, something that Guido wants a lot.
+
+That said, I know I'm going about this wrong. As I said, my initial implementation feels too much like the old one and I want to do something much slicker in the jQuery world. On my walk home, I realized that since I am only storing a reference to the GeoJSON object and the user supplied style I can probably connect the style object to the GeoJSON object using jQuery's data method.
+
+I wasn't sure if targeting a plain object is allowed in jQuery. I know it's possible but that doesn't mean I should. I remember IRC talk about it but forget the outcome. Info on ticket 8108 (http://bugs.jquery.com/ticket/8108) reveals that the DataLink plugin does this so I'm going to assume it's ok.
+
+This little fiddle shows that the data properties don't show up with stringify http://jsfiddle.net/ryanttb/PetpJ/ but I'm going to do more research to see if it changes the object in a way devs will notice.
+
+The data method doesn't natively support namespacing. I could do it myself using a period but I would like to follow what jQuery Mobile is doing with their data attribute stuff. They use data-jm-role which I believe equates to the call .data("jmRole") but I need to check up on that as well. So if I were to do data-geo-style, that would be .data("geoStyle"). I can live with that.
+
+SUGGESTION: Store $.geo styles via $(geoJsonObj).data("geoStyle", style)
+
+=== On shape functions ===
+Again, the shape functions feel very old and were grabbed from my internal control. Tonight I was thinking about a new way to do this and it involves being able to wrap GeoJSON objects with jQuery collections and intercept $.fn calls such as .css. Also, non-jQuery UI functions can be added to the geomap widget's div to replace the old addShape method.
+
+For example: $("#map").geomap("addShape", geoJson) could be $("#map").append(geoJson).
+
+How would I add shapes to specific services in the future? $("#map [data-geo-service='OSM']").append(geoJson) maybe.
+
+This might be going too far. Perhaps the old way is fine but use newer names (without the Shape suffix): $("#map").geomap("append", geoJsonObj), $("#map").geomap("append", "OSM", geoJsonObj), $("#map").geomap("remove", geoJsonObj) and $("#map").geomap("empty").
+
+SUGGESTION: Rename the shape manipulation methods
+
+The methods also need to take arrays of GeoJSON objects as returned by databases and jQuery collections of GeoJSON objects as possibly returned by the find method.
+
+SUGGESTION: Shape manipulation methods should handle arrays
+
+Looking back at the above code, I feel like maybe if I really can get the selector-based way to work, e.g., intercept the append call on the geomap widget, I could target the services using a class. They are divs inside the map, I should be able to trap them:
+
+$("#map .OSM").append(geoJsonObj);
+
+That does look really nice.
+
+SUGGESTION: (future) Trap existing jQuery calls: append, remove and emtpy, on both the widget element and the service elements as syntactic sugar, forward them to geomap calls
+
+However, using the class selector feels wrong. Especially if I'm telling them to use the id property when creating the service objects. I could switch it to name when creating the service objects, then:
+
+$("#map [name='OSM']").append(geoJsonObj);
+
+I need to find out if any of this is possible as soon as possible. It's still shorter than calling geomap. I would have to warn users to make sure the space is there, this needs to be a descendant selector.
+
+SUGGESTION: Use name instead of id in the service objects.
+
+=== On finding shapes ===
+So you can append and remove shapes. Fine. But I also want a better way to search for shapes. Chris and I mulled over a selector-based way. I think I still want the simplicity of $("#map").geomap("find", position, pixelTol). That will cover a lot of use cases, users click maps a lot.
+
+However, there should be other ways to get at your shapes in a UI widget way:
+$("#map").geomap("find", [-67, 43], 8); // find all shapes within 8px of the map position (special case)
+$("#map").geomap("find", "[type='Point']"); // Finds all points
+$("#map").geomap("find", "[name='OSM'] *"); // all shapes in the OSM service (future)
+$("#map").geomap("find", ":intersects(wkt(POINT(-67 43)))"); // Advanced spatial filter, OGC selector names (way future)
+
+Here's how they would look with the future jQuery syntactic sugar:
+$("#map").find([-67, 43], 8); // find all shapes within 8px of the map position (special case)
+$("#map").find("[type='Point']"); // Finds all points
+$("#map [name='OSM']").find(); // all shapes in the OSM service (future)
+$("#map").find(":intersects(wkt(POINT(-67 43)))"); // Advanced spatial filter, OGC selector names (way future)
+

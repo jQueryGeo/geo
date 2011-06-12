@@ -1,0 +1,143 @@
+﻿<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js ie6" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!-->  <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>$.geo logo</title>
+ 
+  <meta name="description" content="Drawing the $.geo logo">
+  <meta name="author" content="Ryan Westphal">
+ 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+  <style type="text/css">
+    body
+    {
+      font-family: Calibri,Arial;
+      margin: 0;
+      padding: 0;
+    }
+    .info { margin: 16px; }
+    #map 
+    {
+      position: absolute;
+      left: 0px;
+      top: 0px;
+      right: 0px;
+      bottom: 0px;
+    }
+    .ie7 #map, .ie6 #map
+    {
+      width: 100%;
+      right: auto;
+      bottom: auto;
+      min-height: 600px;
+    }
+  </style>
+</head>
+<body>
+  <div class="content">
+    <div class="info">
+      <a href="../" class="docLink">&lt; docs</a>
+      <h1>
+        $.geo logos!</h1>
+      <p>
+        This demo uses $.geo to draw its own logo at the top right of the map. Single-click the map to make more logos! The shapes created for the logo are based on the pixelSize of the current scale so your map's current zoom determines the Earth-size of the logo. When you zoom in, the points of the individual logos will spread out.</p>
+    </div>
+    <div id="map">
+    </div>
+  </div>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js"></script>
+  <script src="http://host.appgeo.com/libs/geo/test/jquery-geo-test.min.js"></script>
+  <script>
+    $(function () {
+      var 
+      dblClickTimeout = null, //< We use this timer to distinguish between click & dblclick, don't draw a logo on a dblclick
+      map = $("#map").css("top", $(".info").outerHeight() + 32).geomap({
+        center: [-75, 40],
+        zoom: 5,
+        click: function (e, geo) {
+          if (dblClickTimeout == null) {
+            dblClickTimeout = setTimeout(function () {
+              addLogo(geo);
+              dblClickTimeout = null;
+            }, 250);
+          }
+        },
+        dblclick: function (e, geo) {
+          clearTimeout(dblClickTimeout);
+          dblClickTimeout = null;
+        }
+      });
+
+      var width = $(document).width();
+      addLogo({ pixels: [width - 16, 16], coordinates: map.geomap("toMap", [width - 16, 16]) });
+
+      function addLogo(geo) {
+        var 
+        logoOuterCoords = map.geomap("toMap", [
+          [geo.pixels[0] - 16, geo.pixels[1]],
+          [geo.pixels[0] - 15, geo.pixels[1] + 6],
+          [geo.pixels[0] - 11, geo.pixels[1] + 11],
+          [geo.pixels[0] - 6, geo.pixels[1] + 15],
+          [geo.pixels[0], geo.pixels[1] + 16]
+        ]),
+        logoOuterPoints = [],
+        logoInnerCoords = map.geomap("toMap", [
+          [geo.pixels[0] - 8, geo.pixels[1]],
+          [geo.pixels[0] - 6, geo.pixels[1] + 6],
+          [geo.pixels[0], geo.pixels[1] + 8]
+        ]),
+        logoInnerPoints = [],
+        logoCornerCoord = geo.coordinates,
+        logoLines = {
+          type: "GeometryCollection",
+          geometries: []
+        },
+        logoPoints = {
+          type: "GeometryCollection",
+          geometries: []
+        };
+
+        $.merge(logoLines.geometries, [{
+          type: "LineString",
+          coordinates: logoOuterCoords
+        }]);
+
+        $.merge(logoLines.geometries, [{
+          type: "LineString",
+          coordinates: logoInnerCoords
+        }]);
+
+        $.each(logoOuterCoords, function (i) {
+          logoOuterPoints[i] = {
+            type: "Point",
+            coordinates: this
+          };
+        });
+
+        $.merge(logoPoints.geometries, logoOuterPoints);
+
+        $.each(logoInnerCoords, function (i) {
+          logoInnerPoints[i] = {
+            type: "Point",
+            coordinates: this
+          };
+        });
+
+        $.merge(logoPoints.geometries, logoInnerPoints);
+
+        $.merge(logoPoints.geometries, [{
+          type: "Point",
+          coordinates: logoCornerCoord
+        }]);
+
+        map.geomap("append", logoLines, { strokeWidth: "2px", fill: "#faa", fillOpacity: 1 });
+        map.geomap("append", logoPoints, { strokeWidth: "1px", width: "3px", height: "3px", fill: "#faa", fillOpacity: 1 });
+      }
+    });
+  </script>
+</body>
+</html>
