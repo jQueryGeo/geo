@@ -5,16 +5,16 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <title>findShape | $.geo</title>
-  <meta name="description" content="$.geo findShape method">
+  <title>find | $.geo</title>
+  <meta name="description" content="$.geo find method">
   <meta name="author" content="Ryan Westphal">
 </head>
 
 <body>
 
-  <div id="findShape" data-role=page data-theme="b">
+  <div id="find" data-role=page data-theme="b">
     <div data-role="header">
-      <h1>findShape</h1>
+      <h1>find</h1>
     </div>
     
     <div data-role="content">
@@ -25,14 +25,14 @@
         </tr>
         <tr>
           <th>syntax</th>
-          <td>.geomap( &quot;findShape&quot;, Array position (<a href="http://geojson.org/geojson-spec.html#positions">GeoJSON position</a>), Number pixelTolerance )</td>
+          <td>.geomap( &quot;find&quot;, Array position (<a href="http://geojson.org/geojson-spec.html#positions">GeoJSON position</a>), Number pixelTolerance )</td>
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>var existingShape = $(&quot;#map&quot;).geomap( &quot;findShape&quot;, [ -71.098709, 42.330322 ], 8 )</code></pre></td>
+          <td><pre><code>var existingShape = $(&quot;#map&quot;).geomap( &quot;find&quot;, [ -71.098709, 42.330322 ], 8 )</code></pre></td>
         </tr>
       </table>
-      <p>The findShape method takes a single map position (which is an array of two values: x and y or longitude and latitude) and returns all shapes within a pixel radius of the given location that have been added with addShape. If there are no shapes at the location, this method returns an empty array.</p>
+      <p>The find method takes a single map position (which is an array of two values: x and y or longitude and latitude) and returns all shapes within a pixel radius of the given location that have been added with append. If there are no shapes at the location, this method returns an empty array.</p>
       <p>If $.geo.proj is not null, the position argument must be in geodetic coordinates, position[0] is longitude and position[1] is latitude. If $.geo.proj is null, the position must be in the widget's internal projection as defined by tilingScheme for tiled map services or bboxMax for shingled (dynamic) map services.</p>
       <p>The pixelTolerance argument is always in pixels. This allows for pixel-based searches regardless of the map's current zoom. A high-zoom search is finer than a low-zoom one because at lower zoom levels, i.e., the map is zoomed out more, the map-size of a pixel is greater.</p>
     </div>

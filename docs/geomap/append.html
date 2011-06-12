@@ -1,0 +1,46 @@
+<!doctype html>  
+
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>append | $.geo</title>
+  <meta name="description" content="$.geo append method">
+  <meta name="author" content="Ryan Westphal">
+</head>
+
+<body>
+
+  <div id="append" data-role=page data-theme="b">
+    <div data-role="header">
+      <h1>append</h1>
+    </div>
+    
+    <div data-role="content">
+      <table>
+        <tr>
+          <th>return type</th>
+          <td>jQuery</td>
+        </tr>
+        <tr>
+          <th>syntax</th>
+          <td>.geomap( &quot;append&quot; <!--[ , String serviceId ]--> , Object shape ( <a href="http://geojson.org/geojson-spec.html" rel="external">GeoJSON object</a> ) [ , Object style ( geomap style ) ] )</td>
+        </tr>
+        <tr>
+          <th>usage</th>
+          <td><pre><code>$(&quot;map&quot;).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] } )
+$(&quot;map&quot;).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, { stroke: &quot;#11117f&quot;, strokeWidth: &quot;3px&quot; } )</code></pre></td>
+        </tr>
+      </table>
+      <p>The append method adds a shape to the map and then redraws the map. In this documentation the word shape means a GeoJSON geometry object, GeoJSON feature or GeoJSON feature collection. Each feature in a FeatureCollection's features property is added as a separate shape whereas the other collection geometry types, e.g., MultiPoint, are added as a single shape. This is important distinction when considering the findShape method.</p>
+      <p>The geomap widget maintains a reference to your shape. It will not change the object in any way. You can use the same object in calls to removeShape to remove the shape from the map at any time. You can change the geometry of the original object at any time by updating the coordinates property and geomap will draw the new shape when it refreshes. Changing the type of geometry, e.g., from Point to LineString, is not recommended and geomap's behavior is currently undefined. If you must change the shape type, you should first call removeShape on the original object and append on a new one.</p>
+      <!--<p>geomap draws shapes ordered by geometry type and then by order of addition. It draws Polygon shapes first followed by LineString and finally Point shapes. </p>-->
+      <p>If $.geo.proj is not null, all coordinates of all geometry (whether plain or part of a feature) must be in geodetic coordinates, e.g., for a Point object coordinates[0] is longitude and coordinates[1] is latitude. If $.geo.proj is null, all coordinates must be in the widget's internal projection as defined by tilingScheme for tiled map services or bboxMax for shingled (dynamic) map services.</p>
+      <p>The optional style argument modifies how geomap draws the specific geometry or feature you are adding. Properties supplied in this style will override ones of the same name in geomap&#39;s base shapeStyle. Properties not referenced are inheritied from the base style and can change with future calls to shapeStyle. Please see the shapeStyle method documentation for information about what properties are valid for this object.</p>
+      <!--<p>This method returns the original jQuery collection to maintain call chaining.</p>-->
+    </div>
+  </div> <!-- end of #container -->
+</body>
+</html>
+

@@ -1,0 +1,14 @@
+﻿body { font-family: Calibri,Arial; }
+
+.docLink 
+{
+  background: url(../../images/$.geo-logo-small.png) right no-repeat;
+  color: #7f0000;
+  display: block;
+  float: right;
+  font-size: 24px;
+  font-weight: bold;
+  padding-right: 24px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
