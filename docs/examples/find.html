@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>geomap find test</title>
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+</head>
+<body>
+    <a href="../" class="docLink">&lt; docs</a>
+  <h1>geomap find test</h1>
+  <div class="geomap" style="width: 640px; height: 480px;"></div>
+  <div class="output">
+    <h2>Click the geometry!</h2>
+    <ul></ul>
+  </div>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js"></script>
+  <script src="http://host.appgeo.com/libs/geo/test/jquery-geo-test.min.js"></script>
+  <script>
+    $(function () {
+      var geomap = $(".geomap").geomap({
+        center: [-71.05, 42.35],
+        zoom: 13,
+        click: function (e, geo) {
+          var outputHtml = "",
+              result = geomap.geomap("find", geo, 8);
+
+          $.each(result, function () {
+            outputHtml += ("<li>Found a " + this.type + " at " + this.coordinates + "</li>");
+          });
+
+          $(".output ul").html(outputHtml);
+        }
+      });
+
+      var geoms = {
+        one: { type: "Point", coordinates: [-71.05, 42.35] },
+        two: { type: "Point", coordinates: [-71.045, 42.355] },
+        three: { type: "Point", coordinates: [-71.055, 42.345] },
+        four: { type: "Point", coordinates: [-71.055, 42.355] },
+        five: { type: "Point", coordinates: [-71.045, 42.345] },
+        six: { type: "LineString", coordinates: [[-71.055, 42.355], [-71.045, 42.355]] },
+        seven: { type: "Polygon", coordinates: [[[-71.06, 42.3425], [-71.06, 42.3475], [-71.04, 42.3475], [-71.04, 42.3425], [-71.06, 42.3425]]] }
+      };
+
+      for (var geomKey in geoms) {
+        geomap.geomap("append", geoms[geomKey]);
+      }
+    });
+  </script>
+</body>
+</html>

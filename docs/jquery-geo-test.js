@@ -658,48 +658,48 @@ if (!document.createElement('canvas').getContext) {
       this.currentY_ = p.y;
     };
 
-    //  contextPrototype.bezierCurveTo = function(aCP1x, aCP1y,
-    //                                            aCP2x, aCP2y,
-    //                                            aX, aY) {
-    //    var p = getCoords(this, aX, aY);
-    //    var cp1 = getCoords(this, aCP1x, aCP1y);
-    //    var cp2 = getCoords(this, aCP2x, aCP2y);
-    //    bezierCurveTo(this, cp1, cp2, p);
-    //  };
+    contextPrototype.bezierCurveTo = function(aCP1x, aCP1y,
+                                              aCP2x, aCP2y,
+                                              aX, aY) {
+      var p = getCoords(this, aX, aY);
+      var cp1 = getCoords(this, aCP1x, aCP1y);
+      var cp2 = getCoords(this, aCP2x, aCP2y);
+      bezierCurveTo(this, cp1, cp2, p);
+    };
 
-    //  // Helper function that takes the already fixed cordinates.
-    //  function bezierCurveTo(self, cp1, cp2, p) {
-    //    self.currentPath_.push({
-    //      type: 'bezierCurveTo',
-    //      cp1x: cp1.x,
-    //      cp1y: cp1.y,
-    //      cp2x: cp2.x,
-    //      cp2y: cp2.y,
-    //      x: p.x,
-    //      y: p.y
-    //    });
-    //    self.currentX_ = p.x;
-    //    self.currentY_ = p.y;
-    //  }
+    // Helper function that takes the already fixed cordinates.
+    function bezierCurveTo(self, cp1, cp2, p) {
+      self.currentPath_.push({
+        type: 'bezierCurveTo',
+        cp1x: cp1.x,
+        cp1y: cp1.y,
+        cp2x: cp2.x,
+        cp2y: cp2.y,
+        x: p.x,
+        y: p.y
+      });
+      self.currentX_ = p.x;
+      self.currentY_ = p.y;
+    }
 
-    //  contextPrototype.quadraticCurveTo = function(aCPx, aCPy, aX, aY) {
-    //    // the following is lifted almost directly from
-    //    // http://developer.mozilla.org/en/docs/Canvas_tutorial:Drawing_shapes
+    contextPrototype.quadraticCurveTo = function(aCPx, aCPy, aX, aY) {
+      // the following is lifted almost directly from
+      // http://developer.mozilla.org/en/docs/Canvas_tutorial:Drawing_shapes
 
-    //    var cp = getCoords(this, aCPx, aCPy);
-    //    var p = getCoords(this, aX, aY);
+      var cp = getCoords(this, aCPx, aCPy);
+      var p = getCoords(this, aX, aY);
 
-    //    var cp1 = {
-    //      x: this.currentX_ + 2.0 / 3.0 * (cp.x - this.currentX_),
-    //      y: this.currentY_ + 2.0 / 3.0 * (cp.y - this.currentY_)
-    //    };
-    //    var cp2 = {
-    //      x: cp1.x + (p.x - this.currentX_) / 3.0,
-    //      y: cp1.y + (p.y - this.currentY_) / 3.0
-    //    };
+      var cp1 = {
+        x: this.currentX_ + 2.0 / 3.0 * (cp.x - this.currentX_),
+        y: this.currentY_ + 2.0 / 3.0 * (cp.y - this.currentY_)
+      };
+      var cp2 = {
+        x: cp1.x + (p.x - this.currentX_) / 3.0,
+        y: cp1.y + (p.y - this.currentY_) / 3.0
+      };
 
-    //    bezierCurveTo(this, cp1, cp2, p);
-    //  };
+      bezierCurveTo(this, cp1, cp2, p);
+    };
 
     contextPrototype.arc = function (aX, aY, aRadius,
                                   aStartAngle, aEndAngle, aClockwise) {
@@ -1795,10 +1795,8 @@ $.Widget.prototype = {
 }﻿(function ($, window, undefined) {
   $.geo = {
     //
-    // geometry functions
+    // bbox functions
     //
-
-    // bbox
 
     _center: function (bbox) {
       // bbox only, use centroid for geom
@@ -1843,6 +1841,187 @@ $.Widget.prototype = {
 
     _width: function (bbox) {
       return bbox[2] - bbox[0];
+    },
+
+    //
+    // geometry functions
+    //
+
+    // contains
+
+    _contains: function (geom1, geom2) {
+      if (geom1.type != "Polygon") {
+        return false;
+      }
+
+      switch (geom2.type) {
+        case "Point":
+          return this._containsPolygonPoint(geom1.coordinates, geom2.coordinates);
+
+        case "LineString":
+          return this._containsPolygonLineString(geom1.coordinates, geom2.coordinates);
+
+        case "Polygon":
+          return this._containsPolygonLineString(geom1.coordinates, geom2.coordinates[0]);
+      }
+    },
+
+    _containsPolygonPoint: function (polygonCoordinates, pointCoordinate) {
+      if (polygonCoordinates.length == 0 || polygonCoordinates[0].length < 4) {
+        return false;
+      }
+
+      var rayCross = 0,
+          a = polygonCoordinates[0][0],
+          i = 1,
+          b,
+          x;
+
+      for (; i < polygonCoordinates[0].length; i++) {
+        b = polygonCoordinates[0][i];
+
+        if ((a[1] <= pointCoordinate[1] && pointCoordinate[1] < b[1]) || (b[1] <= pointCoordinate[1] && pointCoordinate[1] < a[1]) && (pointCoordinate[0] < a[0] || pointCoordinate[0] < b[0])) {
+          x = a[0] + (b[0] - a[0]) * (pointCoordinate[1] - a[1]) / (b[1] - a[1]);
+
+          if (x > pointCoordinate[0]) {
+            rayCross++;
+          }
+        }
+
+        a = b;
+      }
+
+      return rayCross % 2 == 1;
+    },
+
+    _containsPolygonLineString: function (polygonCoordinates, lineStringCoordinates) {
+      for (var i = 0; i < lineStringCoordinates.length; i++) {
+        if (!this._containsPolygonPoint(polygonCoordinates, lineStringCoordinates[i])) {
+          return false;
+        }
+      }
+      return true;
+    },
+
+    // distance
+    // despite the other function names, only _distance takes GeoJSON objects
+
+    _distance: function (geom1, geom2) {
+      var geom1Coordinates = $.isArray(geom1) ? geom1 : geom1.coordinates,
+          geom2Coordinates = $.isArray(geom2) ? geom2 : geom2.coordinates,
+          geom1CoordinatesProjected = $.geo.proj ? $.geo.proj.fromGeodetic(geom1Coordinates) : geom1Coordinates,
+          geom2CoordinatesProjected = $.geo.proj ? $.geo.proj.fromGeodetic(geom2Coordinates) : geom2Coordinates;
+
+      switch (geom1.type) {
+        case "Point":
+          switch (geom2.type) {
+            case "Point":
+              return this._distancePointPoint(geom2CoordinatesProjected, geom1CoordinatesProjected);
+            case "LineString":
+              return this._distanceLineStringPoint(geom2CoordinatesProjected, geom1CoordinatesProjected);
+            case "Polygon":
+              return this._containsPolygonPoint(geom2CoordinatesProjected, geom1CoordinatesProjected) ? 0 : this._distanceLineStringPoint(geom2CoordinatesProjected[0], geom1CoordinatesProjected);
+            default:
+              throw new Error("not implemented");
+          }
+          break;
+
+        case "LineString":
+          switch (geom2.type) {
+            case "Point":
+              return this._distanceLineStringPoint(geom1CoordinatesProjected, geom2CoordinatesProjected);
+            case "LineString":
+              return this._distanceLineStringLineString(geom1CoordinatesProjected, geom2CoordinatesProjected);
+            case "Polygon":
+              return this._containsPolygonLineString(geom2CoordinatesProjected, geom1CoordinatesProjected) ? 0 : this._distanceLineStringLineString(geom2CoordinatesProjected[0], geom1CoordinatesProjected);
+            default:
+              throw new Error("not implemented");
+          }
+          break;
+
+        case "Polygon":
+          switch (geom2.type) {
+            case "Point":
+              return this._containsPolygonPoint(geom1CoordinatesProjected, geom2CoordinatesProjected) ? 0 : this._distanceLineStringPoint(geom1CoordinatesProjected[0], geom2CoordinatesProjected);
+            case "LineString":
+              return this._containsPolygonLineString(geom1CoordinatesProjected, geom2CoordinatesProjected) ? 0 : this._distanceLineStringLineString(geom1CoordinatesProjected[0], geom2CoordinatesProjected);
+            case "Polygon":
+              return this._containsPolygonLineString(geom1CoordinatesProjected, geom2CoordinatesProjected[0]) ? 0 : this._distanceLineStringLineString(geom1CoordinatesProjected[0], geom2CoordinatesProjected[0]);
+            default:
+              throw new Error("not implemented");
+          }
+          break;
+      }
+    },
+
+    _distancePointPoint: function (coordinate1, coordinate2) {
+      var dx = coordinate2[0] - coordinate1[0],
+          dy = coordinate2[1] - coordinate1[1];
+      return Math.sqrt((dx * dx) + (dy * dy));
+    },
+
+    _distanceLineStringPoint: function (lineStringCoordinates, pointCoordinate) {
+      var minDist = Number.POSITIVE_INFINITY;
+
+      if (lineStringCoordinates.length > 0) {
+        var a = lineStringCoordinates[0],
+
+            apx = pointCoordinate[0] - a[0],
+            apy = pointCoordinate[1] - a[1];
+
+        if (lineStringCoordinates.length == 1) {
+          return Math.sqrt(apx * apx + apy * apy);
+        } else {
+          for (var i = 1; i < lineStringCoordinates.length; i++) {
+            var b = lineStringCoordinates[i],
+
+                abx = b[0] - a[0],
+                aby = b[1] - a[1],
+                bpx = pointCoordinate[0] - b[0],
+                bpy = pointCoordinate[1] - b[1],
+
+                d = this._distanceSegmentPoint(abx, aby, apx, apy, bpx, bpy);
+
+            if (d == 0) {
+              return 0;
+            }
+
+            if (d < minDist) {
+              minDist = d;
+            }
+
+            a = b;
+            apx = bpx;
+            apy = bpy;
+          }
+        }
+      }
+
+      return Math.sqrt(minDist);
+    },
+
+    _distanceSegmentPoint: function (abx, aby, apx, apy, bpx, bpy) {
+      var dot1 = abx * apx + aby * apy;
+
+      if (dot1 <= 0) {
+        return apx * apx + apy * apy;
+      }
+
+      var dot2 = abx * abx + aby * aby;
+
+      if (dot1 >= dot2) {
+        return bpx * bpx + bpy * bpy;
+      }
+
+      return apx * apx + apy * apy - dot1 * dot1 / dot2;
+    },
+
+    _distanceLineStringLineString: function (lineStringCoordinates1, lineStringCoordinates2) {
+      var minDist = Number.POSITIVE_INFINITY;
+      for (var i = 0; i < lineStringCoordinates2; i++) {
+        minDist = Math.min(minDist, this._distanceLineStringPoint(lineStringCoordinates1, lineStringCoordinates2[i]));
+      }
+      return minDist;
     },
 
     //
@@ -2001,28 +2180,72 @@ $.Widget.prototype = {
 
 
       return {
-        fromGeodetic: function (positions) {
-          var isArray = $.isArray(positions[0]), result = [], i = 0, cur;
-          if (!isArray) {
-            positions = [positions];
-          }
-          for (; i < positions.length; i++) {
-            cur = webMercator.toProjected({ x: positions[i][0], y: positions[i][1] });
-            result[i] = [cur.x, cur.y];
-          }
-          return isArray ? result : result[0];
+        fromGeodeticPos: function (coordinate) {
+          var cur = webMercator.toProjected({ x: coordinate[0], y: coordinate[1] });
+          return [cur.x, cur.y];
         },
 
-        toGeodetic: function (positions) {
-          var isArray = $.isArray(positions[0]), result = [], i = 0, cur;
-          if (!isArray) {
-            positions = [positions];
+        fromGeodetic: function (coordinates) {
+          var 
+          isArray = $.isArray(coordinates[0]),
+          isDblArray = isArray && $.isArray(coordinates[0][0]),
+          isTriArray = isDblArray && $.isArray(coordinates[0][0][0]),
+          result = [[[]]],
+          fromGeodeticPos = this.fromGeodeticPos;
+
+          if (!isTriArray) {
+            if (!isDblArray) {
+              if (!isArray) {
+                coordinates = [coordinates];
+              }
+              coordinates = [coordinates];
+            }
+            coordinates = [coordinates];
           }
-          for (; i < positions.length; i++) {
-            cur = webMercator.toGeodetic({ x: positions[i][0], y: positions[i][1] });
-            result[i] = [cur.x, cur.y];
+
+          $.each(coordinates, function (i) {
+            $.each(this, function (j) {
+              $.each(this, function (k) {
+                result[i][j][k] = fromGeodeticPos(this);
+              });
+            });
+          });
+
+          return isTriArray ? result : isDblArray ? result[0] : isArray ? result[0][0] : result[0][0][0];
+        },
+
+        toGeodeticPos: function (coordinate) {
+          var cur = webMercator.toGeodetic({ x: coordinate[0], y: coordinate[1] });
+          return [cur.x, cur.y];
+        },
+
+        toGeodetic: function (coordinates) {
+          var 
+          isArray = $.isArray(coordinates[0]),
+          isDblArray = isArray && $.isArray(coordinates[0][0]),
+          isTriArray = isDblArray && $.isArray(coordinates[0][0][0]),
+          result = [[[]]],
+          toGeodeticPos = this.toGeodeticPos;
+
+          if (!isTriArray) {
+            if (!isDblArray) {
+              if (!isArray) {
+                coordinates = [coordinates];
+              }
+              coordinates = [coordinates];
+            }
+            coordinates = [coordinates];
           }
-          return isArray ? result : result[0];
+
+          $.each(coordinates, function (i) {
+            $.each(this, function (j) {
+              $.each(this, function (k) {
+                result[i][j][k] = toGeodeticPos(this);
+              });
+            });
+          });
+
+          return isTriArray ? result : isDblArray ? result[0] : isArray ? result[0][0] : result[0][0][0];
         }
       }
     })()
@@ -2050,6 +2273,7 @@ $.Widget.prototype = {
   $.widget("geo.geographics", {
     options: {
       style: {
+        borderRadius: "8px",
         color: "#7f0000",
         //fill: undefined,
         fillOpacity: .2,
@@ -2158,6 +2382,41 @@ $.Widget.prototype = {
     },
 
     drawPoint: function (coordinates, style) {
+      var graphicStyle = this._getGraphicStyle(style);
+      if (graphicStyle.widthValue == graphicStyle.heightValue && graphicStyle.heightValue == graphicStyle.borderRadiusValue) {
+        this.drawArc(coordinates, 0, 360, style);
+      } else if (graphicStyle.visibility != "hidden") {
+        graphicStyle.borderRadiusValue = Math.min(Math.min(graphicStyle.widthValue, graphicStyle.heightValue) / 2, graphicStyle.borderRadiusValue);
+        coordinates[0] -= graphicStyle.widthValue / 2;
+        coordinates[1] -= graphicStyle.heightValue / 2;
+        _context.beginPath();
+        _context.moveTo(coordinates[0] + graphicStyle.borderRadiusValue, coordinates[1]);
+        _context.lineTo(coordinates[0] + graphicStyle.widthValue - graphicStyle.borderRadiusValue, coordinates[1]);
+        _context.quadraticCurveTo(coordinates[0] + graphicStyle.widthValue, coordinates[1], coordinates[0] + graphicStyle.widthValue, coordinates[1] + graphicStyle.borderRadiusValue);
+        _context.lineTo(coordinates[0] + graphicStyle.widthValue, coordinates[1] + graphicStyle.heightValue - graphicStyle.borderRadiusValue);
+        _context.quadraticCurveTo(coordinates[0] + graphicStyle.widthValue, coordinates[1] + graphicStyle.heightValue, coordinates[0] + graphicStyle.widthValue - graphicStyle.borderRadiusValue, coordinates[1] + graphicStyle.heightValue);
+        _context.lineTo(coordinates[0] + graphicStyle.borderRadiusValue, coordinates[1] + graphicStyle.heightValue);
+        _context.quadraticCurveTo(coordinates[0], coordinates[1] + graphicStyle.heightValue, coordinates[0], coordinates[1] + graphicStyle.heightValue - graphicStyle.borderRadiusValue);
+        _context.lineTo(coordinates[0], coordinates[1] + graphicStyle.borderRadiusValue);
+        _context.quadraticCurveTo(coordinates[0], coordinates[1], coordinates[0] + graphicStyle.borderRadiusValue, coordinates[1]);
+        _context.closePath();
+
+        if (graphicStyle.doFill) {
+          _context.fillStyle = graphicStyle.fill;
+          _context.globalAlpha = graphicStyle.opacity * graphicStyle.fillOpacity;
+          _context.fill();
+        }
+
+        if (graphicStyle.doStroke) {
+          _context.lineJoin = "round";
+          _context.lineWidth = graphicStyle.strokeWidthValue;
+          _context.strokeStyle = graphicStyle.stroke;
+
+          _context.globalAlpha = graphicStyle.opacity * graphicStyle.strokeOpacity;
+
+          _context.stroke();
+        }
+      }
     },
 
     drawLineString: function (coordinates, style) {
@@ -2185,6 +2444,7 @@ $.Widget.prototype = {
       }
 
       style = $.extend({}, _options.style, style);
+      style.borderRadiusValue = safeParse(style.borderRadius);
       style.fill = style.fill || style.color;
       style.fillOpacity = style.fillOpacity || style.opacity;
       style.doFill = style.fill && style.fillOpacity > 0;
@@ -2207,26 +2467,24 @@ $.Widget.prototype = {
       i, j;
 
       if (style.visibility != "hidden") {
-        if (style.doFill && close) {
-          _context.fillStyle = style.fill;
-          _context.globalAlpha = style.opacity * style.fillOpacity;
-          _context.beginPath();
-          _context.moveTo(coordinates[0][0][0], coordinates[0][0][1]);
+        _context.beginPath();
+        _context.moveTo(coordinates[0][0][0], coordinates[0][0][1]);
 
-          var lastPoint = coordinates[0][coordinates[0].length - 1];
+        var lastPoint = coordinates[0][coordinates[0].length - 1];
 
-          for (i = 0; i < coordinates.length; i++) {
-            for (j = 0; j < coordinates[i].length; j++) {
-              _context.lineTo(coordinates[i][j][0], coordinates[i][j][1]);
-            }
-
-            if (i > 0) {
-              _context.lineTo(lastPoint[0], lastPoint[1]);
-            }
+        for (i = 0; i < coordinates.length; i++) {
+          for (j = 0; j < coordinates[i].length; j++) {
+            _context.lineTo(coordinates[i][j][0], coordinates[i][j][1]);
           }
 
-          _context.closePath();
+          if (close && i > 0) {
+            _context.lineTo(lastPoint[0], lastPoint[1]);
+            _context.closePath();
+          }
+        }
 
+        if (style.doFill) {
+          _context.fillStyle = style.fill;
           _context.globalAlpha = style.opacity * style.fillOpacity;
           _context.fill();
         }
@@ -2237,21 +2495,7 @@ $.Widget.prototype = {
           _context.strokeStyle = style.stroke;
 
           _context.globalAlpha = style.opacity * style.strokeOpacity;
-
-          for (i = 0; i < coordinates.length; i++) {
-            _context.beginPath();
-            _context.moveTo(coordinates[i][0][0], coordinates[i][0][1]);
-
-            for (j = 0; j < coordinates[i].length; j++) {
-              _context.lineTo(coordinates[i][j][0], coordinates[i][j][1]);
-            }
-
-            if (close) {
-              _context.lineTo(coordinates[i][0][0], coordinates[i][0][1]);
-            }
-
-            _context.stroke();
-          }
+          _context.stroke();
         }
       }
     }
@@ -3106,20 +3350,55 @@ $.Widget.prototype = {
           }
 
           $.each(shapes, function () {
-            if (this.type == "GeometryCollection") {
-              map.append(this.geometries, style, false);
-            } else {
-              _graphicShapes[_graphicShapes.length] = {
-                shape: this,
-                style: style
-              };
-            }
+            _graphicShapes[_graphicShapes.length] = {
+              shape: this,
+              style: style
+            };
           });
 
           if (refresh) {
             this._refresh();
           }
         }
+      },
+
+      empty: function () {
+        _graphicShapes = [];
+        this._refresh();
+      },
+
+      find: function (point, pixelTolerance) {
+        var searchPixel = this.toPixel(point.coordinates),
+            mapTol = _pixelSize * pixelTolerance,
+            result = [];
+
+        $.each(_graphicShapes, function (i) {
+          if ($.geo._distance(this.shape, point) < mapTol) {
+            result.push(this.shape);
+          } else {
+            //            var labelPoint = this._map.toPixelPoint(this._items[i]._labelCoord);
+            //            if (labelPoint.x - tol <= searchPixel.x &&
+            //                searchPixel.x <= labelPoint.x + this._items[i]._labelSize.width + tol &&
+            //                labelPoint.y - tol <= searchPixel.y &&
+            //                searchPixel.y <= labelPoint.y + this._items[i]._labelSize.height + tol) {
+            //              result.push(this.shape);
+            //            }
+          }
+        });
+
+        return result;
+      },
+
+      remove: function (shape) {
+        $.each(_graphicShapes, function (i) {
+          if (this.shape == shape) {
+            var rest = _graphicShapes.slice(i + 1 || _graphicShapes.length);
+            _graphicShapes.length = i < 0 ? _graphicShapes.length + i : i;
+            _graphicShapes.push.apply(_graphicShapes, rest);
+            return false;
+          }
+        });
+        this._refresh();
       },
 
       _getBbox: function () {
@@ -3209,16 +3488,22 @@ $.Widget.prototype = {
         _currentServices = _options["services"];
       },
 
-      _drawGraphics: function (geographics, shapes) {
-        var i, mgi, shape, style, pixelPositions, map = this;
+      _drawGraphics: function (geographics, shapes, styles) {
+        var i,
+            mgi,
+            shape,
+            style,
+            pixelPositions,
+            geomap = this;
+
         for (i = 0; i < shapes.length; i++) {
-          // Either a GeoJSON Feature or a GeoJSON Geometry object are allowed
-          shape = shapes[i].shape.geometry ? shapes[i].shape.geometry : shapes[i].shape;
-          style = _graphicShapes[i].style;
+          shape = shapes[i].shape || shapes[i];
+          shape = shape.geometry || shape;
+          style = $.isArray(styles) ? styles[i].style : styles;
 
           switch (shape.type) {
             case "Point":
-              _$shapesContainer.geographics("drawArc", this.toPixel(shape.coordinates), 0, 360, style);
+              _$shapesContainer.geographics("drawPoint", this.toPixel(shape.coordinates), style);
               break;
             case "LineString":
               _$shapesContainer.geographics("drawLineString", this.toPixel(shape.coordinates), style);
@@ -3226,13 +3511,13 @@ $.Widget.prototype = {
             case "Polygon":
               pixelPositions = [];
               $.each(shape.coordinates, function (i) {
-                pixelPositions[i] = map.toPixel(this);
+                pixelPositions[i] = geomap.toPixel(this);
               });
               _$shapesContainer.geographics("drawPolygon", pixelPositions, style);
               break;
             case "MultiPoint":
               for (mgi = 0; mgi < shape.coordinates; mgi++) {
-                _$shapesContainer.geographics("drawArc", this.toPixel(shape.coordinates[mgi]), 0, 360, style);
+                _$shapesContainer.geographics("drawPoint", this.toPixel(shape.coordinates[mgi]), style);
               }
               break;
             case "MultiLineString":
@@ -3244,10 +3529,14 @@ $.Widget.prototype = {
               for (mgi = 0; mgi < shape.coordinates; mgi++) {
                 pixelPositions = [];
                 $.each(shape.coordinates[mgi], function (i) {
-                  pixelPositions[i] = map.toPixel(this);
+                  pixelPositions[i] = geomap.toPixel(this);
                 });
                 _$shapesContainer.geographics("drawPolygon", pixelPositions, style);
               }
+              break;
+
+            case "GeometryCollection":
+              geomap._drawGraphics(geographics, shape.geometries, style);
               break;
           }
         }
@@ -3432,9 +3721,11 @@ $.Widget.prototype = {
           }
         }
 
-        if (_graphicShapes.length > 0) {
+        if (_$shapesContainer) {
           _$shapesContainer.geographics("clear");
-          this._drawGraphics(_$shapesContainer, _graphicShapes);
+          if (_graphicShapes.length > 0) {
+            this._drawGraphics(_$shapesContainer, _graphicShapes, _graphicShapes);
+          }
         }
       },
 
@@ -3525,8 +3816,8 @@ $.Widget.prototype = {
 
         $.each(p, function (i) {
           result[i] = [
-            (this[0] - bbox[0]) * width / bboxWidth,
-            (bbox[3] - this[1]) * height / bboxHeight
+            Math.round((this[0] - bbox[0]) * width / bboxWidth),
+            Math.round((bbox[3] - this[1]) * height / bboxHeight)
           ];
         });
 
@@ -3556,7 +3847,7 @@ $.Widget.prototype = {
 
         switch (_options["mode"]) {
           case "pan":
-            this._trigger("dblclick", e, { pixels: _current, coordinates: this.toMap(_current) });
+            this._trigger("dblclick", e, { type: "Point", coordinates: this.toMap(_current) });
             if (!e.isDefaultPrevented()) {
               this._zoomTo(this._toMap(_current), this._getZoom() + 1, true, true);
             }
@@ -3652,7 +3943,7 @@ $.Widget.prototype = {
             if (_mouseDown || _toolPan) {
               this._panMove();
             } else {
-              this._trigger("move", e, { pixels: current, coordinates: this.toMap(current) });
+              this._trigger("move", e, { type: "Point", coordinates: this.toMap(current) });
             }
             break;
         }
@@ -3704,7 +3995,7 @@ $.Widget.prototype = {
                 this._panEnd();
               } else {
                 if (clickDate - _clickDate > 100) {
-                  this._trigger("click", e, { pixels: current, coordinates: this.toMap(current) });
+                  this._trigger("click", e, { type: "Point", coordinates: this.toMap(current) });
                   _inOp = false;
                 }
               }

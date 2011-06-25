@@ -154,7 +154,7 @@
         center: [-76, 43],
         zoom: 5,
         click: function (e, geo) {
-          geomap.geomap("append", { type: "Point", coordinates: geo.coordinates }, ($("input[name='appendStyle']:checked").val() == "override" ? appendStyle : undefined));
+          geomap.geomap("append", geo, ($("input[name='appendStyle']:checked").val() == "override" ? appendStyle : undefined));
         }
       });
 

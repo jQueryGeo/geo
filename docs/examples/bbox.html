@@ -131,7 +131,12 @@
         $.geo.proj = null;
       }
 
-      $("#map").geomap({ bbox: $.parseJSON(initBboxInput.val()) });
+      $("#map").geomap({
+        bbox: $.parseJSON(initBboxInput.val()),
+        bboxchange: function (e, geo) {
+          refreshActual();
+        }
+      });
 
       refreshActual();
 
