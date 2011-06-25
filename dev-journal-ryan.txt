@@ -1,20 +1,69 @@
 ﻿== TO DO ==
 
-* geomap - Port initial find functionality (position + pixel buffer)
+* geomap - document (make public) the refresh argument in append, add one to remove & empty
 * geomap - Allow append to take an array of geometry objects, each one should be a new shape
-* geographics - Forgo ovals for borderRadius support and rectangles, rename drawArc to drawPoint
 * geo.proj - Update bundled projection code
-* docs/internal - Document how geomap draws shapes
+* docs/internal - Document how geomap draws shapes, the geomapgraphics widget and the reason shapeStyle is a method
 * docs/geomap - Use name instead of id for service objects
+* docs/geomap - Scale map according to cursor location instead of re-centering during double-click zoom
 * widgets - Verify that vars local to initial closure do not conflict when multiple maps are placed
 * geomap - Auto-handle window resize events
 * geomap - [BUG] Mouse wheel on bad or missing tile doesn't zoom out on first rotate
 * geomap - Document and implement service-level shapes
 * geomap - Document and implement passing a function to shapeStyle and append that returns a geomap style object based on feature or geometry properties
+* geographics - Rename the generated style properties to something simple or get better control over closure compiler
 * geomap - Document and implement find's callback syntax
+* geographics - Disable fill by setting style.fill to "" & stroke by style.stroke to ""
 * graphics - See Modernizr for comment on BB Storm & canvas detection
 * geographics - Document graphics widget
 * geomap - [BUG] Android browser stops pan/zoom after 7 logos on logo demo
+
+== 2011-06-24 ==
+
+=== on shape methods ===
+I'm almost done. I need to finish empty and then I have what I wanted for an alpha 2 release!
+
+=== on Point vs. coordinate ===
+I think I'm going to settle on using Point objects everywhere except the projection functions. Which means I need to change find to accept a Point instead of an array. This should work out because the position events already send GeoJSON objects instead of position arrays.
+
+=== on geometry ===
+contains doesn't care about projections. Lon/lat values do not need to be projected.
+
+I got done some of the geometry functions in $.geo but I'm leaving them private for now until I have a chance to document them and fully implement them.
+
+=== on proj ===
+Finished changing the $.geo.proj docs to explain that it will convert any GeoJSON coordinates array. I think I will also change the requirements to implement other projections by having the developer only have to override single position conversion functions (instead of worrying about the dimentionality of the passed array). Done.
+
+=== on find ===
+Now that proj is more powerful, I think I can handle find.
+
+== 2011-06-18 ==
+Accidentally coded append differently than how I documented. Will fix the code. Documentation FTW!
+
+I can't decide if the geometry functions in $.geo should only accept the base geometry types or not. Initially they will not. I don't want to even think about getting into $.geo.distance(multiPoint, geometryCollection).
+
+$.proj should go up to a three dimensional array to handle the coordinates in a Polygon. Go big or go home, I'm going to support four dimensional arrays so that I can get MultiPolygons as well. That will handle all of the GeoJSON types that have the coordinates property. If you have a GeometryCollection (geometries property), a Feature (geometry property) or a FeatureCollection (features property), then you're on your own.
+
+I may change every mention of "web mercator" to "spherical mercator" to be more specific.
+
+== 2011-06-17 ==
+Attempting to change drawPoint from ovals to rounded rectangles. Shortcutting to drawArc if the width/height/borderRadius are the same.
+
+Since I plan to make geographics public at some point, I thought I might make the drawPoint/Line/Polygon functions take actual GeoJSON shapes but I think that might conflict with some functionality internal to the geomap during digitization...I'll have to revisit this.
+
+I seriously need to settle on the word "position" in my code when referring to an array containing an x/y. I use coordinate a bunch because that's what I used in the old project. Oh, but the property name of the GeoJSON object is coordinates. Heh, this is so confusing :) Ok, as I have been doing: coordinates in code, position in documentation.
+
+I'm using cowboy's safeParse but can't tell what it's guarding against. I thought it would always give me a number but that's not the case. Guard against NaN or undefined?
+
+Should drawing a bbox ignore borderRadius? I haven't decided.
+
+You can fill and then stroke the same path, just sayin'.
+
+Point graphics now draw as rounded rectangles. There's weirdness if your sizes are a little off though. I should probably start clamping values to each other like width & height to borderRadius. Yeah, if either is smaller than borderRadius the drawing gets weird. Maybe I should clamp borderRadius instead. Probably. Yeah, have to clamp borderRadius to min(width, height)/2.
+
+I don't think you can disable fill by setting style.fill to "", but you should be allowed. It shouldn't be required to set fillOpacity to 0.
+
+I just dropped a couple loops out of my graphic drawing in geographics. Should help a bit :)
 
 == 2011-06-12 ==
 I'm finally pushing the renaming changes to the main project.
@@ -23,6 +72,30 @@ I'm finally pushing the renaming changes to the main project.
 I talked to Boaz at Bocoup the other day. He suggested cleaning up the examples. I already had this in mind but I should probably do it sooner rather than later. Especially the simplest example. It will look nicer if I cut the div down to 256x256 to match the initial tile I think (done, it already feels better). I do need to keep the examples specific and don't want to add any HTML or JavaScript to them that does not directly relate to the feature I'm testing in the example.
 
 He also suggested unit tests and an API audit, both of which are great ideas and much needed by $.geo.
+
+=== On ovals ===
+Peter and I discussed how points are drawn and what width and height mean in geomap styles. We both agree that ovals are not very useful or used constructs in GIS and it would be better to have rounded rectangles. Therefore, I am dropping ovals and intead supporting a borderRadius property. Circles are still possible as long as your width, height and border radius are all the same, you will have a circle. This will be the default.
+
+=== On double-click zoom ===
+Peter and I both agree that double-click zoom should operate similar to mouse-wheel zoom in that the bbox should scale according to the placement of the mouse cursor during double-click instead of completely re-centering. You will notice that mouse-wheel feels right and double-click can be confusing.
+
+SUGGESTION: Double-click zoom should scale according to cursor location instead of re-centering
+
+=== On position events ===
+I cannot decide if I should officially make the geo argument passed to the position events (move, click, dblclick) a true GeoJSON Point object. The only difference would be the presense of a type property set to "Point". However, the extra pixels property that I have on the geo argument is not part of GeoJSON and will remain in memory. Also, if a developer pushes the new object to a database they are storing extra information that they don't need and will be useless later.
+
+Is the pixels property even that useful? The dev can call geomap.toPixels if they need it. I added the pixels property just because I had the pixels lying around in the internal handling of the event. I think I might just not pass them. It would be more useful to a developer I think to have a true GeoJSON Point object that they can send to geomap.append or a database without worrying about having extra useless data stored with it.
+
+SUGGESTION: Remove the pixels property from position events and add the type property to make the event argument a true GeoJSON Point
+
+I just updated the docs and changed the implementation. I already like this a lot better and am now thinking that the bbox event type could actually send a true GeoJSON Polygon with the bbox property set. That would be totally within the GeoJSON spec and might be useful. That's a bit of extra code on the widget's side though so for now I'm going to leave it as is. I can add that feature later since the current implementation (an object with just a bbox property) is already partially in a true Polygon's spec.
+
+FUTURE SUGGESTION: Send a true GeoJSON Polygon object as the geo argument of bbox events
+
+=== On returning jQuery collections ===
+I need to better design the return values of the shape methods other than find & shapeStyle. Should append, remove and emtpy return the jQuery object of the map elements that the call originated from? Probably.
+
+I just tested and yes, as long as you don't issue a return statement inside a jQuery UI widget method, jQuery UI will return the original jQuery collection for you.
 
 == 2011-06-10 ==
 

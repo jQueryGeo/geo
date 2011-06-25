@@ -36,7 +36,7 @@
         </tr>
       </table>
       <p>The dblclick event triggers when the user double-clicks or double-taps a point on the map. However, it only triggers if the user is not currently performing some other action which might be handled internally by the widget.</p>
-      <p>The geo argument contains two properties, pixels and coordinates. Both are <a href="http://geojson.org/geojson-spec.html#positions">GeoJSON positions</a>. The former is in pixel coordinates and the latter is in map coordinates.</p>
+      <p>The geo argument is a <a href="http://geojson.org/geojson-spec.html#point">GeoJSON Point</a> object of the clicked location in map coordinates.</p>
       <p>The default action for a double-click/tap is to zoom the map in one level. However, as a developer you can override this by calling e.preventDefault() in your callback.</p>
       <code><pre>$( &quot;#map&quot; ).geomap( {
   dblclick: function( e, geo ) { e.preventDefault(); }

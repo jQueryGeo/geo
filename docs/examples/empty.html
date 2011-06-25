@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>geomap find test</title>
+  <meta name="description" content="Small test of $.geo's geometry functions">
+  <meta name="author" content="Ryan Westphal">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+</head>
+<body>
+  <div>
+    <a href="../" class="docLink">&lt; docs</a>
+    <h1>
+      geomap find test</h1>
+    <p>
+      Click the map to add points, click the Empty button to remove them all at once.</p>
+    <button type="button">
+      Empty</button>
+    <div class="geomap" style="width: 640px; height: 480px;">
+    </div>
+  </div>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js"></script>
+  <script src="http://host.appgeo.com/libs/geo/test/jquery-geo-test.min.js"></script>
+  <script>
+    $(function () {
+      var geomap = $(".geomap").geomap({
+        center: [-71.05, 42.35],
+        zoom: 13,
+        click: function (e, geo) {
+          geomap.geomap("append", geo);
+        }
+      });
+
+      $("button").click(function () {
+        geomap.geomap("empty");
+      });
+    });
+  </script>
+</body>
+</html>

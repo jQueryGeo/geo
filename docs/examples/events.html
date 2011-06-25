@@ -83,18 +83,18 @@
     $(function () {
       var defaultProj = $.geo.proj;
 
-      $("#map").geomap({
+      var map = $("#map").geomap({
         move: function (e, geo) {
           $(".movedate").text($.now());
-          $(".movedata").text("pixels: [ " + geo.pixels + " ], coordinates: [ " + geo.coordinates + " ]");
+          $(".movedata").text("pixels: [ " + map.geomap("toPixel", geo.coordinates) + " ], coordinates: [ " + geo.coordinates + " ]");
         },
         click: function (e, geo) {
           $(".clickdate").text($.now());
-          $(".clickdata").text("pixels: [ " + geo.pixels + " ], coordinates: [ " + geo.coordinates + " ]");
+          $(".clickdata").text("pixels: [ " + map.geomap("toPixel", geo.coordinates) + " ], coordinates: [ " + geo.coordinates + " ]");
         },
         dblclick: function (e, geo) {
           $(".dblclickdate").text($.now());
-          $(".dblclickdata").text("pixels: [ " + geo.pixels + " ], coordinates: [ " + geo.coordinates + " ]");
+          $(".dblclickdata").text("pixels: [ " + map.geomap("toPixel", geo.coordinates) + " ], coordinates: [ " + geo.coordinates + " ]");
         },
         bboxchange: function (e, geo) {
           $(".bboxdate").text($.now());

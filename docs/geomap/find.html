@@ -25,16 +25,16 @@
         </tr>
         <tr>
           <th>syntax</th>
-          <td>.geomap( &quot;find&quot;, Array position (<a href="http://geojson.org/geojson-spec.html#positions">GeoJSON position</a>), Number pixelTolerance )</td>
+          <td>.geomap( &quot;find&quot;, Object point (<a href="http://geojson.org/geojson-spec.html#point">GeoJSON Point</a>), Number pixelTolerance )</td>
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>var existingShape = $(&quot;#map&quot;).geomap( &quot;find&quot;, [ -71.098709, 42.330322 ], 8 )</code></pre></td>
+          <td><pre><code>var existingShape = $(&quot;#map&quot;).geomap( &quot;find&quot;, { type: &quot;Point&quot;, coordinates: [ -71.098709, 42.330322 ] }, 8 )</code></pre></td>
         </tr>
       </table>
-      <p>The find method takes a single map position (which is an array of two values: x and y or longitude and latitude) and returns all shapes within a pixel radius of the given location that have been added with append. If there are no shapes at the location, this method returns an empty array.</p>
-      <p>If $.geo.proj is not null, the position argument must be in geodetic coordinates, position[0] is longitude and position[1] is latitude. If $.geo.proj is null, the position must be in the widget's internal projection as defined by tilingScheme for tiled map services or bboxMax for shingled (dynamic) map services.</p>
-      <p>The pixelTolerance argument is always in pixels. This allows for pixel-based searches regardless of the map's current zoom. A high-zoom search is finer than a low-zoom one because at lower zoom levels, i.e., the map is zoomed out more, the map-size of a pixel is greater.</p>
+      <p>The find method takes a single GeoJSON map point and returns all shapes within a pixel radius of the given location that have been added with append. If there are no shapes at the location, this method returns an empty array.</p>
+      <p>If $.geo.proj is not null, the position argument must be in geodetic coordinates, point.coordinates[0] is longitude and point.coordinates[1] is latitude. If $.geo.proj is null, the position must be in the widget's internal projection as defined by tilingScheme for tiled map services or bboxMax for shingled (dynamic) map services.</p>
+      <p>The pixelTolerance argument is always in pixels. This allows for pixel-based searches regardless of the map's current zoom. A high-zoom search is finer than a low-zoom one because at lower zoom levels, i.e., the map is zoomed out more, the Earth-size of a pixel is greater causing this search to reach out farther from the supplied position.</p>
     </div>
   </div> <!-- end of #container -->
 </body>

@@ -20,6 +20,7 @@
   $.widget("geo.geographics", {
     options: {
       style: {
+        borderRadius: "8px",
         color: "#7f0000",
         //fill: undefined,
         fillOpacity: .2,
@@ -128,6 +129,41 @@
     },
 
     drawPoint: function (coordinates, style) {
+      var graphicStyle = this._getGraphicStyle(style);
+      if (graphicStyle.widthValue == graphicStyle.heightValue && graphicStyle.heightValue == graphicStyle.borderRadiusValue) {
+        this.drawArc(coordinates, 0, 360, style);
+      } else if (graphicStyle.visibility != "hidden") {
+        graphicStyle.borderRadiusValue = Math.min(Math.min(graphicStyle.widthValue, graphicStyle.heightValue) / 2, graphicStyle.borderRadiusValue);
+        coordinates[0] -= graphicStyle.widthValue / 2;
+        coordinates[1] -= graphicStyle.heightValue / 2;
+        _context.beginPath();
+        _context.moveTo(coordinates[0] + graphicStyle.borderRadiusValue, coordinates[1]);
+        _context.lineTo(coordinates[0] + graphicStyle.widthValue - graphicStyle.borderRadiusValue, coordinates[1]);
+        _context.quadraticCurveTo(coordinates[0] + graphicStyle.widthValue, coordinates[1], coordinates[0] + graphicStyle.widthValue, coordinates[1] + graphicStyle.borderRadiusValue);
+        _context.lineTo(coordinates[0] + graphicStyle.widthValue, coordinates[1] + graphicStyle.heightValue - graphicStyle.borderRadiusValue);
+        _context.quadraticCurveTo(coordinates[0] + graphicStyle.widthValue, coordinates[1] + graphicStyle.heightValue, coordinates[0] + graphicStyle.widthValue - graphicStyle.borderRadiusValue, coordinates[1] + graphicStyle.heightValue);
+        _context.lineTo(coordinates[0] + graphicStyle.borderRadiusValue, coordinates[1] + graphicStyle.heightValue);
+        _context.quadraticCurveTo(coordinates[0], coordinates[1] + graphicStyle.heightValue, coordinates[0], coordinates[1] + graphicStyle.heightValue - graphicStyle.borderRadiusValue);
+        _context.lineTo(coordinates[0], coordinates[1] + graphicStyle.borderRadiusValue);
+        _context.quadraticCurveTo(coordinates[0], coordinates[1], coordinates[0] + graphicStyle.borderRadiusValue, coordinates[1]);
+        _context.closePath();
+
+        if (graphicStyle.doFill) {
+          _context.fillStyle = graphicStyle.fill;
+          _context.globalAlpha = graphicStyle.opacity * graphicStyle.fillOpacity;
+          _context.fill();
+        }
+
+        if (graphicStyle.doStroke) {
+          _context.lineJoin = "round";
+          _context.lineWidth = graphicStyle.strokeWidthValue;
+          _context.strokeStyle = graphicStyle.stroke;
+
+          _context.globalAlpha = graphicStyle.opacity * graphicStyle.strokeOpacity;
+
+          _context.stroke();
+        }
+      }
     },
 
     drawLineString: function (coordinates, style) {
@@ -155,6 +191,7 @@
       }
 
       style = $.extend({}, _options.style, style);
+      style.borderRadiusValue = safeParse(style.borderRadius);
       style.fill = style.fill || style.color;
       style.fillOpacity = style.fillOpacity || style.opacity;
       style.doFill = style.fill && style.fillOpacity > 0;
@@ -177,26 +214,24 @@
       i, j;
 
       if (style.visibility != "hidden") {
-        if (style.doFill && close) {
-          _context.fillStyle = style.fill;
-          _context.globalAlpha = style.opacity * style.fillOpacity;
-          _context.beginPath();
-          _context.moveTo(coordinates[0][0][0], coordinates[0][0][1]);
+        _context.beginPath();
+        _context.moveTo(coordinates[0][0][0], coordinates[0][0][1]);
 
-          var lastPoint = coordinates[0][coordinates[0].length - 1];
+        var lastPoint = coordinates[0][coordinates[0].length - 1];
 
-          for (i = 0; i < coordinates.length; i++) {
-            for (j = 0; j < coordinates[i].length; j++) {
-              _context.lineTo(coordinates[i][j][0], coordinates[i][j][1]);
-            }
-
-            if (i > 0) {
-              _context.lineTo(lastPoint[0], lastPoint[1]);
-            }
+        for (i = 0; i < coordinates.length; i++) {
+          for (j = 0; j < coordinates[i].length; j++) {
+            _context.lineTo(coordinates[i][j][0], coordinates[i][j][1]);
           }
 
-          _context.closePath();
+          if (close && i > 0) {
+            _context.lineTo(lastPoint[0], lastPoint[1]);
+            _context.closePath();
+          }
+        }
 
+        if (style.doFill) {
+          _context.fillStyle = style.fill;
           _context.globalAlpha = style.opacity * style.fillOpacity;
           _context.fill();
         }
@@ -207,21 +242,7 @@
           _context.strokeStyle = style.stroke;
 
           _context.globalAlpha = style.opacity * style.strokeOpacity;
-
-          for (i = 0; i < coordinates.length; i++) {
-            _context.beginPath();
-            _context.moveTo(coordinates[i][0][0], coordinates[i][0][1]);
-
-            for (j = 0; j < coordinates[i].length; j++) {
-              _context.lineTo(coordinates[i][j][0], coordinates[i][j][1]);
-            }
-
-            if (close) {
-              _context.lineTo(coordinates[i][0][0], coordinates[i][0][1]);
-            }
-
-            _context.stroke();
-          }
+          _context.stroke();
         }
       }
     }

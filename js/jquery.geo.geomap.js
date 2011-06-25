@@ -844,20 +844,55 @@
           }
 
           $.each(shapes, function () {
-            if (this.type == "GeometryCollection") {
-              map.append(this.geometries, style, false);
-            } else {
-              _graphicShapes[_graphicShapes.length] = {
-                shape: this,
-                style: style
-              };
-            }
+            _graphicShapes[_graphicShapes.length] = {
+              shape: this,
+              style: style
+            };
           });
 
           if (refresh) {
             this._refresh();
           }
         }
+      },
+
+      empty: function () {
+        _graphicShapes = [];
+        this._refresh();
+      },
+
+      find: function (point, pixelTolerance) {
+        var searchPixel = this.toPixel(point.coordinates),
+            mapTol = _pixelSize * pixelTolerance,
+            result = [];
+
+        $.each(_graphicShapes, function (i) {
+          if ($.geo._distance(this.shape, point) < mapTol) {
+            result.push(this.shape);
+          } else {
+            //            var labelPoint = this._map.toPixelPoint(this._items[i]._labelCoord);
+            //            if (labelPoint.x - tol <= searchPixel.x &&
+            //                searchPixel.x <= labelPoint.x + this._items[i]._labelSize.width + tol &&
+            //                labelPoint.y - tol <= searchPixel.y &&
+            //                searchPixel.y <= labelPoint.y + this._items[i]._labelSize.height + tol) {
+            //              result.push(this.shape);
+            //            }
+          }
+        });
+
+        return result;
+      },
+
+      remove: function (shape) {
+        $.each(_graphicShapes, function (i) {
+          if (this.shape == shape) {
+            var rest = _graphicShapes.slice(i + 1 || _graphicShapes.length);
+            _graphicShapes.length = i < 0 ? _graphicShapes.length + i : i;
+            _graphicShapes.push.apply(_graphicShapes, rest);
+            return false;
+          }
+        });
+        this._refresh();
       },
 
       _getBbox: function () {
@@ -947,16 +982,22 @@
         _currentServices = _options["services"];
       },
 
-      _drawGraphics: function (geographics, shapes) {
-        var i, mgi, shape, style, pixelPositions, map = this;
+      _drawGraphics: function (geographics, shapes, styles) {
+        var i,
+            mgi,
+            shape,
+            style,
+            pixelPositions,
+            geomap = this;
+
         for (i = 0; i < shapes.length; i++) {
-          // Either a GeoJSON Feature or a GeoJSON Geometry object are allowed
-          shape = shapes[i].shape.geometry ? shapes[i].shape.geometry : shapes[i].shape;
-          style = _graphicShapes[i].style;
+          shape = shapes[i].shape || shapes[i];
+          shape = shape.geometry || shape;
+          style = $.isArray(styles) ? styles[i].style : styles;
 
           switch (shape.type) {
             case "Point":
-              _$shapesContainer.geographics("drawArc", this.toPixel(shape.coordinates), 0, 360, style);
+              _$shapesContainer.geographics("drawPoint", this.toPixel(shape.coordinates), style);
               break;
             case "LineString":
               _$shapesContainer.geographics("drawLineString", this.toPixel(shape.coordinates), style);
@@ -964,13 +1005,13 @@
             case "Polygon":
               pixelPositions = [];
               $.each(shape.coordinates, function (i) {
-                pixelPositions[i] = map.toPixel(this);
+                pixelPositions[i] = geomap.toPixel(this);
               });
               _$shapesContainer.geographics("drawPolygon", pixelPositions, style);
               break;
             case "MultiPoint":
               for (mgi = 0; mgi < shape.coordinates; mgi++) {
-                _$shapesContainer.geographics("drawArc", this.toPixel(shape.coordinates[mgi]), 0, 360, style);
+                _$shapesContainer.geographics("drawPoint", this.toPixel(shape.coordinates[mgi]), style);
               }
               break;
             case "MultiLineString":
@@ -982,10 +1023,14 @@
               for (mgi = 0; mgi < shape.coordinates; mgi++) {
                 pixelPositions = [];
                 $.each(shape.coordinates[mgi], function (i) {
-                  pixelPositions[i] = map.toPixel(this);
+                  pixelPositions[i] = geomap.toPixel(this);
                 });
                 _$shapesContainer.geographics("drawPolygon", pixelPositions, style);
               }
+              break;
+
+            case "GeometryCollection":
+              geomap._drawGraphics(geographics, shape.geometries, style);
               break;
           }
         }
@@ -1170,9 +1215,11 @@
           }
         }
 
-        if (_graphicShapes.length > 0) {
+        if (_$shapesContainer) {
           _$shapesContainer.geographics("clear");
-          this._drawGraphics(_$shapesContainer, _graphicShapes);
+          if (_graphicShapes.length > 0) {
+            this._drawGraphics(_$shapesContainer, _graphicShapes, _graphicShapes);
+          }
         }
       },
 
@@ -1263,8 +1310,8 @@
 
         $.each(p, function (i) {
           result[i] = [
-            (this[0] - bbox[0]) * width / bboxWidth,
-            (bbox[3] - this[1]) * height / bboxHeight
+            Math.round((this[0] - bbox[0]) * width / bboxWidth),
+            Math.round((bbox[3] - this[1]) * height / bboxHeight)
           ];
         });
 
@@ -1294,7 +1341,7 @@
 
         switch (_options["mode"]) {
           case "pan":
-            this._trigger("dblclick", e, { pixels: _current, coordinates: this.toMap(_current) });
+            this._trigger("dblclick", e, { type: "Point", coordinates: this.toMap(_current) });
             if (!e.isDefaultPrevented()) {
               this._zoomTo(this._toMap(_current), this._getZoom() + 1, true, true);
             }
@@ -1390,7 +1437,7 @@
             if (_mouseDown || _toolPan) {
               this._panMove();
             } else {
-              this._trigger("move", e, { pixels: current, coordinates: this.toMap(current) });
+              this._trigger("move", e, { type: "Point", coordinates: this.toMap(current) });
             }
             break;
         }
@@ -1442,7 +1489,7 @@
                 this._panEnd();
               } else {
                 if (clickDate - _clickDate > 100) {
-                  this._trigger("click", e, { pixels: current, coordinates: this.toMap(current) });
+                  this._trigger("click", e, { type: "Point", coordinates: this.toMap(current) });
                   _inOp = false;
                 }
               }
