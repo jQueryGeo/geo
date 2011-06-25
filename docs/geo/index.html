@@ -20,48 +20,49 @@
     <div data-role="content">
       <p>The $.geo namespace contains all geometry functions implemented in the plugin and an object having the plugin's two projection functions.</p>
       <h2>projection</h2>
-      <p>The $.geo namespace has a property named proj which is a JavaScript object having two function properties: fromGeodetic and toGeodetic. These two functions control the type of argument and return coordinates for all $.geo static geometry functions, geomap widget properties, geomap widget events &amp; geomap widget methods (collectively referred to as plugin functions from now on).</p>
+      <p>The $.geo namespace has a property named proj which is a JavaScript object having two methods: fromGeodetic and toGeodetic. These two functions control the type of argument and return coordinates for all $.geo static geometry functions, geomap widget properties, geomap widget events &amp; geomap widget methods (collectively referred to as plugin functions from now on).</p>
       <p>If $.geo.proj is not null any plugin function that accepts a GeoJSON geometry object expects the geometry to be in longitude and latitude, i.e., each GeoJSON position in the geometry is an array where geometry[0] is the longitude and geometry[1] is latitude. The plugin function will automatically call $.geo.proj.fromGeodetic on incoming geometry positions and $.geo.proj.toGeodetic before returning values.</p>
       <p>If you set $.geo.proj to null then plugin functions will not convert incoming geometry. They will assume the incoming geometry is in the same projection as your map widget. For example, you can set $.geo.proj to null and work directly in web mercator meters which is the projection of the default tiling scheme.</p>
       <p>The default $.geo.proj object comes pre-built with functions that quickly convert between geodetic coordinates and web mercator meters, the default internal projection, so you can start using lon/lat right away with the default OpenStreetMap tiles. If your map service uses a different projection you need to set $.geo.proj to null or roll your own proj object. Read <a data-href=otherprojections href="javascript:void(0);">Other projections</a> below for information on how to do that.</p>
       <h3>Usage</h3>
-      <p>Both methods can take and return either a single GeoJSON position or an array of GeoJSON positions. For example you can use the following to convert the position contained in a GeoJSON point object:</p>
+      <p>Both methods can take and return: a single GeoJSON position (Point.coordinates), an array of GeoJSON positions (MultiPoint.coordinates or LineString.coordinates), an array of arrays of positions (MultiLineString.coordinates or Polygon.coordinates) or an array of arrays of arrays of positions (MultiPolygon.coordinates). In other words, the $.geo.proj functions convert the coordinates property of any of the GeoJSON object types that have it. For example, you can use the following to convert the position contained in a GeoJSON point object:</p>
       <pre><code>var projectedCoords = $.geo.proj.fromGeodetic( myPoint.coordinates );</code></pre>
       <p>However, a LineString's coordinates property is an array of positions which you can also pass to the fromGeodetic method to get an array converted positions</p>
       <pre><code>var projectedCoords = $.geo.proj.fromGeodetic( myLineString.coordinates );</code></pre>
-      <p>Finally, for any geometry you want to manually convert that is greater than two dimensions, you must manually iterate over the outer arrays until you can pass the $.geo.proj method two-dimensional arrays, i.e., arrays of GeoJSON positions.</p>
+      <p>To convert a set of projected GeoJSON positions back to web mercator, call toGeodetic.</p>
+      <pre><code>var geodeticCoords = $.geo.proj.toGeodetic( myProjectedPolygon.coordinates );</code></pre>
       <h3 id=otherprojections>Other projections</h3>
       <p>The $.geo.proj property allows you to use whichever coordinate system or projection you want. By setting it to null you can directly use other projected coordinates, e.g., Massachusetts Mainland State Plane meters, in any plugin function, e.g., bbox.</p>
       <pre><code>$.geo.proj = null;
 
 $('map').geomap( {
   tilingScheme: null,
-  bboxmax: [ 31790, 790195, 337250, 961865 ],
+  bboxMax: [ 31790, 790195, 337250, 961865 ],
   bbox: [ 235644, 894775, 237775, 898523 ],
   services: [ /* service object that supports MA State Plane */ ]
 } );</code></pre>
-      <p>By setting $.geo.proj to a custom JavaScript object that implements the fromGeodetic and toGeodetic functions you can change the internal projection used by all plugin functions and still use geodetic (longitude/latitude) coordinates as arguments and return values.</p>
-      <pre><code>$.geo.proj = {
-  fromGeodetic: function( posArray ) {
+      <p>$.geo uses the two $.geo.proj functions throughout to convert between geodetic and projected coordinates. However, there are two other functions: fromGeodeticPos and toGeodeticPos which handle the conversion of individual GeoJSON positions. You can extend $.geo.proj with your own implementations of fromGeodeticPos and toGeodeticPos to change the internal projection used by all plugin functions and still use geodetic (longitude/latitude) coordinates as arguments and return values.</p>
+      <pre><code>$.extend($.geo.proj, {
+  fromGeodeticPos: function( coordinate ) {
     var converted = [];
-    // convert the GeoJSON lon/lat positions in posArray to MA State Plane
+    // convert the GeoJSON lon/lat position to MA State Plane
     return converted;
   },
 
-  toGeodetic: function( posArray ) {
+  toGeodeticPos: function( coordinate ) {
     var converted = [];
-    // convert the GeoJSON MA State Plane positions in posArray to lon/lat
+    // convert the GeoJSON MA State Plane position to lon/lat
     return converted;
   }
-};
+});
 
 $('map').geomap( {
   tilingScheme: null,
-  bboxmax: [ -73.5100, 41.3500, -69.8600, 42.8900 ],
+  bboxMax: [ -73.5100, 41.3500, -69.8600, 42.8900 ],
   bbox: [ -71.098709, 42.330322, -71.072617, 42.351608 ],
   services: [ /* service object that supports MA State Plane */ ]
 } );</code></pre>
-      <p>Implementing custom from/to Geodetic functions is <i>currently</i> beyond the scope of this documentation but I assure you it involves using <a href="http://proj4js.org/" rel=external>Proj4js</a>.</p>
+      <p>Implementing custom from/to GeodeticPos functions is <i>currently</i> beyond the scope of this documentation but I assure you it involves using <a href="http://proj4js.org/" rel=external>Proj4js</a>.</p>
     </div>
   </div> <!-- end of #container -->
 

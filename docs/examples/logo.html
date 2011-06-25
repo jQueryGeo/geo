@@ -76,30 +76,30 @@
       addLogo({ pixels: [width - 16, 16], coordinates: map.geomap("toMap", [width - 16, 16]) });
 
       function addLogo(geo) {
-        var 
-        logoOuterCoords = map.geomap("toMap", [
-          [geo.pixels[0] - 16, geo.pixels[1]],
-          [geo.pixels[0] - 15, geo.pixels[1] + 6],
-          [geo.pixels[0] - 11, geo.pixels[1] + 11],
-          [geo.pixels[0] - 6, geo.pixels[1] + 15],
-          [geo.pixels[0], geo.pixels[1] + 16]
-        ]),
-        logoOuterPoints = [],
-        logoInnerCoords = map.geomap("toMap", [
-          [geo.pixels[0] - 8, geo.pixels[1]],
-          [geo.pixels[0] - 6, geo.pixels[1] + 6],
-          [geo.pixels[0], geo.pixels[1] + 8]
-        ]),
-        logoInnerPoints = [],
-        logoCornerCoord = geo.coordinates,
-        logoLines = {
-          type: "GeometryCollection",
-          geometries: []
-        },
-        logoPoints = {
-          type: "GeometryCollection",
-          geometries: []
-        };
+        var geoPixels = map.geomap("toPixel", geo.coordinates),
+            logoOuterCoords = map.geomap("toMap", [
+              [geoPixels[0] - 16, geoPixels[1]],
+              [geoPixels[0] - 15, geoPixels[1] + 6],
+              [geoPixels[0] - 11, geoPixels[1] + 11],
+              [geoPixels[0] - 6, geoPixels[1] + 15],
+              [geoPixels[0], geoPixels[1] + 16]
+            ]),
+            logoOuterPoints = [],
+            logoInnerCoords = map.geomap("toMap", [
+              [geoPixels[0] - 8, geoPixels[1]],
+              [geoPixels[0] - 6, geoPixels[1] + 6],
+              [geoPixels[0], geoPixels[1] + 8]
+            ]),
+            logoInnerPoints = [],
+            logoCornerCoord = geo.coordinates,
+            logoLines = {
+              type: "GeometryCollection",
+              geometries: []
+            },
+            logoPoints = {
+              type: "GeometryCollection",
+              geometries: []
+            };
 
         $.merge(logoLines.geometries, [{
           type: "LineString",

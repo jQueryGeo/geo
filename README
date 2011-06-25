@@ -16,11 +16,18 @@ Documentation is hosted at http://host.appgeo.com/libs/geo/test/
 * geomap - [BUG] Cannot see dev-supplied inner content if not set to rel/abs position
 * geomap - Add mobile test page
 * geographics - Port graphic code from internal control
-* geomap - Implement non-service addShape method
-* graphics - drawArc should use style's width and height and only take center as an argument
-* graphics - Allow ovals for points
+* geomap - Implement append method
+* geographics - drawArc should use style's width and height and only take center as an argument
 * geomap - Document and implement the public refresh method
-* docs - Rename findShape to find, addShape to append, removeShape to remove and clearShapes to empty
+* geomap - Implement shapeStyle method
+* geographics - Draw points as rounded rectangles via width, height & borderRadius properties on shapeStyle, drop oval functionality
+* geomap - Remove the pixels property from position events and add the type property to make the event argument a true GeoJSON Point
+* proj - support up to four dimentional array to convert MultiPolygon coordinates in one shot
+* proj - add functions to convert individual positions that developers can re-implement for their own projection
+* geomap - implement remove method
+* geomap - implement find method
+* geomap - [bug] toPixel should round pixel values
+* geomap - [bug] GeometryCollection shapes do not draw with their parent shape's style
 
 === Version alpha1 (2011-05-09) ===
 * docs - Document a new interface to our internal map control
