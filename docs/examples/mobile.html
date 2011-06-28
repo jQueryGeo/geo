@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 
-    <title>simplest</title>
+    <title>mobile</title>
     <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
 
     <meta name="description" content="A very simple instantiation of the geomap widget for a full screen mobile app">
@@ -20,7 +20,7 @@
     <div id="map" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;">
       <div class="info">
         <h1>mobile</h1>
-        <p>A full window div...geomap called zoomed in to level 3.</p>
+        <p>A full window div...geomap called, zoomed in to level 6.</p>
         <p>Add a <i>meta viewport</i> tag to your head element and you're good to go.</p>
       </div>
     </div>
@@ -30,7 +30,10 @@
   <script src="http://host.appgeo.com/libs/geo/test/jquery-geo-test.min.js"></script>
   <script>
     $(function () {
-      $("#map").geomap({ zoom: 2 });
+      $("#map").geomap({
+        center: [-71.0595678, 42.3604823],
+        zoom: 6
+      });
     });  
   </script>
 </body>

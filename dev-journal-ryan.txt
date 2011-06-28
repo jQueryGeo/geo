@@ -1,13 +1,16 @@
 ﻿== TO DO ==
 
+* geomap - add opacity to service type objects & call from geomap's opacity method
+* geomap - add toggle to service type objects & call from geomap's toggle method
 * geomap - document (make public) the refresh argument in append, add one to remove & empty
+* geomap - deep extend existing service objects when services property is set
 * geomap - Allow append to take an array of geometry objects, each one should be a new shape
 * geo.proj - Update bundled projection code
 * docs/internal - Document how geomap draws shapes, the geomapgraphics widget and the reason shapeStyle is a method
 * docs/geomap - Use name instead of id for service objects
 * docs/geomap - Scale map according to cursor location instead of re-centering during double-click zoom
 * widgets - Verify that vars local to initial closure do not conflict when multiple maps are placed
-* geomap - Auto-handle window resize events
+* geomap - auto-handle window resize events
 * geomap - [BUG] Mouse wheel on bad or missing tile doesn't zoom out on first rotate
 * geomap - Document and implement service-level shapes
 * geomap - Document and implement passing a function to shapeStyle and append that returns a geomap style object based on feature or geometry properties
@@ -19,6 +22,18 @@
 * geomap - [BUG] Android browser stops pan/zoom after 7 logos on logo demo
 
 == 2011-06-28 ==
+
+=== on services ===
+I think it would be nice to deep extend service objects that come in via the services property if a service with the given id already exists in _currentServices. This way, you could set the initial opacity of OSM by simply sending {services: [{id: "OSM", opacity: .8}]} during init.
+
+SUGGESTION: deep extend existing service objects when services property is set
+
+=== on opacity ===
+I was beginning to try to throw the opacity & toggle methods into alpha2 but setting the services property is too flickery. I want to do it more like the old widget but that will require adding opacity and toggle methods into the services types. That will have to wait. It will be much faster to call the opacity/toggle methods on geomap than to set the services property each time. I will have to document that.
+
+SUGGESTION: require opacity and toggle functions in the service type objects
+
+== 2011-06-27 ==
 
 === on events ===
 I almost forgot that I don't want bboxchange to fire when the developer changes a property in code. Unlike jQuery UI, my events trigger only when the user does something.
