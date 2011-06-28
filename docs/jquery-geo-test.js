@@ -2483,7 +2483,7 @@ $.Widget.prototype = {
           }
         }
 
-        if (style.doFill) {
+        if (close && style.doFill) {
           _context.fillStyle = style.fill;
           _context.globalAlpha = style.opacity * style.fillOpacity;
           _context.fill();
