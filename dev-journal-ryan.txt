@@ -18,6 +18,14 @@
 * geographics - Document graphics widget
 * geomap - [BUG] Android browser stops pan/zoom after 7 logos on logo demo
 
+== 2011-06-28 ==
+
+=== on events ===
+I almost forgot that I don't want bboxchange to fire when the developer changes a property in code. Unlike jQuery UI, my events trigger only when the user does something.
+
+=== on alpha 2 ===
+I'm trying to put this together.
+
 == 2011-06-24 ==
 
 === on shape methods ===

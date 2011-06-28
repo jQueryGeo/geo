@@ -25,15 +25,15 @@
     <div data-role="content">
       <p>The $.geo plugin has one widget, geomap, that you can instantiate on any div with a computable width and height.</p>
       <h2>html</h2>
-      <code><pre>&lt;div id=map style=&quot;width: 640px; height: 480px;&quot;&gt;&lt;/div&gt;</pre></code>
+      <pre><code>&lt;div id=&quot;map&quot; style=&quot;width: 640px; height: 480px;&quot;&gt;&lt;/div&gt;</code></pre>
       <h2>javascript</h2>
-      <code><pre>$(&quot;#map&quot;).geomap();</pre></code>
+      <pre><code>$(&quot;#map&quot;).geomap();</code></pre>
       <p>By default, this one line of code will create a fully functional map on your page showing the whole world and using the <a href="http://www.openstreetmap.org/" rel=external>OpenStreetMap</a> tile set.</p>
       <p>The default units are <i>longitude &amp; latitude degrees</i> which is the most common format for GPS and other online spatial data. <!--More advanced users can easily switch to <i>web mercator meters</i> which is the same unit type that Google, Bing and ESRI now use.--> You can set the center and zoom of the map at the same time you initialize it by passing a JavaScript object of options.</p>
-      <code><pre>$("#map").geomap({
+      <pre><code>$(&quot;#map&quot;).geomap({
   center: { [ -71.037598, 42.363281 ] },
   zoom: 10
-});</pre></code>
+});</code></pre>
       <p>The above example will show the City of Boston. The value passed to the center property is a <a href="http://geojson.org/geojson-spec.html#positions" rel=external>GeoJSON</a> position, which is an array with an x value followed by a y value.</p>
       <p>If you need help determining the center point values the <a href="../examples/events.html" rel=external>events example</a> can help. Pan and zoom the map to an area and click the location you want. Then copy the coordinates value displayed under the <b>geo argument</b> heading of the click event and paste it into you code.</p>
       <p><b>Please note that longitude is the first value, x, even though it is commonly spoken second.</b> This plugin does not distinguish between lon/lat and any other x/y coordinate system.</p>
