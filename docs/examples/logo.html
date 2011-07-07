@@ -13,13 +13,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" type="text/css" href="css/style.css" />
   <style type="text/css">
-    body
-    {
-      font-family: Calibri,Arial;
-      margin: 0;
-      padding: 0;
-    }
-    .info { margin: 16px; }
     #map 
     {
       position: absolute;
@@ -39,23 +32,23 @@
 </head>
 <body>
   <div class="content">
+    <div id="map">
+    </div>
     <div class="info">
       <a href="../" class="docLink">&lt; docs</a>
       <h1>
         $.geo logos!</h1>
       <p>
-        This demo uses $.geo to draw its own logo at the top right of the map. Single-click the map to make more logos! The shapes created for the logo are based on the pixelSize of the current scale so your map's current zoom determines the Earth-size of the logo. When you zoom in, the points of the individual logos will spread out.</p>
-    </div>
-    <div id="map">
+        This demo uses $.geo to draw its own logo at the top left of the map. Single-click the map to make more logos! The shapes created for the logo are based on the pixelSize of the current scale so your map's current zoom determines the Earth-size of the logo. When you zoom in, the points of the individual logos will spread out.</p>
     </div>
   </div>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
   <script src="http://host.appgeo.com/libs/geo/test/jquery-geo-test.min.js"></script>
   <script>
     $(function () {
       var 
       dblClickTimeout = null, //< We use this timer to distinguish between click & dblclick, don't draw a logo on a dblclick
-      map = $("#map").css("top", $(".info").outerHeight() + 32).geomap({
+      map = $("#map").geomap({
         center: [-75, 40],
         zoom: 5,
         click: function (e, geo) {
@@ -73,7 +66,7 @@
       });
 
       var width = $(document).width();
-      addLogo({ pixels: [width - 16, 16], coordinates: map.geomap("toMap", [width - 16, 16]) });
+      addLogo({ pixels: [16, 16], coordinates: map.geomap("toMap", [32, 16]) });
 
       function addLogo(geo) {
         var geoPixels = map.geomap("toPixel", geo.coordinates),

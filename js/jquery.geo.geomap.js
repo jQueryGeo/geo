@@ -819,6 +819,20 @@
         return this._toPixel(p);
       },
 
+      opacity: function (serviceId, value) {
+        if (value >= 0 || value <= 1) {
+          var geomap = this;
+          $.each(_currentServices, function () {
+            if (this.id == serviceId) {
+              this.opacity = value;
+              geomap._createServices();
+              geomap._refresh();
+              return false;
+            }
+          });
+        }
+      },
+
       refresh: function () {
         this._refresh();
       },
@@ -864,19 +878,30 @@
       find: function (point, pixelTolerance) {
         var searchPixel = this.toPixel(point.coordinates),
             mapTol = _pixelSize * pixelTolerance,
-            result = [];
+            result = [],
+            curGeom;
 
         $.each(_graphicShapes, function (i) {
-          if ($.geo._distance(this.shape, point) < mapTol) {
-            result.push(this.shape);
-          } else {
-            //            var labelPoint = this._map.toPixelPoint(this._items[i]._labelCoord);
-            //            if (labelPoint.x - tol <= searchPixel.x &&
-            //                searchPixel.x <= labelPoint.x + this._items[i]._labelSize.width + tol &&
-            //                labelPoint.y - tol <= searchPixel.y &&
-            //                searchPixel.y <= labelPoint.y + this._items[i]._labelSize.height + tol) {
-            //              result.push(this.shape);
-            //            }
+          var bbox = $.geo._bbox(this.shape),
+              bboxPolygon = {
+                type: "Polygon",
+                coordinates: [[
+                  [bbox[0], bbox[1]],
+                  [bbox[0], bbox[3]],
+                  [bbox[2], bbox[3]],
+                  [bbox[2], bbox[1]],
+                  [bbox[0], bbox[1]]
+                ]]
+              };
+
+          if ($.geo._distance(bboxPolygon, point) <= mapTol) {
+            var geometries = $.geo._flatten(this.shape);
+            for (curGeom = 0; curGeom < geometries.length; curGeom++) {
+              if ($.geo._distance(geometries[curGeom], point) <= mapTol) {
+                result.push(this.shape);
+                break;
+              }
+            }
           }
         });
 

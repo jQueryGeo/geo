@@ -4,9 +4,15 @@ After years of internal development, we are pleased to bring our JavaScript map 
 
 == DOCS ==
 
-Documentation is hosted at http://host.appgeo.com/libs/geo/test/
+Documentation is hosted at http://host.appgeo.com/libs/geo/
 
 == CHANGELOG ==
+
+=== Version alpha3 ===
+* geomap - find - [bug] does not handle GeoJSON features
+* geomap - find - allow for 0 pixel tolerance
+* geomap - find - check for bbox on geometries before getting too specific
+* geo - bbox - cache shape bboxes
 
 === Version alpha2 ===
 * geomap - Support dynamic map services

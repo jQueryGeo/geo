@@ -1,5 +1,6 @@
 ﻿== TO DO ==
 
+* geomap - document a way to flag a shape as dirty so we recalculate the bbox
 * geomap - add opacity to service type objects & call from geomap's opacity method
 * geomap - add toggle to service type objects & call from geomap's toggle method
 * geomap - document (make public) the refresh argument in append, add one to remove & empty
@@ -11,6 +12,8 @@
 * docs/geomap - Scale map according to cursor location instead of re-centering during double-click zoom
 * widgets - Verify that vars local to initial closure do not conflict when multiple maps are placed
 * geomap - auto-handle window resize events
+* geomap - port shape labels
+* geomap - find should check labels first
 * geomap - [BUG] Mouse wheel on bad or missing tile doesn't zoom out on first rotate
 * geomap - Document and implement service-level shapes
 * geomap - Document and implement passing a function to shapeStyle and append that returns a geomap style object based on feature or geometry properties
@@ -20,9 +23,34 @@
 * graphics - See Modernizr for comment on BB Storm & canvas detection
 * geographics - Document graphics widget
 * geomap - [BUG] Android browser stops pan/zoom after 7 logos on logo demo
+* geomap - design how to store shapes as a hidden input
+
+== 2011-07-07 ==
+=== bbox ===
+I added bbox caching! I even check to see if the GeoJSON object has a bbox property, which is legal. There's no way to update the bbox but that'll come later.
+
+=== distance ===
+I almost tried to have distance support taking in a Feature but that opens a whole can of worms. I'm going to fix find to only send base geometry types to distance.
+
+DOCUMENT: geometry methods will only take base geometry types (Point, LineString, Polygon & Multi*) or coordinate arrays
+
+I had some weird comment on this method, it should be documented to only take base types, as I just said.
+
+=== form input ===
+I was talking to Chris last night about what geomap does that others don't and he reminded my about the idea I had of keeping a hidden input of the shapes as WKT. This would mean that I had to have a property on geomap for the map's name and also definitely change the service object to use name instead of id for when I add service-level shapes. WKT becomes a problem though when they've added features. I suppose I would dig into the features and only pull the geometry.
+
+=== json ===
+It's been a while since alpha 2. I'm working on a demo that draws the US state boundaries as graphics.
+
+== 2011-06-30 ==
+=== min ===
+Srsly? I wasn't using minified jQuery in my examples? Wow.
+
+== 2011-06-29 ==
+=== alpha2 ===
+Released alpha 2. I don't think anyone's really using it yet though.
 
 == 2011-06-28 ==
-
 === on services ===
 I think it would be nice to deep extend service objects that come in via the services property if a service with the given id already exists in _currentServices. This way, you could set the initial opacity of OSM by simply sending {services: [{id: "OSM", opacity: .8}]} during init.
 
@@ -34,7 +62,6 @@ I was beginning to try to throw the opacity & toggle methods into alpha2 but set
 SUGGESTION: require opacity and toggle functions in the service type objects
 
 == 2011-06-27 ==
-
 === on events ===
 I almost forgot that I don't want bboxchange to fire when the developer changes a property in code. Unlike jQuery UI, my events trigger only when the user does something.
 
