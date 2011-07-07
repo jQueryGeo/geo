@@ -1,10 +1,53 @@
 ﻿(function ($, window, undefined) {
+  var pos_oo = Number.POSITIVE_INFINITY,
+      neg_oo = Number.NEGATIVE_INFINITY;
+
   $.geo = {
+    //
+    // utility functions
+    //
+
+    _allCoordinates: function (geom) {
+      // return array of all positions in all geometries of geom
+      // not in JTS
+      var geometries = this._flatten(geom),
+          curGeom = 0,
+          result = [];
+
+      for (; curGeom < geometries.length; curGeom++) {
+        var coordinates = geometries[curGeom].coordinates,
+              isArray = $.isArray(coordinates[0]),
+              isDblArray = isArray && $.isArray(coordinates[0][0]),
+              isTriArray = isDblArray && $.isArray(coordinates[0][0][0]),
+              i, j, k;
+
+        if (!isTriArray) {
+          if (!isDblArray) {
+            if (!isArray) {
+              coordinates = [coordinates];
+            }
+            coordinates = [coordinates];
+          }
+          coordinates = [coordinates];
+        }
+
+        for (i = 0; i < coordinates.length; i++) {
+          for (j = 0; j < coordinates[i].length; j++) {
+            for (k = 0; k < coordinates[i][j].length; k++) {
+              result.push(coordinates[i][j][k]);
+            }
+          }
+        }
+      }
+      return result;
+    },
+
     //
     // bbox functions
     //
 
     _center: function (bbox) {
+      // Envelope.centre in JTS
       // bbox only, use centroid for geom
       return [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2];
     },
@@ -52,6 +95,32 @@
     //
     // geometry functions
     //
+
+    // bbox (Geometry.getEnvelope in JTS)
+
+    _bbox: function (geom) {
+      var result = $(geom).data("bbox");
+      if (!result) {
+        if (geom.bbox) {
+          $(geom).data("bbox", (result = geom.bbox));
+        } else {
+          result = [pos_oo, pos_oo, neg_oo, neg_oo];
+
+          var coordinates = this._allCoordinates(geom),
+              curCoord = 0;
+
+          for (; curCoord < coordinates.length; curCoord++) {
+            result[0] = Math.min(coordinates[curCoord][0], result[0]);
+            result[1] = Math.min(coordinates[curCoord][1], result[1]);
+            result[2] = Math.max(coordinates[curCoord][0], result[2]);
+            result[3] = Math.max(coordinates[curCoord][1], result[3]);
+          }
+
+          $(geom).data("bbox", result);
+        }
+      }
+      return result;
+    },
 
     // contains
 
@@ -110,7 +179,6 @@
     },
 
     // distance
-    // despite the other function names, only _distance takes GeoJSON objects
 
     _distance: function (geom1, geom2) {
       var geom1Coordinates = $.isArray(geom1) ? geom1 : geom1.coordinates,
@@ -167,7 +235,7 @@
     },
 
     _distanceLineStringPoint: function (lineStringCoordinates, pointCoordinate) {
-      var minDist = Number.POSITIVE_INFINITY;
+      var minDist = pos_oo;
 
       if (lineStringCoordinates.length > 0) {
         var a = lineStringCoordinates[0],
@@ -223,7 +291,7 @@
     },
 
     _distanceLineStringLineString: function (lineStringCoordinates1, lineStringCoordinates2) {
-      var minDist = Number.POSITIVE_INFINITY;
+      var minDist = pos_oo;
       for (var i = 0; i < lineStringCoordinates2; i++) {
         minDist = Math.min(minDist, this._distanceLineStringPoint(lineStringCoordinates1, lineStringCoordinates2[i]));
       }
@@ -231,7 +299,33 @@
     },
 
     //
-    // projection
+    // feature
+    //
+
+    _flatten: function (geom) {
+      // return an array of all basic geometries
+      // not in JTS
+      var geometries = [];
+      switch (geom.type) {
+        case "Feature":
+          $.merge(geometries, this._flatten(geom.geometry));
+          break;
+
+        case "GeometryCollection":
+          for (curGeom = 0; curGeom < geom.geometries.length; curGeom++) {
+            $.merge(geometries, this._flatten(geom.geometries[curGeom]));
+          }
+          break;
+
+        default:
+          geometries[0] = geom;
+          break;
+      }
+      return geometries;
+    },
+
+    //
+    // projection functions
     //
 
     proj: (function () {
