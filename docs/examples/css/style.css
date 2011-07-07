@@ -1,4 +1,7 @@
-﻿body { font-family: Calibri,Arial; }
+﻿html
+{
+  font:13px/1.231 Calibri,Arial,sans-serif; *font-size:small;
+}
 
 .docLink 
 {
@@ -11,4 +14,16 @@
   padding-right: 24px;
   text-decoration: none;
   text-transform: uppercase;
+}
+
+.info 
+{
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: -4px 4px #444;
+  max-width: 45%;
+  padding: 8px;
+  position: absolute;
+  right: 16px;
+  top: 16px;
 }
