@@ -1,11 +1,10 @@
 ﻿== to do ==
 
 === alpha 2.5 ===
-* docs - do not suggest that it's ok to change the geometry now that we're caching bbox for you
-* geomap - jsperf test of bbox query vs. geom query on point data (i.e., should I not do bbox test if it's a Point)
 * geographics - [bug] 0 opacity acts as full opacity
 * geomap - add opacity to service type objects & call from geomap's opacity method
 * geomap - allow append to take an array of geometry objects, each one should be a new shape
+** different than a GeometryCollection where each geometry is still the same shape
 * geo.proj - update bundled projection code
 * geomap - auto-handle window resize events
 * widgets - verify that vars local to initial closure do not conflict when multiple maps are placed
@@ -31,11 +30,14 @@
 * geographics - Rename the generated style properties to something simple or get better control over closure compiler
 * geomap - [maybe] document (make public) the refresh argument in append, add one to remove & empty
 * geomap - Document and implement find's callback syntax
+* geomap - repeat horizontal tiles
 * geographics - Disable fill by setting style.fill to "" & stroke by style.stroke to ""
 * graphics - See Modernizr for comment on BB Storm & canvas detection
 * geographics - Document graphics widget
 * geomap - [BUG] Android browser stops pan/zoom after 7 logos on logo demo
 * geomap - design how to store shapes as a hidden input
+* geomap - find - [maybe] after flatten, check more cached bboxes for non-Point geometries
+* docs/geomap - [maybe] add a method to update an existing shape if you change the shape's geometry externally
 
 == 2011-07-30 ==
 === alpha 2.5 ===
@@ -50,6 +52,18 @@ I wrote a perf for point & linestring bbox cache testing. The test makes me thin
 * Here's the line test: http://jsperf.com/line-vs-bbox
 
 It's always faster to test points by themselves, i.e., don't worry about checking for a cached the bbox.
+
+=== branch ===
+I was on master, so I pushed, then created & switched to alpha2-5.
+
+=== opacity ===
+When developing the heat map example, I remember running into an issue where I couldn't get the opaicty to look right between the border and center. Maybe I fixed it somewhere else because I can't seem to reproduce that.
+
+I can still get it on the latest fiddle of the heat map. It's when the opacity is 1 and the strokeOpacity is 0, the stroke still shows up but it should be hidden.
+
+I still can't recreate this on the shapeStyle test page :( Ah, but the twitter heat example has the issue.
+
+Turns out I was or'ing the stroke/fillOpacity with regular opacity in _getGraphicStyle. That's not the right place to do anything with them, and never or.
 
 == 2011-07-19 ==
 === wkt ===

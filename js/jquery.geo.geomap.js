@@ -882,24 +882,30 @@
             curGeom;
 
         $.each(_graphicShapes, function (i) {
-          var bbox = $.geo._bbox(this.shape),
-              bboxPolygon = {
-                type: "Polygon",
-                coordinates: [[
-                  [bbox[0], bbox[1]],
-                  [bbox[0], bbox[3]],
-                  [bbox[2], bbox[3]],
-                  [bbox[2], bbox[1]],
-                  [bbox[0], bbox[1]]
-                ]]
-              };
+          if (this.shape.type == "Point") {
+            if ($.geo._distance(this.shape, point) <= mapTol) {
+              result.push(this.shape);
+            }
+          } else {
+            var bbox = $.geo._bbox(this.shape),
+                bboxPolygon = {
+                  type: "Polygon",
+                  coordinates: [[
+                    [bbox[0], bbox[1]],
+                    [bbox[0], bbox[3]],
+                    [bbox[2], bbox[3]],
+                    [bbox[2], bbox[1]],
+                    [bbox[0], bbox[1]]
+                  ]]
+                };
 
-          if ($.geo._distance(bboxPolygon, point) <= mapTol) {
-            var geometries = $.geo._flatten(this.shape);
-            for (curGeom = 0; curGeom < geometries.length; curGeom++) {
-              if ($.geo._distance(geometries[curGeom], point) <= mapTol) {
-                result.push(this.shape);
-                break;
+            if ($.geo._distance(bboxPolygon, point) <= mapTol) {
+              var geometries = $.geo._flatten(this.shape);
+              for (curGeom = 0; curGeom < geometries.length; curGeom++) {
+                if ($.geo._distance(geometries[curGeom], point) <= mapTol) {
+                  result.push(this.shape);
+                  break;
+                }
               }
             }
           }
