@@ -35,13 +35,9 @@
         click: function (e, geo) {
           var state = map.geomap("find", geo, 0);
           if (state && state.length > 0) {
-            var r = Math.floor(Math.random() * 256),
-                g = Math.floor(Math.random() * 256),
-                b = Math.floor(Math.random() * 256);
-
             map.geomap("remove", state[0]);
             map.geomap("append", state[0], {
-              color: "rgb(" + r + "," + g + "," + b + ")"
+              color: "#" + Math.round(0xffffff * Math.random()).toString(16)
             });
           }
         }

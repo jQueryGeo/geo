@@ -8,7 +8,7 @@ Documentation is hosted at http://host.appgeo.com/libs/geo/
 
 == CHANGELOG ==
 
-=== Version alpha3 ===
+=== Version alpha2.5 ===
 * geomap - find - [bug] does not handle GeoJSON features
 * geomap - find - allow for 0 pixel tolerance
 * geomap - find - check for bbox on geometries before getting too specific
