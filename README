@@ -16,6 +16,8 @@ Documentation is hosted at http://host.appgeo.com/libs/geo/
 * docs - do not suggest that it's ok to change the geometry now that we're caching bbox
 * geomap - jsperf test of bbox query vs. geom query on point data
 * geographics - [bug] 0 opacity acts as full opacity
+* geomap - add opacity to service type objects & call from geomap's opacity method
+* geomap - add toggle to service type objects & call from geomap's opacity method
 
 === Version alpha2 ===
 * geomap - Support dynamic map services

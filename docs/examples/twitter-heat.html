@@ -118,8 +118,8 @@
         });
 
         map.geomap("shapeStyle", {
-          strokeOpacity: .1,
-          fillOpacity: .4,
+          strokeOpacity: 0,
+          fillOpacity: .3,
           width: "16px",
           height: "16px",
           borderRadius: "8px",
@@ -221,7 +221,7 @@
       function autoSearch() {
         if (searchTerm) {
           search();
-          setTimeout(autoSearch, 1000);
+          setTimeout(autoSearch, 3000);
         }
       }
     });  

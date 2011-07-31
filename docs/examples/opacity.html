@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>opacity</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description" content="A test of geomap's opacity and toggle methods">
+    <meta name="author" content="Ryan Westphal">
+
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/themes/blitzer/jquery-ui.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <style type="text/css">
+      html { font:13px/1.231 sans-serif; *font-size:small; }
+      #map {
+        position: absolute;
+        left: 0; top: 0; right: 0; bottom: 0;
+        background: #b5d0d0;
+      }
+      
+      label { display: block; }
+
+      label span:first-child
+      {
+        font-weight: bold;
+        margin-right: 12px;
+      }
+      
+      .slider
+      {
+        display: inline-block;
+        width: 60%
+      }
+    </style>
+  </head>
+<body>
+  <div>
+    <div id="map">
+    </div>
+    <div class="info">
+      <a href="../" class="docLink">&lt; docs</a>
+      <h1>opacity &amp; toggle</h1>
+      <p>The slider calls geomap's opacity method targeting the OSM service. The button calls the toggle method. I've matched the map div's background color to OSM's water color for effect.</p>
+      <label>
+        <span>opacity</span>
+        <span class="slider"></span>
+      </label>
+      <label>
+        <span>visibility</span>
+        <button type="button">toggle</button>
+      </label>
+    </div>
+  </div>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/jquery-ui.min.js"></script>
+  <script src="http://host.appgeo.com/libs/geo/test/jquery-geo-test.min.js"></script>
+  <script>
+    $(function () {
+      var map = $("#map").geomap({
+        center: [-71.0595678, 42.3604823],
+        zoom: 6
+      });
+
+      $(".slider").slider({
+        value: 100,
+        slide: function (e, ui) {
+          map.geomap("opacity", "OSM", ui.value / 100);
+        }
+      });
+
+      $("button").button().click(function() {
+        map.geomap("toggle", "OSM");
+      });
+    });  
+  </script>
+</body>
+</html>

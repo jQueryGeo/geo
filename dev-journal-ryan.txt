@@ -1,10 +1,6 @@
 ﻿== to do ==
 
 === alpha 2.5 ===
-* geographics - [bug] 0 opacity acts as full opacity
-* geomap - add opacity to service type objects & call from geomap's opacity method
-* geomap - allow append to take an array of geometry objects, each one should be a new shape
-** different than a GeometryCollection where each geometry is still the same shape
 * geo.proj - update bundled projection code
 * geomap - auto-handle window resize events
 * widgets - verify that vars local to initial closure do not conflict when multiple maps are placed
@@ -17,6 +13,7 @@
 * geomap - deep extend existing service objects when services property is set
 * docs/internal - document how geomap draws shapes, the geomapgraphics widget and the reason shapeStyle is a method
 * docs/geomap - [maybe] use name instead of id for service objects
+* geomap - rename service.visible to visibility having either "visible" or "hidden" values
 * geomap - port shape labels
 * geomap - label divs should have class="geo-label" & style="position: relative;"
 * geomap - find should check labels first
@@ -64,6 +61,21 @@ I can still get it on the latest fiddle of the heat map. It's when the opacity i
 I still can't recreate this on the shapeStyle test page :( Ah, but the twitter heat example has the issue.
 
 Turns out I was or'ing the stroke/fillOpacity with regular opacity in _getGraphicStyle. That's not the right place to do anything with them, and never or.
+
+=== service opacity ===
+I'm going to pull in the service opacity method from AppGeo.Web as "opacity" on each service object, like refresh.
+
+That's done. I haven't documented/implemented what happens if you don't pass a service id. It's required. I'm not sure what I want that to do yet.
+
+=== visible ===
+When starting to think about geomap.toggle, I realize I have a naming conflict so to speak. The service object has a boolean visible property while the shape style has a string visibility property. I think I want to change the service to match the shape style. I don't think there are any attributes in HTML that pertains to visibility so I'm going to match CSS even in the service object which is more internal and less graphical. That said, I don't want to start renaming things in alpha 2.5 so that'll wait until 3.
+
+SUGGESTION: Rename service.visible to visibility having either "visible" or "hidden" values
+
+=== service props ===
+So, I noticed that when a service is created, I don't modify the service objects to fill all the supported properties. So, when toggle is called, there's potentially not an initial visible property set.
+
+I think for now, alpha 2.5, I will have the toggle function assume that there could be an undefined service.visible. The refresh method does the same. Later, though I think I might want to set defaults during _createServices.
 
 == 2011-07-19 ==
 === wkt ===

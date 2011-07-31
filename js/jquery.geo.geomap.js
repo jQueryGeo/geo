@@ -308,51 +308,50 @@
             if (service && tiledServicesState[service.id] && (service.visible === undefined || service.visible)) {
               this._cancelUnloaded(map, service);
 
-              var 
-              bbox = map._getBbox(),
-              pixelSize = _pixelSize,
+              var bbox = map._getBbox(),
+                  pixelSize = _pixelSize,
 
-              serviceState = tiledServicesState[service.id],
-              serviceContainer = serviceState.serviceContainer,
+                  serviceState = tiledServicesState[service.id],
+                  $serviceContainer = serviceState.serviceContainer,
 
-              mapWidth = _contentBounds["width"],
-              mapHeight = _contentBounds["height"],
+                  mapWidth = _contentBounds["width"],
+                  mapHeight = _contentBounds["height"],
 
-              tilingScheme = map.options["tilingScheme"],
-              tileWidth = tilingScheme.tileWidth,
-              tileHeight = tilingScheme.tileHeight,
+                  tilingScheme = map.options["tilingScheme"],
+                  tileWidth = tilingScheme.tileWidth,
+                  tileHeight = tilingScheme.tileHeight,
 
-              tileX = Math.floor((bbox[0] - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
-              tileY = Math.floor((tilingScheme.origin[1] - bbox[3]) / (pixelSize * tileHeight)),
-              tileX2 = Math.ceil((bbox[2] - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
-              tileY2 = Math.ceil((tilingScheme.origin[1] - bbox[1]) / (pixelSize * tileHeight)),
+                  tileX = Math.floor((bbox[0] - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
+                  tileY = Math.floor((tilingScheme.origin[1] - bbox[3]) / (pixelSize * tileHeight)),
+                  tileX2 = Math.ceil((bbox[2] - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
+                  tileY2 = Math.ceil((tilingScheme.origin[1] - bbox[1]) / (pixelSize * tileHeight)),
 
-              bboxMax = map._getBboxMax(),
-              pixelSizeAtZero = map._getTiledPixelSize(0),
-              ratio = pixelSizeAtZero / pixelSize,
-              fullXAtScale = Math.floor((bboxMax[0] - tilingScheme.origin[0]) / (pixelSizeAtZero * tileWidth)) * ratio,
-              fullYAtScale = Math.floor((tilingScheme.origin[1] - bboxMax[3]) / (pixelSizeAtZero * tileHeight)) * ratio,
+                  bboxMax = map._getBboxMax(),
+                  pixelSizeAtZero = map._getTiledPixelSize(0),
+                  ratio = pixelSizeAtZero / pixelSize,
+                  fullXAtScale = Math.floor((bboxMax[0] - tilingScheme.origin[0]) / (pixelSizeAtZero * tileWidth)) * ratio,
+                  fullYAtScale = Math.floor((tilingScheme.origin[1] - bboxMax[3]) / (pixelSizeAtZero * tileHeight)) * ratio,
 
-              fullXMinX = tilingScheme.origin[0] + (fullXAtScale * tileWidth) * pixelSize,
-              fullYMaxY = tilingScheme.origin[1] - (fullYAtScale * tileHeight) * pixelSize,
+                  fullXMinX = tilingScheme.origin[0] + (fullXAtScale * tileWidth) * pixelSize,
+                  fullYMaxY = tilingScheme.origin[1] - (fullYAtScale * tileHeight) * pixelSize,
 
-              serviceLeft = Math.round((fullXMinX - bbox[0]) / pixelSize),
-              serviceTop = Math.round((bbox[3] - fullYMaxY) / pixelSize),
+                  serviceLeft = Math.round((fullXMinX - bbox[0]) / pixelSize),
+                  serviceTop = Math.round((bbox[3] - fullYMaxY) / pixelSize),
 
-              scaleContainers = serviceContainer.children().show(),
-              scaleContainer = scaleContainers.filter("[data-pixelSize='" + pixelSize + "']").appendTo(serviceContainer),
+                  scaleContainers = $serviceContainer.children().show(),
+                  scaleContainer = scaleContainers.filter("[data-pixelSize='" + pixelSize + "']").appendTo($serviceContainer),
 
-              opacity = (service.opacity === undefined ? 1 : service.opacity),
+                  opacity = (service.opacity === undefined ? 1 : service.opacity),
 
-              x, y;
+                  x, y;
 
               if (serviceState.reloadTiles) {
                 scaleContainers.find("img").attr("data-dirty", "true");
               }
 
               if (!scaleContainer.size()) {
-                serviceContainer.append("<div style='position:absolute; left:" + serviceLeft % tileWidth + "px; top:" + serviceTop % tileHeight + "px; width:" + tileWidth + "px; height:" + tileHeight + "px; margin:0; padding:0;' data-pixelSize='" + pixelSize + "'></div>");
-                scaleContainer = serviceContainer.children(":last").data("scaleOrigin", (serviceLeft % tileWidth) + "," + (serviceTop % tileHeight));
+                $serviceContainer.append("<div style='position:absolute; left:" + serviceLeft % tileWidth + "px; top:" + serviceTop % tileHeight + "px; width:" + tileWidth + "px; height:" + tileHeight + "px; margin:0; padding:0;' data-pixelSize='" + pixelSize + "'></div>");
+                scaleContainer = $serviceContainer.children(":last").data("scaleOrigin", (serviceLeft % tileWidth) + "," + (serviceTop % tileHeight));
               } else {
                 scaleContainer.css({
                   left: (serviceLeft % tileWidth) + "px",
@@ -434,7 +433,7 @@
                         serviceState.loadCount--;
 
                         if (serviceState.loadCount <= 0) {
-                          serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+                          $serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
                           serviceState.loadCount = 0;
                         }
                       }).error(function (e) {
@@ -442,7 +441,7 @@
                         serviceState.loadCount--;
 
                         if (serviceState.loadCount <= 0) {
-                          serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+                          $serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
                           serviceState.loadCount = 0;
                         }
                       }).attr("src", imageUrl);
@@ -454,6 +453,18 @@
               scaleContainers.find("[data-dirty]").remove();
               serviceState.reloadTiles = false;
             }
+          },
+
+          opacity: function (map, service) {
+            // service.opacity has changed, update any existing images
+            var serviceState = tiledServicesState[service.id];
+            serviceState.serviceContainer.find("img").stop(true).fadeTo("fast", service.opacity);
+          },
+
+          toggle: function (map, service) {
+            // service.visible has changed, update our service container
+            var serviceState = tiledServicesState[service.id];
+            serviceState.serviceContainer.css("display", service.visible ? "block" : "none");
           },
 
           _cancelUnloaded: function (map, service) {
@@ -655,6 +666,12 @@
             }
           },
 
+          opacity: function (map, service) {
+            // service.opacity has changed, update any existing images
+            var serviceState = shingledServicesState[service.id];
+            serviceState.serviceContainer.find("img").stop(true).fadeTo("fast", service.opacity);
+          },
+
           _cancelUnloaded: function (map, service) {
             var serviceState = shingledServicesState[service.id];
 
@@ -821,18 +838,30 @@
 
       opacity: function (serviceId, value) {
         if (value >= 0 || value <= 1) {
-          var geomap = this;
-          $.each(_currentServices, function () {
-            if (this.id == serviceId) {
-              this.opacity = value;
-              geomap._createServices();
-              geomap._refresh();
-              return false;
+          for (var i = 0; i < _options["services"].length; i++) {
+            var service = _options["services"][i];
+            if (service.id == serviceId) {
+              service.opacity = value;
+              _options["_serviceTypes"][service.type].opacity(this, service);
+              break;
             }
-          });
+          }
         }
       },
 
+      toggle: function (serviceId, value) {
+        for (var i = 0; i < _options["services"].length; i++) {
+          var service = _options["services"][i];
+          if (service.id == serviceId) {
+            if (value === undefined) {
+              value = (service.visible === undefined ? false : !service.visible);
+            }
+
+            service.visible = value;
+            _options["_serviceTypes"][service.type].toggle(this, service);
+          }
+        }
+      },
       refresh: function () {
         this._refresh();
       },
