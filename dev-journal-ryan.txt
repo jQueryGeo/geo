@@ -1,8 +1,5 @@
 ﻿== to do ==
 
-=== alpha 2.5 ===
-* geomap - iOS - [bug] third tap acts as a second zoom in, even when delayed
-
 === future ===
 * widgets - verify that vars local to initial closure do not conflict when multiple maps are placed
 * docs/geomap - document the resize method
@@ -88,6 +85,9 @@ SUGGESTION: Add a resize method to let geomap know the div has changed size prog
 I'm not sure of the correct way to kill & remake graphics now that it's a jQuery UI widget. It appears that I can call distroy & re-create it.
 
 Resize, is working though when getting smaller, there is a space for the scroll bars. I don't remember having that issue with the internal AppGeo.Web control. That is an issue to tackle after alpha 2.5.
+
+=== dbl tap ===
+What is a thumb? On touch devices, and other soft-dblclick devices I don't take into account that the second click/tap might be too far from the first to count as a tap. There is no move event to cancel. I'm now calculating distance between the two based on _anchor (previous) and _current ( current :). This will need testing. I'm setting it at 10px for now, line 1480 of geomap.js as of this writing.
 
 == 2011-07-19 ==
 === wkt ===

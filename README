@@ -21,6 +21,7 @@ Documentation is hosted at http://host.appgeo.com/libs/geo/
 * geo.proj - update bundled web mercator projection code (remove 150 lines of code)
 * geomap - auto-handle window resize events
 * docs/geomap - scale map according to cursor location instead of re-centering during double-click zoom
+* geomap - iOS - [bug] second tap can be anywhere & cause a zoom
 
 === Version alpha2 ===
 * geomap - Support dynamic map services
