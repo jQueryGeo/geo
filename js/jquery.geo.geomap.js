@@ -1203,19 +1203,19 @@
         }
       },
 
-      _getWheelCenterAndSize: function () {
+      _getZoomCenterAndSize: function (anchor, zoomDelta, zoomFactor) {
         var pixelSize, zoomLevel, scale;
         if (_options["tilingScheme"]) {
-          zoomLevel = this._getTiledZoom(_pixelSize) + _wheelLevel;
+          zoomLevel = this._getTiledZoom(_pixelSize) + zoomDelta;
           pixelSize = this._getTiledPixelSize(zoomLevel);
         } else {
-          scale = Math.pow(_wheelZoomFactor, -_wheelLevel);
+          scale = Math.pow(zoomFactor, -zoomDelta);
           pixelSize = _pixelSize * scale;
         }
 
         var 
         ratio = pixelSize / _pixelSize,
-        anchorMapCoord = this._toMap(_anchor),
+        anchorMapCoord = this._toMap(anchor),
         centerDelta = [(_center[0] - anchorMapCoord[0]) * ratio, (_center[1] - anchorMapCoord[1]) * ratio],
         scaleCenter = [anchorMapCoord[0] + centerDelta[0], anchorMapCoord[1] + centerDelta[1]];
 
@@ -1226,7 +1226,7 @@
         _wheelTimer = null;
 
         if (_wheelLevel != 0) {
-          var wheelCenterAndSize = this._getWheelCenterAndSize();
+          var wheelCenterAndSize = this._getZoomCenterAndSize(_anchor, _wheelLevel, _wheelZoomFactor);
 
           _wheelLevel = 0;
 
@@ -1449,7 +1449,9 @@
           case "pan":
             this._trigger("dblclick", e, { type: "Point", coordinates: this.toMap(_current) });
             if (!e.isDefaultPrevented()) {
-              this._zoomTo(this._toMap(_current), this._getZoom() + 1, true, true);
+              var centerAndSize = this._getZoomCenterAndSize(_current, 1, _zoomFactor);
+              this._setCenterAndSize(centerAndSize.center, centerAndSize.pixelSize, true, true);
+              //this._zoomTo(this._toMap(_current), this._getZoom() + 1, true, true);
             }
             break;
         }
@@ -1631,7 +1633,7 @@
 
           _wheelLevel += delta;
 
-          var wheelCenterAndSize = this._getWheelCenterAndSize();
+          var wheelCenterAndSize = this._getZoomCenterAndSize(_anchor, _wheelLevel, _wheelZoomFactor);
 
           _$shapesContainer.geographics("clear");
 

@@ -1,7 +1,6 @@
 ﻿== to do ==
 
 === alpha 2.5 ===
-* docs/geomap - scale map according to cursor location instead of re-centering during double-click zoom
 * geomap - iOS - [bug] third tap acts as a second zoom in, even when delayed
 
 === future ===
