@@ -18,6 +18,8 @@ Documentation is hosted at http://host.appgeo.com/libs/geo/
 * geographics - [bug] 0 opacity acts as full opacity
 * geomap - add opacity to service type objects & call from geomap's opacity method
 * geomap - add toggle to service type objects & call from geomap's opacity method
+* geo.proj - update bundled web mercator projection code (remove 150 lines of code)
+* geomap - auto-handle window resize events
 
 === Version alpha2 ===
 * geomap - Support dynamic map services

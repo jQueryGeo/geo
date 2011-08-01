@@ -1,13 +1,12 @@
 ﻿== to do ==
 
 === alpha 2.5 ===
-* geo.proj - update bundled projection code
-* geomap - auto-handle window resize events
-* widgets - verify that vars local to initial closure do not conflict when multiple maps are placed
 * docs/geomap - scale map according to cursor location instead of re-centering during double-click zoom
 * geomap - iOS - [bug] third tap acts as a second zoom in, even when delayed
 
 === future ===
+* widgets - verify that vars local to initial closure do not conflict when multiple maps are placed
+* docs/geomap - document the resize method
 * geomap - document a way to flag a shape as dirty so we recalculate the bbox
 * geomap - add toggle to service type objects & call from geomap's toggle method
 * geomap - deep extend existing service objects when services property is set
@@ -17,6 +16,7 @@
 * geomap - port shape labels
 * geomap - label divs should have class="geo-label" & style="position: relative;"
 * geomap - find should check labels first
+* geomap - Add a resize method to let geomap know the div has changed size programatically
 * geo - implement $.geo.centroid
 ** JTS note: "The centroid is equal to the centroid of the set of component Geometries of highest dimension (since the lower-dimension geometries contribute zero "weight" to the centroid)"
 * geo - Support WKT with $.geo.parseWKT & $.geo.textify
@@ -28,6 +28,7 @@
 * geomap - [maybe] document (make public) the refresh argument in append, add one to remove & empty
 * geomap - Document and implement find's callback syntax
 * geomap - repeat horizontal tiles
+* proj - take scale factor into account when calculating distance in web mercator
 * geographics - Disable fill by setting style.fill to "" & stroke by style.stroke to ""
 * graphics - See Modernizr for comment on BB Storm & canvas detection
 * geographics - Document graphics widget
@@ -76,6 +77,18 @@ SUGGESTION: Rename service.visible to visibility having either "visible" or "hid
 So, I noticed that when a service is created, I don't modify the service objects to fill all the supported properties. So, when toggle is called, there's potentially not an initial visible property set.
 
 I think for now, alpha 2.5, I will have the toggle function assume that there could be an undefined service.visible. The refresh method does the same. Later, though I think I might want to set defaults during _createServices.
+
+=== proj ===
+New projection code seems to work and is awesomely 150 lines shorter!
+
+=== resize ===
+I'm going to hook into the window resize event automatically but I will still need a resize method later in case the dev changes the div size/css.
+
+SUGGESTION: Add a resize method to let geomap know the div has changed size programatically
+
+I'm not sure of the correct way to kill & remake graphics now that it's a jQuery UI widget. It appears that I can call distroy & re-create it.
+
+Resize, is working though when getting smaller, there is a space for the scroll bars. I don't remember having that issue with the internal AppGeo.Web control. That is an issue to tackle after alpha 2.5.
 
 == 2011-07-19 ==
 === wkt ===

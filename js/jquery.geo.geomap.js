@@ -40,6 +40,8 @@
   _lastMove,
   _lastDrag,
 
+  _timeoutResize = null,
+
   _panning,
   _velocity,
   _friction,
@@ -714,24 +716,24 @@
         _pixelSize = _pixelSizeMax = 156543.03392799936;
 
         _mouseDown =
-        _inOp =
-        _toolPan =
-        _shiftZoom =
-        _panning =
-        _isTap =
-        _isDbltap = false;
+          _inOp =
+          _toolPan =
+          _shiftZoom =
+          _panning =
+          _isTap =
+          _isDbltap = false;
 
         _anchor =
-        _current =
-        _lastMove =
-        _lastDrag =
-        _velocity = [0, 0];
+          _current =
+          _lastMove =
+          _lastDrag =
+          _velocity = [0, 0];
 
         _friction = [.8, .8];
 
         _downDate =
-        _moveDate =
-        _clickDate = 0;
+          _moveDate =
+          _clickDate = 0;
 
         $.Widget.prototype._createWidget.apply(this, arguments);
       },
@@ -742,10 +744,9 @@
         _supportTouch = "ontouchend" in document;
         _softDblClick = _supportTouch || _ieVersion == 7;
 
-        var 
-        touchStartEvent = _supportTouch ? "touchstart" : "mousedown",
-    	  touchStopEvent = _supportTouch ? "touchend touchcancel" : "mouseup",
-    	  touchMoveEvent = _supportTouch ? "touchmove" : "mousemove";
+        var touchStartEvent = _supportTouch ? "touchstart" : "mousedown",
+            touchStopEvent = _supportTouch ? "touchend touchcancel" : "mouseup",
+            touchMoveEvent = _supportTouch ? "touchmove" : "mousemove";
 
         _$eventTarget.dblclick($.proxy(this._eventTarget_dblclick, this));
         _$eventTarget.bind(touchStartEvent, $.proxy(this._eventTarget_touchstart, this));
@@ -755,6 +756,16 @@
         dragTarget.bind(touchStopEvent, $.proxy(this._dragTarget_touchstop, this));
 
         _$eventTarget.mousewheel($.proxy(this._eventTarget_mousewheel, this));
+
+        $(window).resize(function() {
+          if (_timeoutResize) {
+            clearTimeout(_timeoutResize);
+          }
+          _timeoutResize = setTimeout(function() {
+            _$elem.geomap("resize");
+          }, 500);
+
+        });
 
         _$shapesContainer.geographics();
 
@@ -862,8 +873,43 @@
           }
         }
       },
+
       refresh: function () {
         this._refresh();
+      },
+
+      resize: function() {
+        var size = this._findMapSize();
+        _contentBounds = {
+          x: parseInt(_$elem.css("padding-left")),
+          y: parseInt(_$elem.css("padding-top")),
+          width: size["width"],
+          height: size["height"]
+        };
+
+        _$contentFrame.css({
+          width: size["width"],
+          height: size["height"]
+        });
+
+        _$servicesContainer.css({
+          width: size["width"],
+          height: size["height"]
+        });
+
+        _$eventTarget.css({
+          width: size["width"],
+          height: size["height"]
+        });
+
+        _$shapesContainer.geographics("destroy");
+        _$shapesContainer.css({
+          width: size.width,
+          height: size.height
+        });
+        _$shapesContainer.geographics();
+
+        this._setCenterAndSize(_center, _pixelSize, false, true);
       },
 
       shapeStyle: function (style) {
