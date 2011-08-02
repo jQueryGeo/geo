@@ -37,7 +37,6 @@ body { font:13px/1.231 sans-serif; *font-size:small; }
 select, input, textarea, button { font:99% sans-serif; }
 pre, code, kbd, samp { font-family: monospace, sans-serif; }
 
-html { overflow-y: scroll; }
 a:hover, a:active { outline: none; }
 ul, ol { margin-left: 2em; }
 ol { list-style-type: decimal; }
@@ -164,7 +163,7 @@ span.Topo { background-position: -15px -18px; }
   bottom: 0;
   left: 0;
   overflow: hidden;
-  position: absolute;
+  position: fixed;
   right: 0;
   top: 128px;
 }

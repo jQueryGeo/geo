@@ -25,7 +25,8 @@
       <pre><code>&lt;div style=&quot;width: 640px; height: 480px;&quot;&gt;&lt;/div&gt;</code></pre>
       <p>If the div is not already in relative, absolute or fixed position, the widget will force relative positioning.</p>
       <p>The div size does not have to be so specific.</p>
-      <pre><code>&lt;div style=&quot;position: absolute; top: 0; right: 0; bottom: 0; left: 0;&quot;&gt;&lt;/div&gt;</code></pre>
+      <pre><code>&lt;div style=&quot;position: fixed; top: 0; right: 0; bottom: 0; left: 0;&quot;&gt;&lt;/div&gt;</code></pre>
+      <p>With position set to either absolute or fixed and the top, right, bottom and left properties set, the map will follow the size of the window. It even recenters when the size of the window changes. If you want the map to fill the window, fixed position is preferred because it will not create scroll bars when making the window smaller. However, keep in mind that fixed position is not supported by IE6.</p>
       <p>The map supports divs that have padding, borders and margins. The plugin will create the map where text would normally go in such a situation, i.e., the map content will be inset from the border by the padding amount.</p>
       <pre><code>&lt;style&gt;
   #map {
