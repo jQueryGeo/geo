@@ -1,6 +1,9 @@
 ﻿== to do ==
 
 === future ===
+* docs - upgrade to jQuery Mobile beta
+* docs - make all map examples live
+* docs - explain the 96px scale bar, why 96?
 * widgets - verify that vars local to initial closure do not conflict when multiple maps are placed
 * docs/geomap - document the resize method
 * geomap - document a way to flag a shape as dirty so we recalculate the bbox
