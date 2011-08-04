@@ -40,6 +40,8 @@
   _lastMove,
   _lastDrag,
 
+  _timeoutResize = null,
+
   _panning,
   _velocity,
   _friction,
@@ -308,51 +310,50 @@
             if (service && tiledServicesState[service.id] && (service.visible === undefined || service.visible)) {
               this._cancelUnloaded(map, service);
 
-              var 
-              bbox = map._getBbox(),
-              pixelSize = _pixelSize,
+              var bbox = map._getBbox(),
+                  pixelSize = _pixelSize,
 
-              serviceState = tiledServicesState[service.id],
-              serviceContainer = serviceState.serviceContainer,
+                  serviceState = tiledServicesState[service.id],
+                  $serviceContainer = serviceState.serviceContainer,
 
-              mapWidth = _contentBounds["width"],
-              mapHeight = _contentBounds["height"],
+                  mapWidth = _contentBounds["width"],
+                  mapHeight = _contentBounds["height"],
 
-              tilingScheme = map.options["tilingScheme"],
-              tileWidth = tilingScheme.tileWidth,
-              tileHeight = tilingScheme.tileHeight,
+                  tilingScheme = map.options["tilingScheme"],
+                  tileWidth = tilingScheme.tileWidth,
+                  tileHeight = tilingScheme.tileHeight,
 
-              tileX = Math.floor((bbox[0] - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
-              tileY = Math.floor((tilingScheme.origin[1] - bbox[3]) / (pixelSize * tileHeight)),
-              tileX2 = Math.ceil((bbox[2] - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
-              tileY2 = Math.ceil((tilingScheme.origin[1] - bbox[1]) / (pixelSize * tileHeight)),
+                  tileX = Math.floor((bbox[0] - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
+                  tileY = Math.floor((tilingScheme.origin[1] - bbox[3]) / (pixelSize * tileHeight)),
+                  tileX2 = Math.ceil((bbox[2] - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
+                  tileY2 = Math.ceil((tilingScheme.origin[1] - bbox[1]) / (pixelSize * tileHeight)),
 
-              bboxMax = map._getBboxMax(),
-              pixelSizeAtZero = map._getTiledPixelSize(0),
-              ratio = pixelSizeAtZero / pixelSize,
-              fullXAtScale = Math.floor((bboxMax[0] - tilingScheme.origin[0]) / (pixelSizeAtZero * tileWidth)) * ratio,
-              fullYAtScale = Math.floor((tilingScheme.origin[1] - bboxMax[3]) / (pixelSizeAtZero * tileHeight)) * ratio,
+                  bboxMax = map._getBboxMax(),
+                  pixelSizeAtZero = map._getTiledPixelSize(0),
+                  ratio = pixelSizeAtZero / pixelSize,
+                  fullXAtScale = Math.floor((bboxMax[0] - tilingScheme.origin[0]) / (pixelSizeAtZero * tileWidth)) * ratio,
+                  fullYAtScale = Math.floor((tilingScheme.origin[1] - bboxMax[3]) / (pixelSizeAtZero * tileHeight)) * ratio,
 
-              fullXMinX = tilingScheme.origin[0] + (fullXAtScale * tileWidth) * pixelSize,
-              fullYMaxY = tilingScheme.origin[1] - (fullYAtScale * tileHeight) * pixelSize,
+                  fullXMinX = tilingScheme.origin[0] + (fullXAtScale * tileWidth) * pixelSize,
+                  fullYMaxY = tilingScheme.origin[1] - (fullYAtScale * tileHeight) * pixelSize,
 
-              serviceLeft = Math.round((fullXMinX - bbox[0]) / pixelSize),
-              serviceTop = Math.round((bbox[3] - fullYMaxY) / pixelSize),
+                  serviceLeft = Math.round((fullXMinX - bbox[0]) / pixelSize),
+                  serviceTop = Math.round((bbox[3] - fullYMaxY) / pixelSize),
 
-              scaleContainers = serviceContainer.children().show(),
-              scaleContainer = scaleContainers.filter("[data-pixelSize='" + pixelSize + "']").appendTo(serviceContainer),
+                  scaleContainers = $serviceContainer.children().show(),
+                  scaleContainer = scaleContainers.filter("[data-pixelSize='" + pixelSize + "']").appendTo($serviceContainer),
 
-              opacity = (service.opacity === undefined ? 1 : service.opacity),
+                  opacity = (service.opacity === undefined ? 1 : service.opacity),
 
-              x, y;
+                  x, y;
 
               if (serviceState.reloadTiles) {
                 scaleContainers.find("img").attr("data-dirty", "true");
               }
 
               if (!scaleContainer.size()) {
-                serviceContainer.append("<div style='position:absolute; left:" + serviceLeft % tileWidth + "px; top:" + serviceTop % tileHeight + "px; width:" + tileWidth + "px; height:" + tileHeight + "px; margin:0; padding:0;' data-pixelSize='" + pixelSize + "'></div>");
-                scaleContainer = serviceContainer.children(":last").data("scaleOrigin", (serviceLeft % tileWidth) + "," + (serviceTop % tileHeight));
+                $serviceContainer.append("<div style='position:absolute; left:" + serviceLeft % tileWidth + "px; top:" + serviceTop % tileHeight + "px; width:" + tileWidth + "px; height:" + tileHeight + "px; margin:0; padding:0;' data-pixelSize='" + pixelSize + "'></div>");
+                scaleContainer = $serviceContainer.children(":last").data("scaleOrigin", (serviceLeft % tileWidth) + "," + (serviceTop % tileHeight));
               } else {
                 scaleContainer.css({
                   left: (serviceLeft % tileWidth) + "px",
@@ -434,7 +435,7 @@
                         serviceState.loadCount--;
 
                         if (serviceState.loadCount <= 0) {
-                          serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+                          $serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
                           serviceState.loadCount = 0;
                         }
                       }).error(function (e) {
@@ -442,7 +443,7 @@
                         serviceState.loadCount--;
 
                         if (serviceState.loadCount <= 0) {
-                          serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+                          $serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
                           serviceState.loadCount = 0;
                         }
                       }).attr("src", imageUrl);
@@ -454,6 +455,18 @@
               scaleContainers.find("[data-dirty]").remove();
               serviceState.reloadTiles = false;
             }
+          },
+
+          opacity: function (map, service) {
+            // service.opacity has changed, update any existing images
+            var serviceState = tiledServicesState[service.id];
+            serviceState.serviceContainer.find("img").stop(true).fadeTo("fast", service.opacity);
+          },
+
+          toggle: function (map, service) {
+            // service.visible has changed, update our service container
+            var serviceState = tiledServicesState[service.id];
+            serviceState.serviceContainer.css("display", service.visible ? "block" : "none");
           },
 
           _cancelUnloaded: function (map, service) {
@@ -655,6 +668,12 @@
             }
           },
 
+          opacity: function (map, service) {
+            // service.opacity has changed, update any existing images
+            var serviceState = shingledServicesState[service.id];
+            serviceState.serviceContainer.find("img").stop(true).fadeTo("fast", service.opacity);
+          },
+
           _cancelUnloaded: function (map, service) {
             var serviceState = shingledServicesState[service.id];
 
@@ -697,24 +716,24 @@
         _pixelSize = _pixelSizeMax = 156543.03392799936;
 
         _mouseDown =
-        _inOp =
-        _toolPan =
-        _shiftZoom =
-        _panning =
-        _isTap =
-        _isDbltap = false;
+          _inOp =
+          _toolPan =
+          _shiftZoom =
+          _panning =
+          _isTap =
+          _isDbltap = false;
 
         _anchor =
-        _current =
-        _lastMove =
-        _lastDrag =
-        _velocity = [0, 0];
+          _current =
+          _lastMove =
+          _lastDrag =
+          _velocity = [0, 0];
 
         _friction = [.8, .8];
 
         _downDate =
-        _moveDate =
-        _clickDate = 0;
+          _moveDate =
+          _clickDate = 0;
 
         $.Widget.prototype._createWidget.apply(this, arguments);
       },
@@ -725,10 +744,9 @@
         _supportTouch = "ontouchend" in document;
         _softDblClick = _supportTouch || _ieVersion == 7;
 
-        var 
-        touchStartEvent = _supportTouch ? "touchstart" : "mousedown",
-    	  touchStopEvent = _supportTouch ? "touchend touchcancel" : "mouseup",
-    	  touchMoveEvent = _supportTouch ? "touchmove" : "mousemove";
+        var touchStartEvent = _supportTouch ? "touchstart" : "mousedown",
+            touchStopEvent = _supportTouch ? "touchend touchcancel" : "mouseup",
+            touchMoveEvent = _supportTouch ? "touchmove" : "mousemove";
 
         _$eventTarget.dblclick($.proxy(this._eventTarget_dblclick, this));
         _$eventTarget.bind(touchStartEvent, $.proxy(this._eventTarget_touchstart, this));
@@ -738,6 +756,16 @@
         dragTarget.bind(touchStopEvent, $.proxy(this._dragTarget_touchstop, this));
 
         _$eventTarget.mousewheel($.proxy(this._eventTarget_mousewheel, this));
+
+        $(window).resize(function() {
+          if (_timeoutResize) {
+            clearTimeout(_timeoutResize);
+          }
+          _timeoutResize = setTimeout(function() {
+            _$elem.geomap("resize");
+          }, 500);
+
+        });
 
         _$shapesContainer.geographics();
 
@@ -821,20 +849,67 @@
 
       opacity: function (serviceId, value) {
         if (value >= 0 || value <= 1) {
-          var geomap = this;
-          $.each(_currentServices, function () {
-            if (this.id == serviceId) {
-              this.opacity = value;
-              geomap._createServices();
-              geomap._refresh();
-              return false;
+          for (var i = 0; i < _options["services"].length; i++) {
+            var service = _options["services"][i];
+            if (service.id == serviceId) {
+              service.opacity = value;
+              _options["_serviceTypes"][service.type].opacity(this, service);
+              break;
             }
-          });
+          }
+        }
+      },
+
+      toggle: function (serviceId, value) {
+        for (var i = 0; i < _options["services"].length; i++) {
+          var service = _options["services"][i];
+          if (service.id == serviceId) {
+            if (value === undefined) {
+              value = (service.visible === undefined ? false : !service.visible);
+            }
+
+            service.visible = value;
+            _options["_serviceTypes"][service.type].toggle(this, service);
+          }
         }
       },
 
       refresh: function () {
         this._refresh();
+      },
+
+      resize: function() {
+        var size = this._findMapSize();
+        _contentBounds = {
+          x: parseInt(_$elem.css("padding-left")),
+          y: parseInt(_$elem.css("padding-top")),
+          width: size["width"],
+          height: size["height"]
+        };
+
+        _$contentFrame.css({
+          width: size["width"],
+          height: size["height"]
+        });
+
+        _$servicesContainer.css({
+          width: size["width"],
+          height: size["height"]
+        });
+
+        _$eventTarget.css({
+          width: size["width"],
+          height: size["height"]
+        });
+
+        _$shapesContainer.geographics("destroy");
+        _$shapesContainer.css({
+          width: size.width,
+          height: size.height
+        });
+        _$shapesContainer.geographics();
+
+        this._setCenterAndSize(_center, _pixelSize, false, true);
       },
 
       shapeStyle: function (style) {
@@ -882,24 +957,30 @@
             curGeom;
 
         $.each(_graphicShapes, function (i) {
-          var bbox = $.geo._bbox(this.shape),
-              bboxPolygon = {
-                type: "Polygon",
-                coordinates: [[
-                  [bbox[0], bbox[1]],
-                  [bbox[0], bbox[3]],
-                  [bbox[2], bbox[3]],
-                  [bbox[2], bbox[1]],
-                  [bbox[0], bbox[1]]
-                ]]
-              };
+          if (this.shape.type == "Point") {
+            if ($.geo._distance(this.shape, point) <= mapTol) {
+              result.push(this.shape);
+            }
+          } else {
+            var bbox = $.geo._bbox(this.shape),
+                bboxPolygon = {
+                  type: "Polygon",
+                  coordinates: [[
+                    [bbox[0], bbox[1]],
+                    [bbox[0], bbox[3]],
+                    [bbox[2], bbox[3]],
+                    [bbox[2], bbox[1]],
+                    [bbox[0], bbox[1]]
+                  ]]
+                };
 
-          if ($.geo._distance(bboxPolygon, point) <= mapTol) {
-            var geometries = $.geo._flatten(this.shape);
-            for (curGeom = 0; curGeom < geometries.length; curGeom++) {
-              if ($.geo._distance(geometries[curGeom], point) <= mapTol) {
-                result.push(this.shape);
-                break;
+            if ($.geo._distance(bboxPolygon, point) <= mapTol) {
+              var geometries = $.geo._flatten(this.shape);
+              for (curGeom = 0; curGeom < geometries.length; curGeom++) {
+                if ($.geo._distance(geometries[curGeom], point) <= mapTol) {
+                  result.push(this.shape);
+                  break;
+                }
               }
             }
           }
@@ -1122,19 +1203,19 @@
         }
       },
 
-      _getWheelCenterAndSize: function () {
+      _getZoomCenterAndSize: function (anchor, zoomDelta, zoomFactor) {
         var pixelSize, zoomLevel, scale;
         if (_options["tilingScheme"]) {
-          zoomLevel = this._getTiledZoom(_pixelSize) + _wheelLevel;
+          zoomLevel = this._getTiledZoom(_pixelSize) + zoomDelta;
           pixelSize = this._getTiledPixelSize(zoomLevel);
         } else {
-          scale = Math.pow(_wheelZoomFactor, -_wheelLevel);
+          scale = Math.pow(zoomFactor, -zoomDelta);
           pixelSize = _pixelSize * scale;
         }
 
         var 
         ratio = pixelSize / _pixelSize,
-        anchorMapCoord = this._toMap(_anchor),
+        anchorMapCoord = this._toMap(anchor),
         centerDelta = [(_center[0] - anchorMapCoord[0]) * ratio, (_center[1] - anchorMapCoord[1]) * ratio],
         scaleCenter = [anchorMapCoord[0] + centerDelta[0], anchorMapCoord[1] + centerDelta[1]];
 
@@ -1145,7 +1226,7 @@
         _wheelTimer = null;
 
         if (_wheelLevel != 0) {
-          var wheelCenterAndSize = this._getWheelCenterAndSize();
+          var wheelCenterAndSize = this._getZoomCenterAndSize(_anchor, _wheelLevel, _wheelZoomFactor);
 
           _wheelLevel = 0;
 
@@ -1368,7 +1449,9 @@
           case "pan":
             this._trigger("dblclick", e, { type: "Point", coordinates: this.toMap(_current) });
             if (!e.isDefaultPrevented()) {
-              this._zoomTo(this._toMap(_current), this._getZoom() + 1, true, true);
+              var centerAndSize = this._getZoomCenterAndSize(_current, 1, _zoomFactor);
+              this._setCenterAndSize(centerAndSize.center, centerAndSize.pixelSize, true, true);
+              //this._zoomTo(this._toMap(_current), this._getZoom() + 1, true, true);
             }
             break;
         }
@@ -1381,9 +1464,26 @@
           return;
         }
 
+        var offset = $(e.currentTarget).offset();
+
+        if (_supportTouch) {
+          _current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
+        } else {
+          _current = [e.pageX - offset.left, e.pageY - offset.top];
+        }
+
         if (_softDblClick) {
           var downDate = $.now();
           if (downDate - _downDate < 750) {
+            if (_isTap) {
+              var dx = _current[0] - _anchor[0],
+                  dy = _current[1] - _anchor[1],
+                  distance = Math.sqrt((dx * dx) + (dy * dy));
+              if (distance > 10) {
+                _isTap = false;
+              }
+            }
+
             if (_isDbltap) {
               _isDbltap = false;
             } else {
@@ -1400,14 +1500,6 @@
 
         this._panFinalize();
         this._mouseWheelFinish();
-
-        var offset = $(e.currentTarget).offset();
-
-        if (_supportTouch) {
-          _current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
-        } else {
-          _current = [e.pageX - offset.left, e.pageY - offset.top];
-        }
 
         _mouseDown = true;
         _anchor = _current;
@@ -1550,7 +1642,7 @@
 
           _wheelLevel += delta;
 
-          var wheelCenterAndSize = this._getWheelCenterAndSize();
+          var wheelCenterAndSize = this._getZoomCenterAndSize(_anchor, _wheelLevel, _wheelZoomFactor);
 
           _$shapesContainer.geographics("clear");
 

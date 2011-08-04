@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>GPS Tracking</title>
+  <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+  <meta name="description" content="A demo that continually tracks your current location">
+  <meta name="author" content="Ryan Westphal">
+  <link rel="stylesheet" href="css/style.css" />
+  <style type="text/css">
+    #map
+    {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      top: 0;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <div id="map">
+    </div>
+    <div class="info">
+      <a href="../" class="docLink">&lt; docs</a>
+      <h1>
+        GPS Tracking</h1>
+      <p>
+        This simple demo continually follows your location at zoom level 15 showing the Esri World Street Map tiles.</p>
+      <p>
+        <a href="http://roycesimpson.wordpress.com/2011/07/19/air-android-arcgis-server-flex-api-gps-activated-mapping-apps/" target="_blank">Inspired by Royce Simpson</a></p>
+    </div>
+  </div>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+  <script src="http://host.appgeo.com/libs/geo/test/jquery-geo-test.min.js"></script>
+  <script>
+    $(function () {
+      var map = null;
+
+      function initMap(center) {
+        map = $("#map").geomap({
+          center: center || [-71.0597732, 42.3584308],
+          zoom: 15
+        });
+        var services = map.geomap("option", "services");
+        $.extend(services[0], {
+          getUrl: function (view) {
+            return "http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/" + view.zoom + "/" + view.tile.row + "/" + view.tile.column
+          }
+        });
+        map.geomap("option", "services", services);
+      }
+
+      if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(function (p) {
+          coord = [p.coords.longitude, p.coords.latitude];
+          if (!map) {
+            initMap(coord);
+          } else {
+            map.geomap("option", "center", coord);
+          }
+          map.geomap("empty");
+          map.geomap("append", { type: "Point", coordinates: coord });
+        }, function (error) {
+          initMap();
+        });
+      } else {
+        initMap();
+      }
+    });  
+  </script>
+</body>
+</html>

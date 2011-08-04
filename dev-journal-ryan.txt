@@ -1,29 +1,142 @@
-﻿== TO DO ==
+﻿== to do ==
 
+=== future ===
+* docs - upgrade to jQuery Mobile beta
+* docs - make all map examples live
+* docs - explain the 96px scale bar, why 96?
+* widgets - verify that vars local to initial closure do not conflict when multiple maps are placed
+* docs/geomap - document the resize method
 * geomap - document a way to flag a shape as dirty so we recalculate the bbox
-* geomap - add opacity to service type objects & call from geomap's opacity method
 * geomap - add toggle to service type objects & call from geomap's toggle method
-* geomap - document (make public) the refresh argument in append, add one to remove & empty
 * geomap - deep extend existing service objects when services property is set
-* geomap - Allow append to take an array of geometry objects, each one should be a new shape
-* geo.proj - Update bundled projection code
-* docs/internal - Document how geomap draws shapes, the geomapgraphics widget and the reason shapeStyle is a method
-* docs/geomap - Use name instead of id for service objects
-* docs/geomap - Scale map according to cursor location instead of re-centering during double-click zoom
-* widgets - Verify that vars local to initial closure do not conflict when multiple maps are placed
-* geomap - auto-handle window resize events
+* docs/internal - document how geomap draws shapes, the geomapgraphics widget and the reason shapeStyle is a method
+* docs/geomap - [maybe] use name instead of id for service objects
+* geomap - rename service.visible to visibility having either "visible" or "hidden" values
 * geomap - port shape labels
+* geomap - label divs should have class="geo-label" & style="position: relative;"
 * geomap - find should check labels first
-* geomap - [BUG] Mouse wheel on bad or missing tile doesn't zoom out on first rotate
-* geomap - Document and implement service-level shapes
-* geomap - Document and implement passing a function to shapeStyle and append that returns a geomap style object based on feature or geometry properties
+* geomap - Add a resize method to let geomap know the div has changed size programatically
+* geo - implement $.geo.centroid
+** JTS note: "The centroid is equal to the centroid of the set of component Geometries of highest dimension (since the lower-dimension geometries contribute zero "weight" to the centroid)"
+* geo - Support WKT with $.geo.parseWKT & $.geo.textify
+* geomap - [bug] mouse wheel on bad or missing tile doesn't zoom out on first rotate
+* geomap - document and implement service-level shapes
+* geomap - service divs should have class="geo-service"
+* docs/geomap - store WKT input for each service
 * geographics - Rename the generated style properties to something simple or get better control over closure compiler
+* geomap - [maybe] document (make public) the refresh argument in append, add one to remove & empty
 * geomap - Document and implement find's callback syntax
+* geomap - repeat horizontal tiles
+* proj - take scale factor into account when calculating distance in web mercator
 * geographics - Disable fill by setting style.fill to "" & stroke by style.stroke to ""
 * graphics - See Modernizr for comment on BB Storm & canvas detection
 * geographics - Document graphics widget
 * geomap - [BUG] Android browser stops pan/zoom after 7 logos on logo demo
 * geomap - design how to store shapes as a hidden input
+* geomap - find - [maybe] after flatten, check more cached bboxes for non-Point geometries
+* docs/geomap - [maybe] add a method to update an existing shape if you change the shape's geometry externally
+
+== 2011-07-30 ==
+=== alpha 2.5 ===
+It's been too long since I had a chance to work on this and I want to get an alpha 2.5 release out.
+
+I need to push this back in an change my current branch name. I think it's alpha3 at the moment.
+
+=== jsperf ===
+I wrote a perf for point & linestring bbox cache testing. The test makes me think jQuery.data doesn't do what I think it's doing. When I cache the bbox in a local var, it's very fast but when I cache with data, it's not.
+
+* Here's the point test: http://jsperf.com/point-vs-bbox
+* Here's the line test: http://jsperf.com/line-vs-bbox
+
+It's always faster to test points by themselves, i.e., don't worry about checking for a cached the bbox.
+
+=== branch ===
+I was on master, so I pushed, then created & switched to alpha2-5.
+
+=== opacity ===
+When developing the heat map example, I remember running into an issue where I couldn't get the opaicty to look right between the border and center. Maybe I fixed it somewhere else because I can't seem to reproduce that.
+
+I can still get it on the latest fiddle of the heat map. It's when the opacity is 1 and the strokeOpacity is 0, the stroke still shows up but it should be hidden.
+
+I still can't recreate this on the shapeStyle test page :( Ah, but the twitter heat example has the issue.
+
+Turns out I was or'ing the stroke/fillOpacity with regular opacity in _getGraphicStyle. That's not the right place to do anything with them, and never or.
+
+=== service opacity ===
+I'm going to pull in the service opacity method from AppGeo.Web as "opacity" on each service object, like refresh.
+
+That's done. I haven't documented/implemented what happens if you don't pass a service id. It's required. I'm not sure what I want that to do yet.
+
+=== visible ===
+When starting to think about geomap.toggle, I realize I have a naming conflict so to speak. The service object has a boolean visible property while the shape style has a string visibility property. I think I want to change the service to match the shape style. I don't think there are any attributes in HTML that pertains to visibility so I'm going to match CSS even in the service object which is more internal and less graphical. That said, I don't want to start renaming things in alpha 2.5 so that'll wait until 3.
+
+SUGGESTION: Rename service.visible to visibility having either "visible" or "hidden" values
+
+=== service props ===
+So, I noticed that when a service is created, I don't modify the service objects to fill all the supported properties. So, when toggle is called, there's potentially not an initial visible property set.
+
+I think for now, alpha 2.5, I will have the toggle function assume that there could be an undefined service.visible. The refresh method does the same. Later, though I think I might want to set defaults during _createServices.
+
+=== proj ===
+New projection code seems to work and is awesomely 150 lines shorter!
+
+=== resize ===
+I'm going to hook into the window resize event automatically but I will still need a resize method later in case the dev changes the div size/css.
+
+SUGGESTION: Add a resize method to let geomap know the div has changed size programatically
+
+I'm not sure of the correct way to kill & remake graphics now that it's a jQuery UI widget. It appears that I can call distroy & re-create it.
+
+Resize, is working though when getting smaller, there is a space for the scroll bars. I don't remember having that issue with the internal AppGeo.Web control. That is an issue to tackle after alpha 2.5.
+
+=== dbl tap ===
+What is a thumb? On touch devices, and other soft-dblclick devices I don't take into account that the second click/tap might be too far from the first to count as a tap. There is no move event to cancel. I'm now calculating distance between the two based on _anchor (previous) and _current ( current :). This will need testing. I'm setting it at 10px for now, line 1480 of geomap.js as of this writing.
+
+== 2011-07-19 ==
+=== wkt ===
+Wrote up some to-WKT code for our internal control today. WKT will also be supported by parseWKT and textify methods in $.geo.
+
+SUGGESTION: Support WKT with $.geo.parseWKT (like JSON.parse or $.parseJSON) and $.geo.textify (like JSON.stringify).
+
+=== centroid ===
+Wrote up some centroid code for all but GeometryCollection as well for our internal control. Code similar to this will end up in $.geo.centroid.
+
+== 2011-07-15 ==
+=== presentation ===
+My first real talk about $.geo went well, I think. Next up is FOSS4G in September and, possibly, jQuery Conference Boston in October & Harvard WWW in December.
+
+=== alpha 2.5 ===
+I think I want to push out a bug-fix release of the alpha 2 tech. I'll tag it as alpha 2.5 in github but overwrite the alpha2 js file on host. Well, rename the old one as alpha2.0 in case people find a bug in the new one.
+
+I need to write down exactly what to do for alpha 2.5.
+
+=== shape images ===
+People really want images on shapes, particularly points. I'm removing this feature from my TO DO list:
+* geomap - Document and implement passing a function to shapeStyle and append that returns a geomap style object based on feature or geometry properties
+because I have a much better plan that involves the label div. It will be a normal div and have a class. Each will have relative position and designers can manipulate it however they want.
+
+== 2011-07-12 ==
+=== fiddles ===
+Some fiddles for my demo on Wednesday:
+
+# show a map:
+#* http://jsfiddle.net/ryanttb/A6avG/
+# show a map & zoom to boston
+#* http://jsfiddle.net/ryanttb/2qBgw/
+# show a map & zoom to geolocation
+#* http://jsfiddle.net/ryanttb/Pre4k/
+# add a location search
+#* http://jsfiddle.net/ryanttb/3LpqG/
+# add a twitter search: rpp=100
+#* http://jsfiddle.net/ryanttb/79zTk/
+# use map center as geocode, radius=(pixelSize * width/2 ) / 1000
+#* http://jsfiddle.net/ryanttb/2PCUu/
+# change style to heat map (16x16 size 8 border-radius)
+#* http://jsfiddle.net/ryanttb/PUeRc/
+# update on bboxchange
+#* http://jsfiddle.net/ryanttb/8LQLW/
+# show tweets in popup
+#* http://jsfiddle.net/ryanttb/y2gTh/
 
 == 2011-07-07 ==
 === bbox ===

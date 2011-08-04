@@ -8,11 +8,20 @@ Documentation is hosted at http://host.appgeo.com/libs/geo/
 
 == CHANGELOG ==
 
-=== Version alpha3 ===
+=== Version alpha2.5 ===
 * geomap - find - [bug] does not handle GeoJSON features
 * geomap - find - allow for 0 pixel tolerance
-* geomap - find - check for bbox on geometries before getting too specific
+* geomap - find - check for bbox on non-Point geometries before getting too specific
 * geo - bbox - cache shape bboxes
+* docs - do not suggest that it's ok to change the geometry now that we're caching bbox
+* geomap - jsperf test of bbox query vs. geom query on point data
+* geographics - [bug] 0 opacity acts as full opacity
+* geomap - add opacity to service type objects & call from geomap's opacity method
+* geomap - add toggle to service type objects & call from geomap's toggle method
+* geo.proj - update bundled web mercator projection code (removed 150 lines of code)
+* geomap - auto-handle window resize events
+* docs/geomap - scale map according to cursor location instead of re-centering during double-click zoom
+* geomap - iOS - [bug] second tap can be anywhere & cause a zoom
 
 === Version alpha2 ===
 * geomap - Support dynamic map services

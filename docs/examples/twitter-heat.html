@@ -1,0 +1,227 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Twitter Heat Map</title>
+  <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+  <meta name="description" content="A demo that continually searches Twitter based on location and draws the results as a heat map">
+  <meta name="author" content="Ryan Westphal">
+  <link rel="stylesheet" href="css/style.css" />
+  <style type="text/css">
+    #map
+    {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      top: 0;
+    }
+    #popup
+    {
+      background: #fff;
+      border: solid 1px #444;
+      border-radius: 8px;
+      display: none;
+      max-height: 50%;
+      padding: 4px;
+      position: absolute;
+      opacity: .6;
+      overflow: hidden;
+      width: 30%;
+    }
+    #popup p
+    {
+      border-top: 2px solid #444;
+    }
+    #popup p:first-child
+    {
+      border-top: none;
+    }
+    #content
+    {
+      background: #fefefe;
+      border: 2px solid #444;
+      border-radius: 8px;
+      padding: 4px;
+      position: relative;
+      width: 320px;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <div id="map">
+      <div id="popup">
+      </div>
+    </div>
+    <div id="content">
+      <form id="loc">
+      <label>
+        Zoom to
+        <input type="text" autofocus />
+      </label>
+      <button type="submit">
+        Go</button>
+      </form>
+      <form id="twit">
+      <label>
+        Search Twitter for
+        <input type="text" />
+      </label>
+      <button type="submit">
+        Go</button>
+      </form>
+    </div>
+    <div class="info">
+      <a href="../" class="docLink">&lt; docs</a>
+      <h1>
+        Twitter Heat Map</h1>
+      <p>
+        This demo continually searches Twitter based on location &amp; query and draws the results as a heat map.</p>
+      <p>
+        You can hover over data to read the tweets.</p>
+    </div>
+  </div>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+  <script src="http://host.appgeo.com/libs/geo/test/jquery-geo-test.min.js"></script>
+  <script>
+    $(function () {
+      var map,
+          searchTerm = "",
+          currentXhr = null;
+
+      function initMap(center) {
+        map = $("#map").geomap({
+          center: center || [-71.0597732, 42.3584308],
+          zoom: 14,
+          move: function (e, geo) {
+            $("#popup").hide().html("");
+            if (searchTerm) {
+              var features = map.geomap("find", geo, 3),
+            popupHtml = "",
+            i = 0;
+
+              for (; i < features.length; i++) {
+                popupHtml += "<p>" + features[i].properties.tweet + "</p>";
+              }
+              if (popupHtml) {
+                $("#popup").append(popupHtml).css({
+                  left: e.pageX,
+                  top: e.pageY
+                }).show();
+              }
+            }
+          }
+        });
+
+        map.geomap("shapeStyle", {
+          strokeOpacity: 0,
+          fillOpacity: .3,
+          width: "16px",
+          height: "16px",
+          borderRadius: "8px",
+          color: "#44e"
+        });
+      }
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (p) {
+          initMap([p.coords.longitude, p.coords.latitude]);
+        }, function (error) {
+          initMap();
+        });
+      } else {
+        initMap();
+      }
+
+      $("#loc").submit(function () {
+        $.ajax({
+          url: "http://open.mapquestapi.com/nominatim/v1/search",
+          data: {
+            format: "json",
+            q: $("#loc input").val()
+          },
+          dataType: "jsonp",
+          jsonp: "json_callback",
+          success: function (results) {
+            if (results && results.length > 0) {
+              var nbbox = results[0].boundingbox;
+              map.geomap("option", "bbox", [
+                nbbox[2], /* min longitude*/
+                nbbox[0], /* min latitude */
+                nbbox[3], /* max longitude */
+                nbbox[1]  /* max latitude */
+              ]);
+            }
+          }
+        });
+        return false;
+      });
+
+      $("#twit").submit(function () {
+        if (currentXhr) {
+          currentXhr.abort();
+          currentXhr = null;
+        }
+
+        map.geomap("empty");
+        searchTerm = $("#twit input").val();
+        autoSearch();
+        return false;
+      });
+
+      function search() {
+        var center = map.geomap("option", "center"),
+            geocode = [
+              center[1],
+              center[0],
+              Math.min(2500, map.geomap("getPixelSize") * $(document).width() / 2 / 1000) + "km"
+            ];
+
+        currentXhr = $.ajax({
+          url: "http://search.twitter.com/search.json",
+          data: {
+            rpp: 100,
+            q: searchTerm,
+            geocode: geocode.join(",")
+          },
+          dataType: "jsonp",
+          complete: function () {
+            currentXhr = null;
+          },
+          success: function (tweets) {
+            if (tweets.results) {
+              $.each(tweets.results, function () {
+                if (this.geo) {
+                  this.geo.coordinates = [
+                    this.geo.coordinates[1],
+                    this.geo.coordinates[0]
+                  ];
+
+                  if (map.geomap("find", this.geo, .01).length == 0) {
+                    var feature = {
+                      type: "Feature",
+                      geometry: this.geo,
+                      properties: {
+                        tweet: "<b>" + this.from_user + "</b>: " + this.text
+                      }
+                    };
+                    map.geomap("append", feature);
+                  }
+                }
+              });
+            }
+          }
+        });
+      }
+
+      function autoSearch() {
+        if (searchTerm) {
+          search();
+          setTimeout(autoSearch, 3000);
+        }
+      }
+    });  
+  </script>
+</body>
+</html>
