@@ -24,9 +24,15 @@
       <p>Our geospatial plugin's only widget is a geographic map that you can create on any div with a computable width and height.</p>
       <pre><code>&lt;div style=&quot;width: 640px; height: 480px;&quot;&gt;&lt;/div&gt;</code></pre>
       <p>If the div is not already in relative, absolute or fixed position, the widget will force relative positioning.</p>
+      <h2>fullscreen</h2>
       <p>The div size does not have to be so specific.</p>
       <pre><code>&lt;div style=&quot;position: fixed; top: 0; right: 0; bottom: 0; left: 0;&quot;&gt;&lt;/div&gt;</code></pre>
-      <p>With position set to either absolute or fixed and the top, right, bottom and left properties set, the map will follow the size of the window. It even recenters when the size of the window changes. If you want the map to fill the window, fixed position is preferred because it will not create scroll bars when making the window smaller. However, keep in mind that fixed position is not supported by IE6.</p>
+      <p>As in the above example, you can have the map fill the window by setting position to either absolute or fixed and the top, right, bottom and left properties to all zero. The map will follow the size of the window and recenter when the size of the window changes.</p>
+      <p>Fixed position is preferred because it will not create scroll bars when making the window smaller. However, keep in mind that fixed position is not supported by IE6 and can be odd on some mobile browsers. If you do use absolute position, you can set the overflow style property on the body element to hidden and avoid scroll bars.</p>
+      <pre><code>&lt;body style=&quot;overflow: hidden;&quot;&gt;
+  &lt;div style=&quot;position: absolute; top: 0; right: 0; bottom: 0; left: 0;&quot;&gt;&lt;/div&gt;
+&lt;/body&gt;</code></pre>
+      <h2>box model</h2>
       <p>The map supports divs that have padding, borders and margins. The plugin will create the map where text would normally go in such a situation, i.e., the map content will be inset from the border by the padding amount.</p>
       <pre><code>&lt;style&gt;
   #map {
@@ -41,19 +47,38 @@
 &lt;/style&gt;
 &lt;div id=&quot;map&quot;&gt;O HAI&lt;/div&gt;</code></pre>
       <div style="width: 90%; max-width: 640px; height: 128px; padding: 8px; border: solid 3px #444; margin: .5em; background: #ddf;">O HAI</div>
+      <h2>inner elements</h2>
       <p>Any elements inside the map div can be absolutely positioned and will not interfere with map operation. Map images will appear beneath them. This is useful if you want to layout a scale bar for example.</p>
       <pre><code>&lt;style&gt;
   #bar {
     position: absolute;
     top: 10px;
     right: 10px;
+    padding: 16px;
+    background: #ccc;
+    opacity: .8;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 10px;
+  }
+  #bar div {
     width: 96px;
     height: 2px;
+    margin-bottom: 8px;
     background: #444;
+    color: #444;
   }
 &lt;/style&gt;
-&lt;div id=&quot;map&quot;&gt;&lt;div id=&quot;bar&quot;&gt;&lt;/div&gt;&lt;/div&gt;</code></pre>
-      <div style="position: relative; width: 90%; max-width: 640px; height: 128px; padding: 8px; border: solid 3px #444; margin: .5em; background: #ddf;"><div style="position: absolute; top: 10px; right: 10px; width: 96px; height: 2px; background: #444;"></div></div>
+&lt;div id=&quot;map&quot;&gt;&lt;div id=&quot;bar&quot;&gt;&lt;div&gt;&lt;/div&gt;&lt;span&gt;1134 meters&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;</code></pre>
+      <div style="position: relative; width: 90%; max-width: 640px; height: 128px; padding: 8px; border: solid 3px #444; margin: .5em; background: #ddf;"><div style="position: absolute; top: 10px; right: 10px; padding: 16px; background: #ccc; opacity: .8; border-radius: 8px; text-align: center; font-size: 10px;"><div style="width: 96px; height: 2px; margin-bottom: 8px; background: #444; color: #444;"></div><span>1134 meters</span></div></div>
+      <p>This rather large scale bar will not interfere with a user trying to pan the map.</p>
+      <h2>mobile</h2>
+      <p>The geomap widget works on modern mobile browsers without any additional JavaScript development. However, some web design is necessary. For starters, as with any mobile development you should add a viewport meta tag into your head element. This should appear above most other tags so the mobile browser can get ready for a mobile page before doing any other work.</p>
+      <pre><code>&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, minimum-scale=1, maximum-scale=1&quot;&gt;</code></pre>
+      <p>If you have done any other mobile web developement, you're probably frowning at my decision to disable the default zoom capability of the device's web browser. If you haven't done much with mobile, I am disabling double-tap to zoom into a page by setting the min and max scale to 1.</p>
+      <p>In almost all other cases, I would agree that disabling browser zoom is a bad user experience, however for this example I am considering a full-screen mapping application. With that in mind, double-tap has a whole new meaning and users expect it to zoom the map itself, not the page. It is in this case only that I suggest you disable browser page zoom. If you are targeting modern mobile browsers such as iOS, Android, Windows Phone 7 or Opera Mobile, you can used fixed positioning and the HTML for the full screen mobile app would look like the first fullscreen example:</p>
+      <pre><code>&lt;div style=&quot;position: fixed; top: 0; right: 0; bottom: 0; left: 0;&quot;&gt;&lt;/div&gt;</code></pre>
+      <p>Other mobile browsers are currently untested.</p>
     </div>
   </div> <!-- end of #container -->
 </body>

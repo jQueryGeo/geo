@@ -94,9 +94,6 @@
         map = $("#map").geomap({
           center: center || [-71.0597732, 42.3584308],
           zoom: 14,
-          bboxchange: function () {
-            map.geomap("empty");
-          },
           move: function (e, geo) {
             $("#popup").hide().html("");
             if (searchTerm) {
