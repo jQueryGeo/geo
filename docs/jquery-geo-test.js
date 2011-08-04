@@ -2123,169 +2123,26 @@ $.Widget.prototype = {
     //
 
     proj: (function () {
-      // RW: This is a direct copy from our internal library and will be cleaned up later
-
-      var tPi = 6.2831853071795864769;
-      var hPi = 1.5707963267948966192;
-      var qPi = 0.7853981633974483096;
-      var radDeg = 0.0174532925199432958;
-      var degRad = 57.295779513082320877;
-      var fpm = 3.2808333333333333333;
-
-      function normalizeLon(lon) {
-        return lon > Math.PI ? lon -= tPi : lon < -Math.PI ? lon += tPi : lon;
-      }
-
-      this.CoordinateSystem = function (prj, fe, fn, upm) {
-        if (arguments.length < 2) {
-          fe = 0;
-        }
-        if (arguments.length < 3) {
-          fn = 0;
-        }
-        if (arguments.length < 4) {
-          upm = 1;
-        }
-
-        switch (upm) {
-          case "meters": upm = 1; break;
-          case "feet": upm = fpm; break;
-        }
-
-        this.toGeodetic = function (p) {
-          return prj.toGeodetic({ x: (p.x - fe) / upm, y: (p.y - fn) / upm });
-        };
-
-        this.toProjected = function (p) {
-          p = prj.toProjected(p);
-          return { x: p.x * upm + fe, y: p.y * upm + fn };
-        };
-      };
-
-      this.Mercator = function (cm, lts, sph) {
-        cm *= radDeg;
-        lts *= radDeg;
-
-        var es = sph.e * sph.e;
-        var sinLat = Math.sin(lts);
-        var sf = 1.0 / (Math.sqrt(1.0 - es * sinLat * sinLat) / Math.cos(lts));
-
-        var es2 = es * es;
-        var es3 = es2 * es;
-        var es4 = es3 * es;
-
-        var ab = es / 2.0 + 5.0 * es2 / 24.0 + es3 / 12.0 + 13.0 * es4 / 360.0;
-        var bb = 7.0 * es2 / 48.0 + 29.0 * es3 / 240.0 + 811.0 * es4 / 11520.0;
-        var cb = 7.0 * es3 / 120.0 + 81.0 * es4 / 1120.0;
-        var db = 4279.0 * es4 / 161280.0;
-
-        this.toGeodetic = function (p) {
-          var lon = normalizeLon(cm + p.x / (sf * sph.smaj));
-
-          var xphi = hPi - 2.0 * Math.atan(1.0 / Math.exp(p.y / (sf * sph.smaj)));
-          var lat = xphi + ab * Math.sin(2.0 * xphi) + bb * Math.sin(4.0 * xphi) + cb * Math.sin(6.0 * xphi) + db * Math.sin(8.0 * xphi);
-
-          return { x: lon * degRad, y: lat * degRad };
-        };
-
-        this.toProjected = function (p) {
-          var lat = p.y * radDeg;
-          var eSinLat = sph.e * Math.sin(lat);
-          var ctanz2 = Math.tan(Math.PI / 4.0 + lat / 2.0) * Math.pow(((1.0 - eSinLat) / (1.0 + eSinLat)), sph.e / 2.0);
-
-          var lon = normalizeLon(p.x * radDeg - cm);
-
-          return { x: sf * sph.smaj * lon, y: sf * sph.smaj * Math.log(ctanz2) };
-        };
-      };
-
-      this.Spheroid = function () {
-        switch (typeof (arguments[0])) {
-          case "number": this.smaj = arguments[0]; this.e = arguments[1]; break;
-
-          case "string":
-            switch (arguments[0]) {
-              case "WGS84Sphere": this.smaj = 6378137; this.e = 0.0; break;
-            }
-            break;
-        }
-
-        this.smin = this.smaj * Math.sqrt(1 - this.e * this.e);
-        var fl = (this.smaj - this.smin) / this.smaj;
-
-        this.distance = function (p0, p1, upm) {
-          if (arguments.length < 3) {
-            upm = 1;
-          }
-
-          switch (upm) {
-            case "meters": upm = 1; break;
-            case "feet": upm = fpm; break;
-          }
-
-          var lon1 = p0.x * radDeg;
-          var lat1 = p0.y * radDeg;
-          var lon2 = p1.x * radDeg;
-          var lat2 = p1.y * radDeg;
-
-          var f = (lat1 + lat2) * 0.5;
-          var g = (lat1 - lat2) * 0.5;
-          var l = (lon1 - lon2) * 0.5;
-
-          var sf2 = Math.sin(f);
-          sf2 *= sf2;
-          var cf2 = Math.cos(f);
-          cf2 *= cf2;
-          var sg2 = Math.sin(g);
-          sg2 *= sg2;
-          var cg2 = Math.cos(g);
-          cg2 *= cg2;
-          var sl2 = Math.sin(l);
-          sl2 *= sl2;
-          var cl2 = Math.cos(l);
-          cl2 *= cl2;
-
-          var s = (sg2 * cl2) + (cf2 * sl2);
-          var c = (cg2 * cl2) + (sf2 * sl2);
-
-          var omega = Math.atan(Math.sqrt(s / c));
-          var rho = Math.sqrt(s * c) / omega;
-
-          var d = 2 * this.smaj * omega;
-          var h1 = ((3 * rho) - 1) / (2 * c);
-          var h2 = ((3 * rho) + 1) / (2 * s);
-
-          return d * (1 + (fl * ((h1 * sf2 * cg2) - (h2 * cf2 * sg2)))) * upm;
-        };
-      };
-
-
-
-
-
-      var webMercator = new Mercator(0, 0, new Spheroid("WGS84Sphere"));
-
-
-
-
-
-
-
-
-
+      var halfPi = 1.5707963267948966192,
+          quarterPi = 0.7853981633974483096,
+          radiansPerDegree = 0.0174532925199432958,
+          degreesPerRadian = 57.295779513082320877,
+          semiMajorAxis = 6378137;
+      
       return {
         fromGeodeticPos: function (coordinate) {
-          var cur = webMercator.toProjected({ x: coordinate[0], y: coordinate[1] });
-          return [cur.x, cur.y];
+          return [
+            semiMajorAxis * coordinate[0] * radiansPerDegree,
+            semiMajorAxis * Math.log(Math.tan(quarterPi + coordinate[1] * radiansPerDegree / 2))
+          ];
         },
 
         fromGeodetic: function (coordinates) {
-          var 
-          isArray = $.isArray(coordinates[0]),
-          isDblArray = isArray && $.isArray(coordinates[0][0]),
-          isTriArray = isDblArray && $.isArray(coordinates[0][0][0]),
-          result = [[[]]],
-          fromGeodeticPos = this.fromGeodeticPos;
+          var isArray = $.isArray(coordinates[0]),
+              isDblArray = isArray && $.isArray(coordinates[0][0]),
+              isTriArray = isDblArray && $.isArray(coordinates[0][0][0]),
+              result = [[[]]],
+              fromGeodeticPos = this.fromGeodeticPos;
 
           if (!isTriArray) {
             if (!isDblArray) {
@@ -2309,17 +2166,18 @@ $.Widget.prototype = {
         },
 
         toGeodeticPos: function (coordinate) {
-          var cur = webMercator.toGeodetic({ x: coordinate[0], y: coordinate[1] });
-          return [cur.x, cur.y];
+          return [
+            (coordinate[0] / semiMajorAxis) * degreesPerRadian,
+            (halfPi - 2 * Math.atan(1 / Math.exp(coordinate[1] / semiMajorAxis))) * degreesPerRadian
+          ];
         },
 
         toGeodetic: function (coordinates) {
-          var 
-          isArray = $.isArray(coordinates[0]),
-          isDblArray = isArray && $.isArray(coordinates[0][0]),
-          isTriArray = isDblArray && $.isArray(coordinates[0][0][0]),
-          result = [[[]]],
-          toGeodeticPos = this.toGeodeticPos;
+          var isArray = $.isArray(coordinates[0]),
+              isDblArray = isArray && $.isArray(coordinates[0][0]),
+              isTriArray = isDblArray && $.isArray(coordinates[0][0][0]),
+              result = [[[]]],
+              toGeodeticPos = this.toGeodeticPos;
 
           if (!isTriArray) {
             if (!isDblArray) {
@@ -2433,7 +2291,7 @@ $.Widget.prototype = {
     drawArc: function (coordinates, startAngle, sweepAngle, style) {
       style = this._getGraphicStyle(style);
 
-      if (style.visibility != "hidden" && style.widthValue > 0 && style.heightValue > 0) {
+      if (style.visibility != "hidden" && style.opacity > 0 && style.widthValue > 0 && style.heightValue > 0) {
         var r = Math.min(style.widthValue, style.heightValue) / 2;
 
         startAngle = (startAngle * Math.PI / 180);
@@ -2476,37 +2334,37 @@ $.Widget.prototype = {
     },
 
     drawPoint: function (coordinates, style) {
-      var graphicStyle = this._getGraphicStyle(style);
-      if (graphicStyle.widthValue == graphicStyle.heightValue && graphicStyle.heightValue == graphicStyle.borderRadiusValue) {
+      var style = this._getGraphicStyle(style);
+      if (style.widthValue == style.heightValue && style.heightValue == style.borderRadiusValue) {
         this.drawArc(coordinates, 0, 360, style);
-      } else if (graphicStyle.visibility != "hidden") {
-        graphicStyle.borderRadiusValue = Math.min(Math.min(graphicStyle.widthValue, graphicStyle.heightValue) / 2, graphicStyle.borderRadiusValue);
-        coordinates[0] -= graphicStyle.widthValue / 2;
-        coordinates[1] -= graphicStyle.heightValue / 2;
+      } else if (style.visibility != "hidden" && style.opacity > 0) {
+        style.borderRadiusValue = Math.min(Math.min(style.widthValue, style.heightValue) / 2, style.borderRadiusValue);
+        coordinates[0] -= style.widthValue / 2;
+        coordinates[1] -= style.heightValue / 2;
         _context.beginPath();
-        _context.moveTo(coordinates[0] + graphicStyle.borderRadiusValue, coordinates[1]);
-        _context.lineTo(coordinates[0] + graphicStyle.widthValue - graphicStyle.borderRadiusValue, coordinates[1]);
-        _context.quadraticCurveTo(coordinates[0] + graphicStyle.widthValue, coordinates[1], coordinates[0] + graphicStyle.widthValue, coordinates[1] + graphicStyle.borderRadiusValue);
-        _context.lineTo(coordinates[0] + graphicStyle.widthValue, coordinates[1] + graphicStyle.heightValue - graphicStyle.borderRadiusValue);
-        _context.quadraticCurveTo(coordinates[0] + graphicStyle.widthValue, coordinates[1] + graphicStyle.heightValue, coordinates[0] + graphicStyle.widthValue - graphicStyle.borderRadiusValue, coordinates[1] + graphicStyle.heightValue);
-        _context.lineTo(coordinates[0] + graphicStyle.borderRadiusValue, coordinates[1] + graphicStyle.heightValue);
-        _context.quadraticCurveTo(coordinates[0], coordinates[1] + graphicStyle.heightValue, coordinates[0], coordinates[1] + graphicStyle.heightValue - graphicStyle.borderRadiusValue);
-        _context.lineTo(coordinates[0], coordinates[1] + graphicStyle.borderRadiusValue);
-        _context.quadraticCurveTo(coordinates[0], coordinates[1], coordinates[0] + graphicStyle.borderRadiusValue, coordinates[1]);
+        _context.moveTo(coordinates[0] + style.borderRadiusValue, coordinates[1]);
+        _context.lineTo(coordinates[0] + style.widthValue - style.borderRadiusValue, coordinates[1]);
+        _context.quadraticCurveTo(coordinates[0] + style.widthValue, coordinates[1], coordinates[0] + style.widthValue, coordinates[1] + style.borderRadiusValue);
+        _context.lineTo(coordinates[0] + style.widthValue, coordinates[1] + style.heightValue - style.borderRadiusValue);
+        _context.quadraticCurveTo(coordinates[0] + style.widthValue, coordinates[1] + style.heightValue, coordinates[0] + style.widthValue - style.borderRadiusValue, coordinates[1] + style.heightValue);
+        _context.lineTo(coordinates[0] + style.borderRadiusValue, coordinates[1] + style.heightValue);
+        _context.quadraticCurveTo(coordinates[0], coordinates[1] + style.heightValue, coordinates[0], coordinates[1] + style.heightValue - style.borderRadiusValue);
+        _context.lineTo(coordinates[0], coordinates[1] + style.borderRadiusValue);
+        _context.quadraticCurveTo(coordinates[0], coordinates[1], coordinates[0] + style.borderRadiusValue, coordinates[1]);
         _context.closePath();
 
-        if (graphicStyle.doFill) {
-          _context.fillStyle = graphicStyle.fill;
-          _context.globalAlpha = graphicStyle.opacity * graphicStyle.fillOpacity;
+        if (style.doFill) {
+          _context.fillStyle = style.fill;
+          _context.globalAlpha = style.opacity * style.fillOpacity;
           _context.fill();
         }
 
-        if (graphicStyle.doStroke) {
+        if (style.doStroke) {
           _context.lineJoin = "round";
-          _context.lineWidth = graphicStyle.strokeWidthValue;
-          _context.strokeStyle = graphicStyle.stroke;
+          _context.lineWidth = style.strokeWidthValue;
+          _context.strokeStyle = style.stroke;
 
-          _context.globalAlpha = graphicStyle.opacity * graphicStyle.strokeOpacity;
+          _context.globalAlpha = style.opacity * style.strokeOpacity;
 
           _context.stroke();
         }
@@ -2540,10 +2398,8 @@ $.Widget.prototype = {
       style = $.extend({}, _options.style, style);
       style.borderRadiusValue = safeParse(style.borderRadius);
       style.fill = style.fill || style.color;
-      style.fillOpacity = style.fillOpacity || style.opacity;
       style.doFill = style.fill && style.fillOpacity > 0;
       style.stroke = style.stroke || style.color;
-      style.strokeOpacity = style.strokeOpacity || style.opacity;
       style.strokeWidthValue = safeParse(style.strokeWidth);
       style.doStroke = style.stroke && style.strokeOpacity > 0 && style.strokeWidthValue > 0;
       style.widthValue = safeParse(style.width);
@@ -2556,11 +2412,10 @@ $.Widget.prototype = {
         return;
       }
 
-      var 
-      style = this._getGraphicStyle(style),
-      i, j;
+      var style = this._getGraphicStyle(style),
+          i, j;
 
-      if (style.visibility != "hidden") {
+      if (style.visibility != "hidden" && style.opacity > 0) {
         _context.beginPath();
         _context.moveTo(coordinates[0][0][0], coordinates[0][0][1]);
 
@@ -2639,6 +2494,8 @@ $.Widget.prototype = {
   _clickDate,
   _lastMove,
   _lastDrag,
+
+  _timeoutResize = null,
 
   _panning,
   _velocity,
@@ -2908,51 +2765,50 @@ $.Widget.prototype = {
             if (service && tiledServicesState[service.id] && (service.visible === undefined || service.visible)) {
               this._cancelUnloaded(map, service);
 
-              var 
-              bbox = map._getBbox(),
-              pixelSize = _pixelSize,
+              var bbox = map._getBbox(),
+                  pixelSize = _pixelSize,
 
-              serviceState = tiledServicesState[service.id],
-              serviceContainer = serviceState.serviceContainer,
+                  serviceState = tiledServicesState[service.id],
+                  $serviceContainer = serviceState.serviceContainer,
 
-              mapWidth = _contentBounds["width"],
-              mapHeight = _contentBounds["height"],
+                  mapWidth = _contentBounds["width"],
+                  mapHeight = _contentBounds["height"],
 
-              tilingScheme = map.options["tilingScheme"],
-              tileWidth = tilingScheme.tileWidth,
-              tileHeight = tilingScheme.tileHeight,
+                  tilingScheme = map.options["tilingScheme"],
+                  tileWidth = tilingScheme.tileWidth,
+                  tileHeight = tilingScheme.tileHeight,
 
-              tileX = Math.floor((bbox[0] - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
-              tileY = Math.floor((tilingScheme.origin[1] - bbox[3]) / (pixelSize * tileHeight)),
-              tileX2 = Math.ceil((bbox[2] - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
-              tileY2 = Math.ceil((tilingScheme.origin[1] - bbox[1]) / (pixelSize * tileHeight)),
+                  tileX = Math.floor((bbox[0] - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
+                  tileY = Math.floor((tilingScheme.origin[1] - bbox[3]) / (pixelSize * tileHeight)),
+                  tileX2 = Math.ceil((bbox[2] - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
+                  tileY2 = Math.ceil((tilingScheme.origin[1] - bbox[1]) / (pixelSize * tileHeight)),
 
-              bboxMax = map._getBboxMax(),
-              pixelSizeAtZero = map._getTiledPixelSize(0),
-              ratio = pixelSizeAtZero / pixelSize,
-              fullXAtScale = Math.floor((bboxMax[0] - tilingScheme.origin[0]) / (pixelSizeAtZero * tileWidth)) * ratio,
-              fullYAtScale = Math.floor((tilingScheme.origin[1] - bboxMax[3]) / (pixelSizeAtZero * tileHeight)) * ratio,
+                  bboxMax = map._getBboxMax(),
+                  pixelSizeAtZero = map._getTiledPixelSize(0),
+                  ratio = pixelSizeAtZero / pixelSize,
+                  fullXAtScale = Math.floor((bboxMax[0] - tilingScheme.origin[0]) / (pixelSizeAtZero * tileWidth)) * ratio,
+                  fullYAtScale = Math.floor((tilingScheme.origin[1] - bboxMax[3]) / (pixelSizeAtZero * tileHeight)) * ratio,
 
-              fullXMinX = tilingScheme.origin[0] + (fullXAtScale * tileWidth) * pixelSize,
-              fullYMaxY = tilingScheme.origin[1] - (fullYAtScale * tileHeight) * pixelSize,
+                  fullXMinX = tilingScheme.origin[0] + (fullXAtScale * tileWidth) * pixelSize,
+                  fullYMaxY = tilingScheme.origin[1] - (fullYAtScale * tileHeight) * pixelSize,
 
-              serviceLeft = Math.round((fullXMinX - bbox[0]) / pixelSize),
-              serviceTop = Math.round((bbox[3] - fullYMaxY) / pixelSize),
+                  serviceLeft = Math.round((fullXMinX - bbox[0]) / pixelSize),
+                  serviceTop = Math.round((bbox[3] - fullYMaxY) / pixelSize),
 
-              scaleContainers = serviceContainer.children().show(),
-              scaleContainer = scaleContainers.filter("[data-pixelSize='" + pixelSize + "']").appendTo(serviceContainer),
+                  scaleContainers = $serviceContainer.children().show(),
+                  scaleContainer = scaleContainers.filter("[data-pixelSize='" + pixelSize + "']").appendTo($serviceContainer),
 
-              opacity = (service.opacity === undefined ? 1 : service.opacity),
+                  opacity = (service.opacity === undefined ? 1 : service.opacity),
 
-              x, y;
+                  x, y;
 
               if (serviceState.reloadTiles) {
                 scaleContainers.find("img").attr("data-dirty", "true");
               }
 
               if (!scaleContainer.size()) {
-                serviceContainer.append("<div style='position:absolute; left:" + serviceLeft % tileWidth + "px; top:" + serviceTop % tileHeight + "px; width:" + tileWidth + "px; height:" + tileHeight + "px; margin:0; padding:0;' data-pixelSize='" + pixelSize + "'></div>");
-                scaleContainer = serviceContainer.children(":last").data("scaleOrigin", (serviceLeft % tileWidth) + "," + (serviceTop % tileHeight));
+                $serviceContainer.append("<div style='position:absolute; left:" + serviceLeft % tileWidth + "px; top:" + serviceTop % tileHeight + "px; width:" + tileWidth + "px; height:" + tileHeight + "px; margin:0; padding:0;' data-pixelSize='" + pixelSize + "'></div>");
+                scaleContainer = $serviceContainer.children(":last").data("scaleOrigin", (serviceLeft % tileWidth) + "," + (serviceTop % tileHeight));
               } else {
                 scaleContainer.css({
                   left: (serviceLeft % tileWidth) + "px",
@@ -3034,7 +2890,7 @@ $.Widget.prototype = {
                         serviceState.loadCount--;
 
                         if (serviceState.loadCount <= 0) {
-                          serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+                          $serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
                           serviceState.loadCount = 0;
                         }
                       }).error(function (e) {
@@ -3042,7 +2898,7 @@ $.Widget.prototype = {
                         serviceState.loadCount--;
 
                         if (serviceState.loadCount <= 0) {
-                          serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+                          $serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
                           serviceState.loadCount = 0;
                         }
                       }).attr("src", imageUrl);
@@ -3054,6 +2910,18 @@ $.Widget.prototype = {
               scaleContainers.find("[data-dirty]").remove();
               serviceState.reloadTiles = false;
             }
+          },
+
+          opacity: function (map, service) {
+            // service.opacity has changed, update any existing images
+            var serviceState = tiledServicesState[service.id];
+            serviceState.serviceContainer.find("img").stop(true).fadeTo("fast", service.opacity);
+          },
+
+          toggle: function (map, service) {
+            // service.visible has changed, update our service container
+            var serviceState = tiledServicesState[service.id];
+            serviceState.serviceContainer.css("display", service.visible ? "block" : "none");
           },
 
           _cancelUnloaded: function (map, service) {
@@ -3255,6 +3123,12 @@ $.Widget.prototype = {
             }
           },
 
+          opacity: function (map, service) {
+            // service.opacity has changed, update any existing images
+            var serviceState = shingledServicesState[service.id];
+            serviceState.serviceContainer.find("img").stop(true).fadeTo("fast", service.opacity);
+          },
+
           _cancelUnloaded: function (map, service) {
             var serviceState = shingledServicesState[service.id];
 
@@ -3297,24 +3171,24 @@ $.Widget.prototype = {
         _pixelSize = _pixelSizeMax = 156543.03392799936;
 
         _mouseDown =
-        _inOp =
-        _toolPan =
-        _shiftZoom =
-        _panning =
-        _isTap =
-        _isDbltap = false;
+          _inOp =
+          _toolPan =
+          _shiftZoom =
+          _panning =
+          _isTap =
+          _isDbltap = false;
 
         _anchor =
-        _current =
-        _lastMove =
-        _lastDrag =
-        _velocity = [0, 0];
+          _current =
+          _lastMove =
+          _lastDrag =
+          _velocity = [0, 0];
 
         _friction = [.8, .8];
 
         _downDate =
-        _moveDate =
-        _clickDate = 0;
+          _moveDate =
+          _clickDate = 0;
 
         $.Widget.prototype._createWidget.apply(this, arguments);
       },
@@ -3325,10 +3199,9 @@ $.Widget.prototype = {
         _supportTouch = "ontouchend" in document;
         _softDblClick = _supportTouch || _ieVersion == 7;
 
-        var 
-        touchStartEvent = _supportTouch ? "touchstart" : "mousedown",
-    	  touchStopEvent = _supportTouch ? "touchend touchcancel" : "mouseup",
-    	  touchMoveEvent = _supportTouch ? "touchmove" : "mousemove";
+        var touchStartEvent = _supportTouch ? "touchstart" : "mousedown",
+            touchStopEvent = _supportTouch ? "touchend touchcancel" : "mouseup",
+            touchMoveEvent = _supportTouch ? "touchmove" : "mousemove";
 
         _$eventTarget.dblclick($.proxy(this._eventTarget_dblclick, this));
         _$eventTarget.bind(touchStartEvent, $.proxy(this._eventTarget_touchstart, this));
@@ -3338,6 +3211,16 @@ $.Widget.prototype = {
         dragTarget.bind(touchStopEvent, $.proxy(this._dragTarget_touchstop, this));
 
         _$eventTarget.mousewheel($.proxy(this._eventTarget_mousewheel, this));
+
+        $(window).resize(function() {
+          if (_timeoutResize) {
+            clearTimeout(_timeoutResize);
+          }
+          _timeoutResize = setTimeout(function() {
+            _$elem.geomap("resize");
+          }, 500);
+
+        });
 
         _$shapesContainer.geographics();
 
@@ -3421,20 +3304,67 @@ $.Widget.prototype = {
 
       opacity: function (serviceId, value) {
         if (value >= 0 || value <= 1) {
-          var geomap = this;
-          $.each(_currentServices, function () {
-            if (this.id == serviceId) {
-              this.opacity = value;
-              geomap._createServices();
-              geomap._refresh();
-              return false;
+          for (var i = 0; i < _options["services"].length; i++) {
+            var service = _options["services"][i];
+            if (service.id == serviceId) {
+              service.opacity = value;
+              _options["_serviceTypes"][service.type].opacity(this, service);
+              break;
             }
-          });
+          }
+        }
+      },
+
+      toggle: function (serviceId, value) {
+        for (var i = 0; i < _options["services"].length; i++) {
+          var service = _options["services"][i];
+          if (service.id == serviceId) {
+            if (value === undefined) {
+              value = (service.visible === undefined ? false : !service.visible);
+            }
+
+            service.visible = value;
+            _options["_serviceTypes"][service.type].toggle(this, service);
+          }
         }
       },
 
       refresh: function () {
         this._refresh();
+      },
+
+      resize: function() {
+        var size = this._findMapSize();
+        _contentBounds = {
+          x: parseInt(_$elem.css("padding-left")),
+          y: parseInt(_$elem.css("padding-top")),
+          width: size["width"],
+          height: size["height"]
+        };
+
+        _$contentFrame.css({
+          width: size["width"],
+          height: size["height"]
+        });
+
+        _$servicesContainer.css({
+          width: size["width"],
+          height: size["height"]
+        });
+
+        _$eventTarget.css({
+          width: size["width"],
+          height: size["height"]
+        });
+
+        _$shapesContainer.geographics("destroy");
+        _$shapesContainer.css({
+          width: size.width,
+          height: size.height
+        });
+        _$shapesContainer.geographics();
+
+        this._setCenterAndSize(_center, _pixelSize, false, true);
       },
 
       shapeStyle: function (style) {
@@ -3482,24 +3412,30 @@ $.Widget.prototype = {
             curGeom;
 
         $.each(_graphicShapes, function (i) {
-          var bbox = $.geo._bbox(this.shape),
-              bboxPolygon = {
-                type: "Polygon",
-                coordinates: [[
-                  [bbox[0], bbox[1]],
-                  [bbox[0], bbox[3]],
-                  [bbox[2], bbox[3]],
-                  [bbox[2], bbox[1]],
-                  [bbox[0], bbox[1]]
-                ]]
-              };
+          if (this.shape.type == "Point") {
+            if ($.geo._distance(this.shape, point) <= mapTol) {
+              result.push(this.shape);
+            }
+          } else {
+            var bbox = $.geo._bbox(this.shape),
+                bboxPolygon = {
+                  type: "Polygon",
+                  coordinates: [[
+                    [bbox[0], bbox[1]],
+                    [bbox[0], bbox[3]],
+                    [bbox[2], bbox[3]],
+                    [bbox[2], bbox[1]],
+                    [bbox[0], bbox[1]]
+                  ]]
+                };
 
-          if ($.geo._distance(bboxPolygon, point) <= mapTol) {
-            var geometries = $.geo._flatten(this.shape);
-            for (curGeom = 0; curGeom < geometries.length; curGeom++) {
-              if ($.geo._distance(geometries[curGeom], point) <= mapTol) {
-                result.push(this.shape);
-                break;
+            if ($.geo._distance(bboxPolygon, point) <= mapTol) {
+              var geometries = $.geo._flatten(this.shape);
+              for (curGeom = 0; curGeom < geometries.length; curGeom++) {
+                if ($.geo._distance(geometries[curGeom], point) <= mapTol) {
+                  result.push(this.shape);
+                  break;
+                }
               }
             }
           }
@@ -3722,19 +3658,19 @@ $.Widget.prototype = {
         }
       },
 
-      _getWheelCenterAndSize: function () {
+      _getZoomCenterAndSize: function (anchor, zoomDelta, zoomFactor) {
         var pixelSize, zoomLevel, scale;
         if (_options["tilingScheme"]) {
-          zoomLevel = this._getTiledZoom(_pixelSize) + _wheelLevel;
+          zoomLevel = this._getTiledZoom(_pixelSize) + zoomDelta;
           pixelSize = this._getTiledPixelSize(zoomLevel);
         } else {
-          scale = Math.pow(_wheelZoomFactor, -_wheelLevel);
+          scale = Math.pow(zoomFactor, -zoomDelta);
           pixelSize = _pixelSize * scale;
         }
 
         var 
         ratio = pixelSize / _pixelSize,
-        anchorMapCoord = this._toMap(_anchor),
+        anchorMapCoord = this._toMap(anchor),
         centerDelta = [(_center[0] - anchorMapCoord[0]) * ratio, (_center[1] - anchorMapCoord[1]) * ratio],
         scaleCenter = [anchorMapCoord[0] + centerDelta[0], anchorMapCoord[1] + centerDelta[1]];
 
@@ -3745,7 +3681,7 @@ $.Widget.prototype = {
         _wheelTimer = null;
 
         if (_wheelLevel != 0) {
-          var wheelCenterAndSize = this._getWheelCenterAndSize();
+          var wheelCenterAndSize = this._getZoomCenterAndSize(_anchor, _wheelLevel, _wheelZoomFactor);
 
           _wheelLevel = 0;
 
@@ -3968,7 +3904,9 @@ $.Widget.prototype = {
           case "pan":
             this._trigger("dblclick", e, { type: "Point", coordinates: this.toMap(_current) });
             if (!e.isDefaultPrevented()) {
-              this._zoomTo(this._toMap(_current), this._getZoom() + 1, true, true);
+              var centerAndSize = this._getZoomCenterAndSize(_current, 1, _zoomFactor);
+              this._setCenterAndSize(centerAndSize.center, centerAndSize.pixelSize, true, true);
+              //this._zoomTo(this._toMap(_current), this._getZoom() + 1, true, true);
             }
             break;
         }
@@ -3981,9 +3919,26 @@ $.Widget.prototype = {
           return;
         }
 
+        var offset = $(e.currentTarget).offset();
+
+        if (_supportTouch) {
+          _current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
+        } else {
+          _current = [e.pageX - offset.left, e.pageY - offset.top];
+        }
+
         if (_softDblClick) {
           var downDate = $.now();
           if (downDate - _downDate < 750) {
+            if (_isTap) {
+              var dx = _current[0] - _anchor[0],
+                  dy = _current[1] - _anchor[1],
+                  distance = Math.sqrt((dx * dx) + (dy * dy));
+              if (distance > 10) {
+                _isTap = false;
+              }
+            }
+
             if (_isDbltap) {
               _isDbltap = false;
             } else {
@@ -4000,14 +3955,6 @@ $.Widget.prototype = {
 
         this._panFinalize();
         this._mouseWheelFinish();
-
-        var offset = $(e.currentTarget).offset();
-
-        if (_supportTouch) {
-          _current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
-        } else {
-          _current = [e.pageX - offset.left, e.pageY - offset.top];
-        }
 
         _mouseDown = true;
         _anchor = _current;
@@ -4150,7 +4097,7 @@ $.Widget.prototype = {
 
           _wheelLevel += delta;
 
-          var wheelCenterAndSize = this._getWheelCenterAndSize();
+          var wheelCenterAndSize = this._getZoomCenterAndSize(_anchor, _wheelLevel, _wheelZoomFactor);
 
           _$shapesContainer.geographics("clear");
 

@@ -86,7 +86,7 @@
     drawArc: function (coordinates, startAngle, sweepAngle, style) {
       style = this._getGraphicStyle(style);
 
-      if (style.visibility != "hidden" && style.widthValue > 0 && style.heightValue > 0) {
+      if (style.visibility != "hidden" && style.opacity > 0 && style.widthValue > 0 && style.heightValue > 0) {
         var r = Math.min(style.widthValue, style.heightValue) / 2;
 
         startAngle = (startAngle * Math.PI / 180);
@@ -129,37 +129,37 @@
     },
 
     drawPoint: function (coordinates, style) {
-      var graphicStyle = this._getGraphicStyle(style);
-      if (graphicStyle.widthValue == graphicStyle.heightValue && graphicStyle.heightValue == graphicStyle.borderRadiusValue) {
+      var style = this._getGraphicStyle(style);
+      if (style.widthValue == style.heightValue && style.heightValue == style.borderRadiusValue) {
         this.drawArc(coordinates, 0, 360, style);
-      } else if (graphicStyle.visibility != "hidden") {
-        graphicStyle.borderRadiusValue = Math.min(Math.min(graphicStyle.widthValue, graphicStyle.heightValue) / 2, graphicStyle.borderRadiusValue);
-        coordinates[0] -= graphicStyle.widthValue / 2;
-        coordinates[1] -= graphicStyle.heightValue / 2;
+      } else if (style.visibility != "hidden" && style.opacity > 0) {
+        style.borderRadiusValue = Math.min(Math.min(style.widthValue, style.heightValue) / 2, style.borderRadiusValue);
+        coordinates[0] -= style.widthValue / 2;
+        coordinates[1] -= style.heightValue / 2;
         _context.beginPath();
-        _context.moveTo(coordinates[0] + graphicStyle.borderRadiusValue, coordinates[1]);
-        _context.lineTo(coordinates[0] + graphicStyle.widthValue - graphicStyle.borderRadiusValue, coordinates[1]);
-        _context.quadraticCurveTo(coordinates[0] + graphicStyle.widthValue, coordinates[1], coordinates[0] + graphicStyle.widthValue, coordinates[1] + graphicStyle.borderRadiusValue);
-        _context.lineTo(coordinates[0] + graphicStyle.widthValue, coordinates[1] + graphicStyle.heightValue - graphicStyle.borderRadiusValue);
-        _context.quadraticCurveTo(coordinates[0] + graphicStyle.widthValue, coordinates[1] + graphicStyle.heightValue, coordinates[0] + graphicStyle.widthValue - graphicStyle.borderRadiusValue, coordinates[1] + graphicStyle.heightValue);
-        _context.lineTo(coordinates[0] + graphicStyle.borderRadiusValue, coordinates[1] + graphicStyle.heightValue);
-        _context.quadraticCurveTo(coordinates[0], coordinates[1] + graphicStyle.heightValue, coordinates[0], coordinates[1] + graphicStyle.heightValue - graphicStyle.borderRadiusValue);
-        _context.lineTo(coordinates[0], coordinates[1] + graphicStyle.borderRadiusValue);
-        _context.quadraticCurveTo(coordinates[0], coordinates[1], coordinates[0] + graphicStyle.borderRadiusValue, coordinates[1]);
+        _context.moveTo(coordinates[0] + style.borderRadiusValue, coordinates[1]);
+        _context.lineTo(coordinates[0] + style.widthValue - style.borderRadiusValue, coordinates[1]);
+        _context.quadraticCurveTo(coordinates[0] + style.widthValue, coordinates[1], coordinates[0] + style.widthValue, coordinates[1] + style.borderRadiusValue);
+        _context.lineTo(coordinates[0] + style.widthValue, coordinates[1] + style.heightValue - style.borderRadiusValue);
+        _context.quadraticCurveTo(coordinates[0] + style.widthValue, coordinates[1] + style.heightValue, coordinates[0] + style.widthValue - style.borderRadiusValue, coordinates[1] + style.heightValue);
+        _context.lineTo(coordinates[0] + style.borderRadiusValue, coordinates[1] + style.heightValue);
+        _context.quadraticCurveTo(coordinates[0], coordinates[1] + style.heightValue, coordinates[0], coordinates[1] + style.heightValue - style.borderRadiusValue);
+        _context.lineTo(coordinates[0], coordinates[1] + style.borderRadiusValue);
+        _context.quadraticCurveTo(coordinates[0], coordinates[1], coordinates[0] + style.borderRadiusValue, coordinates[1]);
         _context.closePath();
 
-        if (graphicStyle.doFill) {
-          _context.fillStyle = graphicStyle.fill;
-          _context.globalAlpha = graphicStyle.opacity * graphicStyle.fillOpacity;
+        if (style.doFill) {
+          _context.fillStyle = style.fill;
+          _context.globalAlpha = style.opacity * style.fillOpacity;
           _context.fill();
         }
 
-        if (graphicStyle.doStroke) {
+        if (style.doStroke) {
           _context.lineJoin = "round";
-          _context.lineWidth = graphicStyle.strokeWidthValue;
-          _context.strokeStyle = graphicStyle.stroke;
+          _context.lineWidth = style.strokeWidthValue;
+          _context.strokeStyle = style.stroke;
 
-          _context.globalAlpha = graphicStyle.opacity * graphicStyle.strokeOpacity;
+          _context.globalAlpha = style.opacity * style.strokeOpacity;
 
           _context.stroke();
         }
@@ -193,10 +193,8 @@
       style = $.extend({}, _options.style, style);
       style.borderRadiusValue = safeParse(style.borderRadius);
       style.fill = style.fill || style.color;
-      style.fillOpacity = style.fillOpacity || style.opacity;
       style.doFill = style.fill && style.fillOpacity > 0;
       style.stroke = style.stroke || style.color;
-      style.strokeOpacity = style.strokeOpacity || style.opacity;
       style.strokeWidthValue = safeParse(style.strokeWidth);
       style.doStroke = style.stroke && style.strokeOpacity > 0 && style.strokeWidthValue > 0;
       style.widthValue = safeParse(style.width);
@@ -209,11 +207,10 @@
         return;
       }
 
-      var 
-      style = this._getGraphicStyle(style),
-      i, j;
+      var style = this._getGraphicStyle(style),
+          i, j;
 
-      if (style.visibility != "hidden") {
+      if (style.visibility != "hidden" && style.opacity > 0) {
         _context.beginPath();
         _context.moveTo(coordinates[0][0][0], coordinates[0][0][1]);
 

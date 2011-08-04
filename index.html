@@ -1,0 +1,150 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>$.geo</title>
+  <meta name="description" content="$.geo - A spatial mapping plugin for jQuery" />
+  <meta name="author" content="Ryan Westphal" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="shortcut icon" href="http://host.appgeo.com/libs/geo/alpha2/favicon.ico" />
+  <link rel="apple-touch-icon" href="http://host.appgeo.com/libs/geo/alpha2/apple-touch-icon.png" />
+  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/themes/blitzer/jquery-ui.css" />
+  <style type="text/css">
+    html { font:13px/1.231 sans-serif; *font-size:small; }
+    
+    body, h1 { margin: 0; padding: 0; }
+    
+    body, select, input, textarea
+    {
+      color: #444;
+    }
+    
+    .geomap
+    {
+      background: #444;
+      bottom: 0;
+      left: 0;
+      position: fixed;
+      right: 0;
+      top: 0;
+    }
+    
+    .container
+    {
+      position: relative;
+      margin: 32px auto;
+      width: 80%;
+    }
+    
+    .nav
+    {
+      float: right;
+    }
+    
+    .header
+    {
+      margin: 32px 0 0 10%;
+    }
+    
+    .header img
+    {
+      height: 64px;
+      width: 64px;
+      vertical-align: bottom;
+    }
+    
+    .header h1
+    {
+      display: inline-block;
+    }
+    
+    .header h1 .framework
+    {
+      color: #fff;
+      font-size: 32px;
+    }
+    
+    .header h1 .subtitle
+    {
+      color: #f40000;
+      display: block;
+      font-size: 14px;
+      font-style: italic;
+      margin-left: 48px;
+    }
+    
+    h2 { margin-bottom: 8px; }
+
+    time
+    {
+      font-size: 8pt;
+      font-style: italic;
+      margin: 2px;
+    }
+
+    .main
+    {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 2px 2px #555;
+      margin-top: 128px;
+      padding: 32px;
+    }
+  </style>
+</head>
+<body>
+  <div class="geomap">
+    <div class="header">
+      <img src="http://host.appgeo.com/libs/geo/alpha2/images/$.geo-logo-large.png" alt="" />
+      <h1><span class="framework">jQuery</span><span class="subtitle">geospatial mapping</span></h1>
+    </div>
+  </div>
+  <div class="container">
+    <div class="main" role="main">
+      <div class="nav">
+        <a href="http://host.appgeo.com/libs/geo/alpha2/" title="Documentation and demos">Documentation &amp; Demos</a>
+        <a href="https://github.com/AppGeo/geo/" title="Source code on GitHub">GitHub Project</a>
+      </div>
+      <h2>$.geo - an interactive mapping plugin</h2>
+      <p>Pronounced &quot;geo&quot; or &quot;jQuery geo&quot;, this open-source project from Applied Geographics provides a streamlined API for a large percentage of your online mapping needs. Whether you just want to display a map on a wep page as quickly as possible or you are a more advanced GIS user, $.geo can help!</p>
+      <h2>Alpha 2.5 Released!</h2>
+      <time>2011-08-02</time>
+      <p>$.geo 1.0 Alpha 2.5 improves support for shape searches, shape drawing, projection and map interaction!</p>
+      <p>There are also a few new demos to play with that include drawing a full GeoJSON FeatureCollection of the United States and searching Twitter for geo-enabled tweets.</p>
+      <h2>Download</h2>
+      <p>Using $.geo requires adding one element, including one script (apart from jQuery itself) and calling one function. The following copy-and-paste snippet will help you get started.</p>
+      <pre>&lt;div id=&quot;mapdiv&quot; style=&quot;height: 320px;&quot;&gt;&lt;/div&gt;
+&lt;script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"&gt;&lt;/script&gt;
+&lt;script src="http://host.appgeo.com/libs/geo/alpha2/jquery-geo-alpha2.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;$(function() { $("#mapdiv").geomap(); });&lt;/script&gt;</pre>
+      <h2>Edge</h2>
+      <p>
+        The links above will always point to the latest stable release. However, you can test the most recently committed docs, code &amp; demos by heading over to the test release.</p>
+      <a data-role="button" href="test/" title="$.geo test build">Test docs &amp; demos</a>
+    </div>
+  </div>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="http://host.appgeo.com/libs/geo/alpha2/jquery-geo-alpha2.min.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      var map = $(".geomap").geomap({
+        center: [-71.0595678, 42.3604823],
+        zoom: 6
+      });
+      map.geomap("opacity", "OSM", .5);
+
+      $(".nav").buttonset();
+      $("a").filter("[data-role='button']").button();
+    });
+  </script>
+  <script type="text/javascript">
+    var _gaq = [['_setAccount', 'UA-18348536-1'], ['_trackPageview']];
+    (function (d, t) {
+      var g = d.createElement(t), s = d.getElementsByTagName(t)[0]; g.async = 1;
+      g.src = ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+      s.parentNode.insertBefore(g, s);
+    } (document, 'script'));
+  </script>
+</body>
+</html>

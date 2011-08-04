@@ -8,7 +8,7 @@
   <meta name="author" content="Ryan Westphal">
   <link rel="stylesheet" href="css/style.css" />
   <style type="text/css">
-    #map { position: absolute; left: 0; top: 0; right: 0; bottom: 0; }
+    #map { position: fixed; left: 0; top: 0; right: 0; bottom: 0; }
   </style>
 </head>
 <body>
@@ -35,13 +35,9 @@
         click: function (e, geo) {
           var state = map.geomap("find", geo, 0);
           if (state && state.length > 0) {
-            var r = Math.floor(Math.random() * 256),
-                g = Math.floor(Math.random() * 256),
-                b = Math.floor(Math.random() * 256);
-
             map.geomap("remove", state[0]);
             map.geomap("append", state[0], {
-              color: "rgb(" + r + "," + g + "," + b + ")"
+              color: "#" + Math.round(0xffffff * Math.random()).toString(16)
             });
           }
         }
