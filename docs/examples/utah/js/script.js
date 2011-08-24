@@ -39,7 +39,7 @@ $(function () {
     if (addressParts.length >= 2) {
       address = address.replace(addressParts[addressParts.length - 1], "").replace(",", "");
       $.ajax({
-        url: "http://mapserv.utah.gov/wsut/Geocode.svc/sgid45/street(" + $.trim(address) + ")zone(" + $.trim(addressParts[addressParts.length - 1]) + ")",
+        url: "http://mapserv.utah.gov/wsut/Geocode.svc/appgeo/street(" + $.trim(address) + ")zone(" + $.trim(addressParts[addressParts.length - 1]) + ")",
         dataType: "jsonp",
         success: function (result) {
           $("#map").geomap("option", {
