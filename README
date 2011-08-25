@@ -8,6 +8,10 @@ Documentation is hosted at http://host.appgeo.com/libs/geo/
 
 == CHANGELOG ==
 
+=== Version alpha3 ===
+* docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon
+* geomap - [bug] tiles do not show when pixel sizes are near or lower than 1.0
+
 === Version alpha2.5 ===
 * geomap - find - [bug] does not handle GeoJSON features
 * geomap - find - allow for 0 pixel tolerance

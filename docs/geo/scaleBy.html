@@ -1,0 +1,44 @@
+<!doctype html>  
+
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>scaleBy | $.geo</title>
+  <meta name="description" content="$.geo scaleBy method">
+  <meta name="author" content="Ryan Westphal">
+</head>
+
+<body>
+
+  <div id="scaleBy" data-role="page" data-theme="b">
+    <div data-role="header">
+      <h1>scaleBy</h1>
+    </div>
+    
+    <div data-role="content">
+      <table>
+        <tr>
+          <th>return type</th>
+          <td>Array ( <a href="http://geojson.org/geojson-spec.html#bounding-boxes">GeoJSON bounding box</a> )</td>
+        </tr>
+        <tr>
+          <th>syntax</th>
+          <td>$.geo.scaleBy( Array bbox ( <a href="http://geojson.org/geojson-spec.html#bounding-boxes">GeoJSON bounding box</a> ), Number scale )</td>
+        </tr>
+        <tr>
+          <th>usage</th>
+          <td><pre><code>var twiceAsBig = $.geo.scaleBy( bbox, 2 )</pre></code></td>
+        </tr>
+      </table>
+      <p>The scaleBy method creates a new bbox with the same center as the original but having a width and height that are both multiplied by the scale argument.</p>
+      <p>The scale argument is a percentage increase/decrease in that supplying 2 will increase the size of the bbox by 200% and .5 will decrease the size of the bbox to half its original size.</p>
+      <p>The scale argument must be greater than zero.</p>
+      <p>If $.geo.proj is not null, this method first calls fromGeodetic on the incoming bbox and toGeodetic on the return value.</p>
+      <p>This function is not defined in JTS.</p>
+    </div>
+  </div> <!-- end of #container -->
+</body>
+</html>
+

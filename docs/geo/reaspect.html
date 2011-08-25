@@ -1,0 +1,43 @@
+<!doctype html>  
+
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>reaspect | $.geo</title>
+  <meta name="description" content="$.geo reaspect method">
+  <meta name="author" content="Ryan Westphal">
+</head>
+
+<body>
+
+  <div id="reaspect" data-role="page" data-theme="b">
+    <div data-role="header">
+      <h1>reaspect</h1>
+    </div>
+    
+    <div data-role="content">
+      <table>
+        <tr>
+          <th>return type</th>
+          <td>Array ( <a href="http://geojson.org/geojson-spec.html#bounding-boxes">GeoJSON bounding box</a> ) </td>
+        </tr>
+        <tr>
+          <th>syntax</th>
+          <td>$.geo.reaspect( Array bbox ( <a href="http://geojson.org/geojson-spec.html#bounding-boxes">GeoJSON bounding box</a> ), Number ratio )</td>
+        </tr>
+        <tr>
+          <th>usage</th>
+          <td><pre><code>var widescreenBbox = $.geo.reaspect( bbox, 16 / 9 )</pre></code></td>
+        </tr>
+      </table>
+      <p>The reaspect method creates a new bbox with the same center as the original but forcing the ratio of width to height to a specific value.</p>
+      <p>If the original width is greater than the original height (think a landscape printout) then the width of the new bbox will be the same as the original but the new height will change to fit the ratio. If the original height is greater than the original width (think a portrait printout) then the new bbox height will remain unchanged but the width will to fit the ratio.</p>
+      <p>If $.geo.proj is not null, this method first calls fromGeodetic on the incoming bbox and toGeodetic on the return value.</p>
+      <p>This function is not defined in JTS.</p>
+    </div>
+  </div> <!-- end of #container -->
+</body>
+</html>
+

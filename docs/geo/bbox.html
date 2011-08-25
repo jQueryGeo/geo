@@ -1,0 +1,64 @@
+<!doctype html>  
+
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>bbox | $.geo</title>
+  <meta name="description" content="$.geo bbox method">
+  <meta name="author" content="Ryan Westphal">
+</head>
+
+<body>
+
+  <div id="bbox" data-role="page" data-theme="b">
+    <div data-role="header">
+      <h1>bbox</h1>
+    </div>
+    
+    <div data-role="content">
+      <table>
+        <tr>
+          <th>return type</th>
+          <td>Array ( <a href="http://geojson.org/geojson-spec.html#bounding-boxes">GeoJSON bounding box</a> )</td>
+        </tr>
+        <tr>
+          <th>syntax</th>
+          <td>$.geo.bbox( Object shape ( <a href="http://geojson.org/geojson-spec.html" rel="external">GeoJSON object</a> ) )</td>
+        </tr>
+        <tr>
+          <th>usage</th>
+          <td><pre><code>var bbox = $.geo.bbox( {
+  type: &quot;LineString&quot;, coordinates: [
+    [ -71, 40 ], [ -70.5, 41 ]
+  ]
+} )</pre></code></td>
+        </tr>
+      </table>
+      <p>The bbox method calculates the smallest box that will contain all the positions in the passed-in shape. The shape can be any GeoJSON geometry object from Point to GeometryCollection.</p>
+      <p>The GeoJSON spec allows for each geometry type to have a bbox property. The $.geo.bbox method will honor that property and assume it is accurate. It will return the value of that property before attempting to calculate the bbox itself. If you wish to force $.geo to calculate the bbox, you will have to manually delete the bbox property from the geometry object.</p>
+      <pre><code>var shape = {
+  type: &quot;LineString&quot;, coordinates: [
+    [ -71, 40 ], [ -70.5, 41 ]
+  ],
+  bbox: [ -71, 40, -70.5, 41 ]
+};
+var bboxFromProperty = $.geo.bbox(shape);
+delete shape.bbox;
+var calculatedBbox = $.geo.bbox(shape);
+</code></pre>
+      <p>When $.geo does calculate a bbox, it will cache the result for faster access next time. Continuing from the above code, the next time we call bbox we will get the cached value.</p>
+      <pre><code><span class="comment">// a calculated bbox is cached by $.geo,</span>
+<span class="comment">// but the property will not be automatically added</span>
+<span class="comment">// back to the shape object ($.geo doesn't modify your objects)</span>
+var cachedBbox = $.geo.bbox(shape);</pre></code>
+      <p>Keep this in mind for the uncommon situation where you want to change an object's specific coordinates directly (or geometries if you're working with the bbox of a GeometryCollection) rather than replace the whole object. In this case, you should remove the cached bbox. $.geo caches the bbox using jQuery's data function under the name geoBbox. To remove this cache, you can call removeData directly on the shape object:</p>
+      <pre><code>$.removeData(shape, &quot;geoBbox&quot;);</code></pre>
+      <p>$.geo.bbox is projection agnostic which means it never calls the from/toGeodetic methods in $.geo.proj as the algorithm is the same regardless. The return bbox will be in the same units as your shape argument.</p>
+      <p>This function is similar to Geometry.getEnvelope in JTS.</p>
+     </div>
+  </div> <!-- end of #container -->
+</body>
+</html>
+

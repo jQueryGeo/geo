@@ -63,6 +63,35 @@ $('map').geomap( {
   services: [ /* service object that supports MA State Plane */ ]
 } );</code></pre>
       <p>Implementing custom from/to GeodeticPos functions is <i>currently</i> beyond the scope of this documentation but I assure you it involves using <a href="http://proj4js.org/" rel=external>Proj4js</a>.</p>
+      <h2>geometry operations</h2>
+      <p>Geometry isn't much fun if you can't do anything with it. These functions help you analyze and manipulate bboxes and GeoJSON geometry objects. You call them directly from the $.geo namespace, e.g.,</p>
+      <pre><code>$.geo.distance(point1, point2)</code></pre>
+
+      <p>Except for a few name changes and switching from an object-oriented API to a function-based one, $.geo attempts to follow the names and behavior of the <a href="http://www.vividsolutions.com/jts/jtshome.htm">Java Topology Suite</a> (JTS), the de-facto standard for geometry library APIs. JTS itself is an implementation of the <a href="http://www.opengis.org/techno/specs.htm">OGC Simple Features</a> specification but has made design decisions that improve the API for developers. The most notable of which is having Envelope (called bbox in $.geo and GeoJSON) be its own class type.</p>
+      <h3>bbox functions</h3>
+      <p>These functions operate on <a href="http://geojson.org/geojson-spec.html#bounding-boxes">GeoJSON bounding box</a> array, i.e., a JavaScript array having four values:</p>
+      <ul>
+        <li>minimum x/longitude</li>
+        <li>minimum y/latitude</li>
+        <li>maximum x/longitude</li>
+        <li>maximum y/latitude</li>
+      </ul>
+      <ul data-role="listview" data-inset="true">
+        <li><a href="center.html">center</a></li>
+        <li><a href="height.html">height</a></li>
+        <li><a href="width.html">width</a></li>
+        <li><a href="expandBy.html">expandBy</a></li>
+        <li><a href="scaleBy.html">scaleBy</a></li>
+        <li><a href="reaspect.html">reaspect</a></li>
+      </ul>
+      <h3>geometry object functions</h3>
+      <p>These functions operate on <a href="http://geojson.org/geojson-spec.html" rel="external">GeoJSON geometry objects</a>: Point, LineString, Polygon, the Multi* variants and GeometryCollection. They do not operate on Feature or FeatureCollection objects, you have to call these methods on the geometry properties of Feature objects.</p>
+      <p>The geometry functions allow you to analyze relationships between geometries such as their distance apart as well as obtain information about them such as bounding box and center point, called the centroid. This section will eventually expand to cover all of the important spatial operations available in the <a href="http://www.vividsolutions.com/jts/jtshome.htm">Java Topology Suite</a>.</p>
+      <ul data-role="listview" data-inset="true">
+        <li><a href="bbox.html">bbox</a></li>
+        <li><a href="distance.html">distance</a></li>
+        <li><a href="contains.html">contains</a></li>
+      </ul>
     </div>
   </div> <!-- end of #container -->
 
