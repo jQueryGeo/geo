@@ -48,14 +48,12 @@ var bboxFromProperty = $.geo.bbox(shape);
 delete shape.bbox;
 var calculatedBbox = $.geo.bbox(shape);
 </code></pre>
-      <p>When $.geo does calculate a bbox, it will cache the result for faster access next time. Continuing from the above code, the next time we call bbox we will get the cached value.</p>
-      <pre><code><span class="comment">// a calculated bbox is cached by $.geo,</span>
-<span class="comment">// but the property will not be automatically added</span>
-<span class="comment">// back to the shape object ($.geo doesn't modify your objects)</span>
-var cachedBbox = $.geo.bbox(shape);</pre></code>
-      <p>Keep this in mind for the uncommon situation where you want to change an object's specific coordinates directly (or geometries if you're working with the bbox of a GeometryCollection) rather than replace the whole object. In this case, you should remove the cached bbox. $.geo caches the bbox using jQuery's data function under the name geoBbox. To remove this cache, you can call removeData directly on the shape object:</p>
-      <pre><code>$.removeData(shape, &quot;geoBbox&quot;);</code></pre>
-      <p>$.geo.bbox is projection agnostic which means it never calls the from/toGeodetic methods in $.geo.proj as the algorithm is the same regardless. The return bbox will be in the same units as your shape argument.</p>
+      <p>To calculate an accurate bbox, this method must operate in non-geodetic coordinates. 
+        Therefore, if $.geo.proj is not null, this method first calls fromGeodetic on the incoming shape and toGeodetic on the positions in the returned bbox.</p>
+      <p>Due to the liberties taken by web mercator to display a round Earth on a single 
+        flat plane, when working in geodetic (lon/lat) coordinates, the result of the 
+        $.geo.bbox function may not be exactly what you expect based on your input 
+        geodetic geometry.</p>
       <p>This function is similar to Geometry.getEnvelope in JTS.</p>
      </div>
   </div> <!-- end of #container -->

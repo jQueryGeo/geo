@@ -1190,10 +1190,10 @@
       _getTiledZoom: function (pixelSize) {
         var tilingScheme = _options["tilingScheme"];
         if (tilingScheme.pixelSizes != null) {
-          var roundedPixelSize = Math.round(pixelSize),
+          var roundedPixelSize = Math.floor(pixelSize * 1000),
           levels = tilingScheme.pixelSizes != null ? tilingScheme.pixelSizes.length : tilingScheme.levels;
           for (var i = levels - 1; i >= 0; i--) {
-            if (Math.round(tilingScheme.pixelSizes[i]) >= roundedPixelSize) {
+            if (Math.floor(tilingScheme.pixelSizes[i] * 1000) >= roundedPixelSize) {
               return i;
             }
           }

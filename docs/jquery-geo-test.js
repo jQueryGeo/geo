@@ -1847,8 +1847,7 @@ $.Widget.prototype = {
     },
 
     _expandBy: function (bbox, dx, dy) {
-      var c = this._center(bbox);
-      return [c[0] - dx, c[1] - dy, c[0] + dx, c[1] + dy];
+      return [bbox[0] - dx, bbox[1] - dy, bbox[2] + dx, bbox[3] + dy];
     },
 
     _height: function (bbox) {
@@ -1879,7 +1878,10 @@ $.Widget.prototype = {
 
     _scaleBy: function (bbox, scale) {
       // not in JTS
-      return this._expandBy(bbox, this._width(bbox) * scale / 2, this._height(bbox) * scale / 2);
+      var c = this._center(bbox),
+          dx = (bbox[2] - bbox[0]) * scale / 2,
+          dy = (bbox[3] - bbox[1]) * scale / 2;
+      return [c[0] - dx, c[1] - dy, c[0] + dx, c[1] + dy];
     },
 
     _width: function (bbox) {
@@ -1893,10 +1895,10 @@ $.Widget.prototype = {
     // bbox (Geometry.getEnvelope in JTS)
 
     _bbox: function (geom) {
-      var result = $(geom).data("bbox");
+      var result = $.data(geom, "geoBbox");
       if (!result) {
         if (geom.bbox) {
-          $(geom).data("bbox", (result = geom.bbox));
+          $.data(geom, "geoBbox", (result = geom.bbox));
         } else {
           result = [pos_oo, pos_oo, neg_oo, neg_oo];
 
@@ -1910,7 +1912,7 @@ $.Widget.prototype = {
             result[3] = Math.max(coordinates[curCoord][1], result[3]);
           }
 
-          $(geom).data("bbox", result);
+          $.data(geom, "geoBbox", result);
         }
       }
       return result;
@@ -3645,10 +3647,10 @@ $.Widget.prototype = {
       _getTiledZoom: function (pixelSize) {
         var tilingScheme = _options["tilingScheme"];
         if (tilingScheme.pixelSizes != null) {
-          var roundedPixelSize = Math.round(pixelSize),
+          var roundedPixelSize = Math.floor(pixelSize * 1000),
           levels = tilingScheme.pixelSizes != null ? tilingScheme.pixelSizes.length : tilingScheme.levels;
           for (var i = levels - 1; i >= 0; i--) {
-            if (Math.round(tilingScheme.pixelSizes[i]) >= roundedPixelSize) {
+            if (Math.floor(tilingScheme.pixelSizes[i] * 1000) >= roundedPixelSize) {
               return i;
             }
           }

@@ -1,0 +1,59 @@
+<!doctype html>  
+
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>centroid | $.geo</title>
+  <meta name="description" content="$.geo centroid method">
+  <meta name="author" content="Ryan Westphal">
+</head>
+
+<body>
+
+  <div id="centroid" data-role="page" data-theme="b">
+    <div data-role="header">
+      <h1>centroid</h1>
+    </div>
+    
+    <div data-role="content">
+      <table>
+        <tr>
+          <th>return type</th>
+          <td>Object ( <a href="http://geojson.org/geojson-spec.html#point">GeoJSON Point</a> )</td>
+        </tr>
+        <tr>
+          <th>syntax</th>
+          <td>$.geo.centroid( Object shape ( <a href="http://geojson.org/geojson-spec.html" rel="external">GeoJSON object</a> ) )</td>
+        </tr>
+        <tr>
+          <th>usage</th>
+          <td><pre><code>var centroid = $.geo.centroid( {
+      type: &quot;Polygon&quot;,
+      coordinates: [[
+        [-75, 39.7],
+        [-74.8, 39.3],
+        [-75.2, 39.3],
+        [-75, 39.7]
+      ]]
+} )</pre></code></td>
+        </tr>
+      </table>
+      <p>The centroid method calculates the center of mass for the passed-in shape. The shape can be any GeoJSON geometry object from Point to GeometryCollection.</p>
+      <p>Technically, only polygons can be considered to have mass. However, a centroid 
+        can be calculated for any geometry type. This method operates on LineStrings as 
+        if they were closed polygons and the centroid will likely not lie along the 
+        line.</p>
+      <p>With GeometryCollections containing multiple geometry types, the centroid of 
+        the geometries of highest dimension will be returned. In other words, one 
+        Polygon will override any number of LineStrings in the collection and the 
+        centroid will simply be the centroid of that Polygon.</p>
+      <p>To calculate an accurate centroid, this method must operate in non-geodetic coordinates. 
+        Therefore, if $.geo.proj is not null, this method first calls fromGeodetic on the incoming shape and toGeodetic on the return point.</p>
+      <p>This function is similar to Geometry.getCentroid in JTS.</p>
+     </div>
+  </div> <!-- end of #container -->
+</body>
+</html>
+

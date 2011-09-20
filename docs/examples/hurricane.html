@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+
+    <title>hurricane</title>
+    <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+
+    <meta name="description" content="Displaying storm activity in the Atlantic">
+    <meta name="author" content="Ryan Westphal">
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <style type="text/css">
+      #map
+      {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: 0;
+      }
+      #popup
+      {
+        background: #fff;
+        border: solid 1px #444;
+        border-radius: 8px;
+        display: none;
+        padding: 4px;
+        position: absolute;
+        opacity: .6;
+        overflow: hidden;
+        width: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="hurricane">
+      <div id="map" style="position: fixed; left: 0; top: 0; right: 0; bottom: 0;">
+        <div class="info">
+          <a href="../" class="docLink">&lt; docs</a>
+            <h1>Hurricane tracking</h1>
+            <p>Displaying a snapshot of storm data extracted from <a href="http://stormpulse.com">stormpulse.com</a></p>
+        </div>
+        <div id="popup">
+        </div>
+      </div>
+    </div>
+    <script id="tmplHurricane" type="text/x-jquery-tmpl">
+      <h2>${category}</h2>
+      <table>
+        <tr><th>date</th><td>${date}</td></tr>
+        <tr><th>accuracy</th><td>${accuracy}/40</td></tr>
+        <tr><th>eye diameter</th><td>${eyeDiameter}</td></tr>
+        <tr><th>direction</th><td>{{if direction}}${direction}&deg;{{/if}}</td></tr>
+        <tr><th>pressure</th><td>${pressure}</td></tr>
+        <tr><th>wind radii</th><td>${windRadii}</td></tr>
+        <tr><th>wind speed</th><td>${windSpeed}</td></tr>
+        <tr><th>gusts</th><td>${gusts}</td></tr>
+      </table>
+    </script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+    <script src="http://host.appgeo.com/libs/geo/test/jquery-geo-test.min.js"></script>
+    <script>
+      $(function () {
+        $("#tmplHurricane").template("hurricane");
+
+        var map = $("#map").geomap({
+            center: [-76.6, 30.4],
+            zoom: 5,
+            move: function (e, geo) {
+              $("#popup").hide().html("");
+              var tracks = map.geomap("find", geo, 4);
+
+              $.each(tracks, function() {
+                if (this.type == "Feature") {
+                  $.tmpl("hurricane", this.properties).appendTo("#popup");
+                  $("#popup").css({
+                    left: e.pageX,
+                    top: e.pageY
+                  }).css("display", "inline-block");
+                }
+              });
+            }
+          });
+
+        $.ajax({
+          url: "http://host.appgeo.com/libs/geo/data/hurricane.txt",
+          dataType: "json",
+          success: function (result) {
+            var shapeStyle = {
+              color: "gray",
+              strokeWidth: "4px"
+            };
+
+            $.each(result.stormData.storms.tracks[0].track, function(i) {
+              var trackPoint = {
+                type: "Feature",
+                geometry: {
+                  type: "Point",
+                  coordinates: [
+                    parseFloat(this[16]),
+                    parseFloat(this[7])
+                  ]
+                },
+                properties: {
+                  eyeDiameter: this[0],
+                  windRadii: this[1],
+                  category: this[4],
+                  accuracy: this[10] || 0,
+                  direction: this[11],
+                  pressure: this[14],
+                  date: this[15],
+                  gusts: this[17],
+                  windSpeed: this[18]
+                }
+              };
+
+              //console.log("accuracy: " + trackPoint.properties.accuracy);
+              if (trackPoint.properties.date != null) {
+                var dateStr = trackPoint.properties.date.toString(),
+                    year = dateStr.substr(0, 4),
+                    month = dateStr.substr(4, 2),
+                    day = dateStr.substr(6);
+                trackPoint.properties.date = year + "-" + month + "-" + day;
+              }
+
+              switch (trackPoint.properties.category) {
+                case "Tropical Storm":
+                  shapeStyle.color = "#eee";
+                  break;
+
+                case "Hurricane - Category 1":
+                  shapeStyle.color = "#ff8";
+                  break;
+
+                case "Hurricane - Category 2":
+                  shapeStyle.color = "orange";
+                  break;
+
+                case "Major Hurricane - Category 3":
+                  shapeStyle.color = "#f88";
+                  break;
+
+                default:
+                  shapeStyle.color = "gray";
+                  break;
+              }
+
+              if (trackPoint.properties.accuracy != null) {
+                var pos = trackPoint.geometry.coordinates,
+                    a = .2 + (40 - trackPoint.properties.accuracy)/40;
+
+                shapeStyle.strokeOpacity = trackPoint.properties.accuracy/40;
+
+                map.geomap("append", {
+                  type: "Polygon",
+                  coordinates: [[
+                    [pos[0] - a, pos[1] - a],
+                    [pos[0] - a, pos[1] + a],
+                    [pos[0] + a, pos[1] + a],
+                    [pos[0] + a, pos[1] - a],
+                    [pos[0] - a, pos[1] - a]
+                  ]]
+                }, $.extend({}, shapeStyle));
+              }
+
+              map.geomap("append", trackPoint, { color: "#444" });
+            });
+          },
+          error: function (xhr) {
+            alert("Sorry, we were unable to read the storm data.");
+          }
+        });
+      });  
+    </script>
+  </body>
+</html>
+

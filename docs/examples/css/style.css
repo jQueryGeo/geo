@@ -24,7 +24,7 @@
   max-width: 45%;
   opacity: .8;
   padding: 8px;
-  position: absolute;
+  position: absolute !important;
   right: 16px;
   top: 16px;
 }
