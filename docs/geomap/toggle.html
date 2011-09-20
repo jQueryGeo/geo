@@ -36,7 +36,7 @@ $(&quot;map&quot;).geomap( &quot;toggle&quot;, &quot;OSM&quot;, true )</code></p
       </table>
       <p>This convenience method toggles or sets the visible property of the requested service's object in the services array.</p>
       <p>If the optional boolean value is not supplied, the visibility of the service will be toggled.</p>
-      <p>It will then refresh the map.</p>
+      <p>The change will happen immediately and you do not need to call refresh. This is recommended over manually changing the visible property of the service object as it does not cause other services to refresh.</p>
     </div>
   </div> <!-- end of #container -->
 </body>

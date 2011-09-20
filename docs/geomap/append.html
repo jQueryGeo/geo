@@ -25,19 +25,44 @@
         </tr>
         <tr>
           <th>syntax</th>
-          <td>.geomap( &quot;append&quot; <!--[ , String serviceId ]--> , Object shape ( <a href="http://geojson.org/geojson-spec.html" rel="external">GeoJSON object</a> ) [ , Object style ( geomap style ) ] )</td>
+          <td>.geomap( &quot;append&quot; <!--[ , String serviceId ]--> , Object shape ( <a href="http://geojson.org/geojson-spec.html" rel="external">GeoJSON object</a> ) [ , Object style ( geomap style ) ] [ , Boolean refresh ] )</td>
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>$(&quot;map&quot;).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] } )
-$(&quot;map&quot;).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, { stroke: &quot;#11117f&quot;, strokeWidth: &quot;3px&quot; } )</code></pre></td>
+          <td><pre><code>$(&quot;#map&quot;).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] } )
+$(&quot;#map&quot;).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, false )
+$(&quot;#map&quot;).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, { stroke: &quot;#11117f&quot;, strokeWidth: &quot;3px&quot; } )
+$(&quot;#map&quot;).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, { stroke: &quot;#11117f&quot;, strokeWidth: &quot;3px&quot; }, false )</code></pre></td>
         </tr>
       </table>
-      <p>The append method adds a shape to the map and then redraws the map. In this documentation the word shape means a GeoJSON geometry object, GeoJSON feature or GeoJSON feature collection. Each feature in a FeatureCollection's features property is added as a separate shape whereas the other collection geometry types, e.g., MultiPoint, are added as a single shape. This is important distinction when considering the find method in that find can potentially return only one shape of a FeatureCollection but will return all shapes in a MultiPoint if only one intersects the find position.</p>
-      <p>The geomap widget maintains a reference to your shape. It will not change the object in any way. You can use the same object in calls to remove to remove the shape from the map at any time. Changing the type of geometry, e.g., from Point to LineString, or coordinates of a shape is not recommended and geomap's behavior is currently undefined. You should first call remove on the original object and append on a new one.</p>
+      <p>The append method adds a shape to the map. In this documentation the word shape means a GeoJSON geometry object, GeoJSON feature or GeoJSON feature collection. Each feature in a FeatureCollection's features property is added as a separate shape whereas the other collection geometry types, e.g., MultiPoint, are added as a single shape. This is important distinction when considering the find method in that find can potentially return only one shape of a FeatureCollection but will return all shapes in a MultiPoint (as a reference to the original MultiPoint object supplied to append) even if only one intersects the find position.</p>
+      <p>The geomap widget maintains a reference to your shape. It will not change the object in any way. You can use the same object in calls to remove in order to remove the shape from the map at any time. Changing the type of geometry, e.g., from Point to LineString, or coordinates of a shape you have appended is not recommended and geomap's behavior is currently undefined. If you wish to do either of these, you should first call remove on the original object and append on a new one.</p>
+      <p>The following odd example will move the first coordinate of any clicked LineString 10 meters to the left. Notice it first removes the shape, then updates the first coordinate and finally appends the new shape.</p>
+      <pre><code>var map = $(&quot;#map&quot;).geomap( {
+  click: function(e, geo) {
+    <span class="comment">// find any shapes within 4 pixels of the clicked point</span>
+    var shapes = map.geomap(&quot;find&quot;, geo, 4);
+    if (shapes.length &gt; 0 &amp;&amp; shapes[0].type == &quot;LineString&quot;) {
+      map.geomap("remove", shapes[0]);
+      <span class="comment">// move the first point in the line 10 meters to the left</span>
+      <span class="comment">// you can edit the coordinates directly since you've removed the shape</span>
+
+      <span class="comment">// we use proj because we want to temporarilly work in meters</span>
+      var firstCoord = $.geo.proj.fromGeodetic(shapes[0].coordinates[0]);
+      <span class="comment">// firstCoord[0] is the x axis</span>
+      firstCoord[0] -= 10;
+      <span class="comment">// we need to convert it back to geodetic (lon/lat)</span>
+      shapes[0].coordinates[0] = $.geo.proj.toGeodetic(firstCoord);
+      <span class="comment">// re-append the shape</span>
+      map.geomap( &quot;append&quot;, shapes[0] );
+    }
+  }
+} );</code></pre>
+ 
       <!--<p>geomap draws shapes ordered by geometry type and then by order of addition. It draws Polygon shapes first followed by LineString and finally Point shapes. </p>-->
       <p>If $.geo.proj is not null, all coordinates of all geometry (whether plain or part of a feature) must be in geodetic coordinates, e.g., for a Point object coordinates[0] is longitude and coordinates[1] is latitude. If $.geo.proj is null, all coordinates must be in the widget's internal projection as defined by tilingScheme for tiled map services or bboxMax for shingled (dynamic) map services.</p>
       <p>The optional style argument modifies how geomap draws the specific geometry or feature you are adding. Properties supplied in this style will override ones of the same name in geomap&#39;s base shapeStyle. Properties not referenced are inheritied from the base style and can change with future calls to shapeStyle. Please see the shapeStyle method documentation for information about what properties are valid for this object.</p>
+      <p>The optional refresh argument determines if geomap refreshes the map graphics after this call to append. It defaults to true. If you pass false, geomap will add the shape internally but not immediately redraw the graphics. If you intend to call append multiple times in a row in a single function, you should pass false for all but the last call to append. If you do not refresh the map by calling the refresh method or passing true to a call to append, remove, or empty then the shapes will not update until the user pans or zooms the map.</p>
       <p>The jQuery UI widget factory returns the original jQuery collection to maintain call chaining.</p>
     </div>
   </div> <!-- end of #container -->

@@ -1,40 +1,184 @@
 ﻿== to do ==
 
+=== 1.0a3 ===
+* geo - make initial geometry functions public
+* [internal] - geo - add an internal ignoreProj argument to $.geo geometry functions.
+* geomap - make the refresh argument in append public, add one to remove & empty
+* geomap - remove should remove the shape's bbox cache
+* geomap - empty should remove the bbox cache for all shapes
+* geomap - ? append should remove the shape's bbox cache (it will be recalculated later)
+* geomap - [bug] adding a service by modifying the services array after initialization fails
+* geomap - [bug] multiple maps do not work on the same page
+* [internal] - geo - add private _from/_toGeodeticBbox methods
+* geo - calculate & cache bbox in projected coordinates
+* geo - cache point bbox if $.geo.proj is not null
+* geo - cache only with append/remove, not in all bbox calls
+* geo - use Array.push instead of $.merge
+* geo - prefer GeoJSON object over $.data, assume it's accurate
+* docs - launch jquerygeo.com
+
 === future ===
-* docs - upgrade to jQuery Mobile beta
+* docs - geomap - more modes: measureDistance, measureArea
+* docs - geomap - append label argument
+* docs - geomap - shapeLabel property
+* geomap - port shape labels
+* docs - upgrade to jQuery Mobile beta 2
 * docs - make all map examples live
 * docs - explain the 96px scale bar, why 96?
-* widgets - verify that vars local to initial closure do not conflict when multiple maps are placed
-* docs/geomap - document the resize method
-* geomap - document a way to flag a shape as dirty so we recalculate the bbox
-* geomap - add toggle to service type objects & call from geomap's toggle method
+* docs - write a full page about GeoJSON and what each object type is to $.geo
+* docs - proj - mention that *Geodetic methods can also do bbox
+* docs - geomap - allow name as well as id for service objects
+** if a service has a name property, it will maintain a hidden input with the given name
+* docs - geomap - service-level shapes
+* geomap - service-level shapes
 * geomap - deep extend existing service objects when services property is set
-* docs/internal - document how geomap draws shapes, the geomapgraphics widget and the reason shapeStyle is a method
-* docs/geomap - [maybe] use name instead of id for service objects
+* code - prefer $.data over $.fn.data
+* docs - internal - document how geomap draws shapes, the geomapgraphics widget and the reason shapeStyle is a method
 * geomap - rename service.visible to visibility having either "visible" or "hidden" values
-* geomap - port shape labels
 * geomap - label divs should have class="geo-label" & style="position: relative;"
 * geomap - find should check labels first
-* geomap - Add a resize method to let geomap know the div has changed size programatically
 * geo - implement $.geo.centroid
 ** JTS note: "The centroid is equal to the centroid of the set of component Geometries of highest dimension (since the lower-dimension geometries contribute zero "weight" to the centroid)"
 * geo - Support WKT with $.geo.parseWKT & $.geo.textify
+* geo - All bbox operations should be done in non-geodetic coordinates for accuracy
 * geomap - [bug] mouse wheel on bad or missing tile doesn't zoom out on first rotate
-* geomap - document and implement service-level shapes
 * geomap - service divs should have class="geo-service"
 * docs/geomap - store WKT input for each service
 * geographics - Rename the generated style properties to something simple or get better control over closure compiler
-* geomap - [maybe] document (make public) the refresh argument in append, add one to remove & empty
 * geomap - Document and implement find's callback syntax
 * geomap - repeat horizontal tiles
+* geomap - possibly add 
 * proj - take scale factor into account when calculating distance in web mercator
 * geographics - Disable fill by setting style.fill to "" & stroke by style.stroke to ""
 * graphics - See Modernizr for comment on BB Storm & canvas detection
 * geographics - Document graphics widget
 * geomap - [BUG] Android browser stops pan/zoom after 7 logos on logo demo
-* geomap - design how to store shapes as a hidden input
+* geomap - store a copy of shapes as WKT in a hidden input
+* geomap - only update WKT copy if shape is appended with refresh argument set to true
 * geomap - find - [maybe] after flatten, check more cached bboxes for non-Point geometries
-* docs/geomap - [maybe] add a method to update an existing shape if you change the shape's geometry externally
+
+==2011-09-20==
+===cache===
+I may be caching too aggressively. I think I should remove caching from $.geo.bbox and instead cache inside of append and clear the bbox cache in remove. I really only need it in the find method.
+
+==2011-09-18==
+===shape===
+Working on the event docs.
+
+===name===
+I was originally going to rename id in the service objects to name so I could use it as an input name on a hidden input. However, I'm now going to require id but allow name as an optional property. If present, it will create the hidden input. This is now a future task and will not be in alpha.
+
+===append===
+While adding the refresh argument to append, I started thinking again how I want to implement service-level graphics. It would be very nice if I could have the map>service syntax to jQuery and call append, remove and empty on that. I think I defined the syntax a while ago...yeah, see "On shape functions" from 2011-06-02.
+
+The issue I have is that a page can have two maps. The default service has id=OSM. So, if I allowed $("#map #OSM") syntax, it would cause the page to have two elements with the same id, #OSM. However, $("#map [data-geo-service='OSM']") is way to wordy. I'll have to discuss this with others later as this is not an alpha feature either.
+
+==2011-09-16==
+===foss4g===
+FOSS4G is an inspiring conference. I gave my talk and people seemed interested. There was a question about Google. I answered that it's illegal to use them and Chris Schmidt mentioned on Twitter that it's not illegal, it's just hard. We're talking different things. jQuery Geo would use Google tiles directly, which is against license. We will never host a third party widget inside the jQuery Geo div as part of the core functionality. OpenLayers wraps the official Google widget to get around the license restriction (since it's the official Google widget, there's nothing wrong with it) & keeps it up to date (or slides it around) when the user interacts with the OL map. I might do something similar as a blog post when I open up the service types plugin system but until then, but it won't be part of jQuery Geo..."here's how to do it if you want", type of thing. The developer would have to pull in the Google maps API themselves.
+
+===centroid===
+I'll have to see if JTS uses Point or Coordinate as a return value & match it.
+
+Centroid needs to use $.geo.proj for accuracy. The centroid should be calculated in web mercator & projected back to geodetic.
+
+===proj===
+The way we do projection is different than how GIS does it. Usually, when you define a projection, you work in non-geodetic coordinates because the coords have been projected to a flat plane. With jQuery Geo, you work in projected coordinates (I call them non-geodetic) when you set $.geo.proj to null. This can be a little confusing but I think it works.
+
+The first thing we would have to do internally is set $.geo.proj to null because we use pro
+
+===bbox proj===
+bbox might be an issue. a bbox in geodetic coordinates (lon/lat) that is a rectangle, will not be a rectangle in web mercator. That's not a problem with setting the bbox property on geomap but could prove interesting for the bbox of geometry objects. For example, the bbox of a square polygon will not be a parallelagram in geodetic coordinates.
+
+SUGGESTION: Calculate & cache bbox in projected coordinates
+SUGGESTION: Document that lon/lat bboxes will not appear to be correct?
+
+===bbox cache===
+Peter and I got into a talk about caching bboxes. He's worried that we will have too many floating references to objects that cannot be collected. That is a valid point. For example: a user creates a polygon as an object literal, they then call $.geo.bbox on it, then the function ends. We will have a cache of the bbox, but most importantly the cache will reference the original polygon so the browser cannot remove it from memory. I agree that this isn't a great situation. However, the performance benefit gained by the find method is hard to ignore. Also, this only becomes a problem when the developer calls bbox directly. Even though we call it during the find method (building up cache), they are all removed when the dev removes shapes from the map with the remove method. I also know I need to research more about how $.data works with objects. I may be wrong about the reference/memory leaks.
+
+===point bbox cache===
+Now that I know I should cache bbox as non-geodetic, I think I should revisit my jsperf regarding caching a point. Since there's going to be much more calculation involved in $.geo.bbox, I might want to cache points. However, I think I should only cache them if $.geo.proj is not null. When it's null, non-cached points will still be faster as per my original jsperf test.
+
+===events===
+The new shape event will need a new event type. Position event won't cover it but it's similar. I'm not 100% sure if I should merge them. The new event type will be a shape event.
+
+==2011-08-24==
+===utah===
+While zooming in, Chrome skips zoom level 12. I wonder if that's a bug in the control. It is. It's a rounding error in _getTiledZoom. Using floor and * instead...fixed.
+
+==2011-08-19==
+===contains===
+Contains is spatial ref agnostic and is called by distance.
+
+== 2011-08-07 ==
+=== bbox ===
+I think I'm missing something from my bbox description.
+
+=== append ===
+I would like to say that devs can call append again on a shape and it will replace the existing one and clear the bbox cache. That might be a good compromise for bbox cache clearing because I don't want a method specifically for that. Maybe, I'm not sold on the word append replacing something that's already there. Does jQuery have a replace function?
+
+SUGGESTION: geomap - append should allow re-append of existing shapes, replacing the old one and clearing the bbox cache
+
+=== bbox ex ===
+I'm writing an odd example and I already forget if fromGeodetic can take a single position. It can, according to my docs :)
+
+=== from/to pos ===
+I keep going back and forth about coordinate vs. position in terms of words. I almost thought of changing fromGeodeticPos to fromGeodeticCoord but they /are/ called positions in the spec so I'm going to leave it. Again, it's spoken words (of which I suppose I am now including API function names) and code, which is GeoJSON object properties and arguments. Still confusing, this will never be settled so I'm dropping it.
+
+=== bbox cache ===
+Oops, I wasn't namespacing my data. I thing it has to be geoBbox because the namespaced data attribute would be data-geo-bbox.
+
+== 2011-08-06 ==
+=== alpha 2.5 ===
+I released a new version last week and it seems to work well. I'm happy with it. On to documenting the features of alpha3!
+
+=== label ===
+I'm going to add labels and I think I want a label argument to append, however I want both style and label to be optional. In other words, you can pass a shape and a label. The label argument will be a string of html or a jQuery collection of elements to append to a label div. The outer label div is controlled by geomap. It will have a class on it, geo-label, if devs find they need or want to control it that way, i.e., add plain text and control the label style using the class.
+
+=== jQuery a plain ===
+Is a jQuery collection a plain object? Not according to this fiddle: http://jsfiddle.net/ryanttb/4rHK5/
+
+So, I will have two optional args: style and label. Style has to be a plain object. Label can be a string or jQuery object. I'll say style comes first but they can be in any order.
+
+=== shape props ===
+Even though I have args on append, I will eventually allow both style and label properties on the GeoJSON object. They're not standard but not illegal according to the spec.
+
+=== stored label ===
+For speed, I will have to build the label HTML during the call to append, whether or not I use the shapeLabel property on the map or the label supplied during append.
+
+=== override ===
+The label supplied to append will completely override the map's shapeLabel property.
+
+=== centroid ===
+While I would like a LineString's centroid to be a point along the line so I can using it for labeling, that's not the accepted definition of a centroid of a line. According to JTS, it's calculated like a polygon, except when there is a polygon as part of a GeometryCollection. In which case lines and points are ignored when calculating centroid.
+
+=== line label ===
+Checking to see if JTS has an official point-along-line function that I can add w/o creating my own name. It doesn't seem to. I just decided to not label on the centroid for lines but on the "center point" of the line. As you add more points, the label will move further along the line.
+
+=== envelope & bbox ===
+So, OGC simple features doesn't seem to define an Envelope class. The Envelope function is defined to return a Polygon, eww!
+
+=== ogc text align ===
+They do define text alignment options called HorizontalAlignment: start, center and end. Might be useful later for text label options.
+
+=== $.geo & proj ===
+Internally, I need to call the geometry ops in $.geo and I will already have a projected bbox or geometry object. I need a way to tell methods such as $.geo.expandBy to not call $.geo.proj.fromGeodetic even if $.geo.proj is not null. I think for now I will have an internal (and undocumented save for here) argument at the end called ignoreProj. If truthy, it will not call fromGeodetic. A false value or undefined will call fromGeodetic if $.geo.proj is not null.
+
+The documentation will always say fromGeodetic is called if $.geo.proj is not null.
+
+SUGGESTION: Add an internal ignoreProj argument to $.geo geometry functions.
+
+=== scaleBy ===
+I haven't used it yet buy my original port of the scaleBy function was wrong. I was calling expandBy which would make scaleBy(bbox, 1) actually increase the size of the bbox, however, scaleBy(bbox, 1) shouldn't change the size at all. Also, expandBy was wrong basing itself on center instead of just modifying the min/max values directly.
+
+=== geodetic bbox ===
+I forgot that from/toGeodetic don't currently support bboxes. What am I doing already in geomap? Ah, right. I only needed it once (the bbox property) so I'm converting to two positions by hand. I think I should make a conveniance method in $.geo.proj. fromGeodeticBbox or something. I'm not going to make it public. Devs shouldn't have to call it, they can work in whichever projection/non-projected state they set $.geo up as and the public functions can handle it.
+
+SUGGESTION: add private _from/_toGeodeticBbox methods
+
+I did remove the, "if $.geo.proj is not null X first calls fromGeodetic..." shpeal that I had in all the bbox methods because it's not accurate. I won't call from/toGeodetic, I'll call a private method.
+
+Actually, I should be able to detect a bbox vs any other geometry in the *Geodetic methods. It will be an array of 4 numbers, so .length == 4 and $.isArray(value[0]) == false. Maybe I'll put bbox conversion into them after all.
 
 == 2011-07-30 ==
 === alpha 2.5 ===

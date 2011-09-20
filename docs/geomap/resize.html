@@ -1,0 +1,45 @@
+<!doctype html>  
+
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>resize | $.geo</title>
+  <meta name="description" content="$.geo resize method">
+  <meta name="author" content="Ryan Westphal">
+</head>
+
+<body>
+
+  <div id="resize" data-role=page data-theme="b">
+    <div data-role="header">
+      <h1>resize</h1>
+    </div>
+    
+    <div data-role="content">
+      <table>
+        <tr>
+          <th>return type</th>
+          <td>undefined</td>
+        </tr>
+        <tr>
+          <th>syntax</th>
+          <td>.geomap( &quot;resize&quot; )</td>
+        </tr>
+        <tr>
+          <th>usage</th>
+          <td><pre><code>$(&quot;map&quot;).geomap( &quot;resize&quot; )</code></pre></td>
+        </tr>
+      </table>
+      <p>
+        This method tells the geomap widget to recalculate its frame and adjust its bbox to fit a new size. The map will maintain its center point and pixel size and expand or contract to fill the new surroundings.</p>
+      <p>
+        The geomap widget watches the browser window for you. If your map widget&#39;s div position is related to the window in some way, geomap will automatically resize to fit when the window size changes. If the map widget&#39;s div is not related to the window and you manually change its size, you need to call resize so that the map can adjust.</p>
+      <p>
+        This method refreshes the map.</p>
+    </div>
+  </div> <!-- end of #container -->
+</body>
+</html>
+

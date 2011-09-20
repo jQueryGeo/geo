@@ -1,0 +1,53 @@
+<!doctype html>  
+
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>contains | $.geo</title>
+  <meta name="description" content="$.geo contains method">
+  <meta name="author" content="Ryan Westphal">
+</head>
+
+<body>
+
+  <div id="contains" data-role="page" data-theme="b">
+    <div data-role="header">
+      <h1>contains</h1>
+    </div>
+    
+    <div data-role="content">
+      <table>
+        <tr>
+          <th>return type</th>
+          <td>Boolean</td>
+        </tr>
+        <tr>
+          <th>syntax</th>
+          <td>$.geo.contains( Object shape1 ( <a href="http://geojson.org/geojson-spec.html" rel="external">GeoJSON object</a> ), Object shape2 ( <a href="http://geojson.org/geojson-spec.html" rel="external">GeoJSON object</a> ) )</td>
+        </tr>
+        <tr>
+          <th>usage</th>
+          <td><pre><code>var contains = $.geo.contains(
+  {
+    type: "Polygon", coordinates: [[
+      [-71.06, 42.3425],
+      [-71.06, 42.3475],
+      [-71.04, 42.3475],
+      [-71.04, 42.3425],
+      [-71.06, 42.3425]
+    ]]
+  },
+  { type: &quot;Point&quot;, &quot;coordinates&quot;: [ -71, 40 ] }
+)</pre></code></td>
+        </tr>
+      </table>
+      <p>The contains method determines if the first basic GeoJSON geometry completely contains a second one. The basic shapes are Point, LineString and Polygon however Point and LineString geometries cannot contain other geometries so the only situation that has a possibility of returning true is when the first argument is a Polygon.</p>
+      <p>$.geo.contains is projection agnostic which means it never calls the from/toGeodetic methods in $.geo.proj as the algorithm is the same regardless.</p>
+      <p>This function is similar to Geometry.contains in JTS.</p>
+    </div>
+  </div> <!-- end of #container -->
+</body>
+</html>
+

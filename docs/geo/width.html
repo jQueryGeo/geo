@@ -1,0 +1,42 @@
+<!doctype html>  
+
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>width | $.geo</title>
+  <meta name="description" content="$.geo width method">
+  <meta name="author" content="Ryan Westphal">
+</head>
+
+<body>
+
+  <div id="width" data-role="page" data-theme="b">
+    <div data-role="header">
+      <h1>width</h1>
+    </div>
+    
+    <div data-role="content">
+      <table>
+        <tr>
+          <th>return type</th>
+          <td>Number</td>
+        </tr>
+        <tr>
+          <th>syntax</th>
+          <td>$.geo.width( Array bbox ( <a href="http://geojson.org/geojson-spec.html#bounding-boxes">GeoJSON bounding box</a> )</td>
+        </tr>
+        <tr>
+          <th>usage</th>
+          <td><pre><code>var width = $.geo.width( [ -71.1, 42.3, -71.0, 42.4 ] )</pre></code></td>
+        </tr>
+      </table>
+      <p>The width method returns the true width of a bbox in non-geodetic units. If you are using geomap with its default map service, the width is in meters because the default projection is web mercator meters.</p>
+      <p>If $.geo.proj is not null, this method first calls fromGeodetic on the incoming bbox before calculating the return value.</p>
+      <p>This function is similar to Envelope.getWidth in JTS.</p>
+    </div>
+  </div> <!-- end of #container -->
+</body>
+</html>
+

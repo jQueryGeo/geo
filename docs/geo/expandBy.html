@@ -1,0 +1,44 @@
+<!doctype html>  
+
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>expandBy | $.geo</title>
+  <meta name="description" content="$.geo expandBy method">
+  <meta name="author" content="Ryan Westphal">
+</head>
+
+<body>
+
+  <div id="expandBy" data-role="page" data-theme="b">
+    <div data-role="header">
+      <h1>expandBy</h1>
+    </div>
+    
+    <div data-role="content">
+      <table>
+        <tr>
+          <th>return type</th>
+          <td>Array ( <a href="http://geojson.org/geojson-spec.html#bounding-boxes">GeoJSON bounding box</a> ) </td>
+        </tr>
+        <tr>
+          <th>syntax</th>
+          <td>$.geo.expandBy( Array bbox ( <a href="http://geojson.org/geojson-spec.html#bounding-boxes">GeoJSON bounding box</a> ), Number dx, Number dy )</td>
+        </tr>
+        <tr>
+          <th>usage</th>
+          <td><pre><code>var largerBbox = $.geo.expandBy( bbox, 20, 20 )</pre></code></td>
+        </tr>
+      </table>
+      <p>The expandBy method creates a new bbox with the same center as the original but having a width and height that is modified by the dx and dy arguments respectively.</p>
+      <p>The dx and dy arguments are non-geodetic units. If you are using geomap with its default map service, these are in meters because the default projection is web mercator meters. If you are working in a different projection such as NAD83 / New Jersey feet, this function will expand or contract the bbox by feet.</p>
+      <p>The dx and dy arguments can be positive, negative or zero and will modify the width or height of the bbox accordingly.</p>
+      <p>If $.geo.proj is not null, this method first calls fromGeodetic on the incoming bbox and toGeodetic on the return value.</p>
+      <p>This function is similar to Envelope.expandBy in JTS.</p>
+    </div>
+  </div> <!-- end of #container -->
+</body>
+</html>
+
