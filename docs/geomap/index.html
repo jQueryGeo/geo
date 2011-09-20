@@ -27,7 +27,7 @@
       <h2>options</h2>
       <p>The options argument is a JavaScript object that configures the map widget during the first instantiation on a div. No options are required. By default the map will show the whole world using the OpenStreetMap tile set.</p>
       <p>The map view refreshes when you change these properties: bbox, center, services, tilingScheme &amp; zoom.</p>
-      <ul data-role=listview data-inset=true>
+      <ul data-role="listview" data-inset="true">
         <li>
           <a href="bbox.html">bbox</a>
         </li>
@@ -58,12 +58,14 @@
       <p>The units in the map event depend on the way you initialize the map widget and whether or not you set $.geo.proj to null.</p>
       <p>Like jQuery UI widgets, geomap triggers events directly on the original map div.</p>
       <p>Programatic changes to properties do not trigger events.</p>
-      <p>The dblclick event is special in that you can prevent the default action by calling e.preventDefault() in your callback. This is currently the only geomap event that you can prevent the default action. Calling preventDefault in the callback of any other geomap event has undefined results.</p>
-      <p>There are two geomap event <i>types</i>. The type of event determines what is sent to your event handler as the second argument, geo.</p>
+      <p>The dblclick event is special in that you can prevent the default action, 
+        zoom-in one level, by calling e.preventDefault() in your callback. This is currently the only geomap event that you can prevent the default action. Calling preventDefault in the callback of any other geomap event has undefined results.</p>
+      <p>There are three geomap event <i>types</i>. The type of event determines what is sent to your event handler as the second argument, geo.</p>
       <h3>position events</h3>
-      <p>With position events the geo argument to your callback is a <a href="http://geojson.org/geojson-spec.html#point">GeoJSON Point</a> object having two properties: type &amp; coordinates. The coordinates property is a single <a href="http://geojson.org/geojson-spec.html#positions">GeoJSON position</a>, i.e., an array containing the x and y value. If $.geo.proj is not the coordinates argument sent to your callback is geodetic, i.e., coordinates[0] is longitude and coordinates[1] is latitude. If $.geo.proj is null, the coordinates argument sent to your callback is in map coordinates based on the tilingScheme for tiled maps and bboxMax for shingled (dynamic) maps.</p>
+      <p>With position events the geo argument to your callback is a <a href="http://geojson.org/geojson-spec.html#point">GeoJSON Point</a> object having two properties: type &amp; coordinates. The coordinates property is a single <a href="http://geojson.org/geojson-spec.html#positions">GeoJSON position</a>, i.e., an array containing the x and y value. If $.geo.proj is not 
+        null, the coordinates argument sent to your callback is geodetic, i.e., coordinates[0] is longitude and coordinates[1] is latitude. If $.geo.proj is null, the coordinates argument sent to your callback is in map coordinates based on the tilingScheme for tiled maps and bboxMax for shingled (dynamic) maps.</p>
       <p>The geo argument to your callback is a true GeoJSON object and you can pass this object directly to the append method. You can also send it directly to a database for storage knowing that there are no non-GeoJSON properties wasting space.</p>
-      <ul data-role=listview data-inset=true>
+      <ul data-role="listview" data-inset="true">
         <li>
             <a href="geomapmove.html">move</a>
         </li>
@@ -75,18 +77,32 @@
         </li>
       </ul>
       <h3>bbox events</h3>
-      <p>With bbox events the geo argument to your callback is an object with single property, bbox, which is a <a href="http://geojson.org/geojson-spec.html#bounding-boxes">GeoJSON bounding box</a> in map coordinates. If $.geo.proj is not null the bbox values are sent to your callback are geodetic. If $.geo.proj is null, the bbox values sent to your callback are in map coordinates based on the tilingScheme for tiled maps and bboxMax for shingled (dynamic) maps.</p>
+      <p>With bbox events the geo argument to your callback is an object with single property, bbox, which is a <a href="http://geojson.org/geojson-spec.html#bounding-boxes">GeoJSON bounding box</a> in map coordinates. If $.geo.proj is not null, the bbox values are sent to your callback are geodetic. If $.geo.proj is null, the bbox values sent to your callback are in map coordinates based on the tilingScheme for tiled maps and bboxMax for shingled (dynamic) maps.</p>
       <!--<h3>geometry events</h3>
       <p>With geometry events the geo argument to your callback is a JavaScript object having two properties: pixels &amp; geometry. Both are multi-dimensional <a href="http://geojson.org/geojson-spec.html#positions">GeoJSON positions</a>, i.e., an array containing the x and y value but pixel is in pixel coordinates based on the current map view and the other in map coordinates based on the tilingScheme for tiled maps and bboxMax for shingled (dynamic) maps.</p>-->
-      <ul data-role=listview data-inset=true>
+      <ul data-role="listview" data-inset="true">
         <li>
             <a href="geomapbbox.html">bboxchange</a>
+        </li>
+      </ul>
+      <h3>shape events</h3>
+      <p>With shape events, the geo argument to your callback is a GeoJSON geometry 
+        object having two properties: type &amp; coordinates. The object type will be either 
+        Point, LineString or Polygon depending on the current geomap mode: drawPoint, 
+        drawLineString, or drawPolygon. If $.geo.proj is not null, the geo object sent 
+        to your callback is in geodetic (lon/lat) coordinates. If $.geo.proj is null, 
+        the geo object sent to your callback is in map coordinates based on the 
+        tilingScheme for tiled maps and bboxMax for shingled (dynamic) maps.</p>
+      <p>The geo argument to your callback is a true GeoJSON object and you can pass this object directly to the append method. You can also send it directly to a database for storage knowing that there are no non-GeoJSON properties wasting space.</p>
+      <ul data-role="listview" data-inset="true">
+        <li>
+            <a href="geomapshape.html">shape</a>
         </li>
       </ul>
       <h2>methods</h2>
       <p>The geomap widget provides some methods to help make interacting map data a little easier.</p>
       <h3>information</h3>
-      <ul data-role=listview data-inset=true>
+      <ul data-role="listview" data-inset="true">
         <li>
           <a href="getPixelSize.html">getPixelSize</a>
         </li>
@@ -101,6 +117,16 @@
           <a href="toPixel.html">toPixel</a>
         </li>
       </ul>
+      <h3>map methods</h3>
+      <p>These methods update the map widget as a whole.</p>
+      <ul data-role="listview" data-inset="true">
+        <li>
+          <a href="refresh.html">refresh</a>
+        </li>
+        <li>
+          <a href="resize.html">resize</a>
+        </li>
+      </ul>
       <h3>service modification</h3>
       <p>Convenience methods that help update objects in the services array.</p>
       <ul data-role="listview" data-inset="true">
@@ -109,9 +135,6 @@
         </li>
         <li>
           <a href="opacity.html">opacity</a>
-        </li>
-        <li>
-          <a href="refresh.html">refresh</a>
         </li>
       </ul>
       <h3>shapes</h3>
