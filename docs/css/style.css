@@ -69,6 +69,20 @@ button {  width: auto; overflow: visible; }
 body, select, input, textarea { color: #444; }
 h1, h2, h3, h4, h5, h6 { font-weight: bold; }
 
+/* jQuery Mobile f theme */
+.ui-bar-f {
+	background: rgb(116, 176, 66); border: 1px solid rgb(86, 160, 14); color: rgb(255, 255, 255); font-weight: bold; text-shadow: 0 -1px 1px #234403;
+}
+.ui-bar-f {
+	color: rgb(255, 255, 255);
+}
+.ui-bar-f .ui-link-inherit {
+	color: rgb(255, 255, 255);
+}
+.ui-bar-f .ui-link {
+	color: rgb(255, 255, 255); font-weight: bold;
+}
+
 
  /* Primary Styles
     Author: Ryan Westphal

@@ -4,7 +4,7 @@ After years of internal development, we are pleased to bring our JavaScript map 
 
 == DOCS ==
 
-Documentation is hosted at http://host.appgeo.com/libs/geo/
+Documentation is hosted at http://jquerygeo.com
 
 == CHANGELOG ==
 
@@ -16,6 +16,9 @@ Documentation is hosted at http://host.appgeo.com/libs/geo/
 * docs - geomap - shape event
 * docs - geomap - refresh argument in append, remove & empty
 * docs - geomap - document the resize method
+* docs - launch jquerygeo.com
+* docs - upgrade to jQuery Mobile b3
+* docs - services - remove id property, explain the class property
 
 === 1.0a2.5 (2011-08-03) ===
 * geomap - find - [bug] does not handle GeoJSON features

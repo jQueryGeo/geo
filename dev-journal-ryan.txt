@@ -1,21 +1,23 @@
 ﻿== to do ==
 
 === 1.0a3 ===
+* docs - rename getPixelSize to just pixelSize, document that it's a method and therefore read-only
 * geo - make initial geometry functions public
 * [internal] - geo - add an internal ignoreProj argument to $.geo geometry functions.
+* geomap - remove service id property
+* geomap - add class child selector to target specific services with toggle & opacity methods
+* geomap - change shapeStyle to a property, explain service class
 * geomap - make the refresh argument in append public, add one to remove & empty
+* geomap - append should cache the shape's bbox (instead of the bbox function)
 * geomap - remove should remove the shape's bbox cache
 * geomap - empty should remove the bbox cache for all shapes
-* geomap - ? append should remove the shape's bbox cache (it will be recalculated later)
 * geomap - [bug] adding a service by modifying the services array after initialization fails
 * geomap - [bug] multiple maps do not work on the same page
 * [internal] - geo - add private _from/_toGeodeticBbox methods
 * geo - calculate & cache bbox in projected coordinates
 * geo - cache point bbox if $.geo.proj is not null
-* geo - cache only with append/remove, not in all bbox calls
 * geo - use Array.push instead of $.merge
 * geo - prefer GeoJSON object over $.data, assume it's accurate
-* docs - launch jquerygeo.com
 
 === future ===
 * docs - geomap - more modes: measureDistance, measureArea
@@ -30,6 +32,7 @@
 * docs - geomap - allow name as well as id for service objects
 ** if a service has a name property, it will maintain a hidden input with the given name
 * docs - geomap - service-level shapes
+* docs - geomap - service-level shapeStyle
 * geomap - service-level shapes
 * geomap - deep extend existing service objects when services property is set
 * code - prefer $.data over $.fn.data
@@ -56,10 +59,30 @@
 * geomap - store a copy of shapes as WKT in a hidden input
 * geomap - only update WKT copy if shape is appended with refresh argument set to true
 * geomap - find - [maybe] after flatten, check more cached bboxes for non-Point geometries
+* docs - services - document the plugin architecture
+** create must return a jQuery collection where geomap can store state info
+
+==2011-09-21==
+===docs===
+I'm trying to clean up the docs and change notational $.geo to jQuery Geo, but not mess up anywhere I mean to reference $.geo the namespace.
+
+===class===
+I have a better plan for service id. I'm going to keep my plan for having the presense of a name property create a hidden input but I'm going to allow the service object to have a class. The class will be applied directly to the built-in service divs. I will still apply data-service-type="tiled" or data-service-type="shingled" to the divs. To apply certain methods to specific services, you will now target the service class under the map element:
+
+$("#map .OSM").geomap("toggle", false); // this will hide OSM.
+
+===service create===
+I'm going to require that the service type's create function return a jQuery collection of one item that is addressable for that service. It doesn't really HAVE to have anything in it but I'm going to store service state on it using $.data($el, "geoServiceState", {}) or something.
+
+===jqm===
+Upgraded to jQuery Mobile b3 & added some color to the headers of various doc pages.
 
 ==2011-09-20==
 ===cache===
 I may be caching too aggressively. I think I should remove caching from $.geo.bbox and instead cache inside of append and clear the bbox cache in remove. I really only need it in the find method.
+
+===jquerygeo.com===
+It's time this project got its own nice site. Also, (mt) is faster than my previous host from places farther away than MA.
 
 ==2011-09-18==
 ===shape===
