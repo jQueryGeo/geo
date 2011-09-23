@@ -2,20 +2,26 @@
 
 === 1.0a3 ===
 * geo - make initial geometry functions public
+* geo - port centroid
 * [internal] - geo - add an internal ignoreProj argument to $.geo geometry functions.
+* geomap - make service id property optional, add HTML id to serviceContainer if present
+** store service state data as jQuery data on serviceContainer element
+* geomap - add class child selector to target specific services with toggle & opacity methods
+* geomap - change shapeStyle to a property, explain service class
 * geomap - make the refresh argument in append public, add one to remove & empty
+* geomap - append should cache the shape's bbox (instead of the bbox function)
 * geomap - remove should remove the shape's bbox cache
 * geomap - empty should remove the bbox cache for all shapes
-* geomap - ? append should remove the shape's bbox cache (it will be recalculated later)
+* geomap - rename getPixelSize to just pixelSize
+* geomap - use _currentServices in all functions unless we actually need to update the public  options services object
 * geomap - [bug] adding a service by modifying the services array after initialization fails
 * geomap - [bug] multiple maps do not work on the same page
+* examples - massgis basemap now contains both forest and hydrography layers
 * [internal] - geo - add private _from/_toGeodeticBbox methods
 * geo - calculate & cache bbox in projected coordinates
-* geo - cache point bbox if $.geo.proj is not null
-* geo - cache only with append/remove, not in all bbox calls
+* geo - ? cache point bbox if $.geo.proj is not null
 * geo - use Array.push instead of $.merge
 * geo - prefer GeoJSON object over $.data, assume it's accurate
-* docs - launch jquerygeo.com
 
 === future ===
 * docs - geomap - more modes: measureDistance, measureArea
@@ -30,6 +36,7 @@
 * docs - geomap - allow name as well as id for service objects
 ** if a service has a name property, it will maintain a hidden input with the given name
 * docs - geomap - service-level shapes
+* docs - geomap - service-level shapeStyle
 * geomap - service-level shapes
 * geomap - deep extend existing service objects when services property is set
 * code - prefer $.data over $.fn.data
@@ -56,10 +63,62 @@
 * geomap - store a copy of shapes as WKT in a hidden input
 * geomap - only update WKT copy if shape is appended with refresh argument set to true
 * geomap - find - [maybe] after flatten, check more cached bboxes for non-Point geometries
+* docs - services - document the plugin architecture
+** create must return a jQuery collection where geomap can store state info
+
+==2011-09-23==
+===filename===
+I renamed the compiled JS files to match what code.jquery.com has for jQuery itself and jQM. jQUI isn't on there, which is odd.
+
+===widget factory syntax hack===
+Testing if the syntax I want is possible with the jQuery UI widget factory pattern. I only want the one widget, but I want to be able to call some functions on other child elements. I already hit a snag. Calling .geomap("toggle") on an element that has not been initialized as a geomap widget doesn't trigger _createWidget, _create or toggle.
+
+===serviceTyep files===
+I'm going to split out the service type objects into their own files. That'll help me make sense of the geomap.js file.
+
+To do that, I had to move _serviceTypes from being an option of geomap to a propery on $.geo itself. This will help third-party service type plugins down the road.
+
+===widget vars===
+I think I have to move all the widget vars back into the object passed to $.widget so that they don't conflict with each other, e.g., multiple geomap widgets. As they are now, I think they're all plugin-level widgets.
+
+===sub-widgets===
+This is awesome. It looks like I can get the syntax I want. Now to figure out the best way to call the method in the parent geomap widget from a service widget.
+
+It seems like the vars created in the closure supplied to $.widget are still used by all widgets on the page. Do I really have to store state in a data object on the element?
+
+Yes, they are shared. Yes, I will have to figure something out.
+
+I just had to plaster my code with this's. I don't like it but it now supports the toggle/opacity syntax I want and *I think* also supports multiple maps on the same page (I think). That's going to increase my minified size quite a bit. I'm going to have to go back and see what I can do to clean it up but I'm choosing proper functionality over code size for the moment.
+
+==2011-09-21==
+===docs===
+I'm trying to clean up the docs and change notational $.geo to jQuery Geo, but not mess up anywhere I mean to reference $.geo the namespace.
+
+===class===
+I have a better plan for service id. I'm going to keep my plan for having the presense of a name property create a hidden input but I'm going to allow the service object to have a class. The class will be applied directly to the built-in service divs. I will still apply data-service-type="tiled" or data-service-type="shingled" to the divs. To apply certain methods to specific services, you will now target the service class under the map element:
+
+$("#map .osm").geomap("toggle", false); // this will hide OSM.
+
+===service create===
+I'm going to require that the service type's create function return a jQuery collection of one item that is addressable for that service. It doesn't really HAVE to have anything in it but I'm going to store service state on it using $.data($el, "geoServiceState", {}) or something.
+
+===jqm===
+Upgraded to jQuery Mobile b3 & added some color to the headers of various doc pages.
+
+===service id===
+After talking to Peter, I'm going to allow class and id with a note that if you use id, you'll have to be careful of adding more than one map on the page. I like this plan. Also, if you do it by id, you can target it directly:
+
+$("#mass-gis").geomap("toggle");
+
+===widget tricks===
+I'm not sure I can do the selector tricks I want with the widget factory. I may have to change my docs & design if I can't do it elegantly :(
 
 ==2011-09-20==
 ===cache===
 I may be caching too aggressively. I think I should remove caching from $.geo.bbox and instead cache inside of append and clear the bbox cache in remove. I really only need it in the find method.
+
+===jquerygeo.com===
+It's time this project got its own nice site. Also, (mt) is faster than my previous host from places farther away than MA.
 
 ==2011-09-18==
 ===shape===

@@ -5,15 +5,15 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <title>tilingScheme | $.geo</title>
-  <meta name="description" content="$.geo tilingScheme property">
+  <title>tilingScheme | geomap</title>
+  <meta name="description" content="geomap tilingScheme property">
   <meta name="author" content="Ryan Westphal">
 </head>
 
 <body>
 
-  <div id="tilingScheme" data-role=page data-theme="b">
-    <div data-role="header">
+  <div id="tilingScheme" data-role="page">
+    <div data-role="header" data-theme="f">
       <h1>tilingScheme</h1>
     </div>
     
@@ -64,7 +64,7 @@
       <table>
         <tr><th>tileWidth (Number)</th><td>the width in pixels of a single tile</td></tr>
         <tr><th>tileHeight (Number)</th><td>the height in pixels of a single tile</td></tr>
-        <tr><th>origin (Array&lt;Number&gt;)</th><td>a <a href="http://geojson.org/geojson-spec.html#positions">GeoJSON position</a> for the top-left corner of the map tiles in map units, this is used to correctly position tiles into the map view</td></tr>
+        <tr><th>origin (Array&lt;Number&gt;)</th><td>a <a href="http://geojson.org/geojson-spec.html#positions" rel="external">GeoJSON position</a> for the top-left corner of the map tiles in map units, this is used to correctly position tiles into the map view</td></tr>
         <tr><th>pixelSizes (Array&lt;Number&gt;)</th><td>an array of all pixel sizes (called resolutions on Esri's products) hosted by the map service, each one represents a zoom level therefore the total number of zoom levels equals the length of the pixelSizes array</td></tr>
         <tr><th>basePixelSize (Number)</th><td>the pixelSize represented by the tiles on zoom level 0, used when each pixelSize is a power of two smaller than the previous one</td></tr>
         <tr><th>levels (Number)</th><td>the total number of pixelSizes allowed, used in conjuction with basePixelSize to determine how far a user is allowed to zoom</td></tr>

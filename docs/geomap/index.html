@@ -5,15 +5,15 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <title>geomap | $.geo</title>
-  <meta name="description" content="$.geo geomap widget">
+  <title>geomap | jQuery Geo</title>
+  <meta name="description" content="jQuery Geo geomap widget">
   <meta name="author" content="Ryan Westphal">
 </head>
 
 <body>
 
-  <div id="geomap" data-role=page data-theme="b">
-    <div data-role="header">
+  <div id="geomap" data-role="page">
+    <div data-role="header" data-theme="d">
       <h1>geomap widget</h1>
     </div>
     
@@ -62,7 +62,7 @@
         zoom-in one level, by calling e.preventDefault() in your callback. This is currently the only geomap event that you can prevent the default action. Calling preventDefault in the callback of any other geomap event has undefined results.</p>
       <p>There are three geomap event <i>types</i>. The type of event determines what is sent to your event handler as the second argument, geo.</p>
       <h3>position events</h3>
-      <p>With position events the geo argument to your callback is a <a href="http://geojson.org/geojson-spec.html#point">GeoJSON Point</a> object having two properties: type &amp; coordinates. The coordinates property is a single <a href="http://geojson.org/geojson-spec.html#positions">GeoJSON position</a>, i.e., an array containing the x and y value. If $.geo.proj is not 
+      <p>With position events the geo argument to your callback is a <a href="http://geojson.org/geojson-spec.html#point" rel="external">GeoJSON Point</a> object having two properties: type &amp; coordinates. The coordinates property is a single <a href="http://geojson.org/geojson-spec.html#positions" rel="external">GeoJSON position</a>, i.e., an array containing the x and y value. If $.geo.proj is not 
         null, the coordinates argument sent to your callback is geodetic, i.e., coordinates[0] is longitude and coordinates[1] is latitude. If $.geo.proj is null, the coordinates argument sent to your callback is in map coordinates based on the tilingScheme for tiled maps and bboxMax for shingled (dynamic) maps.</p>
       <p>The geo argument to your callback is a true GeoJSON object and you can pass this object directly to the append method. You can also send it directly to a database for storage knowing that there are no non-GeoJSON properties wasting space.</p>
       <ul data-role="listview" data-inset="true">
@@ -77,9 +77,9 @@
         </li>
       </ul>
       <h3>bbox events</h3>
-      <p>With bbox events the geo argument to your callback is an object with single property, bbox, which is a <a href="http://geojson.org/geojson-spec.html#bounding-boxes">GeoJSON bounding box</a> in map coordinates. If $.geo.proj is not null, the bbox values are sent to your callback are geodetic. If $.geo.proj is null, the bbox values sent to your callback are in map coordinates based on the tilingScheme for tiled maps and bboxMax for shingled (dynamic) maps.</p>
+      <p>With bbox events the geo argument to your callback is an object with single property, bbox, which is a <a href="http://geojson.org/geojson-spec.html#bounding-boxes" rel="external">GeoJSON bounding box</a> in map coordinates. If $.geo.proj is not null, the bbox values are sent to your callback are geodetic. If $.geo.proj is null, the bbox values sent to your callback are in map coordinates based on the tilingScheme for tiled maps and bboxMax for shingled (dynamic) maps.</p>
       <!--<h3>geometry events</h3>
-      <p>With geometry events the geo argument to your callback is a JavaScript object having two properties: pixels &amp; geometry. Both are multi-dimensional <a href="http://geojson.org/geojson-spec.html#positions">GeoJSON positions</a>, i.e., an array containing the x and y value but pixel is in pixel coordinates based on the current map view and the other in map coordinates based on the tilingScheme for tiled maps and bboxMax for shingled (dynamic) maps.</p>-->
+      <p>With geometry events the geo argument to your callback is a JavaScript object having two properties: pixels &amp; geometry. Both are multi-dimensional <a href="http://geojson.org/geojson-spec.html#positions" rel="external">GeoJSON positions</a>, i.e., an array containing the x and y value but pixel is in pixel coordinates based on the current map view and the other in map coordinates based on the tilingScheme for tiled maps and bboxMax for shingled (dynamic) maps.</p>-->
       <ul data-role="listview" data-inset="true">
         <li>
             <a href="geomapbbox.html">bboxchange</a>
@@ -104,7 +104,7 @@
       <h3>information</h3>
       <ul data-role="listview" data-inset="true">
         <li>
-          <a href="getPixelSize.html">getPixelSize</a>
+          <a href="pixelSize.html">pixelSize</a>
         </li>
       </ul>
       <h3>unit conversion</h3>

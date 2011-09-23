@@ -26,7 +26,7 @@
     </div>
   </div>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-  <script src="http://host.appgeo.com/libs/geo/test/jquery-geo-test.min.js"></script>
+  <script src="http://code.jquerygeo.com/test/jquery.geo-test.min.js"></script>
   <script>
     $(function () {
       var map = $("#map").geomap({
@@ -45,7 +45,7 @@
       states = null;
 
       $.ajax({
-        url: "http://host.appgeo.com/libs/geo/data/usastates.txt",
+        url: "../../data/usastates.json",
         dataType: "json",
         success: function (result) {
           states = result;

@@ -12,8 +12,8 @@
 
 <body>
 
-  <div id="geo" data-role=page data-theme="b">
-    <div data-role="header">
+  <div id="geo" data-role="page">
+    <div data-role="header" data-theme="d">
       <h1>geo namespace</h1>
     </div>
     
@@ -41,7 +41,7 @@ $('map').geomap( {
   bbox: [ 235644, 894775, 237775, 898523 ],
   services: [ /* service object that supports MA State Plane */ ]
 } );</code></pre>
-      <p>$.geo uses the two $.geo.proj functions throughout to convert between geodetic and projected coordinates. However, there are two other functions: fromGeodeticPos and toGeodeticPos which handle the conversion of individual GeoJSON positions. You can extend $.geo.proj with your own implementations of fromGeodeticPos and toGeodeticPos to change the internal projection used by all plugin functions and still use geodetic (longitude/latitude) coordinates as arguments and return values.</p>
+      <p>jQuery Geo uses the two $.geo.proj functions throughout to convert between geodetic and projected coordinates. However, there are two other functions: fromGeodeticPos and toGeodeticPos which handle the conversion of individual GeoJSON positions. You can extend $.geo.proj with your own implementations of fromGeodeticPos and toGeodeticPos to change the internal projection used by all plugin functions and still use geodetic (longitude/latitude) coordinates as arguments and return values.</p>
       <pre><code>$.extend($.geo.proj, {
   fromGeodeticPos: function( coordinate ) {
     var converted = [];
@@ -67,9 +67,9 @@ $('map').geomap( {
       <p>Geometry isn't much fun if you can't do anything with it. These functions help you analyze and manipulate bboxes and GeoJSON geometry objects. You call them directly from the $.geo namespace, e.g.,</p>
       <pre><code>$.geo.distance(point1, point2)</code></pre>
 
-      <p>Except for a few name changes and switching from an object-oriented API to a function-based one, $.geo attempts to follow the names and behavior of the <a href="http://www.vividsolutions.com/jts/jtshome.htm">Java Topology Suite</a> (JTS), the de-facto standard for geometry library APIs. JTS itself is an implementation of the <a href="http://www.opengis.org/techno/specs.htm">OGC Simple Features</a> specification but has made design decisions that improve the API for developers. The most notable of which is having Envelope (called bbox in $.geo and GeoJSON) be its own class type.</p>
+      <p>Except for a few name changes and switching from an object-oriented API to a function-based one, jQuery Geo attempts to follow the names and behavior of the <a href="http://www.vividsolutions.com/jts/jtshome.htm">Java Topology Suite</a> (JTS), the de-facto standard for geometry library APIs. JTS itself is an implementation of the <a href="http://www.opengis.org/techno/specs.htm">OGC Simple Features</a> specification but has made design decisions that improve the API for developers. The most notable of which is having Envelope (called bbox in jQuery Geo and GeoJSON) be its own class type.</p>
       <h3>bbox functions</h3>
-      <p>These functions operate on <a href="http://geojson.org/geojson-spec.html#bounding-boxes">GeoJSON bounding box</a> array, i.e., a JavaScript array having four values:</p>
+      <p>These functions operate on <a href="http://geojson.org/geojson-spec.html#bounding-boxes" rel="external">GeoJSON bounding box</a> array, i.e., a JavaScript array having four values:</p>
       <ul>
         <li>minimum x/longitude</li>
         <li>minimum y/latitude</li>

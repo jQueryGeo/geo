@@ -5,14 +5,14 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <title>internals | $.geo</title>
-  <meta name="description" content="$.geo internals">
+  <title>internals | jQuery Geo</title>
+  <meta name="description" content="jQuery Geo internals">
   <meta name="author" content="Ryan Westphal">
 </head>
 
 <body>
 
-  <div id="internals" data-role=page data-theme="b">
+  <div id="internals" data-role="page" data-theme="b">
     <div data-role="header">
       <h1>internals</h1>
     </div>
@@ -27,19 +27,20 @@
       <h2>Initialization options</h2>
       <p>You may notice that we override jQuery UI's _createWidget function in order to capture the options passed in by the user. <a href="http://twitter.com/ryanttb">Let us know</a> if there's a better way to do that. At the end of _create, we iterate over the passed options and set certain internal state values before creating services and refreshing the map. This insures that we handle supplied bbox or center properly. Since bbox and center can potentially conflict, only supply one. If both are supplied the behavior is technically undefined but currently center will override bbox.</p>
       <h2>bbox cache</h2>
-      <p>When $.geo does calculate a bbox, it will cache the result (in non-geodetic 
-        coordinates) for faster access next time. The next time we call bbox we will get the cached value.</p>
-      <pre><code><span class="comment">// a calculated bbox is cached after it is first calculated,
-which is when it&#39;s first asked for.</span>
+      <p>When you append a shape to the map, the geomap widget will cache the shape&#39;s bounding box (in non-geodetic 
+        coordinates) for faster searches when you call find. When you remove a shape from the map, the cache will be cleared. When you use the $.geo.bbox method on a shape after it has been appended to the map, the cached bounding box will be returned.</p>
+      <pre><code><span class="comment">// the bbox of an appended shape is cached while it is on the map</span>
 var calculatedBbox = $.geo.bbox(shape);
-var cachedBbox = $.geo.bbox(shape);</pre>
-      </code>
-      <p>More advanced developers may want to keep this in mind for the situation where, 
-        rather than replacing the whole geometry object, you want to change an object's specific coordinates directly (or geometries&#39; 
-        coordinates if you're working with the bbox of a GeometryCollection). In this case, you should remove the cached bbox. $.geo caches the bbox using jQuery's data function under the name geoBbox. To remove this cache, you can call removeData directly on the shape object:</p>
+$(&quot;#map&quot;).geomap(&quot;append&quot;, shape);
+var cachedBbox = $.geo.bbox(shape);
+$(&quot;#map&quot;).geomap(&quot;remove&quot;, shape);
+var calculatedAgain = $.geo.bbox(shape);</code></pre>
+      <p>jQuery Geo caches the bbox using jQuery's data function under the name geoBbox. Though I can&#39;t think of a reason to do so, you can remove this cache by calling removeData directly on the shape object:</p>
       <pre><code>$.removeData(shape, &quot;geoBbox&quot;);</code></pre>
+      <p>jQuery Geo's caching will not alter your geometry object so you don't have to worry about unintentionally storing or sending extra data to a server.</p>
       <h2>External libraries</h2>
-      <p>Apart from the jQuery UI widget factory, geomap includes a couple external libraries.    <h3>Mouse wheel extension 3.0.2</h3>
+      <p>Apart from the jQuery UI widget factory, geomap includes a couple external libraries.</p>
+      <h3>Mouse wheel extension 3.0.2</h3>
       <a href="http://plugins.jquery.com/node/7146">http://plugins.jquery.com/node/7146</a>
       <p>We've found this to be a very stable mousewheel special event plugin and are using it to handle mouse wheel interaction. This plugin's license comment and source are included intact in the minified releases of 
         jQuery Geo.</p>
