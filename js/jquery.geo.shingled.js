@@ -9,10 +9,10 @@
             loadCount: 0
           };
 
-          var scHtml = '<div data-geo-service-type="shingled" id="' + service.id + '" style="position:absolute; left:0; top:0; width:16px; height:16px; margin:0; padding:0; display:' + (service.visible === undefined || service.visible ? "block" : "none") + ';"></div>';
+          var scHtml = '<div data-geo-service="shingled" id="' + service.id + '" style="position:absolute; left:0; top:0; width:16px; height:16px; margin:0; padding:0; display:' + (service.visible === undefined || service.visible ? "block" : "none") + ';"></div>';
           servicesContainer.append(scHtml);
 
-          shingledServicesState[service.id].serviceContainer = servicesContainer.children(":last");
+          return (shingledServicesState[service.id].serviceContainer = servicesContainer.children(":last"));
         }
       },
 

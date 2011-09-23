@@ -19,6 +19,13 @@ Documentation is hosted at http://jquerygeo.com
 * docs - launch jquerygeo.com
 * docs - upgrade to jQuery Mobile b3
 * docs - services - remove id property, explain the class property
+* docs - rename getPixelSize to just pixelSize
+* docs - services - change visible to visibility so it matches shapeStyle & CSS
+* docs - geomap - add class child selector to target specific services with toggle & opacity methods
+* geomap - split servieTypes to different files
+* geomap - add data-geo-service to all service container elements, set to type of service
+* geomap - add data-geo-map to map divs initialized with geomap, remove on destroy
+* geomap - allow certain geomap calls on service elements
 
 === 1.0a2.5 (2011-08-03) ===
 * geomap - find - [bug] does not handle GeoJSON features

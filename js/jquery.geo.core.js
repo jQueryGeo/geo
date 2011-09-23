@@ -336,7 +336,7 @@
           radiansPerDegree = 0.0174532925199432958,
           degreesPerRadian = 57.295779513082320877,
           semiMajorAxis = 6378137;
-      
+
       return {
         fromGeodeticPos: function (coordinate) {
           return [
@@ -408,6 +408,12 @@
           return isTriArray ? result : isDblArray ? result[0] : isArray ? result[0][0] : result[0][0][0];
         }
       }
-    })()
+    })(),
+
+    //
+    // service types (defined in other files)
+    //
+
+    _serviceTypes: {}
   }
 })(jQuery, this);

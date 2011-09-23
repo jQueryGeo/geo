@@ -34,7 +34,7 @@
     return &quot;http://tile.openstreetmap.org/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png&quot;;
   },
   attr: &quot;&amp;copy; OpenStreetMap &amp;amp; contributors, CC-BY-SA&quot;,
-  visible: true,
+  visibility: &quot;visible&quot;,
   opacity: 1.0
 } ]</pre></code></td>
         </tr>
@@ -49,7 +49,7 @@
     return &quot;http://tile.openstreetmap.org/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png&quot;;
   },
   attr: &quot;&amp;copy; OpenStreetMap &amp;amp; contributors, CC-BY-SA&quot;,
-  visible: true,
+  visibility: &quot;visible&quot;,
   opacity: 1.0
 } ] } );</code></pre></td>
         </tr>
@@ -62,7 +62,8 @@
         </tr>
         <tr>
           <td colspan=2><pre><code>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;services&quot;, [ {
-  class: &quot;mapquest-open&quot;,
+  id: &quot;mapquest-open&quot;,
+  class: &quot;basemap&quot;,
   type: &quot;tiled&quot;,
   getUrl: function( view ) {
     return &quot;http://otile&quot; + ((view.index % 4) + 1) + &quot;.mqcdn.com/tiles/1.0.0/osm/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png&quot;;
@@ -74,10 +75,11 @@
       <p>The services property is an array of service objects. The service objects are JavaScript objects that control how the geomap widget displays map images.</p>
       <p>By default, geomap will display OpenStreetMap tiles. You can change all services at once by setting this property with an entirely new array of service objects. You can set a specific part of of a specific service by getting the current array, modifying, adding or deleting one of the service objects and then re-setting the services property with the modified array.</p>
       <h2>service object</h2>
-      <p>A service object has five properties, three of which are required.</p>
+      <p>A service object has six properties, two of which are required. The id and class properties are optional but at least one is recommended so you can target specific services with the toggle and opacity methods.</p>
+      <h3>id</h3>
+      <p>Each service can have an id that distinguishes it from other service objects in the array. The id is a string and must be follow the HTML element id naming conditions. If present, the id must be unique across all services in all maps as well as unique from any other HTML element on the page. The default service object of a geomap widget does not have an id.</p>
       <h3>class</h3>
-      <p>Each service needs an class that distinguishes it from other service objects in the array. The class is a string and must be follow the CSS class naming conditions. You can consider this as the class of images the service will supply and usually name it after the service, such as osm, mass-gis, etc.</p>
-      <p><b>Please note</b> that even though jQuery Geo releases are labeled alpha, we are porting an internal library to open source &amp; strive for stable releases and easy upgrades and will not usually commit breaking changes. However, prior to alpha 3, this property was called id. This change greatly helps us support multiple maps on a page as well as a geomap function syntax that is more aligned with how jQuery works.</p>
+      <p>Each service can have a class as well. The class is a string and must be follow the CSS class naming conditions. You can consider this as the class of images the service will supply and usually name it after the service, such as osm, mass-gis, etc. The default service object of a geomap widget has the class: osm.</p>
       <h3>type</h3>
       <p>A service has a type property which is either &quot;tiled&quot; or &quot;shingled&quot;. Tiled servies will get one image request per tile needed to fill a given view when the map refreshes. The tile request's bbox will only be the size of the given tile. Shingled services will get only one image request each time the map refreshes and the bbox will be the extent of the whole map view.</p>
       <h3>getUrl</h3>
@@ -107,8 +109,8 @@
       </table>
       <h3>attr</h3>
       <p>The attr property is optional. It stands for attribution and is a way to give credit to the source of your map imagery. It defaults to an empty string if not specified in a service object. When present, the map widget displays the HTML provided on the bottom-left corner of the map when the service is visible. Users can click links but cannot interact with all other text or images.</p>
-      <h3>visible</h3>
-      <p>The visible property is optional and defaults to true. It determines whether or not the map will show images from this service while refreshing. You can change the visibility of a service either by changing the visible property of the service object and then setting geomap's services property or by using the toggle convenience method of the geomap widget. The latter is recommended.</p>
+      <h3>visibility</h3>
+      <p>The visibility property is optional and defaults to &quot;visible&quot;. It determines whether or not the map will show images from this service while refreshing. You can change the visibility of a service either by changing the visibility property of the service object to &quot;visible&quot; or &quot;hidden&quot; and then setting geomap's services property or by using the toggle convenience method of the geomap widget. The latter is recommended.</p>
       <h3>opacity</h3>
       <p>The opacity property is optional and defaults to 1.0. It determines how transparent a service is when it is visible. Valid values are floating point numbers between 0 and 1 inclusive. Services with an opacity of 0 will not show on the map even if visible is true. You can change the opacity of a service either by changing the opacity property of the service object and then setting geomap's services property or by using the opacity convenience method of the geomap widget. The latter is recommended.</p>
     </div>

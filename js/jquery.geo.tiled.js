@@ -11,10 +11,10 @@
             serviceContainer: null
           };
 
-          var scHtml = '<div data-geo-service-type="tiled" id="' + service.id + '" style="position:absolute; left:0; top:0; width:8px; height:8px; margin:0; padding:0; display:' + (service.visible === undefined || service.visible ? "block" : "none") + ';"></div>';
+          var scHtml = '<div data-geo-service="tiled" id="' + service.id + '" style="position:absolute; left:0; top:0; width:8px; height:8px; margin:0; padding:0; display:' + (service.visible === undefined || service.visible ? "block" : "none") + ';"></div>';
           servicesContainer.append(scHtml);
 
-          tiledServicesState[service.id].serviceContainer = servicesContainer.children(":last");
+          return (tiledServicesState[service.id].serviceContainer = servicesContainer.children(":last"));
         }
       },
 
@@ -40,7 +40,7 @@
 
         if (service && tiledServicesState[service.id] != null && (service.visible === undefined || service.visible)) {
 
-          var
+          var 
           pixelSize = map.getPixelSize(),
 
           serviceState = tiledServicesState[service.id],

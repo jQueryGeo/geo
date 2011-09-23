@@ -34,7 +34,7 @@
     <h2>
       examples</h2>
     <p>
-      The map below is initialized to some WMS services as shown here. We also have to set $.proj to null, turn off the tilingScheme and set a bboxMax when initializing the map. After that, the checkboxes update the visible property of one of the service objects and then update the services option.</p>
+      The map below is initialized to some WMS services as shown here. We also have to set $.proj to null, turn off the tilingScheme and set a bboxMax when initializing the map. After that, the checkboxes update the visibility property of one of the service objects and then updates the services option.</p>
       <pre><code>{
   services: [
     {
@@ -61,7 +61,7 @@
          + view.bbox + &quot;&WIDTH=&quot; + view.width + &quot;&HEIGHT=&quot; + view.height;
       },
       attr: &quot;&amp;copy; 2011 Commonwealth of Massachusetts&quot;,
-      visible: false
+      visibility: &quot;hidden&quot;
     },
     {
       id: &quot;massgis_hydrography&quot;,
@@ -75,7 +75,7 @@
          + view.bbox + &quot;&WIDTH=&quot; + view.width + &quot;&HEIGHT=&quot; + view.height;
       },
       attr: &quot;&amp;copy; 2011 Commonwealth of Massachusetts&quot;,
-      visible: false
+      visibility: &quot;hidden&quot;
     }
   ],
   bboxMax: [31789.1658, 790194.4183, 337250.8970, 961865.1338],
@@ -92,7 +92,15 @@
     </div>
   </div>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-  <script src="../jquery-geo-test.min.js"></script>
+  <script src="../../js/excanvas.js"></script>
+  <script src="../../js/jquery.mousewheel.min.js"></script>
+  <script src="../../js/jquery.ui.widget.js"></script>
+  <script src="../../js/jquery.geo.core.js"></script>
+  <script src="../../js/jquery.geo.geographics.js"></script>
+  <script src="../../js/jquery.geo.geomap.js"></script>
+  <script src="../../js/jquery.geo.tiled.js"></script>
+  <script src="../../js/jquery.geo.shingled.js"></script>
+  <!--<script src="http://code.jquerygeo.com/test/jquery.geo-test.min.js"></script>-->
   <script>
     $(function () {
 
@@ -113,7 +121,7 @@
               return "http://giswebservices.massgis.state.ma.us/geoserver/wms?LAYERS=massgis%3AGISDATA.INTERIORFOREST_POLY&STYLES=GISDATA.INTERIORFOREST_POLY%3A%3ADefault&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX=" + view.bbox + "&WIDTH=" + view.width + "&HEIGHT=" + view.height;
             },
             attr: "&copy; 2011 Commonwealth of Massachusetts",
-            visible: false
+            visibility: "hidden"
           },
           {
             id: "massgis_hydrography",
@@ -122,7 +130,7 @@
               return "http://giswebservices.massgis.state.ma.us/geoserver/wms?LAYERS=massgis%3AGISDATA.MAJPOND_POLY,massgis%3AGISDATA.MAJSTRM_ARC&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX=" + view.bbox + "&WIDTH=" + view.width + "&HEIGHT=" + view.height;
             },
             attr: "&copy; 2011 Commonwealth of Massachusetts",
-            visible: false
+            visibility: "hidden"
           }
         ],
         bboxMax: [31789.1658, 790194.4183, 337250.8970, 961865.1338],
@@ -145,7 +153,7 @@
         });
 
         if (service) {
-          service.visible = $optService.is(":checked");
+          service.visibility = $optService.is(":checked") ? "visible" : "hidden";
           $("#map").geomap("option", "services", options.services);
         }
       });
