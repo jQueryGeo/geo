@@ -5,15 +5,15 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <title>dblclick | $.geo</title>
-  <meta name="description" content="$.geo dblclick event">
+  <title>dblclick | geomap</title>
+  <meta name="description" content="geomap dblclick event">
   <meta name="author" content="Ryan Westphal">
 </head>
 
 <body>
 
-  <div id="dblclick" data-role=page data-theme="b">
-    <div data-role="header">
+  <div id="dblclick" data-role="page">
+    <div data-role="header" data-theme="a">
       <h1>dblclick</h1>
     </div>
     
@@ -36,7 +36,7 @@
         </tr>
       </table>
       <p>The dblclick event triggers when the user double-clicks or double-taps a point on the map. However, it only triggers if the user is not currently performing some other action which might be handled internally by the widget.</p>
-      <p>The geo argument is a <a href="http://geojson.org/geojson-spec.html#point">GeoJSON Point</a> object of the clicked location in map coordinates.</p>
+      <p>The geo argument is a <a href="http://geojson.org/geojson-spec.html#point" rel="external">GeoJSON Point</a> object of the clicked location in map coordinates.</p>
       <p>The default action for a double-click/tap is to zoom the map in one level. However, as a developer you can override this by calling e.preventDefault() in your callback.</p>
       <code><pre>$( &quot;#map&quot; ).geomap( {
   dblclick: function( e, geo ) { e.preventDefault(); }

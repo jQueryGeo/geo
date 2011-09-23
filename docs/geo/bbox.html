@@ -6,14 +6,14 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
   <title>bbox | $.geo</title>
-  <meta name="description" content="$.geo bbox method">
+  <meta name="description" content="jQuery Geo bbox method">
   <meta name="author" content="Ryan Westphal">
 </head>
 
 <body>
 
-  <div id="bbox" data-role="page" data-theme="b">
-    <div data-role="header">
+  <div id="bbox" data-role="page">
+    <div data-role="header" data-theme="b">
       <h1>bbox</h1>
     </div>
     
@@ -21,7 +21,7 @@
       <table>
         <tr>
           <th>return type</th>
-          <td>Array ( <a href="http://geojson.org/geojson-spec.html#bounding-boxes">GeoJSON bounding box</a> )</td>
+          <td>Array ( <a href="http://geojson.org/geojson-spec.html#bounding-boxes" rel="external">GeoJSON bounding box</a> )</td>
         </tr>
         <tr>
           <th>syntax</th>
@@ -37,7 +37,7 @@
         </tr>
       </table>
       <p>The bbox method calculates the smallest box that will contain all the positions in the passed-in shape. The shape can be any GeoJSON geometry object from Point to GeometryCollection.</p>
-      <p>The GeoJSON spec allows for each geometry type to have a bbox property. The $.geo.bbox method will honor that property and assume it is accurate. It will return the value of that property before attempting to calculate the bbox itself. If you wish to force $.geo to calculate the bbox, you will have to manually delete the bbox property from the geometry object.</p>
+      <p>The GeoJSON spec allows for each geometry type to have a bbox property. The $.geo.bbox method will honor that property and assume it is accurate. It will return the value of that property before attempting to calculate the bbox itself. If you wish to force $.geo.bbox to calculate the bbox, you will have to manually delete the bbox property from the geometry object.</p>
       <pre><code>var shape = {
   type: &quot;LineString&quot;, coordinates: [
     [ -71, 40 ], [ -70.5, 41 ]

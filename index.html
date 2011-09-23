@@ -118,7 +118,7 @@
       <h2>Edge</h2>
       <p>
         The links above will always point to the latest stable release. However, you can test the most recently committed docs, code &amp; demos by heading over to the test release.</p>
-      <a data-role="button" href="http://host.appgeo.com/libs/geo/test/" title="jQuery Geo test build">Test docs &amp; demos</a>
+      <a data-role="button" href="http://jquerygeo.com/test/" title="jQuery Geo test build">Test docs &amp; demos</a>
     </div>
   </div>
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
@@ -126,15 +126,30 @@
   <script type="text/javascript" src="http://host.appgeo.com/libs/geo/alpha2/jquery-geo-alpha2.min.js"></script>
   <script type="text/javascript">
     $(function () {
-      var map = $(".geomap").geomap({
-        center: [-71.0595678, 42.3604823],
-        zoom: 6
-      });
-      map.geomap("opacity", "OSM", .5);
+      var map;
 
       $(".nav").buttonset();
       $("a").filter("[data-role='button']").button();
-    });
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (p) {
+          initMap([p.coords.longitude, p.coords.latitude]);
+        }, function (error) {
+          initMap();
+        });
+      } else {
+        initMap();
+      }
+
+      function initMap(center) {
+        map = $("#map").geomap({
+          center: center || [-71.0597732, 42.3584308],
+          zoom: 7
+        });
+
+        map.geomap("opacity", "OSM", .5);
+      }
+   });
   </script>
   <script type="text/javascript">
     var _gaq = [['_setAccount', 'UA-24912338-2'], ['_trackPageview']];

@@ -5,15 +5,15 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <title>opacity | $.geo</title>
-  <meta name="description" content="$.geo opacity method">
+  <title>opacity | geomap</title>
+  <meta name="description" content="geomap opacity method">
   <meta name="author" content="Ryan Westphal">
 </head>
 
 <body>
 
-  <div id="opacity" data-role=page data-theme="b">
-    <div data-role="header">
+  <div id="opacity" data-role="page">
+    <div data-role="header" data-theme="e">
       <h1>opacity</h1>
     </div>
     
@@ -25,15 +25,52 @@
         </tr>
         <tr>
           <th>syntax</th>
-          <td>.geomap( &quot;opacity&quot;, String serviceId, Number opacity )</td>
+          <td>$( <i>selector</i> ).geomap( &quot;opacity&quot;, Number opacity )</td>
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>$(&quot;map&quot;).geomap( &quot;opacity&quot;, &quot;OSM&quot;, .5 )</code></pre></td>
+          <td><pre><code>$(&quot;#map&quot;).geomap( &quot;opacity&quot;, .5 )
+$(&quot;#map .osm&quot;).geomap( &quot;opacity&quot;, .7 )</code></pre>
+          </td>
         </tr>
       </table>
-      <p>This convenience method sets the value of the opacity property of the requested service's object in the services array to the specified value.</p>
+      <p>This convenience method sets the value of the opacity property of service objects in the services array.</p>
       <p>It will also update the opacity of all images already requested by the service.</p>
+      <p>If you call opacity directly on geomap's div element, it will apply to all services. You can target individual services using a CSS selector based on the map div id and the class supplied for the service in its service object or just the id of the service if supplied in its service object.</p>
+      <pre><code>// for example, given the following as the map div
+&lt;div id=&quot;map&quot;&gt;&lt;/div&gt;
+
+// and initializing geomap with the following services
+$(&quot;#map&quot;).geomap({
+  services: [
+    {
+      id: &quot;water&quot;,
+      class: &quot;mass-gis&quot;,
+      type: &quot;shingled&quot;,
+      getUrl: function ( view ) { return null; }
+    },
+    {
+      id: &quot;towns&quot;,
+      class: &quot;mass-gis&quot;,
+      type: &quot;shingled&quot;,
+      getUrl: function ( view ) { return null; }
+    },
+    {
+      id: &quot;harbor-cruise&quot;,
+      type: &quot;shingled&quot;,
+      getUrl: function ( view ) { return null; }
+    }
+  ]
+});
+
+// you can later change the opacity of all services
+$(&quot;#map&quot;).geomap(&quot;opacity&quot;, .8);
+
+// all mass-gis services
+$(&quot;#map .mass-gis&quot;).geomap(&quot;opacity&quot;, .5);
+
+// or a specific service
+$(&quot;#harbor-cruise&quot;).geomap(&quot;opacity&quot;, 1.0);</code></pre>
       <p>This is much faster than changing a service object's opacity value yourself and updating geomap's services property.</p>
     </div>
   </div> <!-- end of #container -->

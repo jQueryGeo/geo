@@ -5,16 +5,16 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <title>getPixelSize | $.geo</title>
-  <meta name="description" content="$.geo getPixelSize method">
+  <title>pixelSize | geomap</title>
+  <meta name="description" content="geomap pixelSize method">
   <meta name="author" content="Ryan Westphal">
 </head>
 
 <body>
 
-  <div id="getPixelSize" data-role=page data-theme="b">
-    <div data-role="header">
-      <h1>getPixelSize</h1>
+  <div id="pixelSize" data-role="page">
+    <div data-role="header" data-theme="e">
+      <h1>pixelSize</h1>
     </div>
     
     <div data-role="content">
@@ -25,15 +25,15 @@
         </tr>
         <tr>
           <th>syntax</th>
-          <td>.geomap( &quot;getPixelSize&quot; );</td>
+          <td>.geomap( &quot;pixelSize&quot; );</td>
         </tr>
         <tr>
           <th>usage</th>
-          <td><code><pre>var pixelSize = $( <i>selector</i> ).geomap( &quot;getPixelSize&quot; );</pre></code></td>
+          <td><pre><code>var pixelSize = $( <i>selector</i> ).geomap( &quot;pixelSize&quot; );</code></pre></td>
         </tr>
       </table>
       <p>The pixel size is the number of map units a single pixel occupies in the current view. A more interesting way to think of it is the Earth-size of the pixel.</p>
-      <p>Because the default internal projection is web mercator meters, the default return value for getPixelSize is in meters even though you set other map values in lon/lat degrees. The unit type will always match the type you set on tilingScheme for tiled maps or bboxMax for shingled (dynamic) maps. For more information on how the plugin handles projections, please read the geo section of this documentation.</p>
+      <p>Because the default internal projection is web mercator meters, the default return value for pixelSize is in meters even though you set other map values in lon/lat degrees. The unit type will always match the type you set on tilingScheme for tiled maps or bboxMax for shingled (dynamic) maps. For more information on how the plugin handles projections, please read the geo section of this documentation.</p>
       <p>The map's pixel size is read-only. To change it you will need to use one of the mutable properties such as bbox, center or zoom.</p>
       <p>The default pixelSize is calculated based on the tilingScheme and zoom for tiled maps or bbox/bboxMax ratio for shingled maps.</p>
     </div>
