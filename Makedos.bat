@@ -13,6 +13,8 @@ type js\jquery.ui.widget.js >> docs\jquery.geo-%1.js
 type js\jquery.geo.core.js >> docs\jquery.geo-%1.js
 type js\jquery.geo.geographics.js >> docs\jquery.geo-%1.js
 type js\jquery.geo.geomap.js >> docs\jquery.geo-%1.js
+type js\jquery.geo.tiled.js >> docs\jquery.geo-%1.js
+type js\jquery.geo.shingled.js >> docs\jquery.geo-%1.js
 
 echo Minifying build
 java -jar build\google-compiler-20100917.jar --js docs\jquery.geo-%1.js --js_output_file docs\jquery.geo-%1.min.js
