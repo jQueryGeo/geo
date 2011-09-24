@@ -105,7 +105,10 @@
       </div>
       <h2>jQuery Geo - an interactive mapping plugin</h2>
       <p>jQuery Geo, an open-source project from Applied Geographics, provides a streamlined API for a large percentage of your online mapping needs. Whether you just want to display a map on a wep page as quickly as possible or you are a more advanced GIS user, jQuery Geo can help!</p>
-      <h2>Alpha 2.5 Released!</h2>
+      <p>This project is considered alpha only because it does not yet fully implement the feature set of our scheduled beta release. Alpha releases are stable and should not change much as we port technology from our internal library to the open source one.</p>
+      <h2>Alpha 3 docs online!</h2>
+      <p>While alpha 2.5 is still the current stable release of code, the documentation for our third release is now available online. Click the Test docs link below to dive in!</p>
+      <h2>Alpha 2.5 released</h2>
       <time>2011-08-02</time>
       <p>jQuery Geo 1.0 Alpha 2.5 improves support for shape searches, shape drawing, projection and map interaction!</p>
       <p>There are also a few new demos to play with that include drawing a full GeoJSON FeatureCollection of the United States and searching Twitter for geo-enabled tweets.</p>
@@ -142,7 +145,7 @@
       }
 
       function initMap(center) {
-        map = $("#map").geomap({
+        map = $(".geomap").geomap({
           center: center || [-71.0597732, 42.3584308],
           zoom: 7
         });
