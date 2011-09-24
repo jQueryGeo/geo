@@ -168,14 +168,14 @@
 
       this._$eventTarget.mousewheel($.proxy(this._eventTarget_mousewheel, this));
 
+      var geomap = this;
       $(window).resize(function () {
-        if (this._timeoutResize) {
-          clearTimeout(this._timeoutResize);
+        if (geomap._timeoutResize) {
+          clearTimeout(geomap._timeoutResize);
         }
         this._timeoutResize = setTimeout(function () {
-          this._$elem.geomap("resize");
+          geomap._$elem.geomap("resize");
         }, 500);
-
       });
 
       this._$shapesContainer.geographics();
