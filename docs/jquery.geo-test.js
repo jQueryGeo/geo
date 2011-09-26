@@ -2813,7 +2813,7 @@ $.Widget.prototype = {
       refresh = (refresh === undefined || refresh);
 
       if (shape) {
-        var shapes, map = this;
+        var shapes, geomap = this;
         if (shape.type == "FeatureCollection") {
           shapes = shape.features;
         } else {
@@ -2821,7 +2821,7 @@ $.Widget.prototype = {
         }
 
         $.each(shapes, function () {
-          this._graphicShapes[this._graphicShapes.length] = {
+          geomap._graphicShapes[geomap._graphicShapes.length] = {
             shape: this,
             style: style
           };
@@ -2878,11 +2878,12 @@ $.Widget.prototype = {
     },
 
     remove: function (shape) {
+      var geomap = this;
       $.each(this._graphicShapes, function (i) {
         if (this.shape == shape) {
-          var rest = this._graphicShapes.slice(i + 1 || this._graphicShapes.length);
-          this._graphicShapes.length = i < 0 ? this._graphicShapes.length + i : i;
-          this._graphicShapes.push.apply(this._graphicShapes, rest);
+          var rest = geomap._graphicShapes.slice(i + 1 || geomap._graphicShapes.length);
+          geomap._graphicShapes.length = i < 0 ? geomap._graphicShapes.length + i : i;
+          geomap._graphicShapes.push.apply(geomap._graphicShapes, rest);
           return false;
         }
       });
@@ -3592,7 +3593,7 @@ $.Widget.prototype = {
         }
       },
 
-      destroy: function (map, service) {
+      destroy: function (map, servicesContainer, service) {
         tiledServicesState[service.id].serviceContainer.remove();
         delete tiledServicesState[service.id];
       },
