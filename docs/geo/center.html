@@ -29,12 +29,13 @@
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>var bboxCenter = $.geo.center( bbox )</pre></code></td>
+          <td><pre><code>var bboxCenter = $.geo.center( bbox )</code></pre></td>
         </tr>
       </table>
       <p>The center method calculates the center of a bbox and returns it as a GeoJSON position.</p>
       <p>It operates on bounding boxes and should not be confused with the centroid function, which operates on GeoJSON geometry objects.</p>
-      <p>$.geo.center is projection agnostic which means it never calls the from/toGeodetic methods in $.geo.proj as the math is the same regardless. The return position will be in the same units as your bbox argument.</p>
+      <p>To calculate an accurate center, this method must operate in non-geodetic coordinates. 
+        Therefore, if $.geo.proj is not null, this method first calls fromGeodetic on the incoming bbox and toGeodetic on the return point.</p>
       <p>This function is called Envelope.centre in JTS (I assume because JTS is built in British Columbia).</p>
     </div>
   </div> <!-- end of #container -->
