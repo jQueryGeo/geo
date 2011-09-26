@@ -18,7 +18,7 @@
         }
       },
 
-      destroy: function (map, service) {
+      destroy: function (map, servicesContainer, service) {
         tiledServicesState[service.id].serviceContainer.remove();
         delete tiledServicesState[service.id];
       },

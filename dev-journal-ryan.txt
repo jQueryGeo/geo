@@ -14,7 +14,7 @@
 * geomap - empty should remove the bbox cache for all shapes
 * geomap - rename getPixelSize to just pixelSize
 * geomap - use _currentServices in all functions unless we actually need to update the public  options services object
-* geomap - [bug] adding a service by modifying the services array after initialization fails
+* geomap - [bug] changing services array after initialization fails
 * geomap - [bug] multiple maps do not work on the same page
 * examples - massgis basemap now contains both forest and hydrography layers
 * [internal] - geo - add private _from/_toGeodeticBbox methods
@@ -65,6 +65,12 @@
 * geomap - find - [maybe] after flatten, check more cached bboxes for non-Point geometries
 * docs - services - document the plugin architecture
 ** create must return a jQuery collection where geomap can store state info
+
+==2011-09-26==
+===refactor===
+Found bugs in serviceType.destroy and graphics due to code refactor. The CDN, while wonderful, takes too long to update. I suppose it's not the best idea to put the test branch on the CDN. Done. I'll still occasionally copy test to the CDN but mostly I'm going to update the non-CDN'd version until I know things are ok.
+
+Alpha 3 docs online & tweeted about!
 
 ==2011-09-24==
 ===resize===
