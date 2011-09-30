@@ -1,10 +1,10 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-  <title>TEMPLATE example</title>
+  <title>zoom example</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
-  <meta name="description" content="An example of TEMPLATE">
+  <meta name="description" content="An example of zoom">
   <meta name="author" content="Ryan Westphal">
   <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/blitzer/jquery-ui.css" />
   <link rel="stylesheet" type="text/css" href="css/style.css" />
@@ -22,13 +22,14 @@
 <body>
   <div>
     <div id="map">
-      <div class="info">
-        <a href="../" class="docLink">&lt; docs</a>
-        <h1>
-          TEMPLATE</h1>
-        <p>
-        </p>
-      </div>
+    </div>
+    <div class="info">
+      <a href="../" class="docLink">&lt; docs</a>
+      <h1>
+        zoom</h1>
+      <p>
+        This example uses the zoom method (as opposed to the zoom option) to change the zoom by relative amounts. Input a number of levels by which to change and click zoom. Negative values zoom out.</p>
+      <input type="number" id="zoom" value="1" /><button type="button">zoom</button>
     </div>
   </div>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
@@ -44,9 +45,16 @@
   <!--<script src="http://jquerygeo.com/test/jquery.geo-test.min.js"></script>-->
   <script>
     $(function () {
-      $("#map").geomap({
+      var map = $("#map").geomap({
         center: [-71.0595678, 42.3604823],
         zoom: 8
+      });
+
+      $("button").button().click(function () {
+        var value = parseInt($("input").val());
+        if (value) {
+          map.geomap("zoom", value);
+        }
       });
     });  
   </script>

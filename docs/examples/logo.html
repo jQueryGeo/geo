@@ -46,26 +46,27 @@
   <script src="http://jquerygeo.com/test/jquery.geo-test.min.js"></script>
   <script>
     $(function () {
-      var 
-      dblClickTimeout = null, //< We use this timer to distinguish between click & dblclick, don't draw a logo on a dblclick
-      map = $("#map").geomap({
-        center: [-75, 40],
-        zoom: 5,
-        click: function (e, geo) {
-          if (dblClickTimeout == null) {
-            dblClickTimeout = setTimeout(function () {
-              addLogo(geo);
-              dblClickTimeout = null;
-            }, 250);
-          }
-        },
-        dblclick: function (e, geo) {
-          clearTimeout(dblClickTimeout);
-          dblClickTimeout = null;
-        }
-      });
+      var dblClickTimeout = null, //< We use this timer to distinguish between click & dblclick, don't draw a logo on a dblclick
 
-      var width = $(document).width();
+          map = $("#map").geomap({
+            center: [-75, 40],
+            zoom: 5,
+            click: function (e, geo) {
+              if (dblClickTimeout == null) {
+                dblClickTimeout = setTimeout(function () {
+                  addLogo(geo);
+                  dblClickTimeout = null;
+                }, 250);
+              }
+            },
+            dblclick: function (e, geo) {
+              clearTimeout(dblClickTimeout);
+              dblClickTimeout = null;
+            }
+          }),
+
+          width = $(document).width();
+
       addLogo({ pixels: [16, 16], coordinates: map.geomap("toMap", [32, 16]) });
 
       function addLogo(geo) {

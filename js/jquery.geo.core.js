@@ -100,7 +100,7 @@
 
     // bbox (Geometry.getEnvelope in JTS)
 
-    _bbox: function (geom) {
+    bbox: function (geom) {
       var result = $.data(geom, "geoBbox");
       if (!result) {
         if (geom.bbox) {
@@ -110,6 +110,10 @@
 
           var coordinates = this._allCoordinates(geom),
               curCoord = 0;
+
+          if ($.geo.proj) {
+            coordinates = $.geo.proj.fromGeodetic(coordinates);
+          }
 
           for (; curCoord < coordinates.length; curCoord++) {
             result[0] = Math.min(coordinates[curCoord][0], result[0]);
@@ -121,7 +125,8 @@
           $.data(geom, "geoBbox", result);
         }
       }
-      return result;
+
+      return $.geo.proj ? $.geo.proj.toGeodetic(result) : result;
     },
 
     // contains
@@ -327,6 +332,160 @@
     },
 
     //
+    // WKT functions
+    //
+
+    _WKT: (function () {
+      function pointToString(value) {
+        return "POINT " + pointToUntaggedString(value.coordinates);
+      }
+
+      function pointToUntaggedString(coordinates) {
+        if (!(coordinates && coordinates.length)) {
+          return "EMPTY";
+        } else {
+          return "(" + coordinates.join(" ") + ")";
+        }
+      }
+
+      function lineStringToString(value) {
+        return "LINESTRING " + lineStringToUntaggedString(value.coordinates);
+      }
+
+      function lineStringToUntaggedString(coordinates) {
+        if (!(coordinates && coordinates.length)) {
+          return "EMPTY";
+        } else {
+          var points = []
+
+          for (var i = 0; i < coordinates.length; i++) {
+            points.push(coordinates[i].join(" "));
+          }
+
+          return "(" + points + ")";
+        }
+      }
+
+      function polygonToString(value) {
+        return "POLYGON " + polygonToUntaggedString(value.coordinates);
+      }
+
+      function polygonToUntaggedString(coordinates) {
+        if (!(coordinates && coordinates.length)) {
+          return "EMTPY";
+        } else {
+          var lineStrings = [];
+
+          for (var i = 0; i < coordinates.length; i++) {
+            lineStrings.push(lineStringToUntaggedString(coordinates[i]));
+          }
+
+          return "(" + lineStrings + ")";
+        }
+      }
+
+      function multiPointToString(value) {
+        return "MULTIPOINT " + lineStringToUntaggedString(value.coordinates);
+      }
+
+      function multiLineStringToString(value) {
+        return "MULTILINSTRING " + polygonToUntaggedString(value.coordinates);
+      }
+
+      function multiPolygonToString(value) {
+        return "MULTIPOLYGON " + multiPolygonToUntaggedString(value.coordinates);
+      }
+
+      function multiPolygonToUntaggedString(coordinates) {
+        if (!(coordinates && coordinates.length)) {
+          return "EMPTY";
+        } else {
+          var polygons = [];
+          for (var i = 0; i < coordinates.length; i++) {
+            polygons.push(polygonToUntaggedString(coordinates[i]));
+          }
+          return "(" + polygons + ")";
+        }
+      }
+
+      function geometryCollectionToString(value) {
+        return "GEOMETRYCOLLECTION " + geometryCollectionToUntaggedString(value.geometries);
+      }
+
+      function geometryCollectionToUntaggedString(geometries) {
+        if (!(geometries && geometries.length)) {
+          return "EMPTY";
+        } else {
+          var geometryText = [];
+          for (var i = 0; i < geometries.length; i++) {
+            geometryText.push(stringify(geometries[i]));
+          }
+          return "(" + geometries + ")";
+        }
+      }
+
+      function stringify(value) {
+        if (!(value && value.type)) {
+          return "";
+        } else {
+          switch (value.type) {
+            case "Point":
+              return pointToString(value);
+
+            case "LineString":
+              return lineStringToString(value);
+
+            case "Polygon":
+              return polygonToString(value);
+
+            case "MultiPoint":
+              return multiPointToString(value);
+
+            case "MultiLineString":
+              return multiLineStringToString(value);
+
+            case "MultiPolygon":
+              return multiPolygonToString(value);
+
+            case "GeometryCollection":
+              return geometryCollectionToString(value);
+
+            default:
+              return "";
+          }
+        }
+      }
+
+      function pointParseUntagged(wkt) {
+        var pointString = wkt.match(/\(\s*([\d\.-]+)\s+([\d\.-]+)\s*\)/);
+        return pointString && pointString.length >= 2 ? {
+          type: "Point",
+          coordinates: [
+            parseFloat(pointString[1]),
+            parseFloat(pointString[2])
+          ]
+        } : null;
+      }
+
+      function parse(wkt) {
+        wkt = $.trim(wkt);
+
+        var typeIndex = wkt.indexOf(" ");
+
+        switch (wkt.substr(0, typeIndex).toUpperCase()) {
+          case "POINT":
+            return pointParseUntagged(wkt.substr(typeIndex + 1));
+        }
+      }
+
+      return {
+        stringify: stringify,
+
+        parse: parse
+      };
+    })(),
+
+    //
     // projection functions
     //
 
@@ -347,30 +506,39 @@
 
         fromGeodetic: function (coordinates) {
           var isArray = $.isArray(coordinates[0]),
-              isDblArray = isArray && $.isArray(coordinates[0][0]),
-              isTriArray = isDblArray && $.isArray(coordinates[0][0][0]),
-              result = [[[]]],
               fromGeodeticPos = this.fromGeodeticPos;
 
-          if (!isTriArray) {
-            if (!isDblArray) {
-              if (!isArray) {
+          if (!isArray && coordinates.length == 4) {
+            // bbox
+            var min = fromGeodeticPos([coordinates[0], coordinates[1]]),
+                max = fromGeodeticPos([coordinates[2], coordinates[3]]);
+            return [min[0], min[1], max[0], max[1]];
+          } else {
+            // geometry
+            var isDblArray = isArray && $.isArray(coordinates[0][0]),
+                isTriArray = isDblArray && $.isArray(coordinates[0][0][0]),
+                result = [[[]]];
+
+            if (!isTriArray) {
+              if (!isDblArray) {
+                if (!isArray) {
+                  coordinates = [coordinates];
+                }
                 coordinates = [coordinates];
               }
               coordinates = [coordinates];
             }
-            coordinates = [coordinates];
-          }
 
-          $.each(coordinates, function (i) {
-            $.each(this, function (j) {
-              $.each(this, function (k) {
-                result[i][j][k] = fromGeodeticPos(this);
+            $.each(coordinates, function (i) {
+              $.each(this, function (j) {
+                $.each(this, function (k) {
+                  result[i][j][k] = fromGeodeticPos(this);
+                });
               });
             });
-          });
 
-          return isTriArray ? result : isDblArray ? result[0] : isArray ? result[0][0] : result[0][0][0];
+            return isTriArray ? result : isDblArray ? result[0] : isArray ? result[0][0] : result[0][0][0];
+          }
         },
 
         toGeodeticPos: function (coordinate) {
@@ -382,30 +550,39 @@
 
         toGeodetic: function (coordinates) {
           var isArray = $.isArray(coordinates[0]),
-              isDblArray = isArray && $.isArray(coordinates[0][0]),
-              isTriArray = isDblArray && $.isArray(coordinates[0][0][0]),
-              result = [[[]]],
               toGeodeticPos = this.toGeodeticPos;
 
-          if (!isTriArray) {
-            if (!isDblArray) {
-              if (!isArray) {
+          if (!isArray && coordinates.length == 4) {
+            // bbox
+            var min = toGeodeticPos([coordinates[0], coordinates[1]]),
+                max = toGeodeticPos([coordinates[2], coordinates[3]]);
+            return [min[0], min[1], max[0], max[1]];
+          } else {
+            // geometry
+            var isDblArray = isArray && $.isArray(coordinates[0][0]),
+                isTriArray = isDblArray && $.isArray(coordinates[0][0][0]),
+                result = [[[]]];
+
+            if (!isTriArray) {
+              if (!isDblArray) {
+                if (!isArray) {
+                  coordinates = [coordinates];
+                }
                 coordinates = [coordinates];
               }
               coordinates = [coordinates];
             }
-            coordinates = [coordinates];
-          }
 
-          $.each(coordinates, function (i) {
-            $.each(this, function (j) {
-              $.each(this, function (k) {
-                result[i][j][k] = toGeodeticPos(this);
+            $.each(coordinates, function (i) {
+              $.each(this, function (j) {
+                $.each(this, function (k) {
+                  result[i][j][k] = toGeodeticPos(this);
+                });
               });
             });
-          });
 
-          return isTriArray ? result : isDblArray ? result[0] : isArray ? result[0][0] : result[0][0][0];
+            return isTriArray ? result : isDblArray ? result[0] : isArray ? result[0][0] : result[0][0][0];
+          }
         }
       }
     })(),

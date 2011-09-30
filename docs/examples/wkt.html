@@ -1,10 +1,10 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-  <title>TEMPLATE example</title>
+  <title>WKT parse/stringify example</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
-  <meta name="description" content="An example of TEMPLATE">
+  <meta name="description" content="An example of WKT parse/stringify">
   <meta name="author" content="Ryan Westphal">
   <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/blitzer/jquery-ui.css" />
   <link rel="stylesheet" type="text/css" href="css/style.css" />
@@ -22,13 +22,16 @@
 <body>
   <div>
     <div id="map">
-      <div class="info">
-        <a href="../" class="docLink">&lt; docs</a>
-        <h1>
-          TEMPLATE</h1>
-        <p>
-        </p>
-      </div>
+    </div>
+    <div class="info">
+      <a href="../" class="docLink">&lt; docs</a>
+      <h1>
+        WKT parse &amp; stringify</h1>
+      <p>
+        This example uses $.geo.WKT.stringify to turn your drawn GeoJSON objects into WKT. The Parse button uses $.geo.WKT.parse to read valid WKT from the text box and add shapes to the map.</p>
+      <textarea id="wkt" rows="4" cols="32"></textarea>
+      <button id="parse" type="button">Parse</button>
+      <button id="clear" type="button">Reset</button>
     </div>
   </div>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
@@ -44,9 +47,25 @@
   <!--<script src="http://jquerygeo.com/test/jquery.geo-test.min.js"></script>-->
   <script>
     $(function () {
-      $("#map").geomap({
+      var map = $("#map").geomap({
         center: [-71.0595678, 42.3604823],
-        zoom: 8
+        zoom: 8,
+        click: function (e, geo) {
+          $("#wkt").val($.geo._WKT.stringify(geo));
+          map.geomap("append", geo);
+        }
+      });
+
+      $("#parse").button().click(function (e) {
+        var geo = $.geo._WKT.parse($("textarea").val());
+        if (geo) {
+          map.geomap("append", geo);
+        }
+      });
+
+      $("#clear").button().click(function (e) {
+        $("textarea").val("");
+        map.geomap("empty");
       });
     });  
   </script>

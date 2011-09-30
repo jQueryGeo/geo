@@ -36,10 +36,12 @@
   $.widget("geo.geomap", {
     // private widget members
     _$elem: undefined,
+    _created: false,
 
     _contentBounds: {},
 
     _$contentFrame: undefined,
+    _$existingChildren: undefined,
     _$servicesContainer: undefined,
     _$shapesContainer: undefined,
     _$textContainer: undefined,
@@ -73,6 +75,7 @@
     _lastMove: undefined,
     _lastDrag: undefined,
 
+    _windowHandler: null,
     _timeoutResize: null,
 
     _panning: undefined,
@@ -101,6 +104,8 @@
       }
 
       this._$elem.attr("data-geo-map", "data-geo-map");
+
+      this._graphicShapes = [];
 
       this._initOptions = options;
 
@@ -169,14 +174,18 @@
       this._$eventTarget.mousewheel($.proxy(this._eventTarget_mousewheel, this));
 
       var geomap = this;
-      $(window).resize(function () {
+      this._windowHandler = function () {
         if (geomap._timeoutResize) {
           clearTimeout(geomap._timeoutResize);
         }
         this._timeoutResize = setTimeout(function () {
-          geomap._$elem.geomap("resize");
+          if (geomap._created) {
+            geomap._$elem.geomap("resize");
+          }
         }, 500);
-      });
+      };
+
+      $(window).resize(this._windowHandler);
 
       this._$shapesContainer.geographics();
 
@@ -197,6 +206,8 @@
       this._createServices();
 
       this._refresh();
+
+      this._created = true;
     },
 
     _setOption: function (key, value, refresh) {
@@ -245,7 +256,20 @@
 
     destroy: function () {
       if (this._$elem.is("[data-geo-map]")) {
+        this._created = false;
+
+        $(window).unbind("resize", this._windowHandler);
+
+        for (var i = 0; i < this._currentServices.length; i++) {
+          this._currentServices[i].serviceContainer.geomap("destroy");
+          $.geo["_serviceTypes"][this._currentServices[i].type].destroy(this, this._$servicesContainer, this._currentServices[i]);
+        }
+
+        this._$shapesContainer.geographics("destroy");
+
+        this._$existingChildren.detach();
         this._$elem.html("");
+        this._$elem.append(this._$existingChildren);
         this._$elem.removeAttr("data-geo-map");
       }
       $.Widget.prototype.destroy.apply(this, arguments);
@@ -294,8 +318,18 @@
 
             this._options["services"][i].visible = service.visible = value;
             $.geo["_serviceTypes"][service.type].toggle(this, service);
+
+            if (value) {
+              $.geo["_serviceTypes"][service.type].refresh(this, service);
+            }
           }
         }
+      }
+    },
+
+    zoom: function (numberOfLevels) {
+      if (numberOfLevels != null) {
+        this._setZoom(this._options["zoom"] + numberOfLevels, false, true);
       }
     },
 
@@ -336,6 +370,8 @@
 
       this._setCenterAndSize(this._center, this._pixelSize, false, true);
     },
+
+
 
     shapeStyle: function (style) {
       if (style) {
@@ -387,7 +423,7 @@
             result.push(this.shape);
           }
         } else {
-          var bbox = $.geo._bbox(this.shape),
+          var bbox = $.geo.bbox(this.shape),
                 bboxPolygon = {
                   type: "Polygon",
                   coordinates: [[
@@ -479,19 +515,18 @@
       if (this._options["tilingScheme"]) {
         this._setCenterAndSize(this._center, this._getTiledPixelSize(value), trigger, refresh);
       } else {
-        var 
-          bbox = $.geo._scaleBy(this._getBbox(), 1 / Math.pow(this._zoomFactor, value)),
-          pixelSize = Math.max($.geo._width(bbox) / this._contentBounds.width, $.geo._height(bbox) / this._contentBounds.height);
+        var bbox = $.geo._scaleBy(this._getBbox(), 1 / Math.pow(this._zoomFactor, value)),
+            pixelSize = Math.max($.geo._width(bbox) / this._contentBounds.width, $.geo._height(bbox) / this._contentBounds.height);
         this._setCenterAndSize(this._center, pixelSize, trigger, refresh);
       }
     },
 
     _createChildren: function () {
-      var existingChildren = this._$elem.children().detach();
+      this._$existingChildren = this._$elem.children().detach();
 
-      this._forcePosition(existingChildren);
+      this._forcePosition(this._$existingChildren);
 
-      existingChildren.css("-moz-user-select", "none");
+      this._$existingChildren.css("-moz-user-select", "none");
 
       this._$elem.prepend("<div style='position:absolute; left:" + this._contentBounds.x + "px; top:" + this._contentBounds.y + "px; width:" + this._contentBounds["width"] + "px; height:" + this._contentBounds["height"] + "px; margin:0; padding:0; overflow:hidden; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none;' unselectable='on'></div>");
       this._$eventTarget = this._$contentFrame = this._$elem.children(':first');
@@ -506,7 +541,7 @@
       this._$textContainer = this._$contentFrame.children(':last');
       this._$textContent = this._$textContainer.children();
 
-      this._$contentFrame.append(existingChildren);
+      this._$contentFrame.append(this._$existingChildren);
     },
 
     _createServices: function () {

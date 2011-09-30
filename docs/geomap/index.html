@@ -22,8 +22,7 @@
       <pre><code>.geomap( options )</code></pre>
       <h2>overview</h2>
       <p>The widget creates an interactive map. Users can pan and zoom on desktop and mobile browsers against many different cached tile sets or dynamic map servers. Developers can handle events triggered by user action.</p>
-      <p>The following is currently a static image. Please check out the examples section of the documentation to see geomap in action.</p>
-      <img src="images/map.png" alt="Example image of geomap in use" />
+      <div class="geomap-indoc"></div>
       <h2>options</h2>
       <p>The options argument is a JavaScript object that configures the map widget during the first instantiation on a div. No options are required. By default the map will show the whole world using the OpenStreetMap tile set.</p>
       <p>The map view refreshes when you change these properties: bbox, center, services, tilingScheme &amp; zoom.</p>
@@ -121,14 +120,20 @@
       <p>These methods update the map widget as a whole.</p>
       <ul data-role="listview" data-inset="true">
         <li>
+          <a href="zoomMethod.html">zoom</a>
+        </li>
+        <li>
           <a href="refresh.html">refresh</a>
         </li>
         <li>
           <a href="resize.html">resize</a>
         </li>
+        <li>
+          <a href="destroy.html">destroy</a>
+        </li>
       </ul>
       <h3>service modification</h3>
-      <p>Convenience methods that help update objects in the services array.</p>
+      <p>Methods that help update objects in the services array.</p>
       <ul data-role="listview" data-inset="true">
         <li>
           <a href="toggle.html">toggle</a>
