@@ -33,7 +33,7 @@
   type: &quot;LineString&quot;, coordinates: [
     [ -71, 40 ], [ -70.5, 41 ]
   ]
-} )</pre></code></td>
+} )</code></pre></td>
         </tr>
       </table>
       <p>The bbox method calculates the smallest box that will contain all the positions in the passed-in shape. The shape can be any GeoJSON geometry object from Point to GeometryCollection.</p>
@@ -50,10 +50,10 @@ var calculatedBbox = $.geo.bbox(shape);
 </code></pre>
       <p>To calculate an accurate bbox, this method must operate in non-geodetic coordinates. 
         Therefore, if $.geo.proj is not null, this method first calls fromGeodetic on the incoming shape and toGeodetic on the positions in the returned bbox.</p>
-      <p>Due to the liberties taken by web mercator to display a round Earth on a single 
+      <!--<p>Due to the liberties taken by web mercator to display a round Earth on a single 
         flat plane, when working in geodetic (lon/lat) coordinates, the result of the 
         $.geo.bbox function may not be exactly what you expect based on your input 
-        geodetic geometry.</p>
+        geodetic geometry.</p>-->
       <p>This function is similar to Geometry.getEnvelope in JTS.</p>
      </div>
   </div> <!-- end of #container -->

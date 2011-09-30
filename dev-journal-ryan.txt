@@ -1,53 +1,58 @@
 ﻿== to do ==
 
 === 1.0a3 ===
-* geo - make initial geometry functions public
-* geo - port centroid
-* [internal] - geo - add an internal ignoreProj argument to $.geo geometry functions.
+* geo - distance function
+* geo - contains function
+* geo - centroid function
 * geomap - make service id property optional, add HTML id to serviceContainer if present
 ** store service state data as jQuery data on serviceContainer element
-* geomap - add class child selector to target specific services with toggle & opacity methods
-* geomap - change shapeStyle to a property, explain service class
 * geomap - make the refresh argument in append public, add one to remove & empty
 * geomap - append should cache the shape's bbox (instead of the bbox function)
 * geomap - remove should remove the shape's bbox cache
 * geomap - empty should remove the bbox cache for all shapes
 * geomap - rename getPixelSize to just pixelSize
+* geomap - rename service.visible to visibility having either "visible" or "hidden" values
 * geomap - use _currentServices in all functions unless we actually need to update the public  options services object
+* geomap - create _defaultState object, use for widget-local _widgetState property, reinit _widgetState on _createWidget
 * geomap - [bug] changing services array after initialization fails
 * geomap - [bug] multiple maps do not work on the same page
-* examples - massgis basemap now contains both forest and hydrography layers
-* [internal] - geo - add private _from/_toGeodeticBbox methods
-* geo - calculate & cache bbox in projected coordinates
+* examples - massgis basemap now contains both forest and hydrography layers? makes shingled a bad example
+* examples - $.geo.bbox function
+* examples - geomap resize method
 * geo - ? cache point bbox if $.geo.proj is not null
 * geo - use Array.push instead of $.merge
 * geo - prefer GeoJSON object over $.data, assume it's accurate
+* geo - [bug] bbox does not store projected coordinates of bbox retrieved as bbox property of geometry object
 
 === future ===
 * docs - geomap - more modes: measureDistance, measureArea
+* docs - geomap - document the correct way to add a service after init
+* docs - geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
+* geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
 * docs - geomap - append label argument
-* docs - geomap - shapeLabel property
 * geomap - port shape labels
-* docs - upgrade to jQuery Mobile beta 2
+* docs - $.geo.WKT object
+* geo - $.geo.WKT object
 * docs - make all map examples live
 * docs - explain the 96px scale bar, why 96?
 * docs - write a full page about GeoJSON and what each object type is to $.geo
-* docs - proj - mention that *Geodetic methods can also do bbox
-* docs - geomap - allow name as well as id for service objects
+* docs - geomap - allow name as service object property
 ** if a service has a name property, it will maintain a hidden input with the given name
 * docs - geomap - service-level shapes
 * docs - geomap - service-level shapeStyle
-* geomap - service-level shapes
 * geomap - deep extend existing service objects when services property is set
 * code - prefer $.data over $.fn.data
+* docs - internal - explain what projection is and which one we use by default (3395) and maybe why we call it web mercator
 * docs - internal - document how geomap draws shapes, the geomapgraphics widget and the reason shapeStyle is a method
-* geomap - rename service.visible to visibility having either "visible" or "hidden" values
 * geomap - label divs should have class="geo-label" & style="position: relative;"
 * geomap - find should check labels first
 * geo - implement $.geo.centroid
 ** JTS note: "The centroid is equal to the centroid of the set of component Geometries of highest dimension (since the lower-dimension geometries contribute zero "weight" to the centroid)"
 * geo - Support WKT with $.geo.parseWKT & $.geo.textify
 * geo - All bbox operations should be done in non-geodetic coordinates for accuracy
+* docs - geomap - shapeLabel property
+** template for labels for all shapes added via append
+* geomap - service-level shapes
 * geomap - [bug] mouse wheel on bad or missing tile doesn't zoom out on first rotate
 * geomap - service divs should have class="geo-service"
 * docs/geomap - store WKT input for each service
@@ -65,6 +70,42 @@
 * geomap - find - [maybe] after flatten, check more cached bboxes for non-Point geometries
 * docs - services - document the plugin architecture
 ** create must return a jQuery collection where geomap can store state info
+* docs - geomap - drawPush function
+** in the drawing modes, this function starts drawing or adds a point into the already-started shape at the given coordinate
+** immediately triggers the shape event if mode is drawPoint
+* geomap - drawPush function
+* docs - geomap - drawStop function
+** in the drawing modes, this function ends drawing and triggers the shape event with whatever coordinates have already been added to the shape
+* geomap - drawStop
+
+==2011-09-29==
+===zoom===
+Documenting and adding the zoom method.
+
+===bbox===
+Made bbox public. It's also now storing projected coordinates. $.geo.proj can also accept bbox arguments now.
+
+==2011-09-28==
+===disable auto-proj===
+Peter suggested (for actual GIS users) a way to disable $.geo.proj but keep the object where it is. The situation is: "I know I'm working in a projection, and I want $.geo.proj to match that projection, but I don't want it to attempt to auto-project coordinates I pass to $.geo functions or geomap because I'm going to send it projected coordinates, but I do want the object around for when I might want to un-project some coordinates to geodetic."
+
+That's wordy but it does make sense.
+
+However, instead of adding a boolean on $.geo called autoproject and telling people that they can shut it off, I'm going to test diving into arguments to determine if they are geodetic and auto-projecting myself. There will be a performance hit but I need to test if it's too much or worth the simplicity. I think I'm going to find that it's worth the simplicity. I can then remove A LOT of words from the docs about if $.geo.proj is null, blah, blah.
+
+That's fine for input values, but what about auto-unprojecting output values? Maybe I do need that boolean property on $.geo? Or I can store the last way center, bbox, or bboxMax were set and return values in the same format. I would rather it not be that tricky though. If I do add a property, it would only need to be for geomap. The $.geo functions are stateless.
+
+===wkt===
+Working on WKT.stringify/parse. There will be a $.geo.WKT object.
+
+Moving along, made the frame of a nice test page too.
+
+===destroy memory===
+A destroyed geomap remembers what was in _graphicShapes. This means that any other private property initialized with _prop: default, is remembered. There could be other issues...until I replace all indivdual properties with a single state objects. For now, I'm going to reset _graphicShapes to [] in createWidget.
+
+==2011-09-27==
+===destroy===
+Somethings wrong with destroy, can't create after. One thing missing is that resize is called (by jQuery Mobile?) after the call to destroy which causes a script error. I have to make sure I unbind resize. Huh, I've never had to unbind a handler before. Heh, destroy erases any content you had inside the widget before you created a geomap.
 
 ==2011-09-26==
 ===refactor===

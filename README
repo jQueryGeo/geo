@@ -21,11 +21,22 @@ Documentation is hosted at http://jquerygeo.com
 * docs - services - remove id property, explain the class property
 * docs - rename getPixelSize to just pixelSize
 * docs - services - change visible to visibility so it matches shapeStyle & CSS
-* docs - geomap - add class child selector to target specific services with toggle & opacity methods
+* docs - geomap - allow child selector syntax to target service elements with toggle & opacity methods
 * geomap - split servieTypes to different files
 * geomap - add data-geo-service to all service container elements, set to type of service
 * geomap - add data-geo-map to map divs initialized with geomap, remove on destroy
-* geomap - allow certain geomap calls on service elements
+* geomap - allow child selector syntax to target service elements with toggle & opacity methods
+* geomap - [bug] toggle does not refresh the map services being shown for the first time
+* geomap - [bug] destroy keeps window resize handler
+* geomap - [bug] destroy erases content originally inside map div
+* geomap - serviceType objects' destroy method isn't being called
+* geomap - [bug] destroyed geomaps remember appended shapes
+* docs - geomap - zoom method
+* geomap - zoom method
+* geo - calculate bbox in projected coordinates
+* docs - proj - mention that *Geodetic methods can also do bbox
+* geo - bbox function
+* docs - geomap - destroy method
 
 === 1.0a2.5 (2011-08-03) ===
 * geomap - find - [bug] does not handle GeoJSON features
