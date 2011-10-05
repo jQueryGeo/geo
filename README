@@ -35,8 +35,13 @@ Documentation is hosted at http://jquerygeo.com
 * geomap - zoom method
 * geo - calculate bbox in projected coordinates
 * docs - proj - mention that *Geodetic methods can also do bbox
-* geo - bbox function
+* geo - geometry - bbox function
 * docs - geomap - destroy method
+* geo - bbox - center function
+* geo - bbox - height/width function
+* geo - bbox - expandBy function
+* geo - bbox - scaleBy function
+* geo - bbox - reaspect function
 
 === 1.0a2.5 (2011-08-03) ===
 * geomap - find - [bug] does not handle GeoJSON features

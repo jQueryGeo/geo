@@ -1,9 +1,9 @@
 ﻿== to do ==
 
 === 1.0a3 ===
-* geo - distance function
-* geo - contains function
-* geo - centroid function
+* geo - geometry - distance function
+* geo - geometry - contains function
+* geo - geometry - centroid function
 * geomap - make service id property optional, add HTML id to serviceContainer if present
 ** store service state data as jQuery data on serviceContainer element
 * geomap - make the refresh argument in append public, add one to remove & empty
@@ -16,8 +16,8 @@
 * geomap - create _defaultState object, use for widget-local _widgetState property, reinit _widgetState on _createWidget
 * geomap - [bug] changing services array after initialization fails
 * geomap - [bug] multiple maps do not work on the same page
+* geomap - [bug] zoom method doesn't work with shingled map
 * examples - massgis basemap now contains both forest and hydrography layers? makes shingled a bad example
-* examples - $.geo.bbox function
 * examples - geomap resize method
 * geo - ? cache point bbox if $.geo.proj is not null
 * geo - use Array.push instead of $.merge
@@ -59,7 +59,7 @@
 * geographics - Rename the generated style properties to something simple or get better control over closure compiler
 * geomap - Document and implement find's callback syntax
 * geomap - repeat horizontal tiles
-* geomap - possibly add 
+* geomap - custering demo/support
 * proj - take scale factor into account when calculating distance in web mercator
 * geographics - Disable fill by setting style.fill to "" & stroke by style.stroke to ""
 * graphics - See Modernizr for comment on BB Storm & canvas detection
@@ -77,6 +77,22 @@
 * docs - geomap - drawStop function
 ** in the drawing modes, this function ends drawing and triggers the shape event with whatever coordinates have already been added to the shape
 * geomap - drawStop
+
+==2011-10-04==
+===jqcon===
+I gave a presentation to jQuery Conference Boston 2011. I didn't have much time because I was sharing a block with another speaker. So, my presentation was rushed but I still think a few people interested. I will have to get better at conveying that this is not a wrapper for Google Maps or OpenLayers. We do not host any 3rd party controls.
+
+===jQM buttons===
+With a jQuery Mobile controlgroup or navbar on the same page as a full screen map, I get huge performance issues on Android. iOS seems ok with it. Desktop browsers are fine. The map doesn't pan while sliding your finger but it does show up in the new location when you let go.
+
+Removing the navbar completely didn't help. I think that unless it's a small in-page map, I'm going to have to make the page external.
+
+===bbox===
+To test these new bbox functions, I'm going to redo the bbox example page.
+
+==2011-09-30==
+===json===
+I can store a tiling scheme in JSON but just realized that I can't store a service definition in JSON because of the getUrl function property.
 
 ==2011-09-29==
 ===zoom===

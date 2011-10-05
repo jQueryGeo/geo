@@ -1,158 +1,228 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-  <title>bbox test</title>
-  <link rel="stylesheet" href="css/style.css?v=2">
+  <title>bbox examples</title>
+  <meta charset="utf-8">
+  <meta name="description" content="An example of bbox property and bbox functions">
+  <meta name="author" content="Ryan Westphal">
+  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/blitzer/jquery-ui.css" />
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
   <style type="text/css">
-    label
+    #map
     {
-      display: block;
-      margin: .25em;
+      position: fixed;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
     }
-    label span
+    
+    table 
     {
-      display: inline-block;
+      table-layout: fixed;
+      width: 99%;
+    }
+    
+    table th
+    {
       font-weight: bold;
-      width: 8em;
+      padding-right: 2px;
+      text-align: right;
+      width: 35%;
     }
-    input[type="text"]
+    
+    .bbox-prop input
     {
-      width: 60%;
+      font-family: Courier New, Monospace;
+      width: 70%;
     }
-    #lblStatus
+    
+    .expandBy input
     {
-      background: #ee4;
-      border-radius: .5em;
-      padding: .5em;
+      width: 80px;
+    }
+    
+    .scaleBy input, .reaspect input
+    {
+      width: 64px;
     }
   </style>
 </head>
 <body>
   <div>
-    <a href="../" class="docLink">&lt; docs</a>
-    <h1>
-      bbox test</h1>
-    <p>
-      This page tests getting and setting the bbox property for a tiled service both during init and at runtime. The bbox property is a <a href="http://geojson.org/geojson-spec.html#bounding-boxes" rel="external">GeoJSON bbox</a> which is an array of four numbers that specify the min x, min y, max x and max y values in that order.</p>
-    <h2>
-      init properties</h2>
-    <p>
-      Change the $.geo.proj or bbox values and click set to refresh the page and re-initialize the map.</p>
-    <form action="bbox.html" method="get">
-    <fieldset>
-      <legend>$.geo.proj</legend>
-      <label>
-        <input type="radio" name="proj" value="default" checked />
-        default (bbox is geodetic lon/lat)
-      </label>
-      <label>
-        <input type="radio" name="proj" value="null" />
-        null (bbox is web mercator)
-      </label>
-    </fieldset>
-    <label>
-      bbox
-      <input type="text" name="initBbox" value="[-71,40,-69,44]" /></label>
-    <button type="submit">
-      set</button>
-    </form>
-    <h2>
-      runtime properties</h2>
-    <p>
-      Change the bbox property and click set to update the map without refreshing the page.</p>
-    <p>
-      Be careful to make sure your array values match the $.geo.proj setting above.</p>
-    <label>
-      bbox
-      <input type="text" name="runtimeBbox" value="[-71,40,-69,44]" /></label>
-    <button id="cmdRuntimeBbox" type="button">
-      set</button>
-    <h2>
-      actual values</h2>
-    <p>
-      Since the actual bbox is constrained by the map view dimensions, it can differ from the supplied bbox. If $.geo.proj is not null, the public bbox is in lon/lat but the internal bbox is in map units, web mercator by default.</p>
-    <table>
-      <tr>
-        <th>
-          actual public
-        </th>
-        <td id="lblBboxPublic">
-        </td>
-      </tr>
-      <tr>
-        <th>
-          actual internal
-        </th>
-        <td id="lblBboxInternal">
-        </td>
-      </tr>
-    </table>
-    <div id="map" style="position: relative; width: 480px; height: 320px; background: #e88;">
+    <div id="map">
+    </div>
+    <div class="info">
+      <div class="links">
+        <a href="../" class="docLink">&lt; docs</a>
+        <a href="http://jsfiddle.net/ryanttb/wQ86c/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
+      </div>
+      <h1>
+        bbox</h1>
+      <p>This example tests getting and setting the bbox property on the geomap widget as well as calling various $.geo bbox functions.</p>
+      <form action="bbox.html" class="bbox">
+        <table>
+          <tr class="bbox-prop">
+            <th><label for="bbox-prop">.geomap(&quot;option&quot;, &quot;bbox&quot;,</label> </th>
+            <td><input id="bbox-prop" name="bbox-prop" type="text" /> <b>)</b> <button type="submit">set</button></td>
+          </tr>
+          <tr class="bbox-center">
+            <th>$.geo.center( bbox )</th>
+            <td></td>
+          </tr>
+          <tr class="bbox-width">
+            <th>$.geo.width( bbox )</th>
+            <td></td>
+          </tr>
+          <tr class="bbox-height">
+            <th>$.geo.height( bbox )</th>
+            <td></td>
+          </tr>
+        </table>
+      </form>
+      <p>For this example, the functions below operate on the above text input only. After using them, you can click <b>set</b> to update the map and other info.</p>
+      <form action="bbox.html" class="expandBy">
+        <table>
+          <tr>
+            <th>$.geo.expandBy( bbox, </th>
+            <td><input type="text" name="dx" value="20000" /> <b>,</b> <input type="text" name="dy" value="20000" /> <b>)</b> <button type="submit">expand</button></td>
+          </tr>
+        </table>
+      </form>
+      <form action="bbox.html" class="scaleBy">
+        <table>
+          <tr>
+            <th>$.geo.scaleBy( bbox, </th>
+            <td><input type="text" name="scale" value="2" /> <b>)</b> <button type="submit">scale</button></td>
+          </tr>
+        </table>
+      </form>
+      <p>This last function, reaspect, forces an aspect ratio (calculation of width divided height) onto the bbox. You can run this but it will be difficult to visually see the effects because the geomap widget will automatically reaspect again to fit the bbox back into the viewport.</p>
+      <p>Common aspect ratio values: 16:9 = 16/9 ~ <b>1.78</b>:1 &amp; 4:3 = 4/3 ~ <b>1.33</b>:1</p>
+      <form action="bbox.html" class="reaspect">
+        <table>
+          <tr>
+            <th>$.geo.reaspect( bbox, </th>
+            <td><input type="text" name="ratio" value="1.78" /> <b>)</b> <button type="submit">reaspect</button></td>
+          </tr>
+        </table>
+      </form>
     </div>
   </div>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
   <script src="http://jquerygeo.com/test/jquery.geo-test.min.js"></script>
   <script>
     $(function () {
-      var initBboxInput = $("input[name='initBbox']"),
-        runtimeBbox = $("input[name='runtimeBbox']"),
-        search = window.location.search,
-        searchParts = search.length && search[0] == "?" ? search.slice(1).split("&") : null,
-        initProj = "default",
-        initBbox = null;
+      var $bboxInput = $(".bbox-prop input"); //< bbox input reference
 
-      if (searchParts) {
-        $.each(searchParts, function () {
-          var kvp = this.split("=");
-          switch (kvp[0]) {
-            case "initBbox":
-              initBbox = decodeURIComponent(kvp[1]).replace(/\+/g, "");
-              break;
-
-            case "proj":
-              initProj = kvp[1];
-              break;
-          }
-        });
-      }
-
-      $("input[name='proj'][value='" + initProj + "']").click();
-
-      if (initBbox) {
-        initBboxInput.val(initBbox);
-      }
-
-      $("#cmdRuntimeBbox").click(function () {
-        $("#map").geomap("option", "bbox", $.parseJSON(runtimeBbox.val()));
-        refreshActual();
-      });
-
-      if (initProj == "null") {
-        $.geo.proj = null;
-      }
-
-      $("#map").geomap({
-        bbox: $.parseJSON(initBboxInput.val()),
+      // create a map
+      var map = $("#map").geomap({
+        center: [-71.0595678, 42.3604823],
+        zoom: 8,
         bboxchange: function (e, geo) {
-          refreshActual();
+          // inside the bboxchange event, update the input with the current bbox
+          // the geo object has a bbox property which is the new bbox
+          updateBboxDisplay(geo.bbox);
         }
       });
 
-      refreshActual();
+      $("form.bbox").submit(function () {
+        // a new bbox is submitted, update the bbox option
+        // since the bbox is a JavaScript array, jQuery's parseJSON method will work
+        map.geomap("option", "bbox", $.parseJSON($bboxInput.val()));
 
-      function refreshActual() {
-        var actualBbox = $("#map").geomap("option", "bbox");
-        $("#lblBboxPublic").text("[" + actualBbox + "]");
-        if ($.geo.proj) {
-          var valuePoints = $.geo.proj.fromGeodetic([[actualBbox[0], actualBbox[1]], [actualBbox[2], actualBbox[3]]]),
-            internal = [valuePoints[0][0], valuePoints[0][1], valuePoints[1][0], valuePoints[1][1]];
-          $("#lblBboxInternal").text("[" + internal + "]");
-        } else {
-          $("#lblBboxInternal").text("[" + actualBbox + "]");
-        }
+        // based on the map view's aspect ratio, the final bbox can be different than the one set
+        // update the input and display based on the new/final value
+        updateBboxDisplay(map.geomap("option", "bbox"));
 
+        // return false to short circuit the form, we don't want to actually submit
+        return false;
+      });
+
+      $("form.expandBy").submit(function () {
+        // read the bbox from the input using jQuery's parseJSON method
+        var bbox = $.parseJSON($bboxInput.val());
+
+        // read the dx, dy inputs
+        var dx = parseFloat($("input[name='dx']").val()),
+            dy = parseFloat($("input[name='dy']").val());
+
+        // call expandBy
+        // expandBy takes a bbox argument & returns an updated bbox
+        bbox = $.geo.expandBy(bbox, dx, dy);
+
+        // only update the bbox input for now and let the user click set
+        $bboxInput.val("[" + bbox + "]");
+
+        return false;
+      });
+
+      $("form.scaleBy").submit(function () {
+        // read the bbox from the input using jQuery's parseJSON method
+        var bbox = $.parseJSON($bboxInput.val());
+
+        // read the scale input
+        var scale = parseFloat($("input[name='scale']").val());
+
+        // call scaleBy
+        // scaleBy takes a bbox argument & returns an updated bbox
+        bbox = $.geo.scaleBy(bbox, scale);
+
+        // only update the bbox input for now and let the user click set
+        $bboxInput.val("[" + bbox + "]");
+
+        return false;
+      });
+
+      $("form.reaspect").submit(function () {
+        // read the bbox from the input using jQuery's parseJSON method
+        var bbox = $.parseJSON($bboxInput.val());
+
+        // read the aspect ratio input
+        var ratio = parseFloat($("input[name='ratio']").val());
+
+        // call reaspect
+        // reaspect takes a bbox argument & returns an updated bbox
+        bbox = $.geo.reaspect(bbox, ratio);
+
+        // only update the bbox input for now and let the user click set
+        $bboxInput.val("[" + bbox + "]");
+
+        return false;
+      });
+
+      // jQuery UI for a pretty button
+      $("button").button();
+
+      // set the initial display based on the map's current bbox
+      updateBboxDisplay(map.geomap("option", "bbox"));
+
+      function updateBboxDisplay(bbox) {
+        // update the bbox displayed in the input and calculated values
+        // the bbox argument is a GeoJSON bounding box, which is a JavaScript array
+        // we can call join on the array to add spaces after the bbox values
+        // the values are: min longitude/x, min latitude/y, max longitude/x, max latitude/y
+        $bboxInput.val("[" + bbox + "]");
+
+        // center of the bbox, a GeoJSON position
+        $(".bbox-center td").text("[" + $.geo.center(bbox) + "]");
+
+        // width & height of the bbox, in meters because the default service is web mercator meters
+        // the units will match whatever coordinate system you set via geomap's tilingScheme or bboxMax properties
+        $(".bbox-width td").text($.geo.width(bbox) + " m");
+        $(".bbox-height td").text($.geo.height(bbox) + " m");
       }
     });  
+  </script>
+
+  <script>
+    var _gaq = [['_setAccount', 'UA-26084853-1'], ['_trackPageview']];
+    (function (d, t) {
+      var g = d.createElement(t), s = d.getElementsByTagName(t)[0]; g.async = 1;
+      g.src = ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+      s.parentNode.insertBefore(g, s);
+    } (document, 'script'));
   </script>
 </body>
 </html>
