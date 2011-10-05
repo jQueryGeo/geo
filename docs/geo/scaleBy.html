@@ -29,11 +29,11 @@
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>var twiceAsBig = $.geo.scaleBy( bbox, 2 )</pre></code></td>
+          <td><pre><code>var twiceAsBig = $.geo.scaleBy( bbox, 2 )</code></pre></td>
         </tr>
       </table>
       <p>The scaleBy method creates a new bbox with the same center as the original but having a width and height that are both multiplied by the scale argument.</p>
-      <p>The scale argument is a percentage increase/decrease in that supplying 2 will increase the size of the bbox by 200% and .5 will decrease the size of the bbox to half its original size.</p>
+      <p>The scale argument is a percentage increase or decrease. This means that supplying 2 will increase the size of the bbox by 200%, which if thinking in terms of a map's view, would zoom out. Supplying .5 will decrease the size of the bbox to half its original size.</p>
       <p>The scale argument must be greater than zero.</p>
       <p>If $.geo.proj is not null, this method first calls fromGeodetic on the incoming bbox and toGeodetic on the return value.</p>
       <p>This function is not defined in JTS.</p>

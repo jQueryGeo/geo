@@ -46,51 +46,71 @@
     // bbox functions
     //
 
-    _center: function (bbox) {
+    center: function (bbox, _ignoreGeo) {
       // Envelope.centre in JTS
       // bbox only, use centroid for geom
-      return [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2];
+      if (!_ignoreGeo && $.geo.proj) {
+        bbox = $.geo.proj.fromGeodetic(bbox);
+      }
+      var center = [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2];
+      return !_ignoreGeo && $.geo.proj ? $.geo.proj.toGeodetic(center) : center;
     },
 
-    _expandBy: function (bbox, dx, dy) {
-      return [bbox[0] - dx, bbox[1] - dy, bbox[2] + dx, bbox[3] + dy];
+    expandBy: function (bbox, dx, dy) {
+      if ($.geo.proj) {
+        bbox = $.geo.proj.fromGeodetic(bbox);
+      }
+      bbox = [bbox[0] - dx, bbox[1] - dy, bbox[2] + dx, bbox[3] + dy];
+      return $.geo.proj ? $.geo.proj.toGeodetic(bbox) : bbox;
     },
 
-    _height: function (bbox) {
+    height: function (bbox, _ignoreGeo) {
+      if (!_ignoreGeo && $.geo.proj) {
+        bbox = $.geo.proj.fromGeodetic(bbox);
+      }
       return bbox[3] - bbox[1];
     },
 
-    _reaspect: function (bbox, ratio) {
+    reaspect: function (bbox, ratio, _ignoreGeo) {
       // not in JTS
-      var width = this._width(bbox),
-        height = this._height(bbox),
-        center = this._center(bbox),
-        dx, dy;
-
-      if (width == 0 || height == 0 || ratio <= 0) {
-        return bbox;
+      if (!_ignoreGeo && $.geo.proj) {
+        bbox = $.geo.proj.fromGeodetic(bbox);
       }
+      var width = this.width(bbox, true),
+          height = this.height(bbox, true),
+          center = this.center(bbox, true),
+          dx, dy;
 
-      if (width / height > ratio) {
-        dx = width / 2;
-        dy = dx / ratio;
-      } else {
-        dy = height / 2;
-        dx = dy * ratio;
+      if (width != 0 && height != 0 && ratio > 0) {
+        if (width / height > ratio) {
+          dx = width / 2;
+          dy = dx / ratio;
+        } else {
+          dy = height / 2;
+          dx = dy * ratio;
+        }
+
+        bbox = [center[0] - dx, center[1] - dy, center[0] + dx, center[1] + dy];
       }
-
-      return [center[0] - dx, center[1] - dy, center[0] + dx, center[1] + dy];
+      return $.geo.proj ? $.geo.proj.toGeodetic(bbox) : bbox;
     },
 
-    _scaleBy: function (bbox, scale) {
+    scaleBy: function (bbox, scale, _ignoreGeo) {
       // not in JTS
-      var c = this._center(bbox),
+      if (!_ignoreGeo && $.geo.proj) {
+        bbox = $.geo.proj.fromGeodetic(bbox);
+      }
+      var c = this.center(bbox, true),
           dx = (bbox[2] - bbox[0]) * scale / 2,
           dy = (bbox[3] - bbox[1]) * scale / 2;
-      return [c[0] - dx, c[1] - dy, c[0] + dx, c[1] + dy];
+      bbox = [c[0] - dx, c[1] - dy, c[0] + dx, c[1] + dy];
+      return !_ignoreGeo && $.geo.proj ? $.geo.proj.toGeodetic(bbox) : bbox;
     },
 
-    _width: function (bbox) {
+    width: function (bbox, _ignoreGeo) {
+      if (!_ignoreGeo && $.geo.proj) {
+        bbox = $.geo.proj.fromGeodetic(bbox);
+      }
       return bbox[2] - bbox[0];
     },
 

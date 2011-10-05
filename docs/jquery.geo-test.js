@@ -1840,51 +1840,71 @@ $.Widget.prototype = {
     // bbox functions
     //
 
-    _center: function (bbox) {
+    center: function (bbox, _ignoreGeo) {
       // Envelope.centre in JTS
       // bbox only, use centroid for geom
-      return [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2];
+      if (!_ignoreGeo && $.geo.proj) {
+        bbox = $.geo.proj.fromGeodetic(bbox);
+      }
+      var center = [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2];
+      return !_ignoreGeo && $.geo.proj ? $.geo.proj.toGeodetic(center) : center;
     },
 
-    _expandBy: function (bbox, dx, dy) {
-      return [bbox[0] - dx, bbox[1] - dy, bbox[2] + dx, bbox[3] + dy];
+    expandBy: function (bbox, dx, dy) {
+      if ($.geo.proj) {
+        bbox = $.geo.proj.fromGeodetic(bbox);
+      }
+      bbox = [bbox[0] - dx, bbox[1] - dy, bbox[2] + dx, bbox[3] + dy];
+      return $.geo.proj ? $.geo.proj.toGeodetic(bbox) : bbox;
     },
 
-    _height: function (bbox) {
+    height: function (bbox, _ignoreGeo) {
+      if (!_ignoreGeo && $.geo.proj) {
+        bbox = $.geo.proj.fromGeodetic(bbox);
+      }
       return bbox[3] - bbox[1];
     },
 
-    _reaspect: function (bbox, ratio) {
+    reaspect: function (bbox, ratio, _ignoreGeo) {
       // not in JTS
-      var width = this._width(bbox),
-        height = this._height(bbox),
-        center = this._center(bbox),
-        dx, dy;
-
-      if (width == 0 || height == 0 || ratio <= 0) {
-        return bbox;
+      if (!_ignoreGeo && $.geo.proj) {
+        bbox = $.geo.proj.fromGeodetic(bbox);
       }
+      var width = this.width(bbox, true),
+          height = this.height(bbox, true),
+          center = this.center(bbox, true),
+          dx, dy;
 
-      if (width / height > ratio) {
-        dx = width / 2;
-        dy = dx / ratio;
-      } else {
-        dy = height / 2;
-        dx = dy * ratio;
+      if (width != 0 && height != 0 && ratio > 0) {
+        if (width / height > ratio) {
+          dx = width / 2;
+          dy = dx / ratio;
+        } else {
+          dy = height / 2;
+          dx = dy * ratio;
+        }
+
+        bbox = [center[0] - dx, center[1] - dy, center[0] + dx, center[1] + dy];
       }
-
-      return [center[0] - dx, center[1] - dy, center[0] + dx, center[1] + dy];
+      return $.geo.proj ? $.geo.proj.toGeodetic(bbox) : bbox;
     },
 
-    _scaleBy: function (bbox, scale) {
+    scaleBy: function (bbox, scale, _ignoreGeo) {
       // not in JTS
-      var c = this._center(bbox),
+      if (!_ignoreGeo && $.geo.proj) {
+        bbox = $.geo.proj.fromGeodetic(bbox);
+      }
+      var c = this.center(bbox, true),
           dx = (bbox[2] - bbox[0]) * scale / 2,
           dy = (bbox[3] - bbox[1]) * scale / 2;
-      return [c[0] - dx, c[1] - dy, c[0] + dx, c[1] + dy];
+      bbox = [c[0] - dx, c[1] - dy, c[0] + dx, c[1] + dy];
+      return !_ignoreGeo && $.geo.proj ? $.geo.proj.toGeodetic(bbox) : bbox;
     },
 
-    _width: function (bbox) {
+    width: function (bbox, _ignoreGeo) {
+      if (!_ignoreGeo && $.geo.proj) {
+        bbox = $.geo.proj.fromGeodetic(bbox);
+      }
       return bbox[2] - bbox[0];
     },
 
@@ -3112,7 +3132,7 @@ $.Widget.prototype = {
 
     _setBbox: function (value, trigger, refresh) {
       var center = [value[0] + (value[2] - value[0]) / 2, value[1] + (value[3] - value[1]) / 2],
-          pixelSize = Math.max($.geo._width(value) / this._contentBounds.width, $.geo._height(value) / this._contentBounds.height);
+          pixelSize = Math.max($.geo.width(value, true) / this._contentBounds.width, $.geo.height(value, true) / this._contentBounds.height);
 
       if (this._options["tilingScheme"]) {
         var zoom = this._getTiledZoom(pixelSize);
@@ -3142,10 +3162,10 @@ $.Widget.prototype = {
         return this._getTiledZoom(this._pixelSize);
       } else {
         var ratio = this._contentBounds["width"] / this._contentBounds["height"],
-          bbox = $.geo._reaspect(this._getBbox(), ratio),
-          bboxMax = $.geo._reaspect(this._getBboxMax(), ratio);
+            bbox = $.geo.reaspect(this._getBbox(), ratio, true),
+            bboxMax = $.geo.reaspect(this._getBboxMax(), ratio, true);
 
-        return Math.log($.geo._width(bboxMax) / $.geo._width(bbox)) / Math.log(this._zoomFactor);
+        return Math.log($.geo.width(bboxMax, true) / $.geo.width(bbox, true)) / Math.log(this._zoomFactor);
       }
     },
 
@@ -3155,8 +3175,8 @@ $.Widget.prototype = {
       if (this._options["tilingScheme"]) {
         this._setCenterAndSize(this._center, this._getTiledPixelSize(value), trigger, refresh);
       } else {
-        var bbox = $.geo._scaleBy(this._getBbox(), 1 / Math.pow(this._zoomFactor, value)),
-            pixelSize = Math.max($.geo._width(bbox) / this._contentBounds.width, $.geo._height(bbox) / this._contentBounds.height);
+        var bbox = $.geo.scaleBy(this._getBbox(), 1 / Math.pow(this._zoomFactor, value), true),
+            pixelSize = Math.max($.geo.width(bbox, true) / this._contentBounds.width, $.geo.height(bbox, true) / this._contentBounds.height);
         this._setCenterAndSize(this._center, pixelSize, trigger, refresh);
       }
     },
@@ -3493,8 +3513,8 @@ $.Widget.prototype = {
         halfWidth = width / 2 * pixelSize,
         halfHeight = height / 2 * pixelSize,
         bbox = [center[0] - halfWidth, center[1] - halfHeight, center[0] + halfWidth, center[1] + halfHeight],
-        xRatio = $.geo._width(bbox) / width,
-        yRatio = $.geo._height(bbox) / height,
+        xRatio = $.geo.width(bbox, true) / width,
+        yRatio = $.geo.height(bbox, true) / height,
         result = [];
 
       $.each(p, function (i) {
@@ -3521,8 +3541,8 @@ $.Widget.prototype = {
         halfWidth = width / 2 * pixelSize,
         halfHeight = height / 2 * pixelSize,
         bbox = [center[0] - halfWidth, center[1] - halfHeight, center[0] + halfWidth, center[1] + halfHeight],
-        bboxWidth = $.geo._width(bbox),
-        bboxHeight = $.geo._height(bbox),
+        bboxWidth = $.geo.width(bbox, true),
+        bboxHeight = $.geo.height(bbox, true),
         result = [];
 
       $.each(p, function (i) {
@@ -3544,8 +3564,8 @@ $.Widget.prototype = {
         this._setCenterAndSize(coord, tiledPixelSize, trigger, refresh);
       } else {
         var 
-          bboxMax = $.geo._scaleBy(this._getBboxMax(), 1 / Math.pow(this._zoomFactor, zoom)),
-          pixelSize = Math.max($.geo._width(bboxMax) / this._contentBounds["width"], $.geo._height(bboxMax) / this._contentBounds["height"]);
+          bboxMax = $.geo._scaleBy(this._getBboxMax(), 1 / Math.pow(this._zoomFactor, zoom), true),
+          pixelSize = Math.max($.geo.width(bboxMax, true) / this._contentBounds["width"], $.geo.height(bboxMax, true) / this._contentBounds["height"]);
 
         this._setCenterAndSize(coord, pixelSize, trigger, refresh);
       }
