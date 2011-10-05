@@ -1,6 +1,6 @@
-﻿html
+﻿.links
 {
-  font:13px/1.231 Calibri,Arial,sans-serif; *font-size:small;
+  float: right;
 }
 
 .docLink 
@@ -8,7 +8,6 @@
   background: url(../../images/$.geo-logo-small.png) right no-repeat;
   color: #7f0000;
   display: block;
-  float: right;
   font-size: 24px;
   font-weight: bold;
   padding-right: 24px;
@@ -17,12 +16,35 @@
   z-index: 1134;
 }
 
+.fiddleLink
+{
+  display: block;
+  font-weight: bold;
+  margin: 4px;
+  text-align: right;
+  text-decoration: none;
+}
+
+.fiddleLink img
+{
+  vertical-align: middle;
+}
+
+div>.info
+{
+  max-width: 45%;
+}
+
+html
+{
+  font:13px/1.231 Calibri,Arial,sans-serif; *font-size:small;
+}
+
 .info 
 {
   background: #fff;
   border-radius: 8px;
   box-shadow: -4px 4px #444;
-  max-width: 45%;
   opacity: .8;
   padding: 8px;
   position: absolute !important;
