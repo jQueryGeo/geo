@@ -33,84 +33,19 @@
 $(&quot;#map&quot;).geomap( &quot;shapeStyle&quot;, { width: &quot;16px&quot;, height: &quot;16px&quot; } )</code></pre></td>
         </tr>
       </table>
-      <p>The shapeStyle method retrieves or updates the <i>base</i> style of geomap graphics. The reasons that this is a method instead of a property will be clearer in a future section of the internals documenation.</p>
+      <p>The shapeStyle method retrieves or updates the <i>base</i> style of shapes appended to the map. The reasons that this is a method instead of a property will be clearer in a future section of the internals documenation.</p>
+      <p>This differs from the drawStyle option which defines the style of incomplete lines and polygons as they are being drawn.</p>
       <p>This method changes specific properties of the internal base style. If you send an incomplete style object, only the style properties you reference are updated.</p>
       <p>Similar to CSS, you can override this style on a per-shape basis by passing a different style to the append method.</p>
       <p>Changing this base style will update how geomap draws existing shapes that do not have their own style. For shapes that do have their own style, changing the base shapeStyle will update any style properties not referenced in the shape-specific style. For example, assume the following:</p>
       <ol>
         <li>the base shapeStyle has a red stroke color and strokeWidth of 2px</li>
-        <li>you call append with a style that increases the stroke width to 4px but leaves the stroke color red</li>
+        <li>you call append with a style that increases the stroke width to 4px but does not supply a stroke color</li>
         <li>you later change the base shapeStyle's stroke color to blue</li>
       </ol>
-      <p>
-        The shape described in the above example will draw with a blue stroke color and a strokeWidth of 4px.</p>
+      <p>The shape described in the above example will draw with a blue stroke color and a strokeWidth of 4px.</p>
       <p>When called with a second argument to set the shapeStyle, the jQuery UI widget factory returns the original jQuery collection to maintain call chaining.</p>
-      <h2>geomap style</h2>
-      <p>A geomap style is an object whose properties follow a subset of <a href="http://www.w3.org/TR/SVG/styling.html">SVG styling</a> properties. The specific styles that geomap recognizes and to which geometry they apply are listed below.</p>
-      <table class="objectProperties">
-        <tr>
-          <th>property</th>
-          <th>default</th>
-          <th>description</th>
-        </tr>
-        <tr>
-          <td>borderRadius</td>
-          <td>&quot;8px&quot;</td>
-          <td>The radii of a quarter ellipse that defines the shape of the corner of the outer border of a box drawn around Point shapes, which means it turns your boxes into curved rectangles. If the width, height and borderRadius properties of a style are the same (the default), the point is drawn as a circle.</td>
-        </tr>
-        <tr>
-          <td>color</td>
-          <td>#7f0000</td>
-          <td>An indirect, fallback value for the fill and stroke properties if they are not set.</td>
-        </tr>
-        <tr>
-          <td>fill</td>
-          <td>undefined</td>
-          <td>Color to use when drawing the interior of a shape. The area to be drawn consists of any areas inside the outline of the shape. By default, fill will use the value of the color property.</td>
-        </tr>
-        <tr>
-          <td>fillOpacity</td>
-          <td>.2</td>
-          <td>Specifies the opacity of the drawing operation used to draw the interior of a shape. The final fill opacity also depends on the value of the opacity property.</td>
-        </tr>
-        <tr>
-          <td>height</td>
-          <td>&quot;8px&quot;</td>
-          <td>The height of a box drawn around Point shapes. Currently only pixel values are allowed.</td>
-        </tr>
-        <tr>
-          <td>opacity</td>
-          <td>1</td>
-          <td>The object opacity of the entire shape. This is a multiplicative operation when determining the final fillOpacity and strokeOpacity where any fill or stroke operation is made even more translucent if this value is below 1.0.</td>
-        </tr>
-        <tr>
-          <td>stroke</td>
-          <td>undefined</td>
-          <td>Color to use when drawing along the outline of a shape. By default, stroke will use the value of the color property.</td>
-        </tr>
-        <tr>
-          <td>strokeOpacity</td>
-          <td>1</td>
-          <td>Specifies the opacity of the drawing operation used to draw the outline of a shape. The final stroke opacity also depends on the value of the opacity property.</td>
-        </tr>
-        <tr>
-          <td>strokeWidth</td>
-          <td>&quot;2px&quot;</td>
-          <td>The width of the stroke of a shape. A zero value causes no stroke to be drawn. Currently only pixel values are allowed.</td>
-        </tr>
-        <tr>
-          <td>visibility</td>
-          <td>&quot;visible&quot;</td>
-          <td>Determines if the shape is drawn (&quot;visible&quot;) or not drawn (&quot;hidden&quot;) on the map. Shapes that are hidden can still be returned by the find method.</td>
-        </tr>
-        <tr>
-          <td>width</td>
-          <td>&quot;8px&quot;</td>
-          <td>The width of a box drawn around Point shapes. Currently only pixel values are allowed.</td>
-        </tr>
-      </table>
-      <p>
-        All properties apply to Point shapes which means that you can adjust the stroke and fill of the box surrounding the point location.</p>
+      <p>Please see the style section at the bottom of the <a href="#" onclick="javascript:window.history.back();">geomap widget</a> page for more information about the style object.</p>
     </div>
   </div> <!-- end of #container -->
 </body>

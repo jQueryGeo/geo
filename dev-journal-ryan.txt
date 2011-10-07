@@ -1,6 +1,10 @@
 ﻿== to do ==
 
 === 1.0a3 ===
+* geomap - drawPoint mode
+* geomap - drawLineString mode
+* geomap - drawPolygon mode
+* geomap - zoom mode
 * geo - geometry - distance function
 * geo - geometry - contains function
 * geo - geometry - centroid function
@@ -17,6 +21,7 @@
 * geomap - [bug] changing services array after initialization fails
 * geomap - [bug] multiple maps do not work on the same page
 * geomap - [bug] zoom method doesn't work with shingled map
+* geomap - [bug] interactiveScale moves drawCoords twice
 * examples - massgis basemap now contains both forest and hydrography layers? makes shingled a bad example
 * examples - geomap resize method
 * geo - ? cache point bbox if $.geo.proj is not null
@@ -56,7 +61,8 @@
 * geomap - [bug] mouse wheel on bad or missing tile doesn't zoom out on first rotate
 * geomap - service divs should have class="geo-service"
 * docs/geomap - store WKT input for each service
-* geographics - Rename the generated style properties to something simple or get better control over closure compiler
+* geographics - rename the generated style properties to something simple or get better control over closure compiler
+* geographics - add a resize method, call from geomap.resize
 * geomap - Document and implement find's callback syntax
 * geomap - repeat horizontal tiles
 * geomap - custering demo/support
@@ -77,6 +83,43 @@
 * docs - geomap - drawStop function
 ** in the drawing modes, this function ends drawing and triggers the shape event with whatever coordinates have already been added to the shape
 * geomap - drawStop
+
+==2011-10-07==
+===drawLineString===
+I've ported some initial line code and actually made it much more elegant than our internal one.
+
+===shingled===
+The shingled demo needs some work.
+
+==2011-10-06==
+===bbox===
+I pushed out a great new bbox example page. It links to a live jsFiddle even so people can play with the code.
+
+===jQM buttons===
+I did have to make the full screen map an external page. It worked ok after that and the back button still works.
+
+===jQM===
+jQM has virtual buttons to handle either touch or mouse input (some devices have both at the same time): vclick, vdown, vmove & vup. However, they don't handle multi-touch so I think I'm going to have to stick with what I have at the moment. I can't require jQM just to have jQG work on mobile.
+
+===draw===
+Porting our shape drawing code over finally. We're getting a new geographics widget to differentiate drawing from appended shapes.
+
+===drawStyle===
+I forgot to write about the drawStyle method. This one might actually be a true option as it will never be service-specific. It can only apply to the map widget.
+
+===draw functions===
+I need to rename some things. I've been using a few old names from our internal code but they don't quite make sense with some of the newer names of public properties. Mostly, shape should mean anything added via append and draw is the actual in-process drawing.
+
+Two internal method names should be: _refreshShapes (instead of _drawGraphics) & _refreshDrawing (instead of _redrawShape)
+
+===drawPoint dblclick===
+As the docs say, a double tap will zoom in just like in pan mode and not trigger the shape event.
+
+===geographics===
+Oops, my underlying geographics widget is sharing the same canvas context. Flicker city! Ah, much better.
+
+===drawPoint===
+Because I'm delaying before I trigger the shape event, it feels slugish. Maybe I can drop the delay down to 100ms. Too fast, I'm getting the shape event.
 
 ==2011-10-04==
 ===jqcon===

@@ -46,7 +46,7 @@
     // bbox functions
     //
 
-    center: function (bbox, _ignoreGeo) {
+    center: function (bbox, _ignoreGeo /* Internal Use Only */) {
       // Envelope.centre in JTS
       // bbox only, use centroid for geom
       if (!_ignoreGeo && $.geo.proj) {
@@ -64,14 +64,14 @@
       return $.geo.proj ? $.geo.proj.toGeodetic(bbox) : bbox;
     },
 
-    height: function (bbox, _ignoreGeo) {
+    height: function (bbox, _ignoreGeo /* Internal Use Only */ ) {
       if (!_ignoreGeo && $.geo.proj) {
         bbox = $.geo.proj.fromGeodetic(bbox);
       }
       return bbox[3] - bbox[1];
     },
 
-    reaspect: function (bbox, ratio, _ignoreGeo) {
+    reaspect: function (bbox, ratio, _ignoreGeo /* Internal Use Only */ ) {
       // not in JTS
       if (!_ignoreGeo && $.geo.proj) {
         bbox = $.geo.proj.fromGeodetic(bbox);
@@ -95,7 +95,7 @@
       return $.geo.proj ? $.geo.proj.toGeodetic(bbox) : bbox;
     },
 
-    scaleBy: function (bbox, scale, _ignoreGeo) {
+    scaleBy: function (bbox, scale, _ignoreGeo /* Internal Use Only */ ) {
       // not in JTS
       if (!_ignoreGeo && $.geo.proj) {
         bbox = $.geo.proj.fromGeodetic(bbox);
@@ -107,7 +107,7 @@
       return !_ignoreGeo && $.geo.proj ? $.geo.proj.toGeodetic(bbox) : bbox;
     },
 
-    width: function (bbox, _ignoreGeo) {
+    width: function (bbox, _ignoreGeo /* Internal Use Only */ ) {
       if (!_ignoreGeo && $.geo.proj) {
         bbox = $.geo.proj.fromGeodetic(bbox);
       }

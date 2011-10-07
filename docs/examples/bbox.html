@@ -3,6 +3,7 @@
 <head>
   <title>bbox examples</title>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
   <meta name="description" content="An example of bbox property and bbox functions">
   <meta name="author" content="Ryan Westphal">
   <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/blitzer/jquery-ui.css" />
@@ -59,7 +60,7 @@
       </div>
       <h1>
         bbox</h1>
-      <p>This example tests getting and setting the bbox property on the geomap widget as well as calling various $.geo bbox functions.</p>
+      <p class="not-mobile">This example tests getting and setting the bbox property on the geomap widget as well as calling various $.geo bbox functions.</p>
       <form action="bbox.html" class="bbox">
         <table>
           <tr class="bbox-prop">
@@ -80,33 +81,35 @@
           </tr>
         </table>
       </form>
-      <p>For this example, the functions below operate on the above text input only. After using them, you can click <b>set</b> to update the map and other info.</p>
-      <form action="bbox.html" class="expandBy">
-        <table>
-          <tr>
-            <th>$.geo.expandBy( bbox, </th>
-            <td><input type="text" name="dx" value="20000" /> <b>,</b> <input type="text" name="dy" value="20000" /> <b>)</b> <button type="submit">expand</button></td>
-          </tr>
-        </table>
-      </form>
-      <form action="bbox.html" class="scaleBy">
-        <table>
-          <tr>
-            <th>$.geo.scaleBy( bbox, </th>
-            <td><input type="text" name="scale" value="2" /> <b>)</b> <button type="submit">scale</button></td>
-          </tr>
-        </table>
-      </form>
-      <p>This last function, reaspect, forces an aspect ratio (calculation of width divided height) onto the bbox. You can run this but it will be difficult to visually see the effects because the geomap widget will automatically reaspect again to fit the bbox back into the viewport.</p>
-      <p>Common aspect ratio values: 16:9 = 16/9 ~ <b>1.78</b>:1 &amp; 4:3 = 4/3 ~ <b>1.33</b>:1</p>
-      <form action="bbox.html" class="reaspect">
-        <table>
-          <tr>
-            <th>$.geo.reaspect( bbox, </th>
-            <td><input type="text" name="ratio" value="1.78" /> <b>)</b> <button type="submit">reaspect</button></td>
-          </tr>
-        </table>
-      </form>
+      <div class="not-mobile">
+        <p>For this example, the functions below operate on the above text input only. After using them, you can click <b>set</b> to update the map and other info.</p>
+        <form action="bbox.html" class="expandBy">
+          <table>
+            <tr>
+              <th>$.geo.expandBy( bbox, </th>
+              <td><input type="text" name="dx" value="20000" /> <b>,</b> <input type="text" name="dy" value="20000" /> <b>)</b> <button type="submit">expand</button></td>
+            </tr>
+          </table>
+        </form>
+        <form action="bbox.html" class="scaleBy">
+          <table>
+            <tr>
+              <th>$.geo.scaleBy( bbox, </th>
+              <td><input type="text" name="scale" value="2" /> <b>)</b> <button type="submit">scale</button></td>
+            </tr>
+          </table>
+        </form>
+        <p>This last function, reaspect, forces an aspect ratio (calculation of width divided height) onto the bbox. You can run this but it will be difficult to visually see the effects because the geomap widget will automatically reaspect again to fit the bbox back into the viewport.</p>
+        <p>Common aspect ratio values: 16:9 = 16/9 ~ <b>1.78</b>:1 &amp; 4:3 = 4/3 ~ <b>1.33</b>:1</p>
+        <form action="bbox.html" class="reaspect">
+          <table>
+            <tr>
+              <th>$.geo.reaspect( bbox, </th>
+              <td><input type="text" name="ratio" value="1.78" /> <b>)</b> <button type="submit">reaspect</button></td>
+            </tr>
+          </table>
+        </form>
+      </div>
     </div>
   </div>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>

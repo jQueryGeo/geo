@@ -42,6 +42,9 @@ Documentation is hosted at http://jquerygeo.com
 * geo - bbox - expandBy function
 * geo - bbox - scaleBy function
 * geo - bbox - reaspect function
+* docs - geomap - drawStyle option
+* geomap - [bug] shapeStyle not maintained after resize
+* geomap - [bug] second drag while in inertial pan causes map to jump back
 
 === 1.0a2.5 (2011-08-03) ===
 * geomap - find - [bug] does not handle GeoJSON features

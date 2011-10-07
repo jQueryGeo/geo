@@ -57,8 +57,7 @@
 
         this._cancelUnloaded(map, service);
 
-        var 
-            serviceState = shingledServicesState[service.id],
+        var serviceState = shingledServicesState[service.id],
             serviceContainer = serviceState.serviceContainer,
 
             contentBounds = map._getContentBounds(),
@@ -71,14 +70,12 @@
             bbox = [center[0] - halfWidth, center[1] - halfHeight, center[0] + halfWidth, center[1] + halfHeight];
 
         serviceContainer.children().each(function (i) {
-          var 
-              $scaleContainer = $(this),
+          var $scaleContainer = $(this),
               scalePixelSize = $scaleContainer.attr("data-pixelSize"),
               ratio = scalePixelSize / pixelSize;
 
           $scaleContainer.css({ width: mapWidth * ratio, height: mapHeight * ratio }).children("img").each(function (i) {
-            var 
-                $img = $(this),
+            var $img = $(this),
                 imgCenter = $img.data("center"),
                 x = (Math.round((imgCenter[0] - center[0]) / scalePixelSize) - halfWidth) * ratio,
                 y = (Math.round((center[1] - imgCenter[1]) / scalePixelSize) - halfHeight) * ratio;
@@ -92,8 +89,7 @@
         if (service && shingledServicesState[service.id] && (service.visible === undefined || service.visible)) {
           this._cancelUnloaded(map, service);
 
-          var 
-              bbox = map._getBbox(),
+          var bbox = map._getBbox(),
               pixelSize = map.getPixelSize(),
 
               serviceState = shingledServicesState[service.id],
@@ -118,8 +114,7 @@
           }
 
           scaleContainer.children("img").each(function (i) {
-            var 
-                $thisimg = $(this),
+            var $thisimg = $(this),
                 imgCenter = $thisimg.data("center"),
                 center = map._getCenter(),
                 x = Math.round((imgCenter[0] - center[0]) / pixelSize) - halfWidth,
@@ -132,8 +127,7 @@
             serviceContainer.find("img").attr("data-keepAlive", "0");
           }
 
-          var 
-              imageUrl = service.getUrl({
+          var imageUrl = service.getUrl({
                 bbox: bbox,
                 width: mapWidth,
                 height: mapHeight,
@@ -164,8 +158,7 @@
                 var panContainerPos = panContainer.position();
 
                 panContainer.children("img").each(function (i) {
-                  var 
-                      $thisimg = $(this),
+                  var $thisimg = $(this),
                       x = panContainerPos.left + parseInt($thisimg.css("left")),
                       y = panContainerPos.top + parseInt($thisimg.css("top"));
 

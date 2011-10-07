@@ -1,23 +1,22 @@
 ﻿(function ($, undefined) {
 
-  var 
-  _$elem,
-  _options,
-  _trueCanvas = true,
-
-  _width,
-  _height,
-
-  _$canvas,
-  _context,
-
-  _ieVersion = (function () {
+  var _ieVersion = (function () {
     var v = 5, div = document.createElement("div"), a = div.all || [];
     while (div.innerHTML = "<!--[if gt IE " + (++v) + "]><br><![endif]-->", a[0]) { }
     return v > 6 ? v : !v;
   } ());
 
   $.widget("geo.geographics", {
+    _$elem: undefined,
+    _options: {},
+    _trueCanvas: true,
+
+    _width: 0,
+    _height: 0,
+
+    _$canvas: undefined,
+    _context: undefined,
+
     options: {
       style: {
         borderRadius: "8px",
@@ -35,52 +34,52 @@
     },
 
     _create: function () {
-      _$elem = this.element;
-      _options = this.options;
+      this._$elem = this.element;
+      this._options = this.options;
 
-      _$elem.css({ display: "inline-block", overflow: "hidden", textAlign: "left" });
+      this._$elem.css({ display: "inline-block", overflow: "hidden", textAlign: "left" });
 
-      if (_$elem.css("position") == "static") {
-        _$elem.css("position", "relative");
+      if (this._$elem.css("position") == "static") {
+        this._$elem.css("position", "relative");
       }
 
-      _width = _$elem.width();
-      _height = _$elem.height();
+      this._width = this._$elem.width();
+      this._height = this._$elem.height();
 
-      if (!(_width && _height)) {
-        _width = parseInt(_$elem.css("width"));
-        _height = parseInt(_$elem.css("height"));
+      if (!(this._width && this._height)) {
+        this._width = parseInt(this._$elem.css("width"));
+        this._height = parseInt(this._$elem.css("height"));
       }
 
       if (document.createElement('canvas').getContext) {
-        _$elem.append('<canvas width="' + _width + '" height="' + _height + '" style="position:absolute; left:0; top:0; width:' + _width + 'px; height:' + _height + 'px;"></canvas>');
-        _$canvas = _$elem.children(':last');
-        _context = _$canvas[0].getContext("2d");
+        this._$elem.append('<canvas width="' + this._width + '" height="' + this._height + '" style="position:absolute; left:0; top:0; width:' + this._width + 'px; height:' + this._height + 'px;"></canvas>');
+        this._$canvas = this._$elem.children(':last');
+        this._context = this._$canvas[0].getContext("2d");
       } else if (_ieVersion <= 8) {
-        _trueCanvas = false;
-        _$elem.append('<div width="' + _width + '" height="' + _height + '" style="position:absolute; left:0; top:0; width:' + _width + 'px; height:' + _height + 'px; margin:0; padding:0;"></div>');
-        _$canvas = _$elem.children(':last');
+        this._trueCanvas = false;
+        this._$elem.append('<div width="' + this._width + '" height="' + this._height + '" style="position:absolute; left:0; top:0; width:' + this._width + 'px; height:' + this._height + 'px; margin:0; padding:0;"></div>');
+        this._$canvas = this._$elem.children(':last');
 
-        G_vmlCanvasManager.initElement(_$canvas[0]);
-        _context = _$canvas[0].getContext("2d");
-        _$canvas.children().css({ backgroundColor: "transparent", width: _width, height: _height });
+        G_vmlCanvasManager.initElement(this._$canvas[0]);
+        this._context = this._$canvas[0].getContext("2d");
+        this._$canvas.children().css({ backgroundColor: "transparent", width: this._width, height: this._height });
       }
     },
 
     _setOption: function (key, value) {
       if (key == "style") {
-        value = $.extend({}, _options.style, value);
+        value = $.extend({}, this._options.style, value);
       }
       $.Widget.prototype._setOption.apply(this, arguments);
     },
 
     destroy: function () {
       $.Widget.prototype.destroy.apply(this, arguments);
-      _$elem.html("");
+      this._$elem.html("");
     },
 
     clear: function () {
-      _context.clearRect(0, 0, _width, _height);
+      this._context.clearRect(0, 0, this._width, this._height);
     },
 
     drawArc: function (coordinates, startAngle, sweepAngle, style) {
@@ -92,38 +91,38 @@
         startAngle = (startAngle * Math.PI / 180);
         sweepAngle = (sweepAngle * Math.PI / 180);
 
-        _context.save();
-        _context.translate(coordinates[0], coordinates[1]);
+        this._context.save();
+        this._context.translate(coordinates[0], coordinates[1]);
         if (style.widthValue > style.heightValue) {
-          _context.scale(style.widthValue / style.heightValue, 1);
+          this._context.scale(style.widthValue / style.heightValue, 1);
         } else {
-          _context.scale(1, style.heightValue / style.widthValue);
+          this._context.scale(1, style.heightValue / style.widthValue);
         }
 
-        _context.beginPath();
-        _context.arc(0, 0, r, startAngle, sweepAngle, false);
+        this._context.beginPath();
+        this._context.arc(0, 0, r, startAngle, sweepAngle, false);
 
-        if (_trueCanvas) {
-          _context.restore();
+        if (this._trueCanvas) {
+          this._context.restore();
         }
 
         if (style.doFill) {
-          _context.fillStyle = style.fill;
-          _context.globalAlpha = style.opacity * style.fillOpacity;
-          _context.fill();
+          this._context.fillStyle = style.fill;
+          this._context.globalAlpha = style.opacity * style.fillOpacity;
+          this._context.fill();
         }
 
         if (style.doStroke) {
-          _context.lineJoin = "round";
-          _context.lineWidth = style.strokeWidthValue;
-          _context.strokeStyle = style.stroke;
+          this._context.lineJoin = "round";
+          this._context.lineWidth = style.strokeWidthValue;
+          this._context.strokeStyle = style.stroke;
 
-          _context.globalAlpha = style.opacity * style.strokeOpacity;
-          _context.stroke();
+          this._context.globalAlpha = style.opacity * style.strokeOpacity;
+          this._context.stroke();
         }
 
-        if (!_trueCanvas) {
-          _context.restore();
+        if (!this._trueCanvas) {
+          this._context.restore();
         }
       }
     },
@@ -136,32 +135,32 @@
         style.borderRadiusValue = Math.min(Math.min(style.widthValue, style.heightValue) / 2, style.borderRadiusValue);
         coordinates[0] -= style.widthValue / 2;
         coordinates[1] -= style.heightValue / 2;
-        _context.beginPath();
-        _context.moveTo(coordinates[0] + style.borderRadiusValue, coordinates[1]);
-        _context.lineTo(coordinates[0] + style.widthValue - style.borderRadiusValue, coordinates[1]);
-        _context.quadraticCurveTo(coordinates[0] + style.widthValue, coordinates[1], coordinates[0] + style.widthValue, coordinates[1] + style.borderRadiusValue);
-        _context.lineTo(coordinates[0] + style.widthValue, coordinates[1] + style.heightValue - style.borderRadiusValue);
-        _context.quadraticCurveTo(coordinates[0] + style.widthValue, coordinates[1] + style.heightValue, coordinates[0] + style.widthValue - style.borderRadiusValue, coordinates[1] + style.heightValue);
-        _context.lineTo(coordinates[0] + style.borderRadiusValue, coordinates[1] + style.heightValue);
-        _context.quadraticCurveTo(coordinates[0], coordinates[1] + style.heightValue, coordinates[0], coordinates[1] + style.heightValue - style.borderRadiusValue);
-        _context.lineTo(coordinates[0], coordinates[1] + style.borderRadiusValue);
-        _context.quadraticCurveTo(coordinates[0], coordinates[1], coordinates[0] + style.borderRadiusValue, coordinates[1]);
-        _context.closePath();
+        this._context.beginPath();
+        this._context.moveTo(coordinates[0] + style.borderRadiusValue, coordinates[1]);
+        this._context.lineTo(coordinates[0] + style.widthValue - style.borderRadiusValue, coordinates[1]);
+        this._context.quadraticCurveTo(coordinates[0] + style.widthValue, coordinates[1], coordinates[0] + style.widthValue, coordinates[1] + style.borderRadiusValue);
+        this._context.lineTo(coordinates[0] + style.widthValue, coordinates[1] + style.heightValue - style.borderRadiusValue);
+        this._context.quadraticCurveTo(coordinates[0] + style.widthValue, coordinates[1] + style.heightValue, coordinates[0] + style.widthValue - style.borderRadiusValue, coordinates[1] + style.heightValue);
+        this._context.lineTo(coordinates[0] + style.borderRadiusValue, coordinates[1] + style.heightValue);
+        this._context.quadraticCurveTo(coordinates[0], coordinates[1] + style.heightValue, coordinates[0], coordinates[1] + style.heightValue - style.borderRadiusValue);
+        this._context.lineTo(coordinates[0], coordinates[1] + style.borderRadiusValue);
+        this._context.quadraticCurveTo(coordinates[0], coordinates[1], coordinates[0] + style.borderRadiusValue, coordinates[1]);
+        this._context.closePath();
 
         if (style.doFill) {
-          _context.fillStyle = style.fill;
-          _context.globalAlpha = style.opacity * style.fillOpacity;
-          _context.fill();
+          this._context.fillStyle = style.fill;
+          this._context.globalAlpha = style.opacity * style.fillOpacity;
+          this._context.fill();
         }
 
         if (style.doStroke) {
-          _context.lineJoin = "round";
-          _context.lineWidth = style.strokeWidthValue;
-          _context.strokeStyle = style.stroke;
+          this._context.lineJoin = "round";
+          this._context.lineWidth = style.strokeWidthValue;
+          this._context.strokeStyle = style.stroke;
 
-          _context.globalAlpha = style.opacity * style.strokeOpacity;
+          this._context.globalAlpha = style.opacity * style.strokeOpacity;
 
-          _context.stroke();
+          this._context.stroke();
         }
       }
     },
@@ -190,7 +189,7 @@
         return (+value + '') === value ? +value : value;
       }
 
-      style = $.extend({}, _options.style, style);
+      style = $.extend({}, this._options.style, style);
       style.borderRadiusValue = safeParse(style.borderRadius);
       style.fill = style.fill || style.color;
       style.doFill = style.fill && style.fillOpacity > 0;
@@ -211,35 +210,35 @@
           i, j;
 
       if (style.visibility != "hidden" && style.opacity > 0) {
-        _context.beginPath();
-        _context.moveTo(coordinates[0][0][0], coordinates[0][0][1]);
+        this._context.beginPath();
+        this._context.moveTo(coordinates[0][0][0], coordinates[0][0][1]);
 
         var lastPoint = coordinates[0][coordinates[0].length - 1];
 
         for (i = 0; i < coordinates.length; i++) {
           for (j = 0; j < coordinates[i].length; j++) {
-            _context.lineTo(coordinates[i][j][0], coordinates[i][j][1]);
+            this._context.lineTo(coordinates[i][j][0], coordinates[i][j][1]);
           }
 
           if (close && i > 0) {
-            _context.lineTo(lastPoint[0], lastPoint[1]);
-            _context.closePath();
+            this._context.lineTo(lastPoint[0], lastPoint[1]);
+            this._context.closePath();
           }
         }
 
         if (close && style.doFill) {
-          _context.fillStyle = style.fill;
-          _context.globalAlpha = style.opacity * style.fillOpacity;
-          _context.fill();
+          this._context.fillStyle = style.fill;
+          this._context.globalAlpha = style.opacity * style.fillOpacity;
+          this._context.fill();
         }
 
         if (style.doStroke) {
-          _context.lineJoin = "round";
-          _context.lineWidth = style.strokeWidthValue;
-          _context.strokeStyle = style.stroke;
+          this._context.lineJoin = "round";
+          this._context.lineWidth = style.strokeWidthValue;
+          this._context.strokeStyle = style.stroke;
 
-          _context.globalAlpha = style.opacity * style.strokeOpacity;
-          _context.stroke();
+          this._context.globalAlpha = style.opacity * style.strokeOpacity;
+          this._context.stroke();
         }
       }
     }
