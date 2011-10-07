@@ -1,0 +1,61 @@
+<!doctype html>  
+
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>drawStyle | geomap</title>
+  <meta name="description" content="geomap drawStyle option">
+  <meta name="author" content="Ryan Westphal">
+</head>
+
+<body>
+
+  <div id="drawStyle" data-role="page">
+    <div data-role="header" data-theme="f">
+      <h1>drawStyle</h1>
+    </div>
+    
+    <div data-role="content">
+      <table>
+        <tr>
+          <th>type</th>
+          <td>Object ( geomap style )</td>
+        </tr>
+        <tr>
+          <th>default</th>
+          <td><pre><code>{
+  borderRadius: &quot;8px&quot;,
+  color: &quot;#7f0000&quot;,
+  fillOpacity: .2,
+  height: &quot;8px&quot;,
+  opacity: 1,
+  strokeOpacity: 1,
+  strokeWidth: &quot;2px&quot;,
+  visibility: &quot;visible&quot;,
+  width: &quot;8px&quot;
+}</code></pre>
+          </td>
+        </tr>
+        <tr>
+          <th>init</th>
+          <td><pre><code>$( <i>selector</i> ).geomap( { drawStyle: { color: &quot;green&quot; } } );</code></pre></td>
+        </tr>
+        <tr>
+          <th>get</th>
+          <td><pre><code>var drawStyle = $( <i>selector</i> ).geomap( &quot;option&quot;, &quot;drawStyle&quot; );</code></pre></td>
+        </tr>
+        <tr>
+          <th>set</th>
+          <td><pre><code>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;drawStyle&quot;, { strokeWidth: &quot;4px&quot; } );</code></pre></td>
+        </tr>
+      </table>
+      <p>The drawStyle option retrieves or updates the style of incomplete lines and polygons <b>as they are being drawn</b>. This differs from the shapeStyle method which updates the style of shapes that you've appended to the map.</p>
+      <p>This option changes specific properties of the internal style object. If you init or set an incomplete style object, only the style properties you reference are updated.</p>
+      <p>Please see the style section at the bottom of the <a href="#" onclick="javascript:window.history.back();">geomap widget</a> page for more information about the style object.</p>
+    </div>
+  </div> <!-- end of #container -->
+</body>
+</html>
+

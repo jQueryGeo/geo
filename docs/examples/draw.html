@@ -1,0 +1,88 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>drawing examples</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+  <meta name="description" content="An example of drawing with the mode property">
+  <meta name="author" content="Ryan Westphal">
+  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/blitzer/jquery-ui.css" />
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+  <style type="text/css">
+    #map
+    {
+      position: fixed;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <div id="map">
+    </div>
+    <div class="info">
+      <div class="links">
+        <a href="../" class="docLink">&lt; docs</a>
+        <a href="http://jsfiddle.net/ryanttb/==JSFIDDLE==/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
+      </div>
+      <h1>
+        drawing</h1>
+      <p>
+        This example tests the three shape drawing modes: drawPoint, drawLineString and drawPolygon. Choose a tool below and start tapping!</p>
+      <div id="modes">
+        <input type="radio" id="drawPoint" name="mode" value="drawPoint" checked="checked" /><label for="drawPoint">drawPoint</label>
+        <input type="radio" id="drawLineString" name="mode" value="drawLineString" /><label for="drawLineString">drawLineString</label>
+        <input type="radio" id="drawPolygon" name="mode" value="drawPolygon" /><label for="drawPolygon">drawPolygon</label>
+      </div>
+    </div>
+  </div>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+  <script src="../../js/excanvas.js"></script>
+  <script src="../../js/jquery.mousewheel.min.js"></script>
+  <script src="../../js/jquery.ui.widget.js"></script>
+  <script src="../../js/jquery.geo.core.js"></script>
+  <script src="../../js/jquery.geo.geographics.js"></script>
+  <script src="../../js/jquery.geo.geomap.js"></script>
+  <script src="../../js/jquery.geo.tiled.js"></script>
+  <script src="../../js/jquery.geo.shingled.js"></script>
+  <!--<script src="http://jquerygeo.com/test/jquery.geo-test.min.js"></script>-->
+  <script>
+    $(function () {
+      // create a map, setting mode to drawPoint initially
+      var map = $("#map").geomap({
+        center: [-71.0595678, 42.3604823],
+        zoom: 8,
+        mode: "drawPoint",
+        shape: function (e, geo) {
+          // the shape event triggers when a user draws a shape
+          // the geo object is a simple GeoJSON object: Point, LineString or Polygon
+          // we can append it directly to the map
+          map.geomap("append", geo);
+        }
+      });
+
+      // jQuery UI for pretty buttons
+      $("#modes").buttonset();
+
+      $("#modes input").click(function () {
+        // set the map's mode option based on value of the input clicked
+        // this will change the map's mode to drawPoint, drawLineString or drawPolygon
+        map.geomap("option", "mode", $(this).val());
+      });
+    });  
+  </script>
+
+  <script>
+    var _gaq = [['_setAccount', 'UA-26084853-1'], ['_trackPageview']];
+    (function (d, t) {
+      var g = d.createElement(t), s = d.getElementsByTagName(t)[0]; g.async = 1;
+      g.src = ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+      s.parentNode.insertBefore(g, s);
+    } (document, 'script'));
+  </script>
+</body>
+</html>
