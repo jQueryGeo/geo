@@ -10,8 +10,13 @@
         bboxMax: [-180, -85, 180, 85],
         center: [0, 0],
         cursors: {
-          pan: "move"
+          pan: "move",
+          zoom: "crosshair",
+          drawPoint: "crosshair",
+          drawLineString: "crosshair",
+          drawPolygon: "crosshair"
         },
+        drawStyle: {},
         mode: "pan",
         services: [
             {
@@ -43,6 +48,7 @@
     _$contentFrame: undefined,
     _$existingChildren: undefined,
     _$servicesContainer: undefined,
+    _$drawContainer: undefined,
     _$shapesContainer: undefined,
     _$textContainer: undefined,
     _$textContent: undefined,
@@ -58,7 +64,7 @@
     _pixelSizeMax: undefined,
 
     _wheelZoomFactor: 1.18920711500273,
-    _wheelTimer: null,
+    _wheelTimeout: null,
     _wheelLevel: 0,
 
     _zoomFactor: 2,
@@ -76,7 +82,7 @@
     _lastDrag: undefined,
 
     _windowHandler: null,
-    _timeoutResize: null,
+    _resizeTimeout: null,
 
     _panning: undefined,
     _velocity: undefined,
@@ -86,6 +92,10 @@
     _softDblClick: undefined,
     _isTap: undefined,
     _isDbltap: undefined,
+
+    _drawTimeout: null, //< used in drawPoint mode so we don't send two shape events on dbltap
+    _drawPixels: [], //< an array of coordinate arrays for drawing lines & polygons, in pixel coordinates
+    _drawCoords: [],
 
     _graphicShapes: [], //< an array of objects containing style object refs & GeoJSON object refs
 
@@ -165,6 +175,9 @@
             touchMoveEvent = this._supportTouch ? "touchmove" : "mousemove";
 
       this._$eventTarget.dblclick($.proxy(this._eventTarget_dblclick, this));
+
+      this._$eventTarget.keydown($.proxy(this._eventTarget_keydown, this));
+
       this._$eventTarget.bind(touchStartEvent, $.proxy(this._eventTarget_touchstart, this));
 
       var dragTarget = (this._$eventTarget[0].setCapture) ? this._$eventTarget : $(document);
@@ -175,10 +188,10 @@
 
       var geomap = this;
       this._windowHandler = function () {
-        if (geomap._timeoutResize) {
-          clearTimeout(geomap._timeoutResize);
+        if (geomap._resizeTimeout) {
+          clearTimeout(geomap._resizeTimeout);
         }
-        this._timeoutResize = setTimeout(function () {
+        this._resizeTimeout = setTimeout(function () {
           if (geomap._created) {
             geomap._$elem.geomap("resize");
           }
@@ -186,6 +199,9 @@
       };
 
       $(window).resize(this._windowHandler);
+
+      this._$drawContainer.geographics({ style: this._initOptions.drawStyle || {} });
+      this._options["drawStyle"] = this._$drawContainer.geographics("option", "style");
 
       this._$shapesContainer.geographics();
 
@@ -237,6 +253,18 @@
           this._setCenterAndSize($.geo.proj ? $.geo.proj.fromGeodetic([[value[0], value[1]]])[0] : value, this._pixelSize, false, refresh);
           break;
 
+        case "drawStyle":
+          if (this._$drawContainer) {
+            this._$drawContainer.geographics("option", "style", value);
+            value = this._$drawContainer.geographics("option", "style");
+          }
+          break;
+
+        case "mode":
+          this._$drawContainer.geographics("clear");
+          this._$eventTarget.css("cursor", this._options["cursors"][value]);
+          break;
+
         case "zoom":
           this._setZoom(value, false, refresh);
           break;
@@ -266,6 +294,7 @@
         }
 
         this._$shapesContainer.geographics("destroy");
+        this._$drawContainer.geographics("destroy");
 
         this._$existingChildren.detach();
         this._$elem.html("");
@@ -284,9 +313,9 @@
       return $.geo.proj ? $.geo.proj.toGeodetic(p) : p;
     },
 
-    toPixel: function (p) {
+    toPixel: function ( p, _center /* Internal Use Only */, _pixelSize /* Internal Use Only */ ) {
       p = $.geo.proj ? $.geo.proj.fromGeodetic(p) : p;
-      return this._toPixel(p);
+      return this._toPixel(p, _center, _pixelSize);
     },
 
     opacity: function (value, _serviceContainer) {
@@ -338,7 +367,10 @@
     },
 
     resize: function () {
-      var size = this._findMapSize();
+      var size = this._findMapSize(),
+          dx = size["width"]/2 - this._contentBounds.width/2,
+          dy = size["height"]/2 - this._contentBounds.height/2;
+
       this._contentBounds = {
         x: parseInt(this._$elem.css("padding-left")),
         y: parseInt(this._$elem.css("padding-top")),
@@ -361,17 +393,30 @@
         height: size["height"]
       });
 
+      var shapeStyle = this._$shapesContainer.geographics("option", "style");
+
       this._$shapesContainer.geographics("destroy");
+      this._$drawContainer.geographics("destroy");
+
+      this._$drawContainer.css({
+        width: size.width,
+        height: size.height
+      });
+      this._$drawContainer.geographics();
+
       this._$shapesContainer.css({
         width: size.width,
         height: size.height
       });
-      this._$shapesContainer.geographics();
+      this._$shapesContainer.geographics( { style: shapeStyle } );
+
+      for (var i = 0; i < this._drawPixels.length; i++) {
+        this._drawPixels[i][0] += dx;
+        this._drawPixels[i][1] += dy;
+      }
 
       this._setCenterAndSize(this._center, this._pixelSize, false, true);
     },
-
-
 
     shapeStyle: function (style) {
       if (style) {
@@ -463,11 +508,13 @@
       this._refresh();
     },
 
-    _getBbox: function () {
+    _getBbox: function (center, pixelSize) {
+      center = center || this._center;
+      pixelSize = pixelSize || this._pixelSize;
       // calculate the internal bbox
-      var halfWidth = this._contentBounds["width"] / 2 * this._pixelSize,
-        halfHeight = this._contentBounds["height"] / 2 * this._pixelSize;
-      return [this._center[0] - halfWidth, this._center[1] - halfHeight, this._center[0] + halfWidth, this._center[1] + halfHeight];
+      var halfWidth = this._contentBounds["width"] / 2 * pixelSize,
+          halfHeight = this._contentBounds["height"] / 2 * pixelSize;
+      return [center[0] - halfWidth, center[1] - halfHeight, center[0] + halfWidth, center[1] + halfHeight];
     },
 
     _setBbox: function (value, trigger, refresh) {
@@ -537,6 +584,9 @@
       this._$contentFrame.append('<div style="position:absolute; left:0; top:0; width:' + this._contentBounds["width"] + 'px; height:' + this._contentBounds["height"] + 'px; margin:0; padding:0;"></div>');
       this._$shapesContainer = this._$contentFrame.children(':last');
 
+      this._$contentFrame.append('<div style="position:absolute; left:0; top:0; width:' + this._contentBounds["width"] + 'px; height:' + this._contentBounds["height"] + 'px; margin:0; padding:0;"></div>');
+      this._$drawContainer = this._$contentFrame.children(':last');
+
       this._$contentFrame.append('<div class="ui-widget ui-widget-content ui-corner-all" style="position:absolute; left:0; top:0px; max-width:128px; display:none;"><div style="margin:.2em;"></div></div>');
       this._$textContainer = this._$contentFrame.children(':last');
       this._$textContent = this._$textContainer.children();
@@ -559,55 +609,83 @@
       }
     },
 
-    _drawGraphics: function (geographics, shapes, styles) {
+    _refreshDrawing: function () {
+      this._$drawContainer.geographics("clear");
+
+      if (this._drawPixels.length > 0) {
+        var mode = this._options["mode"];
+        if (mode == "drawLineString") {
+          this._$drawContainer.geographics("drawLineString", this._drawPixels);
+        } else {
+          this._$drawContainer.geographics("drawPolygon", this._drawPixels);
+        }
+      }
+    },
+
+    _resetDrawing: function () {
+      //this._$textContainer.hide();
+      this._drawPixels = [];
+      this._drawCoords = [];
+      this._$drawContainer.geographics("clear");
+    },
+
+    _refreshShapes: function (geographics, shapes, styles, center, pixelSize) {
       var i,
-            mgi,
-            shape,
-            style,
-            pixelPositions,
-            geomap = this;
+          mgi,
+          shape,
+          shapeBbox,
+          style,
+          pixelPositions,
+          bbox = this._getBbox(center, pixelSize),
+          geomap = this;
 
       for (i = 0; i < shapes.length; i++) {
         shape = shapes[i].shape || shapes[i];
         shape = shape.geometry || shape;
+        shapeBbox = $.data(shape, "geoBbox");
+
+        if (shapeBbox && !$.geo._in(bbox, shapeBbox)) {
+          continue;
+        }
+
         style = $.isArray(styles) ? styles[i].style : styles;
 
-        switch (shape.type) {
+         switch (shape.type) {
           case "Point":
-            this._$shapesContainer.geographics("drawPoint", this.toPixel(shape.coordinates), style);
+            this._$shapesContainer.geographics("drawPoint", this.toPixel(shape.coordinates, center, pixelSize), style);
             break;
           case "LineString":
-            this._$shapesContainer.geographics("drawLineString", this.toPixel(shape.coordinates), style);
+            this._$shapesContainer.geographics("drawLineString", this.toPixel(shape.coordinates, center, pixelSize), style);
             break;
           case "Polygon":
             pixelPositions = [];
             $.each(shape.coordinates, function (i) {
-              pixelPositions[i] = geomap.toPixel(this);
+              pixelPositions[i] = geomap.toPixel(this, center, pixelSize);
             });
             this._$shapesContainer.geographics("drawPolygon", pixelPositions, style);
             break;
           case "MultiPoint":
             for (mgi = 0; mgi < shape.coordinates; mgi++) {
-              this._$shapesContainer.geographics("drawPoint", this.toPixel(shape.coordinates[mgi]), style);
+              this._$shapesContainer.geographics("drawPoint", this.toPixel(shape.coordinates[mgi], center, pixelSize), style);
             }
             break;
           case "MultiLineString":
             for (mgi = 0; mgi < shape.coordinates; mgi++) {
-              this._$shapesContainer.geographics("drawLineString", this.toPixel(shape.coordinates[mgi]), style);
+              this._$shapesContainer.geographics("drawLineString", this.toPixel(shape.coordinates[mgi], center, pixelSize), style);
             }
             break;
           case "MultiPolygon":
             for (mgi = 0; mgi < shape.coordinates; mgi++) {
               pixelPositions = [];
               $.each(shape.coordinates[mgi], function (i) {
-                pixelPositions[i] = geomap.toPixel(this);
+                pixelPositions[i] = geomap.toPixel(this, center, pixelSize);
               });
               this._$shapesContainer.geographics("drawPolygon", pixelPositions, style);
             }
             break;
 
           case "GeometryCollection":
-            geomap._drawGraphics(geographics, shape.geometries, style);
+            geomap._refreshShapes(geographics, shape.geometries, style, center, pixelSize);
             break;
         }
       }
@@ -694,14 +772,14 @@
     },
 
     _mouseWheelFinish: function () {
-      this._wheelTimer = null;
+      this._wheelTimeout = null;
 
       if (this._wheelLevel != 0) {
         var wheelCenterAndSize = this._getZoomCenterAndSize(this._anchor, this._wheelLevel, this._wheelZoomFactor);
 
-        this._wheelLevel = 0;
-
         this._setCenterAndSize(wheelCenterAndSize.center, wheelCenterAndSize.pixelSize, true, true);
+
+        this._wheelLevel = 0;
       } else {
         this._refresh();
       }
@@ -730,11 +808,10 @@
       if (this._panning) {
         this._velocity = [0, 0];
 
-        var 
-          dx = this._current[0] - this._anchor[0],
-          dy = this._current[1] - this._anchor[1],
-          dxMap = -dx * this._pixelSize,
-          dyMap = dy * this._pixelSize;
+        var dx = this._current[0] - this._anchor[0],
+            dy = this._current[1] - this._anchor[1],
+            dxMap = -dx * this._pixelSize,
+            dyMap = dy * this._pixelSize;
 
         this._$shapesContainer.css({ left: 0, top: 0 });
 
@@ -749,9 +826,10 @@
     },
 
     _panMove: function () {
-      var 
-        dx = this._current[0] - this._lastDrag[0],
-        dy = this._current[1] - this._lastDrag[1];
+      var dx = this._current[0] - this._lastDrag[0],
+          dy = this._current[1] - this._lastDrag[1],
+          i = 0,
+          service;
 
       if (this._toolPan || dx > 3 || dx < -3 || dy > 3 || dy < -3) {
         if (!this._toolPan) {
@@ -768,7 +846,7 @@
           this._lastDrag = this._current;
 
           for (i = 0; i < this._options["services"].length; i++) {
-            var service = this._options["services"][i];
+            service = this._options["services"][i];
             $.geo["_serviceTypes"][service.type].interactivePan(this, service, dx, dy);
           }
 
@@ -780,6 +858,13 @@
               return parseInt(value) + dy;
             }
           });
+
+          for (i = 0; i < this._drawPixels.length; i++) {
+            this._drawPixels[i][0] += dx;
+            this._drawPixels[i][1] += dy;
+          }
+
+          this._refreshDrawing();
         }
       }
     },
@@ -795,7 +880,7 @@
       if (this._$shapesContainer) {
         this._$shapesContainer.geographics("clear");
         if (this._graphicShapes.length > 0) {
-          this._drawGraphics(this._$shapesContainer, this._graphicShapes, this._graphicShapes);
+          this._refreshShapes(this._$shapesContainer, this._graphicShapes, this._graphicShapes);
         }
       }
     },
@@ -828,12 +913,17 @@
 
       this._options["zoom"] = this._getZoom();
 
+      if (this._drawCoords.length > 0) {
+        this._drawPixels = this._toPixel(this._drawCoords);
+      }
+
       if (trigger) {
         this._trigger("bboxchange", window.event, { bbox: this._options["bbox"] });
       }
 
       if (refresh) {
         this._refresh();
+        this._refreshDrawing();
       }
     },
 
@@ -847,15 +937,14 @@
       center = center || this._center;
       pixelSize = pixelSize || this._pixelSize;
 
-      var 
-        width = this._contentBounds["width"],
-        height = this._contentBounds["height"],
-        halfWidth = width / 2 * pixelSize,
-        halfHeight = height / 2 * pixelSize,
-        bbox = [center[0] - halfWidth, center[1] - halfHeight, center[0] + halfWidth, center[1] + halfHeight],
-        xRatio = $.geo.width(bbox, true) / width,
-        yRatio = $.geo.height(bbox, true) / height,
-        result = [];
+      var width = this._contentBounds["width"],
+          height = this._contentBounds["height"],
+          halfWidth = width / 2 * pixelSize,
+          halfHeight = height / 2 * pixelSize,
+          bbox = [center[0] - halfWidth, center[1] - halfHeight, center[0] + halfWidth, center[1] + halfHeight],
+          xRatio = $.geo.width(bbox, true) / width,
+          yRatio = $.geo.height(bbox, true) / height,
+          result = [];
 
       $.each(p, function (i) {
         var yOffset = (this[1] * yRatio);
@@ -903,37 +992,76 @@
       if (!isNaN(tiledPixelSize)) {
         this._setCenterAndSize(coord, tiledPixelSize, trigger, refresh);
       } else {
-        var 
-          bboxMax = $.geo._scaleBy(this._getBboxMax(), 1 / Math.pow(this._zoomFactor, zoom), true),
-          pixelSize = Math.max($.geo.width(bboxMax, true) / this._contentBounds["width"], $.geo.height(bboxMax, true) / this._contentBounds["height"]);
+        var bboxMax = $.geo._scaleBy(this._getBboxMax(), 1 / Math.pow(this._zoomFactor, zoom), true),
+            pixelSize = Math.max($.geo.width(bboxMax, true) / this._contentBounds["width"], $.geo.height(bboxMax, true) / this._contentBounds["height"]);
 
         this._setCenterAndSize(coord, pixelSize, trigger, refresh);
+      }
+    },
+
+    _eventTarget_dblclick_zoom: function(e) {
+      this._trigger("dblclick", e, { type: "Point", coordinates: this.toMap(this._current) });
+      if (!e.isDefaultPrevented()) {
+        var centerAndSize = this._getZoomCenterAndSize(this._current, 1, this._zoomFactor);
+        this._setCenterAndSize(centerAndSize.center, centerAndSize.pixelSize, true, true);
       }
     },
 
     _eventTarget_dblclick: function (e) {
       this._panFinalize();
 
+      if (this._drawTimeout) {
+        window.clearTimeout(this._drawTimeout);
+        this._drawTimeout = null;
+      }
+
       var offset = $(e.currentTarget).offset();
 
       switch (this._options["mode"]) {
         case "pan":
-          this._trigger("dblclick", e, { type: "Point", coordinates: this.toMap(this._current) });
-          if (!e.isDefaultPrevented()) {
-            var centerAndSize = this._getZoomCenterAndSize(this._current, 1, this._zoomFactor);
-            this._setCenterAndSize(centerAndSize.center, centerAndSize.pixelSize, true, true);
-            //this._zoomTo(this._toMap(this._current), this._getZoom() + 1, true, true);
+        case "drawPoint":
+          this._eventTarget_dblclick_zoom(e);
+          break;
+
+        case "drawLineString":
+          if (this._drawCoords.length > 1 && !(this._drawCoords[0][0] == this._drawCoords[1][0] &&
+                                               this._drawCoords[0][1] == this._drawCoords[1][1])) {
+              this._drawCoords.length--;
+              this._trigger("shape", e, { type: "LineString", coordinates: $.geo.proj ? $.geo.proj.toGeodetic(this._drawCoords) : this._drawCoords });
+          } else {
+            this._eventTarget_dblclick_zoom(e);
           }
+          this._resetDrawing();
           break;
       }
 
       this._inOp = false;
     },
 
+    _eventTarget_keydown: function (e) {
+      if (this._drawCoords.length > 0 && e.which == 27) {
+        if (this._drawCoords.length <= 2) {
+          this._resetDrawing();
+          this._inOp = false;
+        } else {
+          this._drawCoords[this._drawCoords.length - 2] = this._drawCoords[this._drawCoords.length - 1]
+          this._drawCoords.length = this._drawCoords.length - 1;
+
+          this._drawPixels[this._drawPixels.length - 2] = this._drawPixels[this._drawPixels.length - 1]
+          this._drawPixels.length = this._drawPixels.length - 1;
+
+          this._refreshDrawing();
+        }
+      }
+    },
+
     _eventTarget_touchstart: function (e) {
       if (!this._supportTouch && e.which != 1) {
         return;
       }
+
+      this._panFinalize();
+      this._mouseWheelFinish();
 
       var offset = $(e.currentTarget).offset();
 
@@ -948,10 +1076,12 @@
         if (downDate - this._downDate < 750) {
           if (this._isTap) {
             var dx = this._current[0] - this._anchor[0],
-                  dy = this._current[1] - this._anchor[1],
-                  distance = Math.sqrt((dx * dx) + (dy * dy));
+                dy = this._current[1] - this._anchor[1],
+                distance = Math.sqrt((dx * dx) + (dy * dy));
             if (distance > 10) {
               this._isTap = false;
+            } else {
+              this._current = this._anchor;
             }
           }
 
@@ -969,9 +1099,6 @@
 
       e.preventDefault();
 
-      this._panFinalize();
-      this._mouseWheelFinish();
-
       this._mouseDown = true;
       this._anchor = this._current;
 
@@ -982,6 +1109,8 @@
         this._inOp = true;
         switch (this._options["mode"]) {
           case "pan":
+          case "drawPoint":
+          case "drawLineString":
             this._lastDrag = this._current;
 
             if (e.currentTarget.setCapture) {
@@ -995,9 +1124,9 @@
     },
 
     _dragTarget_touchmove: function (e) {
-      var 
-        offset = this._$eventTarget.offset(),
-        current, i, dx, dy;
+      var offset = this._$eventTarget.offset(),
+          drawCoordsLen = this._drawCoords.length,
+          current;
 
       if (this._supportTouch) {
         current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
@@ -1022,9 +1151,25 @@
 
       switch (mode) {
         case "pan":
+        case "drawPoint":
           if (this._mouseDown || this._toolPan) {
             this._panMove();
           } else {
+            this._trigger("move", e, { type: "Point", coordinates: this.toMap(current) });
+          }
+          break;
+
+        case "drawLineString":
+          if (this._mouseDown || this._toolPan) {
+            this._panMove();
+          } else {
+            if (drawCoordsLen > 0) {
+              this._drawCoords[drawCoordsLen - 1] = this._toMap(current);
+              this._drawPixels[drawCoordsLen - 1] = current;
+
+              this._refreshDrawing();
+            }
+
             this._trigger("move", e, { type: "Point", coordinates: this.toMap(current) });
           }
           break;
@@ -1040,11 +1185,11 @@
         this._eventTarget_touchstart(e);
       }
 
-      var 
-        mouseWasDown = this._mouseDown,
-        wasToolPan = this._toolPan,
-        offset = this._$eventTarget.offset(),
-        current, i;
+      var mouseWasDown = this._mouseDown,
+          wasToolPan = this._toolPan,
+          offset = this._$eventTarget.offset(),
+          mode = this._shiftZoom ? "zoom" : this._options["mode"],
+          current, i, clickDate;
 
       if (this._supportTouch) {
         current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
@@ -1052,23 +1197,16 @@
         current = [e.pageX - offset.left, e.pageY - offset.top];
       }
 
-      var mode = this._shiftZoom ? "zoom" : this._options["mode"];
-
       this._$eventTarget.css("cursor", this._options["cursors"][mode]);
 
-      this._shiftZoom =
-        this._mouseDown =
-        this._toolPan = false;
+      this._shiftZoom = this._mouseDown = this._toolPan = false;
 
       if (document.releaseCapture) {
         document.releaseCapture();
       }
 
       if (mouseWasDown) {
-        var 
-          clickDate = $.now(),
-          dx, dy;
-
+        clickDate = $.now();
         this._current = current;
 
         switch (mode) {
@@ -1080,6 +1218,47 @@
                 this._trigger("click", e, { type: "Point", coordinates: this.toMap(current) });
                 this._inOp = false;
               }
+            }
+            break;
+
+          case "drawPoint":
+            if (this._drawTimeout) {
+              window.clearTimeout(this._drawTimeout);
+              this._drawTimeout = null;
+            }
+
+            if (wasToolPan) {
+              this._panEnd();
+            } else {
+              if (clickDate - this._clickDate > 100) {
+                var geomap = this;
+                this._drawTimeout = setTimeout(function () {
+                  if (geomap._drawTimeout) {
+                    geomap._trigger("shape", e, { type: "Point", coordinates: geomap.toMap(current) });
+                    geomap._inOp = false;
+                    geomap._drawTimeout = false;
+                  }
+                }, 250);
+              }
+            }
+            break;
+
+          case "drawLineString":
+            if (wasToolPan) {
+              this._panEnd();
+            } else {
+              i = (this._drawCoords.length == 0 ? 0 : this._drawCoords.length - 1);
+
+              this._drawCoords[i] = this._toMap(current);
+              this._drawPixels[i] = current;
+
+              if (i < 2 || !(this._drawCoords[i][0] == this._drawCoords[i-1][0] &&
+                             this._drawCoords[i][1] == this._drawCoords[i-1][1])) {
+                this._drawCoords[i + 1] = this._toMap(current);
+                this._drawPixels[i + 1] = current;
+              }
+
+              this._refreshDrawing();
             }
             break;
         }
@@ -1103,9 +1282,9 @@
       }
 
       if (delta != 0) {
-        if (this._wheelTimer) {
-          window.clearTimeout(this._wheelTimer);
-          this._wheelTimer = null;
+        if (this._wheelTimeout) {
+          window.clearTimeout(this._wheelTimeout);
+          this._wheelTimeout = null;
         } else {
           var offset = $(e.currentTarget).offset();
           this._anchor = [e.pageX - offset.left, e.pageY - offset.top];
@@ -1122,21 +1301,19 @@
           $.geo["_serviceTypes"][service.type].interactiveScale(this, service, wheelCenterAndSize.center, wheelCenterAndSize.pixelSize);
         }
 
-        //          if (this._imageShape != null && this._mapShape != null) {
-        //            for (var i = 0; i < this._mapShapeCoords.length; i++) {
-        //              this._imageShapeCoords[i] = this.toPixelPoint(this._mapShapeCoords[i], scaleCenter, pixelSize);
-        //            }
+        this._$shapesContainer.geographics("clear");
+        if (this._graphicShapes.length > 0) {
+          this._refreshShapes(this._$shapesContainer, this._graphicShapes, this._graphicShapes, wheelCenterAndSize.center, wheelCenterAndSize.pixelSize);
+        }
 
-        //            this._redrawShape();
+        if (this._drawCoords.length > 0) {
+          this._drawPixels = this._toPixel(this._drawCoords, wheelCenterAndSize.center, wheelCenterAndSize.pixelSize);
+          this._refreshDrawing();
+        }
 
-        //            if (this._clickMode == Ag.UI.ClickMode.measureLength || this._clickMode == Ag.UI.ClickMode.measureArea) {
-        //              this._labelShape();
-        //            }
-        //          }
-
-        var that = this;
-        this._wheelTimer = window.setTimeout(function () {
-          that._mouseWheelFinish();
+        var geomap = this;
+        this._wheelTimeout = window.setTimeout(function () {
+          geomap._mouseWheelFinish();
         }, 1000);
       }
       return false;

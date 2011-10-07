@@ -16,7 +16,10 @@
     <div id="map">
     </div>
     <div class="info">
-      <a href="../" class="docLink">&lt; docs</a>
+      <div class="links">
+        <a href="../" class="docLink">&lt; docs</a>
+        <a href="http://jsfiddle.net/ryanttb/==JSFIDDLE==/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
+      </div>
       <h1>
         USA States</h1>
       <p>
@@ -53,7 +56,7 @@
       states = null;
 
       $.ajax({
-        url: "/data/usastates.json",
+        url: "../../data/usastates.json",
         dataType: "json",
         success: function (result) {
           states = result;

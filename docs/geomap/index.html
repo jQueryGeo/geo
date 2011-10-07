@@ -43,6 +43,9 @@
           <a href="mode.html"><h3>mode</h3><p class="ui-li-desc">determines how the map, user &amp; developer interact</p></a>          
         </li>
         <li>
+          <a href="drawStyle.html"><h3>drawStyle</h3><p class="ui-li-desc">when drawing shapes, defines how they look during drawing</p></a>          
+        </li>
+        <li>
           <a href="services.html"><h3>services</h3><p class="ui-li-desc">determine the content of the map</p></a>
         </li>
         <li>
@@ -151,8 +154,76 @@
         <li><a href="empty.html">empty</a></li>
         <li><a href="find.html">find</a></li>
       </ul>
-      <h2>theming</h2>
-      <p>The geomap widget itself does not create many DOM elements worth theming. There are exceptions but they are not included in this initial release.<!--The only exception is the floating measure text. It gets the ui-widget, ui-widget-content and ui-corner-all classes.--></p>
+      <h2>style</h2>
+      <p>A geomap style is an object whose properties follow a subset of <a href="http://www.w3.org/TR/SVG/styling.html">SVG styling</a> properties. The specific styles that geomap recognizes and to which geometry they apply are listed below.</p>
+      <p>Use the drawStyle <b>option</b> of the geomap widget to define the style used on incomplete lines and polygons as they are being drawn when mode is drawLineString or drawPolygon.</p>
+      <p>Use the shapeStyle <b>method</b> to define the style of shapes drawn after being appended to the map via the append method.</p>
+      <p>Please note that in drawPoint mode, the shape event is triggered immediately and so no shape will appear until you append a point to the map at which time the shapeStyle will be used.</p>
+      <h3>geomap style properties</h3>
+      <table class="objectProperties">
+        <tr>
+          <th>property</th>
+          <th>default</th>
+          <th>description</th>
+        </tr>
+        <tr>
+          <td>borderRadius</td>
+          <td>&quot;8px&quot;</td>
+          <td>The radii of a quarter ellipse that defines the shape of the corner of the outer border of a box drawn around Point shapes, which means it turns your boxes into curved rectangles. If the width, height and borderRadius properties of a style are the same (the default), the point is drawn as a circle.</td>
+        </tr>
+        <tr>
+          <td>color</td>
+          <td>#7f0000</td>
+          <td>An indirect, fallback value for the fill and stroke properties if they are not set.</td>
+        </tr>
+        <tr>
+          <td>fill</td>
+          <td>undefined</td>
+          <td>Color to use when drawing the interior of a shape. The area to be drawn consists of any areas inside the outline of the shape. By default, fill will use the value of the color property.</td>
+        </tr>
+        <tr>
+          <td>fillOpacity</td>
+          <td>.2</td>
+          <td>Specifies the opacity of the drawing operation used to draw the interior of a shape. The final fill opacity also depends on the value of the opacity property.</td>
+        </tr>
+        <tr>
+          <td>height</td>
+          <td>&quot;8px&quot;</td>
+          <td>The height of a box drawn around Point shapes. Currently only pixel values are allowed.</td>
+        </tr>
+        <tr>
+          <td>opacity</td>
+          <td>1</td>
+          <td>The object opacity of the entire shape. This is a multiplicative operation when determining the final fillOpacity and strokeOpacity where any fill or stroke operation is made even more translucent if this value is below 1.0.</td>
+        </tr>
+        <tr>
+          <td>stroke</td>
+          <td>undefined</td>
+          <td>Color to use when drawing along the outline of a shape. By default, stroke will use the value of the color property.</td>
+        </tr>
+        <tr>
+          <td>strokeOpacity</td>
+          <td>1</td>
+          <td>Specifies the opacity of the drawing operation used to draw the outline of a shape. The final stroke opacity also depends on the value of the opacity property.</td>
+        </tr>
+        <tr>
+          <td>strokeWidth</td>
+          <td>&quot;2px&quot;</td>
+          <td>The width of the stroke of a shape. A zero value causes no stroke to be drawn. Currently only pixel values are allowed.</td>
+        </tr>
+        <tr>
+          <td>visibility</td>
+          <td>&quot;visible&quot;</td>
+          <td>Determines if the shape is drawn (&quot;visible&quot;) or not drawn (&quot;hidden&quot;) on the map. Shapes that are hidden can still be returned by the find method.</td>
+        </tr>
+        <tr>
+          <td>width</td>
+          <td>&quot;8px&quot;</td>
+          <td>The width of a box drawn around Point shapes. Currently only pixel values are allowed.</td>
+        </tr>
+      </table>
+      <p>
+        All properties apply to Point shapes which means that you can adjust the stroke and fill of the box surrounding the point location.</p>
     </div>
   </div> <!-- end of #container -->
 </body>

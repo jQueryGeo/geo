@@ -13,7 +13,6 @@
   padding-right: 24px;
   text-decoration: none;
   text-transform: uppercase;
-  z-index: 1134;
 }
 
 .fiddleLink
@@ -27,12 +26,29 @@
 
 .fiddleLink img
 {
+  border: none;
   vertical-align: middle;
 }
-
-div>.info
+  
+.not-mobile
 {
-  max-width: 45%;
+  display: none;
+}
+
+@media only screen and (min-width: 800px) 
+{  
+  .info
+  {
+    max-width: 45% !important;
+    position: absolute !important;
+    right: 16px;
+    top: 16px;
+  }
+  
+  .not-mobile
+  {
+    display: block;
+  }
 }
 
 html
@@ -47,7 +63,5 @@ html
   box-shadow: -4px 4px #444;
   opacity: .8;
   padding: 8px;
-  position: absolute !important;
-  right: 16px;
-  top: 16px;
+  width: 95%;
 }
