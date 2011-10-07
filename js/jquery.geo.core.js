@@ -71,6 +71,13 @@
       return bbox[3] - bbox[1];
     },
 
+    _in: function(bbox1, bbox2) {
+      return bbox1[0] <= bbox2[0] &&
+             bbox1[1] <= bbox2[1] &&
+             bbox1[2] >= bbox2[2] &&
+             bbox1[3] >= bbox2[3];
+    },
+
     reaspect: function (bbox, ratio, _ignoreGeo /* Internal Use Only */ ) {
       // not in JTS
       if (!_ignoreGeo && $.geo.proj) {

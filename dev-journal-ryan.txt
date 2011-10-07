@@ -1,13 +1,10 @@
 ﻿== to do ==
 
 === 1.0a3 ===
-* geomap - drawPoint mode
-* geomap - drawLineString mode
 * geomap - drawPolygon mode
 * geomap - zoom mode
 * geo - geometry - distance function
 * geo - geometry - contains function
-* geo - geometry - centroid function
 * geomap - make service id property optional, add HTML id to serviceContainer if present
 ** store service state data as jQuery data on serviceContainer element
 * geomap - make the refresh argument in append public, add one to remove & empty
@@ -22,12 +19,13 @@
 * geomap - [bug] multiple maps do not work on the same page
 * geomap - [bug] zoom method doesn't work with shingled map
 * geomap - [bug] interactiveScale moves drawCoords twice
+* geomap - don't redraw shapes after interactiveScale, they've already been drawn at new scale
 * examples - massgis basemap now contains both forest and hydrography layers? makes shingled a bad example
 * examples - geomap resize method
-* geo - ? cache point bbox if $.geo.proj is not null
+* geo - cache point bbox if $.geo.proj is not null
 * geo - use Array.push instead of $.merge
-* geo - prefer GeoJSON object over $.data, assume it's accurate
-* geo - [bug] bbox does not store projected coordinates of bbox retrieved as bbox property of geometry object
+* docs - geo - stop reading GeoJSON's bbox property, always calculate
+* geo - stop reading GeoJSON's bbox property, always calculate
 
 === future ===
 * docs - geomap - more modes: measureDistance, measureArea
@@ -51,7 +49,7 @@
 * docs - internal - document how geomap draws shapes, the geomapgraphics widget and the reason shapeStyle is a method
 * geomap - label divs should have class="geo-label" & style="position: relative;"
 * geomap - find should check labels first
-* geo - implement $.geo.centroid
+* geo - geometry - centroid function
 ** JTS note: "The centroid is equal to the centroid of the set of component Geometries of highest dimension (since the lower-dimension geometries contribute zero "weight" to the centroid)"
 * geo - Support WKT with $.geo.parseWKT & $.geo.textify
 * geo - All bbox operations should be done in non-geodetic coordinates for accuracy

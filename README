@@ -45,6 +45,9 @@ Documentation is hosted at http://jquerygeo.com
 * docs - geomap - drawStyle option
 * geomap - [bug] shapeStyle not maintained after resize
 * geomap - [bug] second drag while in inertial pan causes map to jump back
+* geomap - drawPoint mode
+* geomap - drawLineString mode
+* geomap - refreshShapes should check bbox cache before drawing
 
 === 1.0a2.5 (2011-08-03) ===
 * geomap - find - [bug] does not handle GeoJSON features

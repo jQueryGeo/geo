@@ -68,7 +68,6 @@
     _wheelLevel: 0,
 
     _zoomFactor: 2,
-    _interactiveScale: false,
 
     _mouseDown: undefined,
     _inOp: undefined,
@@ -314,9 +313,9 @@
       return $.geo.proj ? $.geo.proj.toGeodetic(p) : p;
     },
 
-    toPixel: function (p) {
+    toPixel: function ( p, _center /* Internal Use Only */, _pixelSize /* Internal Use Only */ ) {
       p = $.geo.proj ? $.geo.proj.fromGeodetic(p) : p;
-      return this._toPixel(p);
+      return this._toPixel(p, _center, _pixelSize);
     },
 
     opacity: function (value, _serviceContainer) {
@@ -509,11 +508,13 @@
       this._refresh();
     },
 
-    _getBbox: function () {
+    _getBbox: function (center, pixelSize) {
+      center = center || this._center;
+      pixelSize = pixelSize || this._pixelSize;
       // calculate the internal bbox
-      var halfWidth = this._contentBounds["width"] / 2 * this._pixelSize,
-        halfHeight = this._contentBounds["height"] / 2 * this._pixelSize;
-      return [this._center[0] - halfWidth, this._center[1] - halfHeight, this._center[0] + halfWidth, this._center[1] + halfHeight];
+      var halfWidth = this._contentBounds["width"] / 2 * pixelSize,
+          halfHeight = this._contentBounds["height"] / 2 * pixelSize;
+      return [center[0] - halfWidth, center[1] - halfHeight, center[0] + halfWidth, center[1] + halfHeight];
     },
 
     _setBbox: function (value, trigger, refresh) {
@@ -628,55 +629,63 @@
       this._$drawContainer.geographics("clear");
     },
 
-    _refreshShapes: function (geographics, shapes, styles) {
+    _refreshShapes: function (geographics, shapes, styles, center, pixelSize) {
       var i,
-            mgi,
-            shape,
-            style,
-            pixelPositions,
-            geomap = this;
+          mgi,
+          shape,
+          shapeBbox,
+          style,
+          pixelPositions,
+          bbox = this._getBbox(center, pixelSize),
+          geomap = this;
 
       for (i = 0; i < shapes.length; i++) {
         shape = shapes[i].shape || shapes[i];
         shape = shape.geometry || shape;
+        shapeBbox = $.data(shape, "geoBbox");
+
+        if (shapeBbox && !$.geo._in(bbox, shapeBbox)) {
+          continue;
+        }
+
         style = $.isArray(styles) ? styles[i].style : styles;
 
-        switch (shape.type) {
+         switch (shape.type) {
           case "Point":
-            this._$shapesContainer.geographics("drawPoint", this.toPixel(shape.coordinates), style);
+            this._$shapesContainer.geographics("drawPoint", this.toPixel(shape.coordinates, center, pixelSize), style);
             break;
           case "LineString":
-            this._$shapesContainer.geographics("drawLineString", this.toPixel(shape.coordinates), style);
+            this._$shapesContainer.geographics("drawLineString", this.toPixel(shape.coordinates, center, pixelSize), style);
             break;
           case "Polygon":
             pixelPositions = [];
             $.each(shape.coordinates, function (i) {
-              pixelPositions[i] = geomap.toPixel(this);
+              pixelPositions[i] = geomap.toPixel(this, center, pixelSize);
             });
             this._$shapesContainer.geographics("drawPolygon", pixelPositions, style);
             break;
           case "MultiPoint":
             for (mgi = 0; mgi < shape.coordinates; mgi++) {
-              this._$shapesContainer.geographics("drawPoint", this.toPixel(shape.coordinates[mgi]), style);
+              this._$shapesContainer.geographics("drawPoint", this.toPixel(shape.coordinates[mgi], center, pixelSize), style);
             }
             break;
           case "MultiLineString":
             for (mgi = 0; mgi < shape.coordinates; mgi++) {
-              this._$shapesContainer.geographics("drawLineString", this.toPixel(shape.coordinates[mgi]), style);
+              this._$shapesContainer.geographics("drawLineString", this.toPixel(shape.coordinates[mgi], center, pixelSize), style);
             }
             break;
           case "MultiPolygon":
             for (mgi = 0; mgi < shape.coordinates; mgi++) {
               pixelPositions = [];
               $.each(shape.coordinates[mgi], function (i) {
-                pixelPositions[i] = geomap.toPixel(this);
+                pixelPositions[i] = geomap.toPixel(this, center, pixelSize);
               });
               this._$shapesContainer.geographics("drawPolygon", pixelPositions, style);
             }
             break;
 
           case "GeometryCollection":
-            geomap._refreshShapes(geographics, shape.geometries, style);
+            geomap._refreshShapes(geographics, shape.geometries, style, center, pixelSize);
             break;
         }
       }
@@ -771,7 +780,6 @@
         this._setCenterAndSize(wheelCenterAndSize.center, wheelCenterAndSize.pixelSize, true, true);
 
         this._wheelLevel = 0;
-        this._interactiveScale = false;
       } else {
         this._refresh();
       }
@@ -1283,7 +1291,6 @@
         }
 
         this._wheelLevel += delta;
-        this._interactiveScale = true;
 
         var wheelCenterAndSize = this._getZoomCenterAndSize(this._anchor, this._wheelLevel, this._wheelZoomFactor);
 
@@ -1292,6 +1299,11 @@
         for (i = 0; i < this._options["services"].length; i++) {
           var service = this._options["services"][i];
           $.geo["_serviceTypes"][service.type].interactiveScale(this, service, wheelCenterAndSize.center, wheelCenterAndSize.pixelSize);
+        }
+
+        this._$shapesContainer.geographics("clear");
+        if (this._graphicShapes.length > 0) {
+          this._refreshShapes(this._$shapesContainer, this._graphicShapes, this._graphicShapes, wheelCenterAndSize.center, wheelCenterAndSize.pixelSize);
         }
 
         if (this._drawCoords.length > 0) {
