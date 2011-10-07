@@ -96,6 +96,7 @@
 
     _drawTimeout: null, //< used in drawPoint mode so we don't send two shape events on dbltap
     _drawPixels: [], //< an array of coordinate arrays for drawing lines & polygons, in pixel coordinates
+    _drawCoords: [],
 
     _graphicShapes: [], //< an array of objects containing style object refs & GeoJSON object refs
 
@@ -623,6 +624,8 @@
     _resetDrawing: function () {
       //this._$textContainer.hide();
       this._drawPixels = [];
+      this._drawCoords = [];
+      this._$drawContainer.geographics("clear");
     },
 
     _refreshShapes: function (geographics, shapes, styles) {
@@ -882,12 +885,6 @@
           var service = this._options["services"][i];
           $.geo["_serviceTypes"][service.type].interactiveScale(this, service, center, pixelSize);
         }
-
-        if (!this._interactiveScale && this._drawPixels.length > 0) {
-          // interactiveScale has already handled drawCoords updates
-          this._drawPixels = this._toMap(this._drawPixels, this._center, this._pixelSize);
-          this._drawPixels = this._toPixel(this._drawPixels, center, pixelSize);
-        }
       }
 
       this._center = center;
@@ -907,6 +904,10 @@
       }
 
       this._options["zoom"] = this._getZoom();
+
+      if (this._drawCoords.length > 0) {
+        this._drawPixels = this._toPixel(this._drawCoords);
+      }
 
       if (trigger) {
         this._trigger("bboxchange", window.event, { bbox: this._options["bbox"] });
@@ -1015,10 +1016,10 @@
           break;
 
         case "drawLineString":
-          if (this._drawPixels.length > 1 && !(this._drawPixels[0][0] == this._drawPixels[1][0] &&
-                                               this._drawPixels[0][1] == this._drawPixels[1][1])) {
-              this._drawPixels.length--;
-              this._trigger("shape", e, { type: "LineString", coordinates: this.toMap(this._drawPixels) });
+          if (this._drawCoords.length > 1 && !(this._drawCoords[0][0] == this._drawCoords[1][0] &&
+                                               this._drawCoords[0][1] == this._drawCoords[1][1])) {
+              this._drawCoords.length--;
+              this._trigger("shape", e, { type: "LineString", coordinates: $.geo.proj ? $.geo.proj.toGeodetic(this._drawCoords) : this._drawCoords });
           } else {
             this._eventTarget_dblclick_zoom(e);
           }
@@ -1030,13 +1031,15 @@
     },
 
     _eventTarget_keydown: function (e) {
-      if (this._drawPixels.length > 0 && e.which == 27) {
-        if (this._drawPixels.length <= 2) {
+      if (this._drawCoords.length > 0 && e.which == 27) {
+        if (this._drawCoords.length <= 2) {
           this._resetDrawing();
           this._inOp = false;
         } else {
-          this._drawPixels[this._drawPixels.length - 2] = this._drawPixels[this._drawPixels.length - 1]
+          this._drawCoords[this._drawCoords.length - 2] = this._drawCoords[this._drawCoords.length - 1]
+          this._drawCoords.length = this._drawCoords.length - 1;
 
+          this._drawPixels[this._drawPixels.length - 2] = this._drawPixels[this._drawPixels.length - 1]
           this._drawPixels.length = this._drawPixels.length - 1;
 
           this._refreshDrawing();
@@ -1114,7 +1117,8 @@
 
     _dragTarget_touchmove: function (e) {
       var offset = this._$eventTarget.offset(),
-          current, dx, dy;
+          drawCoordsLen = this._drawCoords.length,
+          current;
 
       if (this._supportTouch) {
         current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
@@ -1151,8 +1155,9 @@
           if (this._mouseDown || this._toolPan) {
             this._panMove();
           } else {
-            if (this._drawPixels.length > 0) {
-              this._drawPixels[this._drawPixels.length - 1] = current;
+            if (drawCoordsLen > 0) {
+              this._drawCoords[drawCoordsLen - 1] = this._toMap(current);
+              this._drawPixels[drawCoordsLen - 1] = current;
 
               this._refreshDrawing();
             }
@@ -1234,12 +1239,14 @@
             if (wasToolPan) {
               this._panEnd();
             } else {
-              i = (this._drawPixels.length == 0 ? 0 : this._drawPixels.length - 1);
+              i = (this._drawCoords.length == 0 ? 0 : this._drawCoords.length - 1);
 
+              this._drawCoords[i] = this._toMap(current);
               this._drawPixels[i] = current;
 
-              if (i < 2 || !(this._drawPixels[i][0] == this._drawPixels[i-1][0] &&
-                             this._drawPixels[i][1] == this._drawPixels[i-1][1])) {
+              if (i < 2 || !(this._drawCoords[i][0] == this._drawCoords[i-1][0] &&
+                             this._drawCoords[i][1] == this._drawCoords[i-1][1])) {
+                this._drawCoords[i + 1] = this._toMap(current);
                 this._drawPixels[i + 1] = current;
               }
 
@@ -1287,9 +1294,8 @@
           $.geo["_serviceTypes"][service.type].interactiveScale(this, service, wheelCenterAndSize.center, wheelCenterAndSize.pixelSize);
         }
 
-        if (this._drawPixels.length > 0) {
-          this._drawPixels = this._toMap(this._drawPixels, this._center, this._pixelSize);
-          this._drawPixels = this._toPixel(this._drawPixels, wheelCenterAndSize.center, wheelCenterAndSize.pixelSize);
+        if (this._drawCoords.length > 0) {
+          this._drawPixels = this._toPixel(this._drawCoords, wheelCenterAndSize.center, wheelCenterAndSize.pixelSize);
           this._refreshDrawing();
         }
 
