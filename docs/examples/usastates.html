@@ -29,17 +29,67 @@
     </div>
   </div>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-  <script src="../../js/excanvas.js"></script>
-  <script src="../../js/jquery.mousewheel.min.js"></script>
-  <script src="../../js/jquery.ui.widget.js"></script>
-  <script src="../../js/jquery.geo.core.js"></script>
-  <script src="../../js/jquery.geo.geographics.js"></script>
-  <script src="../../js/jquery.geo.geomap.js"></script>
-  <script src="../../js/jquery.geo.tiled.js"></script>
-  <script src="../../js/jquery.geo.shingled.js"></script>
-  <!--<script src="http://jquerygeo.com/test/jquery.geo-test.min.js"></script>-->
+  <script src="http://jquerygeo.com/test/jquery.geo-test.min.js"></script>
   <script>
     $(function () {
+
+
+      $.ajaxTransport( function( options, originalOptions, jqXHR ) {
+        var xdr;
+
+        return {
+          send: function( _, completeCallback ) {
+            xdr = new XDomainRequest();
+            xdr.onload = function() {
+              var responses = {
+                text: xdr.responseText
+              };
+
+              // force status code to 200, XDomainRequest rejects all other successful status codes
+              if (xdr.contentType.match(/\/xml/)){
+                // there is no responseXML in XDomainRequest, so we have to create it manually
+                var dom = new ActiveXObject('Microsoft.XMLDOM');
+                dom.async = false;
+                dom.loadXML(xdr.responseText);
+                responses.xml = dom;
+
+                if($(dom).children('error').length != 0) {
+                  var $error = $(dom).find('error');
+                  completeCallback(parseInt($error.attr('response_code')), $error.attr('message_key'), responses);
+                } else {
+                  completeCallback(200, 'success', responses);
+                }
+              } else if (xdr.contentType.match(/\/json/)) {
+                options.dataTypes.push("json");
+                completeCallback(200, 'success', responses);
+              } else {
+                completeCallback(200, 'success', responses); 
+                // see bug https://connect.microsoft.com/IE/feedback/ViewFeedback.aspx?FeedbackID=334804
+              }
+            };
+            xdr.onerror = xdr.ontimeout = function() {
+              var responses = {
+                text: xdr.responseText
+              };
+              completeCallback(400, 'failed', responses);
+            }
+
+            xdr.open(options.type, options.url);
+            xdr.send(options.data);
+          },
+          abort: function() {
+            if(xdr) {
+              xdr.abort();
+            }
+          }
+        };
+      });
+
+
+
+
+
+
       var map = $("#map").geomap({
         center: [-71.0595678, 42.3604823],
         zoom: 6,
@@ -56,8 +106,7 @@
       states = null;
 
       $.ajax({
-        url: "../../data/usastates.json",
-        dataType: "json",
+        url: "http://data.jquerygeo.com/usastates.json",
         success: function (result) {
           states = result;
           map.geomap("append", states);

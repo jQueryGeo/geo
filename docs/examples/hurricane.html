@@ -84,8 +84,7 @@
           });
 
         $.ajax({
-          url: "/data/hurricane.json",
-          dataType: "json",
+          url: "http://data.jquerygeo.com/hurricane.json",
           success: function (result) {
             var shapeStyle = {
               color: "gray",
