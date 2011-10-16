@@ -1,9 +1,9 @@
 ﻿== to do ==
 
 === 1.0a3 ===
-* geomap - drawPolygon mode
 * geomap - zoom mode
 * geo - geometry - distance function
+* examples - distance
 * geo - geometry - contains function
 * geomap - make service id property optional, add HTML id to serviceContainer if present
 ** store service state data as jQuery data on serviceContainer element
@@ -45,7 +45,7 @@
 * docs - geomap - service-level shapeStyle
 * geomap - deep extend existing service objects when services property is set
 * code - prefer $.data over $.fn.data
-* docs - internal - explain what projection is and which one we use by default (3395) and maybe why we call it web mercator
+* docs - internal - explain what projection is and which one we use by default (3395) and maybe why we call it web mercator & why we can't get to +/- 90 lat
 * docs - internal - document how geomap draws shapes, the geomapgraphics widget and the reason shapeStyle is a method
 * geomap - label divs should have class="geo-label" & style="position: relative;"
 * geomap - find should check labels first
@@ -55,6 +55,8 @@
 * geo - All bbox operations should be done in non-geodetic coordinates for accuracy
 * docs - geomap - shapeLabel property
 ** template for labels for all shapes added via append
+* docs - geomap - multiple labels
+* geomap - multiple labels
 * geomap - service-level shapes
 * geomap - [bug] mouse wheel on bad or missing tile doesn't zoom out on first rotate
 * geomap - service divs should have class="geo-service"
@@ -71,7 +73,10 @@
 * geomap - [BUG] Android browser stops pan/zoom after 7 logos on logo demo
 * geomap - store a copy of shapes as WKT in a hidden input
 * geomap - only update WKT copy if shape is appended with refresh argument set to true
-* geomap - find - [maybe] after flatten, check more cached bboxes for non-Point geometries
+* geomap - find - [maybe] after flatten, check more cached bboxes for non-Point geometrie
+* docs - geomap - SVG & other neat elements/media in labels
+* docs - geo - $.geo.guessLocation function
+* geo - $.geo.guessLocation function
 * docs - services - document the plugin architecture
 ** create must return a jQuery collection where geomap can store state info
 * docs - geomap - drawPush function
@@ -81,6 +86,23 @@
 * docs - geomap - drawStop function
 ** in the drawing modes, this function ends drawing and triggers the shape event with whatever coordinates have already been added to the shape
 * geomap - drawStop
+
+==2011-10-15==
+===draw pan===
+The current version didn't get the code ported over that disables inertia while drawing. I think I need to put that in because without it, the drawing does feel too fidgety.
+
+I was calling _panEnd instead of _panFinalize for the draw modes.
+
+===draw polygon===
+Finally ported this code over. Seems ok.
+
+==2011-10-14==
+===maps===
+I would like to make an app that lives at maps.jquerygeo.com and has some useful functionality similar to Google maps but uses all open data.
+
+==2011-10-12==
+===push it===
+jQuery Geo is still functional in Chrome drawing all of the census tracts of MA. That's over 55,000 points and 3,000 features. Not too bad.
 
 ==2011-10-07==
 ===drawLineString===
