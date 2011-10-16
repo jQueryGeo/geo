@@ -48,6 +48,7 @@ Documentation is hosted at http://jquerygeo.com
 * geomap - drawPoint mode
 * geomap - drawLineString mode
 * geomap - refreshShapes should check bbox cache before drawing
+* geomap - drawPolygon mode
 
 === 1.0a2.5 (2011-08-03) ===
 * geomap - find - [bug] does not handle GeoJSON features

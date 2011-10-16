@@ -67,6 +67,10 @@
             <th><label for="bbox-prop">.geomap(&quot;option&quot;, &quot;bbox&quot;,</label> </th>
             <td><input id="bbox-prop" name="bbox-prop" type="text" /> <b>)</b> <button type="submit">set</button></td>
           </tr>
+          <tr class="bbox-proj">
+            <th>$.geo.proj.fromGeodetic( bbox )</th>
+            <td></td>
+          </tr>
           <tr class="bbox-center">
             <th>$.geo.center( bbox )</th>
             <td></td>
@@ -207,6 +211,9 @@
         // we can call join on the array to add spaces after the bbox values
         // the values are: min longitude/x, min latitude/y, max longitude/x, max latitude/y
         $bboxInput.val("[" + bbox + "]");
+
+        // projected coordinates of the bbox
+        $(".bbox-proj td").text("[" + $.geo.proj.fromGeodetic(bbox) + "]");
 
         // center of the bbox, a GeoJSON position
         $(".bbox-center td").text("[" + $.geo.center(bbox) + "]");

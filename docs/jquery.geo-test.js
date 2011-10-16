@@ -2840,9 +2840,9 @@ $.Widget.prototype = {
             touchStopEvent = this._supportTouch ? "touchend touchcancel" : "mouseup",
             touchMoveEvent = this._supportTouch ? "touchmove" : "mousemove";
 
-      this._$eventTarget.dblclick($.proxy(this._eventTarget_dblclick, this));
+      $(document).keydown($.proxy(this._document_keydown, this));
 
-      this._$eventTarget.keydown($.proxy(this._eventTarget_keydown, this));
+      this._$eventTarget.dblclick($.proxy(this._eventTarget_dblclick, this));
 
       this._$eventTarget.bind(touchStartEvent, $.proxy(this._eventTarget_touchstart, this));
 
@@ -3279,11 +3279,14 @@ $.Widget.prototype = {
       this._$drawContainer.geographics("clear");
 
       if (this._drawPixels.length > 0) {
-        var mode = this._options["mode"];
+        var mode = this._options["mode"],
+            drawPolygonCoords;
         if (mode == "drawLineString") {
           this._$drawContainer.geographics("drawLineString", this._drawPixels);
         } else {
-          this._$drawContainer.geographics("drawPolygon", this._drawPixels);
+          drawPolygonCoords = $.merge( [], this._drawPixels );
+          drawPolygonCoords.push( drawPolygonCoords );
+          this._$drawContainer.geographics( "drawPolygon", drawPolygonCoords );
         }
       }
     },
@@ -3665,6 +3668,24 @@ $.Widget.prototype = {
       }
     },
 
+    _document_keydown: function (e) {
+      var len = this._drawCoords.length;
+      if (len > 0 && e.which == 27) {
+        if (len <= 2) {
+          this._resetDrawing();
+          this._inOp = false;
+        } else {
+          this._drawCoords[len - 2] = $.merge( [], this._drawCoords[ len - 1 ] );
+          this._drawPixels[len - 2] = $.merge( [], this._drawPixels[ len - 1 ] );
+
+          this._drawCoords.length--;
+          this._drawPixels.length--;
+
+          this._refreshDrawing();
+        }
+      }
+    },
+
     _eventTarget_dblclick_zoom: function(e) {
       this._trigger("dblclick", e, { type: "Point", coordinates: this.toMap(this._current) });
       if (!e.isDefaultPrevented()) {
@@ -3690,10 +3711,30 @@ $.Widget.prototype = {
           break;
 
         case "drawLineString":
-          if (this._drawCoords.length > 1 && !(this._drawCoords[0][0] == this._drawCoords[1][0] &&
-                                               this._drawCoords[0][1] == this._drawCoords[1][1])) {
+          if ( this._drawCoords.length > 1 && ! ( this._drawCoords[0][0] == this._drawCoords[1][0] &&
+                                                  this._drawCoords[0][1] == this._drawCoords[1][1] ) ) {
               this._drawCoords.length--;
-              this._trigger("shape", e, { type: "LineString", coordinates: $.geo.proj ? $.geo.proj.toGeodetic(this._drawCoords) : this._drawCoords });
+              this._trigger( "shape", e, {
+                type: "LineString",
+                coordinates: $.geo.proj ? $.geo.proj.toGeodetic(this._drawCoords) : this._drawCoords
+              } );
+          } else {
+            this._eventTarget_dblclick_zoom(e);
+          }
+          this._resetDrawing();
+          break;
+
+        case "drawPolygon":
+          if ( this._drawCoords.length > 1 && ! ( this._drawCoords[0][0] == this._drawCoords[1][0] &&
+                                                  this._drawCoords[0][1] == this._drawCoords[1][1] ) ) {
+            var endIndex = this._drawCoords.length - 1;
+            if (endIndex > 2) {
+              this._drawCoords[endIndex] = $.merge( [], this._drawCoords[0] );
+              this._trigger( "shape", e, {
+                type: "Polygon",
+                coordinates: [ $.geo.proj ? $.geo.proj.toGeodetic(this._drawCoords) : this._drawCoords ]
+              } );
+            }
           } else {
             this._eventTarget_dblclick_zoom(e);
           }
@@ -3702,23 +3743,6 @@ $.Widget.prototype = {
       }
 
       this._inOp = false;
-    },
-
-    _eventTarget_keydown: function (e) {
-      if (this._drawCoords.length > 0 && e.which == 27) {
-        if (this._drawCoords.length <= 2) {
-          this._resetDrawing();
-          this._inOp = false;
-        } else {
-          this._drawCoords[this._drawCoords.length - 2] = this._drawCoords[this._drawCoords.length - 1]
-          this._drawCoords.length = this._drawCoords.length - 1;
-
-          this._drawPixels[this._drawPixels.length - 2] = this._drawPixels[this._drawPixels.length - 1]
-          this._drawPixels.length = this._drawPixels.length - 1;
-
-          this._refreshDrawing();
-        }
-      }
     },
 
     _eventTarget_touchstart: function (e) {
@@ -3777,6 +3801,7 @@ $.Widget.prototype = {
           case "pan":
           case "drawPoint":
           case "drawLineString":
+          case "drawPolygon":
             this._lastDrag = this._current;
 
             if (e.currentTarget.setCapture) {
@@ -3826,6 +3851,7 @@ $.Widget.prototype = {
           break;
 
         case "drawLineString":
+        case "drawPolygon":
           if (this._mouseDown || this._toolPan) {
             this._panMove();
           } else {
@@ -3894,7 +3920,7 @@ $.Widget.prototype = {
             }
 
             if (wasToolPan) {
-              this._panEnd();
+              this._panFinalize();
             } else {
               if (clickDate - this._clickDate > 100) {
                 var geomap = this;
@@ -3910,8 +3936,9 @@ $.Widget.prototype = {
             break;
 
           case "drawLineString":
+          case "drawPolygon":
             if (wasToolPan) {
-              this._panEnd();
+              this._panFinalize();
             } else {
               i = (this._drawCoords.length == 0 ? 0 : this._drawCoords.length - 1);
 
