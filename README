@@ -49,6 +49,16 @@ Documentation is hosted at http://jquerygeo.com
 * geomap - drawLineString mode
 * geomap - refreshShapes should check bbox cache before drawing
 * geomap - drawPolygon mode
+* geomap - port zoom mode
+* geomap - port shift-zoom mode for pan & draw modes
+* geo - geometry - distance function
+* examples - distance
+* geomap - rename getPixelSize to just pixelSize
+* geomap - [bug] zoom method doesn't work with shingled map
+* geomap - store service state data as jQuery data on serviceContainer element
+* geo - geometry - contains function
+* geomap - rename service.visible to visibility having either "visible" or "hidden" values
+* geo - geometry - centroid function
 
 === 1.0a2.5 (2011-08-03) ===
 * geomap - find - [bug] does not handle GeoJSON features
@@ -64,6 +74,7 @@ Documentation is hosted at http://jquerygeo.com
 * geomap - auto-handle window resize events
 * docs/geomap - scale map according to cursor location instead of re-centering during double-click zoom
 * geomap - iOS - [bug] second tap can be anywhere & cause a zoom
+* geomap - shingled - [bug] map doesn't resize correctly
 
 === 1.0a2 (2011-06-29) ===
 * geomap - Support dynamic map services

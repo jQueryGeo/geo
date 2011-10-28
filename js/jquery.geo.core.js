@@ -102,7 +102,7 @@
       return $.geo.proj ? $.geo.proj.toGeodetic(bbox) : bbox;
     },
 
-    scaleBy: function (bbox, scale, _ignoreGeo /* Internal Use Only */ ) {
+    scaleBy: function ( bbox, scale, _ignoreGeo /* Internal Use Only */ ) {
       // not in JTS
       if (!_ignoreGeo && $.geo.proj) {
         bbox = $.geo.proj.fromGeodetic(bbox);
@@ -138,6 +138,10 @@
           var coordinates = this._allCoordinates(geom),
               curCoord = 0;
 
+          if (coordinates.length == 0) {
+            return undefined;
+          }
+
           if ($.geo.proj) {
             coordinates = $.geo.proj.fromGeodetic(coordinates);
           }
@@ -156,9 +160,58 @@
       return $.geo.proj ? $.geo.proj.toGeodetic(result) : result;
     },
 
+    // centroid
+    
+    centroid: function( geom, _ignoreGeo /* Internal Use Only */ ) {
+      switch (geom.type) {
+        case "Point":
+          return $.extend({}, geom);
+
+        case "LineString":
+        case "Polygon":
+          var a = 0,
+              c = [0, 0],
+              coords = $.merge( [ ], geom.type == "Polygon" ? geom.coordinates[0] : geom.coordinates ),
+              i = 1, j, n;
+
+          if ( !_ignoreGeo && $.geo.proj ) {
+            coords = $.geo.proj.fromGeodetic(coords);
+          }
+
+          //if (coords[0][0] != coords[coords.length - 1][0] || coords[0][1] != coords[coords.length - 1][1]) {
+          //  coords.push(coords[0]);
+          //}
+
+          for (; i <= coords.length; i++) {
+            j = i % coords.length;
+            n = (coords[i - 1][0] * coords[j][1]) - (coords[j][0] * coords[i - 1][1]);
+            a += n;
+            c[0] += (coords[i - 1][0] + coords[j][0]) * n;
+            c[1] += (coords[i - 1][1] + coords[j][1]) * n;
+          }
+
+          if (a == 0) {
+            if (coords.length > 0) {
+              c[0] = coords[0][0];
+              c[1] = coords[0][1];
+              return { type: "Point", coordinates: !_ignoreGeo && $.geo.proj ? $.geo.proj.toGeodetic(c) : c };
+            } else {
+              return undefined;
+            }
+          }
+
+          a *= 3;
+          c[0] /= a;
+          c[1] /= a;
+
+          return { type: "Point", coordinates: !_ignoreGeo && $.geo.proj ? $.geo.proj.toGeodetic(c) : c };
+      }
+      return undefined;
+    },
+
     // contains
 
-    _contains: function (geom1, geom2) {
+    contains: function (geom1, geom2) {
       if (geom1.type != "Polygon") {
         return false;
       }
@@ -172,6 +225,9 @@
 
         case "Polygon":
           return this._containsPolygonLineString(geom1.coordinates, geom2.coordinates[0]);
+
+        default:
+          return false;
       }
     },
 
@@ -214,11 +270,9 @@
 
     // distance
 
-    _distance: function (geom1, geom2) {
-      var geom1Coordinates = $.isArray(geom1) ? geom1 : geom1.coordinates,
-          geom2Coordinates = $.isArray(geom2) ? geom2 : geom2.coordinates,
-          geom1CoordinatesProjected = $.geo.proj ? $.geo.proj.fromGeodetic(geom1Coordinates) : geom1Coordinates,
-          geom2CoordinatesProjected = $.geo.proj ? $.geo.proj.fromGeodetic(geom2Coordinates) : geom2Coordinates;
+    distance: function ( geom1, geom2, _ignoreGeo /* Internal Use Only */ ) {
+      var geom1CoordinatesProjected = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic(geom1.coordinates) : geom1.coordinates,
+          geom2CoordinatesProjected = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic(geom2.coordinates) : geom2.coordinates;
 
       switch (geom1.type) {
         case "Point":
@@ -230,7 +284,7 @@
             case "Polygon":
               return this._containsPolygonPoint(geom2CoordinatesProjected, geom1CoordinatesProjected) ? 0 : this._distanceLineStringPoint(geom2CoordinatesProjected[0], geom1CoordinatesProjected);
             default:
-              throw new Error("not implemented");
+              return undefined;
           }
           break;
 
@@ -243,7 +297,7 @@
             case "Polygon":
               return this._containsPolygonLineString(geom2CoordinatesProjected, geom1CoordinatesProjected) ? 0 : this._distanceLineStringLineString(geom2CoordinatesProjected[0], geom1CoordinatesProjected);
             default:
-              throw new Error("not implemented");
+              return undefined;
           }
           break;
 
@@ -256,7 +310,7 @@
             case "Polygon":
               return this._containsPolygonLineString(geom1CoordinatesProjected, geom2CoordinatesProjected[0]) ? 0 : this._distanceLineStringLineString(geom1CoordinatesProjected[0], geom2CoordinatesProjected[0]);
             default:
-              throw new Error("not implemented");
+              return undefined;
           }
           break;
       }
@@ -326,7 +380,7 @@
 
     _distanceLineStringLineString: function (lineStringCoordinates1, lineStringCoordinates2) {
       var minDist = pos_oo;
-      for (var i = 0; i < lineStringCoordinates2; i++) {
+      for (var i = 0; i < lineStringCoordinates2.length; i++) {
         minDist = Math.min(minDist, this._distanceLineStringPoint(lineStringCoordinates1, lineStringCoordinates2[i]));
       }
       return minDist;
@@ -339,14 +393,21 @@
     _flatten: function (geom) {
       // return an array of all basic geometries
       // not in JTS
-      var geometries = [];
+      var geometries = [],
+          curGeom = 0;
       switch (geom.type) {
         case "Feature":
           $.merge(geometries, this._flatten(geom.geometry));
           break;
 
+        case "FeatureCollection":
+          for (; curGeom < geom.features.length; curGeom++) {
+            $.merge(geometries, this._flatten(geom.features[curGeom].geometry));
+          }
+          break;
+
         case "GeometryCollection":
-          for (curGeom = 0; curGeom < geom.geometries.length; curGeom++) {
+          for (; curGeom < geom.geometries.length; curGeom++) {
             $.merge(geometries, this._flatten(geom.geometries[curGeom]));
           }
           break;

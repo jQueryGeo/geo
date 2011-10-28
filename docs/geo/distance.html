@@ -36,6 +36,7 @@
         </tr>
       </table>
       <p>The distance method calculates the distance between two basic GeoJSON geometry objects and returns it in non-geodetic units. The basic shapes are Point, LineString and Polygon. If you are using geomap with its default map service, the distance is in meters because the default projection is web mercator meters.</p>
+      <p>If either argument is not a basic GeoJSON geometry object, this function returns undefined.</p>
       <p>If $.geo.proj is not null, this method first calls fromGeodetic on both incoming shapes before calculating the return value.</p>
       <p>This function is similar to Geometry.distance in JTS.</p>
     </div>

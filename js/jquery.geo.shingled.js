@@ -1,37 +1,41 @@
 ﻿(function ($, undefined) {
   $.geo._serviceTypes.shingled = (function () {
-    var shingledServicesState = {};
-
     return {
       create: function (map, servicesContainer, service, index) {
+        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState") || {};
+
         if (!shingledServicesState[service.id]) {
           shingledServicesState[service.id] = {
             loadCount: 0
           };
 
-          var scHtml = '<div data-geo-service="shingled" id="' + service.id + '" style="position:absolute; left:0; top:0; width:16px; height:16px; margin:0; padding:0; display:' + (service.visible === undefined || service.visible ? "block" : "none") + ';"></div>';
+          var scHtml = '<div data-geo-service="shingled" id="' + service.id + '" style="position:absolute; left:0; top:0; width:16px; height:16px; margin:0; padding:0; display:' + (service.visibility === undefined || service.visibility === "visible" ? "block" : "none") + ';"></div>';
           servicesContainer.append(scHtml);
 
-          return (shingledServicesState[service.id].serviceContainer = servicesContainer.children(":last"));
+          shingledServicesState[service.id].serviceContainer = servicesContainer.children(":last");
+          servicesContainer.data("geoShingledServicesState", shingledServicesState);
         }
+
+        return shingledServicesState[service.id].serviceContainer;
       },
 
       destroy: function (map, servicesContainer, service) {
+        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
         shingledServicesState[service.id].serviceContainer.remove();
         delete shingledServicesState[service.id];
       },
 
       interactivePan: function (map, service, dx, dy) {
-        if (!shingledServicesState[service.id]) {
+        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
+        if (!(shingledServicesState && shingledServicesState[service.id])) {
           return;
         }
 
         this._cancelUnloaded(map, service);
 
-        var 
-            serviceState = shingledServicesState[service.id],
+        var serviceState = shingledServicesState[service.id],
             serviceContainer = serviceState.serviceContainer,
-            pixelSize = map.getPixelSize(),
+            pixelSize = map.pixelSize(),
             scaleContainer = serviceContainer.children("[data-pixelSize='" + pixelSize + "']"),
             panContainer = scaleContainer.children("div");
 
@@ -51,7 +55,8 @@
       },
 
       interactiveScale: function (map, service, center, pixelSize) {
-        if (!shingledServicesState[service.id]) {
+        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
+        if (!(shingledServicesState && shingledServicesState[service.id])) {
           return;
         }
 
@@ -86,11 +91,12 @@
       },
 
       refresh: function (map, service) {
-        if (service && shingledServicesState[service.id] && (service.visible === undefined || service.visible)) {
+        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
+        if (service && shingledServicesState[service.id] && (service.visibility === undefined || service.visibility === "visible")) {
           this._cancelUnloaded(map, service);
 
           var bbox = map._getBbox(),
-              pixelSize = map.getPixelSize(),
+              pixelSize = map.pixelSize(),
 
               serviceState = shingledServicesState[service.id],
               serviceContainer = serviceState.serviceContainer,
@@ -182,13 +188,47 @@
         }
       },
 
+      resize: function (map, service) {
+        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
+        if (service && shingledServicesState[service.id] && (service.visibility === undefined || service.visibility === "visible")) {
+          this._cancelUnloaded(map, service);
+
+          var serviceState = shingledServicesState[service.id],
+              serviceContainer = serviceState.serviceContainer,
+
+              contentBounds = map._getContentBounds(),
+              mapWidth = contentBounds["width"],
+              mapHeight = contentBounds["height"],
+
+              halfWidth = mapWidth / 2,
+              halfHeight = mapHeight / 2,
+
+              scaleContainer = serviceContainer.children();
+
+          scaleContainer.attr("data-pixelSize", "0");
+          scaleContainer.css({
+            left: halfWidth + 'px',
+            top: halfHeight + 'px'
+          });
+        }
+      },
+
       opacity: function (map, service) {
+        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
         // service.opacity has changed, update any existing images
         var serviceState = shingledServicesState[service.id];
         serviceState.serviceContainer.find("img").stop(true).fadeTo("fast", service.opacity);
       },
 
+      toggle: function (map, service) {
+        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
+        // service.visible has changed, update our service container
+        var serviceState = shingledServicesState[service.id];
+        serviceState.serviceContainer.css("display", service.visibility === "visible" ? "block" : "none");
+      },
+
       _cancelUnloaded: function (map, service) {
+        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
         var serviceState = shingledServicesState[service.id];
 
         if (serviceState && serviceState.loadCount > 0) {
