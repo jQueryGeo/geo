@@ -48,8 +48,8 @@ var bboxFromProperty = $.geo.bbox(shape);
 delete shape.bbox;
 var calculatedBbox = $.geo.bbox(shape);
 </code></pre>
-      <p>To calculate an accurate bbox, this method must operate in non-geodetic coordinates. 
-        Therefore, if $.geo.proj is not null, this method first calls fromGeodetic on the incoming shape and toGeodetic on the positions in the returned bbox.</p>
+      <p>If the argument is not a basic GeoJSON geometry object, this function returns undefined.</p>
+      <p>To calculate an accurate bbox, this method must operate in non-geodetic coordinates. Therefore, if $.geo.proj is not null, this method first calls fromGeodetic on the incoming shape and toGeodetic on the positions in the returned bbox.</p>
       <!--<p>Due to the liberties taken by web mercator to display a round Earth on a single 
         flat plane, when working in geodetic (lon/lat) coordinates, the result of the 
         $.geo.bbox function may not be exactly what you expect based on your input 

@@ -304,7 +304,7 @@
       $.Widget.prototype.destroy.apply(this, arguments);
     },
 
-    getPixelSize: function () {
+    pixelSize: function () {
       return this._pixelSize;
     },
 
@@ -342,10 +342,10 @@
           var service = this._currentServices[i];
           if (!_serviceContainer || service.serviceContainer[0] == _serviceContainer[0]) {
             if (value === undefined) {
-              value = (service.visible === undefined ? false : !service.visible);
+              value = (service.visibility === undefined || service.visibility === "visible" ? false : true);
             }
 
-            this._options["services"][i].visible = service.visible = value;
+            this._options["services"][i].visibility = service.visibility = ( value ? "visible" : "hidden" );
             $.geo["_serviceTypes"][service.type].toggle(this, service);
 
             if (value) {
@@ -369,7 +369,8 @@
     resize: function () {
       var size = this._findMapSize(),
           dx = size["width"]/2 - this._contentBounds.width/2,
-          dy = size["height"]/2 - this._contentBounds.height/2;
+          dy = size["height"]/2 - this._contentBounds.height/2,
+          i;
 
       this._contentBounds = {
         x: parseInt(this._$elem.css("padding-left")),
@@ -398,6 +399,11 @@
       this._$shapesContainer.geographics("destroy");
       this._$drawContainer.geographics("destroy");
 
+      for (i = 0; i < this._currentServices.length; i++) {
+        $.geo["_serviceTypes"][this._currentServices[i].type].resize(this, this._currentServices[i]);
+      }
+
+
       this._$drawContainer.css({
         width: size.width,
         height: size.height
@@ -410,7 +416,7 @@
       });
       this._$shapesContainer.geographics( { style: shapeStyle } );
 
-      for (var i = 0; i < this._drawPixels.length; i++) {
+      for (i = 0; i < this._drawPixels.length; i++) {
         this._drawPixels[i][0] += dx;
         this._drawPixels[i][1] += dy;
       }
@@ -464,7 +470,7 @@
 
       $.each(this._graphicShapes, function (i) {
         if (this.shape.type == "Point") {
-          if ($.geo._distance(this.shape, point) <= mapTol) {
+          if ($.geo.distance(this.shape, point, true) <= mapTol) {
             result.push(this.shape);
           }
         } else {
@@ -480,10 +486,10 @@
                   ]]
                 };
 
-          if ($.geo._distance(bboxPolygon, point) <= mapTol) {
+          if ($.geo.distance(bboxPolygon, point, true) <= mapTol) {
             var geometries = $.geo._flatten(this.shape);
             for (curGeom = 0; curGeom < geometries.length; curGeom++) {
-              if ($.geo._distance(geometries[curGeom], point) <= mapTol) {
+              if ($.geo.distance(geometries[curGeom], point, true) <= mapTol) {
                 result.push(this.shape);
                 break;
               }
@@ -543,6 +549,10 @@
       return this._contentBounds;
     },
 
+    _getServicesContainer: function () {
+      return this._$servicesContainer;
+    },
+
     _getZoom: function () {
       // calculate the internal zoom level, vs. public zoom property
       if (this._options["tilingScheme"]) {
@@ -562,7 +572,7 @@
       if (this._options["tilingScheme"]) {
         this._setCenterAndSize(this._center, this._getTiledPixelSize(value), trigger, refresh);
       } else {
-        var bbox = $.geo.scaleBy(this._getBbox(), 1 / Math.pow(this._zoomFactor, value), true),
+        var bbox = $.geo.scaleBy(this._getBboxMax(), 1 / Math.pow(this._zoomFactor, value), true),
             pixelSize = Math.max($.geo.width(bbox, true) / this._contentBounds.width, $.geo.height(bbox, true) / this._contentBounds.height);
         this._setCenterAndSize(this._center, pixelSize, trigger, refresh);
       }
@@ -1175,6 +1185,20 @@
       var mode = this._shiftZoom ? "zoom" : this._options["mode"];
 
       switch (mode) {
+        case "zoom":
+          if ( this._mouseDown ) {
+            this._$drawContainer.geographics( "clear" );
+            this._$drawContainer.geographics( "drawBbox", [
+              this._anchor[ 0 ],
+              this._anchor[ 1 ],
+              current[ 0 ],
+              current[ 1 ]
+            ] );
+          } else {
+            this._trigger("move", e, { type: "Point", coordinates: this.toMap(current) });
+          }
+          break;
+
         case "pan":
         case "drawPoint":
           if (this._mouseDown || this._toolPan) {
@@ -1215,7 +1239,8 @@
           wasToolPan = this._toolPan,
           offset = this._$eventTarget.offset(),
           mode = this._shiftZoom ? "zoom" : this._options["mode"],
-          current, i, clickDate;
+          current, i, clickDate,
+          dx, dy;
 
       if (this._supportTouch) {
         current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
@@ -1223,7 +1248,10 @@
         current = [e.pageX - offset.left, e.pageY - offset.top];
       }
 
-      this._$eventTarget.css("cursor", this._options["cursors"][mode]);
+      dx = current[0] - this._anchor[0];
+      dy = current[1] - this._anchor[1];
+
+      this._$eventTarget.css("cursor", this._options["cursors"][this._options["mode"]]);
 
       this._shiftZoom = this._mouseDown = this._toolPan = false;
 
@@ -1236,6 +1264,34 @@
         this._current = current;
 
         switch (mode) {
+          case "zoom":
+            if ( dx > 0 || dy > 0 ) {
+              var minSize = this._pixelSize * 6,
+                  bboxCoords = this._toMap( [ [
+                      Math.min( this._anchor[ 0 ], current[ 0 ] ),
+                      Math.max( this._anchor[ 1 ], current[ 1 ] )
+                    ], [
+                      Math.max( this._anchor[ 0 ], current[ 0 ] ),
+                      Math.min( this._anchor[ 1 ], current[ 1 ] )
+                    ]
+                  ] ),
+                  bbox = [
+                    bboxCoords[0][0],
+                    bboxCoords[0][1],
+                    bboxCoords[1][0],
+                    bboxCoords[1][1]
+                  ];
+
+              if ( ( bbox[2] - bbox[0] ) < minSize && ( bbox[3] - bbox[1] ) < minSize ) {
+                bbox = $.geo.scaleBy( this._getBbox( $.geo.center( bbox, true ) ), .5, true );
+              }
+
+              this._setBbox(bbox, true, true);
+            }
+
+            this._resetDrawing();
+            break;
+
           case "pan":
             if (wasToolPan) {
               this._panEnd();
