@@ -1,31 +1,23 @@
 ﻿== to do ==
 
 === 1.0a3 ===
-* geomap - zoom mode
-* geo - geometry - distance function
-* examples - distance
-* geo - geometry - contains function
 * geomap - make service id property optional, add HTML id to serviceContainer if present
-** store service state data as jQuery data on serviceContainer element
-* geomap - make the refresh argument in append public, add one to remove & empty
 * geomap - append should cache the shape's bbox (instead of the bbox function)
+* geomap - cache point bbox if $.geo.proj is not null
 * geomap - remove should remove the shape's bbox cache
 * geomap - empty should remove the bbox cache for all shapes
-* geomap - rename getPixelSize to just pixelSize
-* geomap - rename service.visible to visibility having either "visible" or "hidden" values
-* geomap - use _currentServices in all functions unless we actually need to update the public  options services object
-* geomap - create _defaultState object, use for widget-local _widgetState property, reinit _widgetState on _createWidget
-* geomap - [bug] changing services array after initialization fails
-* geomap - [bug] multiple maps do not work on the same page
-* geomap - [bug] zoom method doesn't work with shingled map
-* geomap - [bug] interactiveScale moves drawCoords twice
-* geomap - don't redraw shapes after interactiveScale, they've already been drawn at new scale
-* examples - massgis basemap now contains both forest and hydrography layers? makes shingled a bad example
-* examples - geomap resize method
-* geo - cache point bbox if $.geo.proj is not null
-* geo - use Array.push instead of $.merge
 * docs - geo - stop reading GeoJSON's bbox property, always calculate
 * geo - stop reading GeoJSON's bbox property, always calculate
+* geomap - [bug] changing services array after initialization fails
+* geomap - [bug] multiple maps do not work on the same page
+* geomap - use _currentServices in all functions unless we actually need to update the public  options services object
+* geomap - create _defaultState object, use for widget-local _widgetState property, reinit _widgetState on _createWidget
+* geomap - don't redraw shapes after interactiveScale, they've already been drawn at new scale
+* geo - use Array.push instead of $.merge
+* geomap - make the refresh argument in append public, add one to remove & empty
+* examples - geomap resize method
+* examples - multiple maps example
+* docs & examples - settle on the word "option" in all text (instead of property) to match widget function
 
 === future ===
 * docs - geomap - more modes: measureDistance, measureArea
@@ -43,14 +35,22 @@
 ** if a service has a name property, it will maintain a hidden input with the given name
 * docs - geomap - service-level shapes
 * docs - geomap - service-level shapeStyle
+* docs - geo - support up to GeometryCollection in distance
+* geo - support up to GeometryCollection in distance
+* docs - geo - support up to GeometryCollection in contains
+* geo - support up to GeometryCollection in contains
+* docs - geo - support up to GeometryCollection in centroid
+* geo - support up to GeometryCollection in centroid
+* docs - geo - empty function
+* geo - geometry - empty function
+* geomap - android - [bug] cannot always pan map after appending shapes
 * geomap - deep extend existing service objects when services property is set
 * code - prefer $.data over $.fn.data
 * docs - internal - explain what projection is and which one we use by default (3395) and maybe why we call it web mercator & why we can't get to +/- 90 lat
 * docs - internal - document how geomap draws shapes, the geomapgraphics widget and the reason shapeStyle is a method
 * geomap - label divs should have class="geo-label" & style="position: relative;"
 * geomap - find should check labels first
-* geo - geometry - centroid function
-** JTS note: "The centroid is equal to the centroid of the set of component Geometries of highest dimension (since the lower-dimension geometries contribute zero "weight" to the centroid)"
+* geo - geometry - implement JTS note: "The centroid is equal to the centroid of the set of component Geometries of highest dimension (since the lower-dimension geometries contribute zero "weight" to the centroid)"
 * geo - Support WKT with $.geo.parseWKT & $.geo.textify
 * geo - All bbox operations should be done in non-geodetic coordinates for accuracy
 * docs - geomap - shapeLabel property
@@ -86,6 +86,32 @@
 * docs - geomap - drawStop function
 ** in the drawing modes, this function ends drawing and triggers the shape event with whatever coordinates have already been added to the shape
 * geomap - drawStop
+
+==2011-10-28==
+===style===
+Both shapeStyle and drawStyle get and set a plain JavaScript object and should be widget "option"s. While changing them does have side effects, they perform no action themsevles.
+
+===centroid===
+I'm leaving centroid in a3 but removing support for GeometryCollection for now (in the docs & code). That can come later.
+
+===distance===
+No sense having the two lines that support arrays, they'll never hit a valid switch case and it's not in the docs.
+
+==2011-10-25==
+===service state===
+I finally moved it to a $.data store on the services container. It was getting messed up moving between pages in jQuery Mobile when one of the pages had a map.
+
+==2011-10-21==
+===resize===
+Shingled maps don't resize properly. I think I have to have a resize method in there & call it from geomap. All set, I had to mark the current scaleContainer as not being for the given scale any longer and re-center it.
+
+===visible===
+I can't decide about this property of the service object. I need an API audit from Bocoup :(
+
+Since I have opacity and visibility in shapeStyle, and I know I'm not going to change them, I think I do want to have the naming synergy because I do have opacity in service properties that I'm not going to change. Ugh, but the toggle method takes a true or false value. But so does jQuery's and that changes a CSS property from one text string to another.
+
+===change service object===
+Unlike the shape objects, I think it's fine if I change the service object's visibility property. It's sort of awful to see the check for undefined & I change it anyway when they use the toggle method. Why not just set it to "visible" when I create the service?
 
 ==2011-10-15==
 ===draw pan===

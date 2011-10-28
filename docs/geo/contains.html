@@ -44,6 +44,7 @@
         </tr>
       </table>
       <p>The contains method determines if the first basic GeoJSON geometry completely contains a second one. The basic shapes are Point, LineString and Polygon however Point and LineString geometries cannot contain other geometries so the only situation that has a possibility of returning true is when the first argument is a Polygon.</p>
+      <p>If either argument is not a basic GeoJSON geometry object, this function returns undefined.</p>
       <p>$.geo.contains is projection agnostic which means it never calls the from/toGeodetic methods in $.geo.proj as the algorithm is the same regardless.</p>
       <p>This function is similar to Geometry.contains in JTS.</p>
     </div>

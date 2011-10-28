@@ -1896,7 +1896,7 @@ $.Widget.prototype = {
       return $.geo.proj ? $.geo.proj.toGeodetic(bbox) : bbox;
     },
 
-    scaleBy: function (bbox, scale, _ignoreGeo /* Internal Use Only */ ) {
+    scaleBy: function ( bbox, scale, _ignoreGeo /* Internal Use Only */ ) {
       // not in JTS
       if (!_ignoreGeo && $.geo.proj) {
         bbox = $.geo.proj.fromGeodetic(bbox);
@@ -1932,6 +1932,10 @@ $.Widget.prototype = {
           var coordinates = this._allCoordinates(geom),
               curCoord = 0;
 
+          if (coordinates.length == 0) {
+            return undefined;
+          }
+
           if ($.geo.proj) {
             coordinates = $.geo.proj.fromGeodetic(coordinates);
           }
@@ -1950,9 +1954,58 @@ $.Widget.prototype = {
       return $.geo.proj ? $.geo.proj.toGeodetic(result) : result;
     },
 
+    // centroid
+    
+    centroid: function( geom, _ignoreGeo /* Internal Use Only */ ) {
+      switch (geom.type) {
+        case "Point":
+          return $.extend({}, geom);
+
+        case "LineString":
+        case "Polygon":
+          var a = 0,
+              c = [0, 0],
+              coords = $.merge( [ ], geom.type == "Polygon" ? geom.coordinates[0] : geom.coordinates ),
+              i = 1, j, n;
+
+          if ( !_ignoreGeo && $.geo.proj ) {
+            coords = $.geo.proj.fromGeodetic(coords);
+          }
+
+          //if (coords[0][0] != coords[coords.length - 1][0] || coords[0][1] != coords[coords.length - 1][1]) {
+          //  coords.push(coords[0]);
+          //}
+
+          for (; i <= coords.length; i++) {
+            j = i % coords.length;
+            n = (coords[i - 1][0] * coords[j][1]) - (coords[j][0] * coords[i - 1][1]);
+            a += n;
+            c[0] += (coords[i - 1][0] + coords[j][0]) * n;
+            c[1] += (coords[i - 1][1] + coords[j][1]) * n;
+          }
+
+          if (a == 0) {
+            if (coords.length > 0) {
+              c[0] = coords[0][0];
+              c[1] = coords[0][1];
+              return { type: "Point", coordinates: !_ignoreGeo && $.geo.proj ? $.geo.proj.toGeodetic(c) : c };
+            } else {
+              return undefined;
+            }
+          }
+
+          a *= 3;
+          c[0] /= a;
+          c[1] /= a;
+
+          return { type: "Point", coordinates: !_ignoreGeo && $.geo.proj ? $.geo.proj.toGeodetic(c) : c };
+      }
+      return undefined;
+    },
+
     // contains
 
-    _contains: function (geom1, geom2) {
+    contains: function (geom1, geom2) {
       if (geom1.type != "Polygon") {
         return false;
       }
@@ -1966,6 +2019,9 @@ $.Widget.prototype = {
 
         case "Polygon":
           return this._containsPolygonLineString(geom1.coordinates, geom2.coordinates[0]);
+
+        default:
+          return false;
       }
     },
 
@@ -2008,11 +2064,9 @@ $.Widget.prototype = {
 
     // distance
 
-    _distance: function (geom1, geom2) {
-      var geom1Coordinates = $.isArray(geom1) ? geom1 : geom1.coordinates,
-          geom2Coordinates = $.isArray(geom2) ? geom2 : geom2.coordinates,
-          geom1CoordinatesProjected = $.geo.proj ? $.geo.proj.fromGeodetic(geom1Coordinates) : geom1Coordinates,
-          geom2CoordinatesProjected = $.geo.proj ? $.geo.proj.fromGeodetic(geom2Coordinates) : geom2Coordinates;
+    distance: function ( geom1, geom2, _ignoreGeo /* Internal Use Only */ ) {
+      var geom1CoordinatesProjected = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic(geom1.coordinates) : geom1.coordinates,
+          geom2CoordinatesProjected = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic(geom2.coordinates) : geom2.coordinates;
 
       switch (geom1.type) {
         case "Point":
@@ -2024,7 +2078,7 @@ $.Widget.prototype = {
             case "Polygon":
               return this._containsPolygonPoint(geom2CoordinatesProjected, geom1CoordinatesProjected) ? 0 : this._distanceLineStringPoint(geom2CoordinatesProjected[0], geom1CoordinatesProjected);
             default:
-              throw new Error("not implemented");
+              return undefined;
           }
           break;
 
@@ -2037,7 +2091,7 @@ $.Widget.prototype = {
             case "Polygon":
               return this._containsPolygonLineString(geom2CoordinatesProjected, geom1CoordinatesProjected) ? 0 : this._distanceLineStringLineString(geom2CoordinatesProjected[0], geom1CoordinatesProjected);
             default:
-              throw new Error("not implemented");
+              return undefined;
           }
           break;
 
@@ -2050,7 +2104,7 @@ $.Widget.prototype = {
             case "Polygon":
               return this._containsPolygonLineString(geom1CoordinatesProjected, geom2CoordinatesProjected[0]) ? 0 : this._distanceLineStringLineString(geom1CoordinatesProjected[0], geom2CoordinatesProjected[0]);
             default:
-              throw new Error("not implemented");
+              return undefined;
           }
           break;
       }
@@ -2120,7 +2174,7 @@ $.Widget.prototype = {
 
     _distanceLineStringLineString: function (lineStringCoordinates1, lineStringCoordinates2) {
       var minDist = pos_oo;
-      for (var i = 0; i < lineStringCoordinates2; i++) {
+      for (var i = 0; i < lineStringCoordinates2.length; i++) {
         minDist = Math.min(minDist, this._distanceLineStringPoint(lineStringCoordinates1, lineStringCoordinates2[i]));
       }
       return minDist;
@@ -2133,14 +2187,21 @@ $.Widget.prototype = {
     _flatten: function (geom) {
       // return an array of all basic geometries
       // not in JTS
-      var geometries = [];
+      var geometries = [],
+          curGeom = 0;
       switch (geom.type) {
         case "Feature":
           $.merge(geometries, this._flatten(geom.geometry));
           break;
 
+        case "FeatureCollection":
+          for (; curGeom < geom.features.length; curGeom++) {
+            $.merge(geometries, this._flatten(geom.features[curGeom].geometry));
+          }
+          break;
+
         case "GeometryCollection":
-          for (curGeom = 0; curGeom < geom.geometries.length; curGeom++) {
+          for (; curGeom < geom.geometries.length; curGeom++) {
             $.merge(geometries, this._flatten(geom.geometries[curGeom]));
           }
           break;
@@ -2970,7 +3031,7 @@ $.Widget.prototype = {
       $.Widget.prototype.destroy.apply(this, arguments);
     },
 
-    getPixelSize: function () {
+    pixelSize: function () {
       return this._pixelSize;
     },
 
@@ -3008,10 +3069,10 @@ $.Widget.prototype = {
           var service = this._currentServices[i];
           if (!_serviceContainer || service.serviceContainer[0] == _serviceContainer[0]) {
             if (value === undefined) {
-              value = (service.visible === undefined ? false : !service.visible);
+              value = (service.visibility === undefined || service.visibility === "visible" ? false : true);
             }
 
-            this._options["services"][i].visible = service.visible = value;
+            this._options["services"][i].visibility = service.visibility = ( value ? "visible" : "hidden" );
             $.geo["_serviceTypes"][service.type].toggle(this, service);
 
             if (value) {
@@ -3035,7 +3096,8 @@ $.Widget.prototype = {
     resize: function () {
       var size = this._findMapSize(),
           dx = size["width"]/2 - this._contentBounds.width/2,
-          dy = size["height"]/2 - this._contentBounds.height/2;
+          dy = size["height"]/2 - this._contentBounds.height/2,
+          i;
 
       this._contentBounds = {
         x: parseInt(this._$elem.css("padding-left")),
@@ -3064,6 +3126,11 @@ $.Widget.prototype = {
       this._$shapesContainer.geographics("destroy");
       this._$drawContainer.geographics("destroy");
 
+      for (i = 0; i < this._currentServices.length; i++) {
+        $.geo["_serviceTypes"][this._currentServices[i].type].resize(this, this._currentServices[i]);
+      }
+
+
       this._$drawContainer.css({
         width: size.width,
         height: size.height
@@ -3076,7 +3143,7 @@ $.Widget.prototype = {
       });
       this._$shapesContainer.geographics( { style: shapeStyle } );
 
-      for (var i = 0; i < this._drawPixels.length; i++) {
+      for (i = 0; i < this._drawPixels.length; i++) {
         this._drawPixels[i][0] += dx;
         this._drawPixels[i][1] += dy;
       }
@@ -3130,7 +3197,7 @@ $.Widget.prototype = {
 
       $.each(this._graphicShapes, function (i) {
         if (this.shape.type == "Point") {
-          if ($.geo._distance(this.shape, point) <= mapTol) {
+          if ($.geo.distance(this.shape, point, true) <= mapTol) {
             result.push(this.shape);
           }
         } else {
@@ -3146,10 +3213,10 @@ $.Widget.prototype = {
                   ]]
                 };
 
-          if ($.geo._distance(bboxPolygon, point) <= mapTol) {
+          if ($.geo.distance(bboxPolygon, point, true) <= mapTol) {
             var geometries = $.geo._flatten(this.shape);
             for (curGeom = 0; curGeom < geometries.length; curGeom++) {
-              if ($.geo._distance(geometries[curGeom], point) <= mapTol) {
+              if ($.geo.distance(geometries[curGeom], point, true) <= mapTol) {
                 result.push(this.shape);
                 break;
               }
@@ -3209,6 +3276,10 @@ $.Widget.prototype = {
       return this._contentBounds;
     },
 
+    _getServicesContainer: function () {
+      return this._$servicesContainer;
+    },
+
     _getZoom: function () {
       // calculate the internal zoom level, vs. public zoom property
       if (this._options["tilingScheme"]) {
@@ -3228,7 +3299,7 @@ $.Widget.prototype = {
       if (this._options["tilingScheme"]) {
         this._setCenterAndSize(this._center, this._getTiledPixelSize(value), trigger, refresh);
       } else {
-        var bbox = $.geo.scaleBy(this._getBbox(), 1 / Math.pow(this._zoomFactor, value), true),
+        var bbox = $.geo.scaleBy(this._getBboxMax(), 1 / Math.pow(this._zoomFactor, value), true),
             pixelSize = Math.max($.geo.width(bbox, true) / this._contentBounds.width, $.geo.height(bbox, true) / this._contentBounds.height);
         this._setCenterAndSize(this._center, pixelSize, trigger, refresh);
       }
@@ -3841,6 +3912,20 @@ $.Widget.prototype = {
       var mode = this._shiftZoom ? "zoom" : this._options["mode"];
 
       switch (mode) {
+        case "zoom":
+          if ( this._mouseDown ) {
+            this._$drawContainer.geographics( "clear" );
+            this._$drawContainer.geographics( "drawBbox", [
+              this._anchor[ 0 ],
+              this._anchor[ 1 ],
+              current[ 0 ],
+              current[ 1 ]
+            ] );
+          } else {
+            this._trigger("move", e, { type: "Point", coordinates: this.toMap(current) });
+          }
+          break;
+
         case "pan":
         case "drawPoint":
           if (this._mouseDown || this._toolPan) {
@@ -3881,7 +3966,8 @@ $.Widget.prototype = {
           wasToolPan = this._toolPan,
           offset = this._$eventTarget.offset(),
           mode = this._shiftZoom ? "zoom" : this._options["mode"],
-          current, i, clickDate;
+          current, i, clickDate,
+          dx, dy;
 
       if (this._supportTouch) {
         current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
@@ -3889,7 +3975,10 @@ $.Widget.prototype = {
         current = [e.pageX - offset.left, e.pageY - offset.top];
       }
 
-      this._$eventTarget.css("cursor", this._options["cursors"][mode]);
+      dx = current[0] - this._anchor[0];
+      dy = current[1] - this._anchor[1];
+
+      this._$eventTarget.css("cursor", this._options["cursors"][this._options["mode"]]);
 
       this._shiftZoom = this._mouseDown = this._toolPan = false;
 
@@ -3902,6 +3991,34 @@ $.Widget.prototype = {
         this._current = current;
 
         switch (mode) {
+          case "zoom":
+            if ( dx > 0 || dy > 0 ) {
+              var minSize = this._pixelSize * 6,
+                  bboxCoords = this._toMap( [ [
+                      Math.min( this._anchor[ 0 ], current[ 0 ] ),
+                      Math.max( this._anchor[ 1 ], current[ 1 ] )
+                    ], [
+                      Math.max( this._anchor[ 0 ], current[ 0 ] ),
+                      Math.min( this._anchor[ 1 ], current[ 1 ] )
+                    ]
+                  ] ),
+                  bbox = [
+                    bboxCoords[0][0],
+                    bboxCoords[0][1],
+                    bboxCoords[1][0],
+                    bboxCoords[1][1]
+                  ];
+
+              if ( ( bbox[2] - bbox[0] ) < minSize && ( bbox[3] - bbox[1] ) < minSize ) {
+                bbox = $.geo.scaleBy( this._getBbox( $.geo.center( bbox, true ) ), .5, true );
+              }
+
+              this._setBbox(bbox, true, true);
+            }
+
+            this._resetDrawing();
+            break;
+
           case "pan":
             if (wasToolPan) {
               this._panEnd();
@@ -4017,10 +4134,10 @@ $.Widget.prototype = {
 
 ﻿(function ($, undefined) {
   $.geo._serviceTypes.tiled = (function () {
-    var tiledServicesState = {};
-
     return {
       create: function (map, servicesContainer, service, index) {
+        var tiledServicesState = map._getServicesContainer().data("geoTiledServicesState") || {};
+
         if (!tiledServicesState[service.id]) {
           tiledServicesState[service.id] = {
             loadCount: 0,
@@ -4028,20 +4145,25 @@ $.Widget.prototype = {
             serviceContainer: null
           };
 
-          var scHtml = '<div data-geo-service="tiled" id="' + service.id + '" style="position:absolute; left:0; top:0; width:8px; height:8px; margin:0; padding:0; display:' + (service.visible === undefined || service.visible ? "block" : "none") + ';"></div>';
+          var scHtml = '<div data-geo-service="tiled" id="' + service.id + '" style="position:absolute; left:0; top:0; width:8px; height:8px; margin:0; padding:0; display:' + (service.visibility === undefined || service.visibility === "visible" ? "block" : "none") + ';"></div>';
           servicesContainer.append(scHtml);
 
-          return (tiledServicesState[service.id].serviceContainer = servicesContainer.children(":last"));
+          tiledServicesState[service.id].serviceContainer = servicesContainer.children(":last");
+          servicesContainer.data("geoTiledServicesState", tiledServicesState);
         }
+
+        return tiledServicesState[service.id].serviceContainer;
       },
 
       destroy: function (map, servicesContainer, service) {
+        var tiledServicesState = map._getServicesContainer().data("geoTiledServicesState");
         tiledServicesState[service.id].serviceContainer.remove();
         delete tiledServicesState[service.id];
       },
 
       interactivePan: function (map, service, dx, dy) {
-        if (!tiledServicesState[service.id]) {
+        var tiledServicesState = map._getServicesContainer().data("geoTiledServicesState");
+        if (!(tiledServicesState && tiledServicesState[service.id])) {
           return;
         }
 
@@ -4055,10 +4177,10 @@ $.Widget.prototype = {
           }
         });
 
-        if (service && tiledServicesState[service.id] != null && (service.visible === undefined || service.visible)) {
+        if (service && tiledServicesState[service.id] != null && (service.visibility === undefined || service.visibility === "visible")) {
 
           var 
-          pixelSize = map.getPixelSize(),
+          pixelSize = map.pixelSize(),
 
           serviceState = tiledServicesState[service.id],
           serviceContainer = serviceState.serviceContainer,
@@ -4191,7 +4313,8 @@ $.Widget.prototype = {
       },
 
       interactiveScale: function (map, service, center, pixelSize) {
-        if (!tiledServicesState[service.id]) {
+        var tiledServicesState = map._getServicesContainer().data("geoTiledServicesState");
+        if (!(tiledServicesState && tiledServicesState[service.id])) {
           return;
         }
 
@@ -4233,11 +4356,12 @@ $.Widget.prototype = {
       },
 
       refresh: function (map, service) {
-        if (service && tiledServicesState[service.id] && (service.visible === undefined || service.visible)) {
+        var tiledServicesState = map._getServicesContainer().data("geoTiledServicesState");
+        if (service && tiledServicesState[service.id] && (service.visibility === undefined || service.visibility === "visible")) {
           this._cancelUnloaded(map, service);
 
           var bbox = map._getBbox(),
-              pixelSize = map.getPixelSize(),
+              pixelSize = map.pixelSize(),
 
               serviceState = tiledServicesState[service.id],
               $serviceContainer = serviceState.serviceContainer,
@@ -4384,19 +4508,25 @@ $.Widget.prototype = {
         }
       },
 
+      resize: function (map, service) {
+      },
+
       opacity: function (map, service) {
+        var tiledServicesState = map._getServicesContainer().data("geoTiledServicesState");
         // service.opacity has changed, update any existing images
         var serviceState = tiledServicesState[service.id];
         serviceState.serviceContainer.find("img").stop(true).fadeTo("fast", service.opacity);
       },
 
       toggle: function (map, service) {
+        var tiledServicesState = map._getServicesContainer().data("geoTiledServicesState");
         // service.visible has changed, update our service container
         var serviceState = tiledServicesState[service.id];
-        serviceState.serviceContainer.css("display", service.visible ? "block" : "none");
+        serviceState.serviceContainer.css("display", service.visibility === "visible" ? "block" : "none");
       },
 
       _cancelUnloaded: function (map, service) {
+        var tiledServicesState = map._getServicesContainer().data("geoTiledServicesState");
         var serviceState = tiledServicesState[service.id];
 
         if (serviceState && serviceState.loadCount > 0) {
@@ -4411,38 +4541,42 @@ $.Widget.prototype = {
 })(jQuery);
 ﻿(function ($, undefined) {
   $.geo._serviceTypes.shingled = (function () {
-    var shingledServicesState = {};
-
     return {
       create: function (map, servicesContainer, service, index) {
+        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState") || {};
+
         if (!shingledServicesState[service.id]) {
           shingledServicesState[service.id] = {
             loadCount: 0
           };
 
-          var scHtml = '<div data-geo-service="shingled" id="' + service.id + '" style="position:absolute; left:0; top:0; width:16px; height:16px; margin:0; padding:0; display:' + (service.visible === undefined || service.visible ? "block" : "none") + ';"></div>';
+          var scHtml = '<div data-geo-service="shingled" id="' + service.id + '" style="position:absolute; left:0; top:0; width:16px; height:16px; margin:0; padding:0; display:' + (service.visibility === undefined || service.visibility === "visible" ? "block" : "none") + ';"></div>';
           servicesContainer.append(scHtml);
 
-          return (shingledServicesState[service.id].serviceContainer = servicesContainer.children(":last"));
+          shingledServicesState[service.id].serviceContainer = servicesContainer.children(":last");
+          servicesContainer.data("geoShingledServicesState", shingledServicesState);
         }
+
+        return shingledServicesState[service.id].serviceContainer;
       },
 
       destroy: function (map, servicesContainer, service) {
+        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
         shingledServicesState[service.id].serviceContainer.remove();
         delete shingledServicesState[service.id];
       },
 
       interactivePan: function (map, service, dx, dy) {
-        if (!shingledServicesState[service.id]) {
+        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
+        if (!(shingledServicesState && shingledServicesState[service.id])) {
           return;
         }
 
         this._cancelUnloaded(map, service);
 
-        var 
-            serviceState = shingledServicesState[service.id],
+        var serviceState = shingledServicesState[service.id],
             serviceContainer = serviceState.serviceContainer,
-            pixelSize = map.getPixelSize(),
+            pixelSize = map.pixelSize(),
             scaleContainer = serviceContainer.children("[data-pixelSize='" + pixelSize + "']"),
             panContainer = scaleContainer.children("div");
 
@@ -4462,7 +4596,8 @@ $.Widget.prototype = {
       },
 
       interactiveScale: function (map, service, center, pixelSize) {
-        if (!shingledServicesState[service.id]) {
+        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
+        if (!(shingledServicesState && shingledServicesState[service.id])) {
           return;
         }
 
@@ -4497,11 +4632,12 @@ $.Widget.prototype = {
       },
 
       refresh: function (map, service) {
-        if (service && shingledServicesState[service.id] && (service.visible === undefined || service.visible)) {
+        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
+        if (service && shingledServicesState[service.id] && (service.visibility === undefined || service.visibility === "visible")) {
           this._cancelUnloaded(map, service);
 
           var bbox = map._getBbox(),
-              pixelSize = map.getPixelSize(),
+              pixelSize = map.pixelSize(),
 
               serviceState = shingledServicesState[service.id],
               serviceContainer = serviceState.serviceContainer,
@@ -4593,13 +4729,47 @@ $.Widget.prototype = {
         }
       },
 
+      resize: function (map, service) {
+        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
+        if (service && shingledServicesState[service.id] && (service.visibility === undefined || service.visibility === "visible")) {
+          this._cancelUnloaded(map, service);
+
+          var serviceState = shingledServicesState[service.id],
+              serviceContainer = serviceState.serviceContainer,
+
+              contentBounds = map._getContentBounds(),
+              mapWidth = contentBounds["width"],
+              mapHeight = contentBounds["height"],
+
+              halfWidth = mapWidth / 2,
+              halfHeight = mapHeight / 2,
+
+              scaleContainer = serviceContainer.children();
+
+          scaleContainer.attr("data-pixelSize", "0");
+          scaleContainer.css({
+            left: halfWidth + 'px',
+            top: halfHeight + 'px'
+          });
+        }
+      },
+
       opacity: function (map, service) {
+        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
         // service.opacity has changed, update any existing images
         var serviceState = shingledServicesState[service.id];
         serviceState.serviceContainer.find("img").stop(true).fadeTo("fast", service.opacity);
       },
 
+      toggle: function (map, service) {
+        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
+        // service.visible has changed, update our service container
+        var serviceState = shingledServicesState[service.id];
+        serviceState.serviceContainer.css("display", service.visibility === "visible" ? "block" : "none");
+      },
+
       _cancelUnloaded: function (map, service) {
+        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
         var serviceState = shingledServicesState[service.id];
 
         if (serviceState && serviceState.loadCount > 0) {

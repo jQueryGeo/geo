@@ -26,17 +26,17 @@
     <div class="info">
       <div class="links">
         <a href="../" class="docLink">&lt; docs</a>
-        <a href="http://jsfiddle.net/ryanttb/2TAzc/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
+        <a href="http://jsfiddle.net/ryanttb/2TAzc/embedded/" class="fiddleLink not-mobile"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
       </div>
       <h1>
         drawing</h1>
-      <p>
-        This example tests the three shape drawing modes: drawPoint, drawLineString and drawPolygon. Choose a tool below and start tapping!</p>
-      <p>You can remove individual points while drawing lines &amp; polygons with the escape key.</p>
+      <p class="not-mobile">This example tests the three shape drawing modes: drawPoint, drawLineString and drawPolygon. Choose a tool below and start tapping!</p>
+      <p class="not-mobile">Double-tap to add the last point and end lines &amp; polygons.</p>
+      <p class="not-mobile">You can remove individual points while drawing lines &amp; polygons with the escape key.</p>
       <div id="modes">
-        <input type="radio" id="drawPoint" name="mode" value="drawPoint" checked="checked" /><label for="drawPoint">drawPoint</label>
-        <input type="radio" id="drawLineString" name="mode" value="drawLineString" /><label for="drawLineString">drawLineString</label>
-        <input type="radio" id="drawPolygon" name="mode" value="drawPolygon" /><label for="drawPolygon">drawPolygon</label>
+        <input type="radio" id="drawPoint" name="mode" value="drawPoint" checked="checked" /><label for="drawPoint">point</label>
+        <input type="radio" id="drawLineString" name="mode" value="drawLineString" /><label for="drawLineString">line</label>
+        <input type="radio" id="drawPolygon" name="mode" value="drawPolygon" /><label for="drawPolygon">polygon</label>
       </div>
     </div>
   </div>
