@@ -20,7 +20,7 @@
         mode: "pan",
         services: [
             {
-              id: "OSM",
+              "class": "osm",
               type: "tiled",
               getUrl: function (view) {
                 return "http://tile.openstreetmap.org/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
@@ -117,7 +117,7 @@
 
       this._graphicShapes = [];
 
-      this._initOptions = options;
+      this._initOptions = options || {};
 
       this._forcePosition(this._$elem);
 
@@ -288,7 +288,7 @@
 
         $(window).unbind("resize", this._windowHandler);
 
-        for (var i = 0; i < this._currentServices.length; i++) {
+        for ( var i = 0; i < this._currentServices.length; i++ ) {
           this._currentServices[i].serviceContainer.geomap("destroy");
           $.geo["_serviceTypes"][this._currentServices[i].type].destroy(this, this._$servicesContainer, this._currentServices[i]);
         }
@@ -323,9 +323,9 @@
         this._$elem.closest("[data-geo-map]").geomap("opacity", value, this._$elem);
       } else {
         if (value >= 0 || value <= 1) {
-          for (var i = 0; i < this._currentServices.length; i++) {
+          for ( var i = 0; i < this._currentServices.length; i++ ) {
             var service = this._currentServices[i];
-            if (!_serviceContainer || service.serviceContainer[0] == _serviceContainer[0]) {
+            if ( !_serviceContainer || service.serviceContainer[0] == _serviceContainer[0] ) {
               this._options["services"][i].opacity = service.opacity = value;
               $.geo["_serviceTypes"][service.type].opacity(this, service);
             }
@@ -470,7 +470,7 @@
 
       $.each(this._graphicShapes, function (i) {
         if (this.shape.type == "Point") {
-          if ($.geo.distance(this.shape, point, true) <= mapTol) {
+          if ($.geo.distance(this.shape, point) <= mapTol) {
             result.push(this.shape);
           }
         } else {
@@ -486,10 +486,10 @@
                   ]]
                 };
 
-          if ($.geo.distance(bboxPolygon, point, true) <= mapTol) {
+          if ($.geo.distance(bboxPolygon, point) <= mapTol) {
             var geometries = $.geo._flatten(this.shape);
             for (curGeom = 0; curGeom < geometries.length; curGeom++) {
-              if ($.geo.distance(geometries[curGeom], point, true) <= mapTol) {
+              if ($.geo.distance(geometries[curGeom], point) <= mapTol) {
                 result.push(this.shape);
                 break;
               }
@@ -614,7 +614,7 @@
 
       this._currentServices = [];
       for (i = 0; i < this._options["services"].length; i++) {
-        this._currentServices[i] = $.extend({}, this._options["services"][i]);
+        this._currentServices[i] = this._options["services"][i];
         this._currentServices[i].serviceContainer = $.geo["_serviceTypes"][this._currentServices[i].type].create(this, this._$servicesContainer, this._currentServices[i], i).geomap();
       }
     },

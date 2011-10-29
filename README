@@ -59,6 +59,7 @@ Documentation is hosted at http://jquerygeo.com
 * geo - geometry - contains function
 * geomap - rename service.visible to visibility having either "visible" or "hidden" values
 * geo - geometry - centroid function
+* geomap - make service id property optional, add HTML id to serviceContainer if present
 
 === 1.0a2.5 (2011-08-03) ===
 * geomap - find - [bug] does not handle GeoJSON features

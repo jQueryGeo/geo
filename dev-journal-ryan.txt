@@ -1,7 +1,6 @@
 ﻿== to do ==
 
 === 1.0a3 ===
-* geomap - make service id property optional, add HTML id to serviceContainer if present
 * geomap - append should cache the shape's bbox (instead of the bbox function)
 * geomap - cache point bbox if $.geo.proj is not null
 * geomap - remove should remove the shape's bbox cache
@@ -18,6 +17,7 @@
 * examples - geomap resize method
 * examples - multiple maps example
 * docs & examples - settle on the word "option" in all text (instead of property) to match widget function
+* geomap - [bug] when a singled image hasn't loaded after pan and you double click on empty space, the zoomed bbox seems wrong
 
 === future ===
 * docs - geomap - more modes: measureDistance, measureArea
@@ -59,7 +59,6 @@
 * geomap - multiple labels
 * geomap - service-level shapes
 * geomap - [bug] mouse wheel on bad or missing tile doesn't zoom out on first rotate
-* geomap - service divs should have class="geo-service"
 * docs/geomap - store WKT input for each service
 * geographics - rename the generated style properties to something simple or get better control over closure compiler
 * geographics - add a resize method, call from geomap.resize
@@ -86,6 +85,34 @@
 * docs - geomap - drawStop function
 ** in the drawing modes, this function ends drawing and triggers the shape event with whatever coordinates have already been added to the shape
 * geomap - drawStop
+
+==2011-10-29==
+===id/class===
+I'm at WhereCamp Boston 2011 and going to try to finish Alpha 3 while I'm here starting with making id optional.
+
+===initOptions===
+Was getting undefined when a user passed nothing as in the simplest test.
+
+===class===
+So, I forgot that class is a reserved word. I'm not sure what to do about that. I can make id optional for now but I'll have to decide about class as a property name. I know as an object literal, I'm supposed to enclose the word in quotes but that's not going to look right for the user who wants to use this. I might have to call it cssClass or something. I'll find out what jQuery uses.
+
+Google Closure won't even minify the build with the word class used as I'm using it. When I'm creating an element using jQuery's argument that takes an object for attributes, what do they use? They require quotes.
+
+===id===
+I'm still storing the service state by id. Since both id and class are optional, I think I need to store it as an array. That's not true, I can store an id on the service object via $.data. The id can be $.now. I wonder if $.now actually has different values if I'm creating more than on service at the same time? I will need to test and potentially use a different means to create the id.
+
+===service create===
+I'm going to assume that the service doesn't already exist during create. Not sure if that's a good idea though. Maybe for now, I won't and I can make the create code smaller later after I have time to test.
+
+I completely forgot that I'm going to store the entire service state via $.data. That will make things a lot easier.
+
+Seems to work ok.
+
+===double click on unloaded===
+When a singled image hasn't loaded after pan and you double click on empty space, the zoomed area seems wrong.
+
+===fusion===
+Adrian from Google is showing radius query using fusion tables. Seems like something I can do with jQuery Geo.
 
 ==2011-10-28==
 ===style===
