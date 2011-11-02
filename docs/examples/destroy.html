@@ -51,15 +51,15 @@
             center: [-71.0595678, 42.3604823],
             zoom: 8
           });
+          created = true;
         }
-        created = !created;
       });
 
       $("button[data-command='destroy']").button().click(function () {
         if (created) {
           $("#map").geomap("destroy");
+          created = false;
         }
-        created = !created;
       });
     });  
   </script>

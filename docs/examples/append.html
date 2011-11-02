@@ -2,83 +2,48 @@
 <html>
 <head>
   <title>append test</title>
+  <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+  <meta name="description" content="An example of append">
+  <meta name="author" content="Ryan Westphal">
   <link rel="stylesheet" type="text/css" href="css/style.css" />
   <style type="text/css">
-    label
+    #map
     {
-      display: block;
-      margin: .25em;
-    }
-    label span
-    {
-      cursor: pointer;
-      display: inline-block;
-      font-weight: bold;
-      width: 8em;
+      position: fixed;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
     }
   </style>
 </head>
 <body>
   <div>
-    <a href="../" class="docLink">&lt; docs</a>
-    <h1>
-      append test</h1>
-    <p>
-      This page tests geomap's append method and some style options.</p>
-    <p>
-      A geomap widget is initialized to the continental US and a point is placed in Massachusetts. A line extends from MA to South Jersey where a triangle covers an area. For points, geomap draws a pixel-based oval around the map coordinate. Since the size of the oval is based on pixels, it will be the same size at all scales. The pixel length of lines and size of polygons changes at different scales because each point that makes up the shapes is locked at specific map coordinates. The stroke width for all shapes will be the same number of pixels at all scales.</p>
-    <p>
-      All the geometry is stored in a single GeometryCollection. This example first draws the entire collection with a broad stroked, off-white style to create a halo effect behind the real shapes. This makes them a little easier to see on the map. Then we draw each individual shape again with color. The first two have the default style which is red. For the last one, we change the color to blue.</p>
-    <div id="map" style="float: left; width: 640px; height: 480px;">
+    <div id="map">
     </div>
-    <pre style="float: left;"><code>var map = $("#map").geomap({
-  center: [-75, 40],
-  zoom: 5
-});
-
-var gcol = {
-  type: &quot;GeometryCollection&quot;,
-  geometries: [
-    {
-      type: &quot;Point&quot;,
-      coordinates: [-71, 42]
-    },
-    {
-      type: &quot;LineString&quot;,
-      coordinates: [
-        [-71, 42],
-        [-75, 39.5]
-      ]
-    },
-    {
-      type: &quot;Polygon&quot;,
-      coordinates: [[
-        [-75, 39.7],
-        [-74.8, 39.3],
-        [-75.2, 39.3],
-        [-75, 39.7]
-      ]]
-    }
-  ]
-};
-
-map.geomap(&quot;append&quot;, gcol, { strokeWidth: &quot;8px&quot;, color: &quot;#dedede&quot; });
-
-map.geomap(&quot;append&quot;, gcol.geometries[0]);
-
-map.geomap(&quot;append&quot;, gcol.geometries[1]);
-
-map.geomap(&quot;append&quot;, gcol.geometries[2], { color: &quot;blue&quot; });</code></pre>
+    <div class="info">
+      <div class="links">
+        <a href="../" class="docLink">&lt; docs</a>
+        <a href="http://jsfiddle.net/ryanttb/NPdUp/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
+      </div>
+      <h1>append</h1>
+      <p>This page tests geomap's append method and some style and refresh arguments.</p>
+      <p class="not-mobile">A geomap widget is initialized to the continental US and a point is placed in Massachusetts. A line extends from MA to South Jersey where a triangle covers an area. For points, geomap draws a pixel-based oval around the map coordinate. Since the size of the oval is based on pixels, it will be the same size at all scales. The pixel length of lines and size of polygons changes at different scales because each point that makes up the shapes is locked at specific map coordinates. The stroke width for all shapes will be the same number of pixels at all scales.</p>
+      <p class="not-mobile">All the geometry is stored in a single GeometryCollection. This example first draws the entire collection with a broad stroked, off-white style to create a halo effect behind the real shapes. This makes them a little easier to see on the map. Then we draw each individual shape again with color. The first two have the default style which is red. For the last one, we change the color to blue.</p>
+    </div>
   </div>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
   <script src="http://jquerygeo.com/test/jquery.geo-test.min.js"></script>
   <script>
     $(function () {
+      // create a map
       var map = $("#map").geomap({
         center: [-75, 40],
         zoom: 5
       });
 
+      // create a geometry collection having a
+      // Point, LineString and Polygon
       var gcol = {
         type: "GeometryCollection",
         geometries: [
@@ -105,12 +70,24 @@ map.geomap(&quot;append&quot;, gcol.geometries[2], { color: &quot;blue&quot; });
         ]
       };
 
-      map.geomap("append", gcol, { strokeWidth: "8px", color: "#dedede" });
+      // append the entire collection as a single geometry
+      // do not refresh the map yet
+      map.geomap("append", gcol, { strokeWidth: "8px", color: "#dedede" }, false);
 
-      map.geomap("append", gcol.geometries[0]);
+      // append the point
+      // I'm refreshing the map just as an example
+      // since true is the default, this is the same as not passing it
+      // we normally would pass false because there's more append calls below
+      map.geomap("append", gcol.geometries[0], true);
 
-      map.geomap("append", gcol.geometries[1]);
+      // append the LineString
+      // don't refresh the map yet,
+      // this is the correct way when there's more drawing to do
+      map.geomap("append", gcol.geometries[1], false);
 
+      // append the Polygon with a blue style
+      // refresh will default to true and the map will redraw
+      // even if we passed false to all append calls above
       map.geomap("append", gcol.geometries[2], { color: "#00d" });
     });
   </script>

@@ -2,8 +2,8 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>geomap find test</title>
-  <meta name="description" content="Small test of jQuery Geo's geometry functions">
+  <title>geomap empty test</title>
+  <meta name="description" content="Small test of jQuery Geo's shape functions">
   <meta name="author" content="Ryan Westphal">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" type="text/css" href="css/style.css" />
@@ -12,7 +12,7 @@
   <div>
     <a href="../" class="docLink">&lt; docs</a>
     <h1>
-      geomap find test</h1>
+      geomap empty test</h1>
     <p>
       Click the map to add points, click the Empty button to remove them all at once.</p>
     <button type="button">
@@ -20,8 +20,17 @@
     <div class="geomap" style="width: 640px; height: 480px;">
     </div>
   </div>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-  <script src="http://jquerygeo.com/test/jquery.geo-test.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+  <script src="../../js/jquery.geo.head.js"></script>
+  <script src="../../js/excanvas.js"></script>
+  <script src="../../js/jquery.mousewheel.min.js"></script>
+  <script src="../../js/jquery.ui.widget.js"></script>
+  <script src="../../js/jquery.geo.core.js"></script>
+  <script src="../../js/jquery.geo.geographics.js"></script>
+  <script src="../../js/jquery.geo.geomap.js"></script>
+  <script src="../../js/jquery.geo.tiled.js"></script>
+  <script src="../../js/jquery.geo.shingled.js"></script>
+  <!--<script src="http://jquerygeo.com/test/jquery.geo-test.min.js"></script>-->
   <script>
     $(function () {
       var geomap = $(".geomap").geomap({

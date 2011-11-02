@@ -1,23 +1,24 @@
 ﻿== to do ==
 
 === 1.0a3 ===
-* geomap - make service id property optional, add HTML id to serviceContainer if present
-* geomap - append should cache the shape's bbox (instead of the bbox function)
-* geomap - cache point bbox if $.geo.proj is not null
-* geomap - remove should remove the shape's bbox cache
-* geomap - empty should remove the bbox cache for all shapes
-* docs - geo - stop reading GeoJSON's bbox property, always calculate
-* geo - stop reading GeoJSON's bbox property, always calculate
-* geomap - [bug] changing services array after initialization fails
+* geomap - make pixelSize a read-only option instead of a function
+* docs - geomap - make shapeStyle a service-targetting option
+* geomap - make shapeStyle a service-targetting option
+* geomap - [bug] changing services array (without changing all services) after initialization fails
 * geomap - [bug] multiple maps do not work on the same page
 * geomap - use _currentServices in all functions unless we actually need to update the public  options services object
 * geomap - create _defaultState object, use for widget-local _widgetState property, reinit _widgetState on _createWidget
 * geomap - don't redraw shapes after interactiveScale, they've already been drawn at new scale
-* geo - use Array.push instead of $.merge
-* geomap - make the refresh argument in append public, add one to remove & empty
 * examples - geomap resize method
 * examples - multiple maps example
-* docs & examples - settle on the word "option" in all text (instead of property) to match widget function
+* geomap - [bug] when a singled image hasn't loaded after pan and you double click on empty space, the zoomed bbox seems wrong
+
+=== 1.0a35 ===
+* geomap - use profiling to improve pan performance
+* geomap - remove this-style state properties
+* geo - use Array.push instead of $.merge
+* docs - upgrade to jQuery Mobile rc2
+* docs - allow page refreshing
 
 === future ===
 * docs - geomap - more modes: measureDistance, measureArea
@@ -28,6 +29,8 @@
 * geomap - port shape labels
 * docs - $.geo.WKT object
 * geo - $.geo.WKT object
+* geomap - reenable graphics redraw on interactiveScale, if canvas...and scale canvas
+* docs & examples - settle on the word "option" in all text (instead of property) to match widget function
 * docs - make all map examples live
 * docs - explain the 96px scale bar, why 96?
 * docs - write a full page about GeoJSON and what each object type is to $.geo
@@ -45,6 +48,7 @@
 * geo - geometry - empty function
 * geomap - android - [bug] cannot always pan map after appending shapes
 * geomap - deep extend existing service objects when services property is set
+* geomap - cache point bbox if $.geo.proj is not null?
 * code - prefer $.data over $.fn.data
 * docs - internal - explain what projection is and which one we use by default (3395) and maybe why we call it web mercator & why we can't get to +/- 90 lat
 * docs - internal - document how geomap draws shapes, the geomapgraphics widget and the reason shapeStyle is a method
@@ -53,13 +57,13 @@
 * geo - geometry - implement JTS note: "The centroid is equal to the centroid of the set of component Geometries of highest dimension (since the lower-dimension geometries contribute zero "weight" to the centroid)"
 * geo - Support WKT with $.geo.parseWKT & $.geo.textify
 * geo - All bbox operations should be done in non-geodetic coordinates for accuracy
+* geo - support bbox in distance ( fix geomap.find )
 * docs - geomap - shapeLabel property
 ** template for labels for all shapes added via append
 * docs - geomap - multiple labels
 * geomap - multiple labels
 * geomap - service-level shapes
 * geomap - [bug] mouse wheel on bad or missing tile doesn't zoom out on first rotate
-* geomap - service divs should have class="geo-service"
 * docs/geomap - store WKT input for each service
 * geographics - rename the generated style properties to something simple or get better control over closure compiler
 * geographics - add a resize method, call from geomap.resize
@@ -86,6 +90,70 @@
 * docs - geomap - drawStop function
 ** in the drawing modes, this function ends drawing and triggers the shape event with whatever coordinates have already been added to the shape
 * geomap - drawStop
+
+==2011-11-01==
+===refresh===
+Cleaned up the wording for append, remove & empty. Also, going to have append allow style only, refresh only, or both.
+
+===refreshShapes===
+Due to performance, I'm going to disable the auto refresh after interactiveScale of shapes if the number of shapes is over a certain limit, say, 255.
+
+==2011-10-31==
+===tile paint===
+Another app I want will be tilepaint.jquerygeo.com. It won't actually use jQuery Geo but will repaint tiles on the fly for you based in an input URL and color changes.
+
+===fromGeodeticPos===
+There's a bug trying to convert some positions of a town near Concord in the voting demo. I wonder what's different about that geometry.
+
+The shape is a multipolygon which I am not handling properly. It can be a quadArray. I also removed all the $.each calls which should speed things up a bit.
+
+All set now.
+
+===ArcGIS Wrapper===
+agw.jquerygeo.com will take an ArcGIS Server endpoint and spit out the jQueryGeo you need to initialize a map to that service. It should handle both cached and dynamic services.
+
+==2011-10-30==
+===voting===
+I'm working with Calvin Metcalf at MassDOT attempting to push all the data into jQuery Geo. I might want an option to turn off scaling vector data because it's rather slow. Maybe only do it if they have WebGL.
+
+Disabled it for now.
+
+===refresh===
+The refersh property must be made public, pushing large number of features isn't useful without out.
+
+==2011-10-29==
+===id/class===
+I'm at WhereCamp Boston 2011 and going to try to finish Alpha 3 while I'm here starting with making id optional.
+
+===initOptions===
+Was getting undefined when a user passed nothing as in the simplest test.
+
+===class===
+So, I forgot that class is a reserved word. I'm not sure what to do about that. I can make id optional for now but I'll have to decide about class as a property name. I know as an object literal, I'm supposed to enclose the word in quotes but that's not going to look right for the user who wants to use this. I might have to call it cssClass or something. I'll find out what jQuery uses.
+
+Google Closure won't even minify the build with the word class used as I'm using it. When I'm creating an element using jQuery's argument that takes an object for attributes, what do they use? They require quotes.
+
+===id===
+I'm still storing the service state by id. Since both id and class are optional, I think I need to store it as an array. That's not true, I can store an id on the service object via $.data. The id can be $.now. I wonder if $.now actually has different values if I'm creating more than on service at the same time? I will need to test and potentially use a different means to create the id.
+
+===service create===
+I'm going to assume that the service doesn't already exist during create. Not sure if that's a good idea though. Maybe for now, I won't and I can make the create code smaller later after I have time to test.
+
+I completely forgot that I'm going to store the entire service state via $.data. That will make things a lot easier.
+
+Seems to work ok.
+
+===double click on unloaded===
+When a singled image hasn't loaded after pan and you double click on empty space, the zoomed area seems wrong.
+
+===fusion===
+Andres from Google is showing radius query using fusion tables. Seems like something I can do with jQuery Geo.
+
+===kml===
+I might have to support kml.
+
+===maps.jquerygeo.com===
+I should support typing a url to a geojson file to append all of the json.
 
 ==2011-10-28==
 ===style===

@@ -2,103 +2,104 @@
   $.geo._serviceTypes.shingled = (function () {
     return {
       create: function (map, servicesContainer, service, index) {
-        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState") || {};
+        var serviceState = $.data(service, "geoServiceState");
 
-        if (!shingledServicesState[service.id]) {
-          shingledServicesState[service.id] = {
+        if ( !serviceState ) {
+          serviceState = {
             loadCount: 0
           };
 
-          var scHtml = '<div data-geo-service="shingled" id="' + service.id + '" style="position:absolute; left:0; top:0; width:16px; height:16px; margin:0; padding:0; display:' + (service.visibility === undefined || service.visibility === "visible" ? "block" : "none") + ';"></div>';
+          var idString = service.id ? ' id="' + service.id + '"' : "",
+              classString = service["class"] ? ' class="' + service["class"] + '"' : "",
+              scHtml = '<div data-geo-service="shingled"' + idString + classString + ' style="position:absolute; left:0; top:0; width:16px; height:16px; margin:0; padding:0; display:' + (service.visibility === undefined || service.visibility === "visible" ? "block" : "none") + ';"></div>';
+
           servicesContainer.append(scHtml);
 
-          shingledServicesState[service.id].serviceContainer = servicesContainer.children(":last");
-          servicesContainer.data("geoShingledServicesState", shingledServicesState);
+          serviceState.serviceContainer = servicesContainer.children(":last");
+          $.data(service, "geoServiceState", serviceState);
         }
 
-        return shingledServicesState[service.id].serviceContainer;
+        return serviceState.serviceContainer;
       },
 
       destroy: function (map, servicesContainer, service) {
-        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
-        shingledServicesState[service.id].serviceContainer.remove();
-        delete shingledServicesState[service.id];
+        var serviceState = $.data(service, "geoServiceState");
+
+        serviceState.serviceContainer.remove();
+
+        $.removeData(service, "geoServiceState");
       },
 
       interactivePan: function (map, service, dx, dy) {
-        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
-        if (!(shingledServicesState && shingledServicesState[service.id])) {
-          return;
-        }
+        var serviceState = $.data(service, "geoServiceState");
 
-        this._cancelUnloaded(map, service);
+        if ( serviceState ) {
+          this._cancelUnloaded(map, service);
 
-        var serviceState = shingledServicesState[service.id],
-            serviceContainer = serviceState.serviceContainer,
-            pixelSize = map.pixelSize(),
-            scaleContainer = serviceContainer.children("[data-pixelSize='" + pixelSize + "']"),
+          var serviceContainer = serviceState.serviceContainer,
+              pixelSize = map.pixelSize(),
+              scaleContainer = serviceContainer.children("[data-pixelSize='" + pixelSize + "']"),
+              panContainer = scaleContainer.children("div");
+
+          if ( !panContainer.length ) {
+            scaleContainer.children("img").wrap('<div style="position:absolute; left:0; top:0; width:100%; height:100%;"></div>');
             panContainer = scaleContainer.children("div");
-
-        if (!panContainer.length) {
-          scaleContainer.children("img").wrap('<div style="position:absolute; left:0; top:0; width:100%; height:100%;"></div>');
-          panContainer = scaleContainer.children("div");
-        }
-
-        panContainer.css({
-          left: function (index, value) {
-            return parseInt(value) + dx;
-          },
-          top: function (index, value) {
-            return parseInt(value) + dy;
           }
-        });
+
+          panContainer.css( {
+            left: function (index, value) {
+              return parseInt(value) + dx;
+            },
+            top: function (index, value) {
+              return parseInt(value) + dy;
+            }
+          } );
+        }
       },
 
       interactiveScale: function (map, service, center, pixelSize) {
-        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
-        if (!(shingledServicesState && shingledServicesState[service.id])) {
-          return;
-        }
+        var serviceState = $.data(service, "geoServiceState");
 
-        this._cancelUnloaded(map, service);
+        if ( serviceState ) {
+          this._cancelUnloaded(map, service);
 
-        var serviceState = shingledServicesState[service.id],
-            serviceContainer = serviceState.serviceContainer,
+          var serviceContainer = serviceState.serviceContainer,
 
-            contentBounds = map._getContentBounds(),
-            mapWidth = contentBounds["width"],
-            mapHeight = contentBounds["height"],
+              contentBounds = map._getContentBounds(),
+              mapWidth = contentBounds["width"],
+              mapHeight = contentBounds["height"],
 
-            halfWidth = mapWidth / 2,
-            halfHeight = mapHeight / 2,
+              halfWidth = mapWidth / 2,
+              halfHeight = mapHeight / 2,
 
-            bbox = [center[0] - halfWidth, center[1] - halfHeight, center[0] + halfWidth, center[1] + halfHeight];
+              bbox = [center[0] - halfWidth, center[1] - halfHeight, center[0] + halfWidth, center[1] + halfHeight];
 
-        serviceContainer.children().each(function (i) {
-          var $scaleContainer = $(this),
-              scalePixelSize = $scaleContainer.attr("data-pixelSize"),
-              ratio = scalePixelSize / pixelSize;
+          serviceContainer.children().each(function (i) {
+            var $scaleContainer = $(this),
+                scalePixelSize = $scaleContainer.attr("data-pixelSize"),
+                ratio = scalePixelSize / pixelSize;
 
-          $scaleContainer.css({ width: mapWidth * ratio, height: mapHeight * ratio }).children("img").each(function (i) {
-            var $img = $(this),
-                imgCenter = $img.data("center"),
-                x = (Math.round((imgCenter[0] - center[0]) / scalePixelSize) - halfWidth) * ratio,
-                y = (Math.round((center[1] - imgCenter[1]) / scalePixelSize) - halfHeight) * ratio;
+            $scaleContainer.css({ width: mapWidth * ratio, height: mapHeight * ratio }).children("img").each(function (i) {
+              var $img = $(this),
+                  imgCenter = $img.data("center"),
+                  x = (Math.round((imgCenter[0] - center[0]) / scalePixelSize) - halfWidth) * ratio,
+                  y = (Math.round((center[1] - imgCenter[1]) / scalePixelSize) - halfHeight) * ratio;
 
-            $img.css({ left: x + "px", top: y + "px" });
+              $img.css({ left: x + "px", top: y + "px" });
+            });
           });
-        });
+        }
       },
 
       refresh: function (map, service) {
-        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
-        if (service && shingledServicesState[service.id] && (service.visibility === undefined || service.visibility === "visible")) {
+        var serviceState = $.data(service, "geoServiceState");
+
+        if (serviceState && service && (service.visibility === undefined || service.visibility === "visible")) {
           this._cancelUnloaded(map, service);
 
           var bbox = map._getBbox(),
               pixelSize = map.pixelSize(),
 
-              serviceState = shingledServicesState[service.id],
               serviceContainer = serviceState.serviceContainer,
 
               contentBounds = map._getContentBounds(),
@@ -114,7 +115,7 @@
 
               $img;
 
-          if (!scaleContainer.size()) {
+          if ( !scaleContainer.size() ) {
             serviceContainer.append('<div style="position:absolute; left:' + halfWidth + 'px; top:' + halfHeight + 'px; width:' + mapWidth + 'px; height:' + mapHeight + 'px; margin:0; padding:0;" data-pixelSize="' + pixelSize + '"></div>');
             scaleContainer = serviceContainer.children(":last");
           }
@@ -189,8 +190,9 @@
       },
 
       resize: function (map, service) {
-        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
-        if (service && shingledServicesState[service.id] && (service.visibility === undefined || service.visibility === "visible")) {
+        var serviceState = $.data(service, "geoServiceState");
+
+        if ( serviceState && service && (service.visibility === undefined || service.visibility === "visible")) {
           this._cancelUnloaded(map, service);
 
           var serviceState = shingledServicesState[service.id],
@@ -214,22 +216,17 @@
       },
 
       opacity: function (map, service) {
-        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
-        // service.opacity has changed, update any existing images
-        var serviceState = shingledServicesState[service.id];
+        var serviceState = $.data(service, "geoServiceState");
         serviceState.serviceContainer.find("img").stop(true).fadeTo("fast", service.opacity);
       },
 
       toggle: function (map, service) {
-        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
-        // service.visible has changed, update our service container
-        var serviceState = shingledServicesState[service.id];
+        var serviceState = $.data(service, "geoServiceState");
         serviceState.serviceContainer.css("display", service.visibility === "visible" ? "block" : "none");
       },
 
       _cancelUnloaded: function (map, service) {
-        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
-        var serviceState = shingledServicesState[service.id];
+        var serviceState = $.data(service, "geoServiceState");
 
         if (serviceState && serviceState.loadCount > 0) {
           serviceState.serviceContainer.find("img:hidden").remove();
