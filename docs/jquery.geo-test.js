@@ -1872,6 +1872,13 @@ $.Widget.prototype = {
              bbox1[3] >= bbox2[3];
     },
 
+    _bboxDisjoint: function( bbox1, bbox2 ) {
+      return bbox2[ 0 ] > bbox1[ 2 ] || 
+             bbox2[ 2 ] < bbox1[ 0 ] || 
+             bbox2[ 1 ] > bbox1[ 3 ] ||
+             bbox2[ 3 ] < bbox1[ 1 ];
+    },
+
     reaspect: function (bbox, ratio, _ignoreGeo /* Internal Use Only */ ) {
       // not in JTS
       if (!_ignoreGeo && $.geo.proj) {
@@ -1921,33 +1928,30 @@ $.Widget.prototype = {
 
     // bbox (Geometry.getEnvelope in JTS)
 
-    bbox: function (geom) {
-      var result = $.data(geom, "geoBbox");
-      if (!result) {
-        if (geom.bbox) {
-          $.data(geom, "geoBbox", (result = geom.bbox));
-        } else {
-          result = [pos_oo, pos_oo, neg_oo, neg_oo];
+    bbox: function ( geom, _ignoreGeo /* Internal Use Only */ ) {
+      if ( !geom ) {
+        return undefined;
+      } else if ( geom.bbox ) {
+        result = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic( geom.bbox ) : geom.bbox;
+      } else {
+        result = [ pos_oo, pos_oo, neg_oo, neg_oo ];
 
-          var coordinates = this._allCoordinates(geom),
-              curCoord = 0;
+        var coordinates = this._allCoordinates( geom ),
+            curCoord = 0;
 
-          if (coordinates.length == 0) {
-            return undefined;
-          }
+        if ( coordinates.length == 0 ) {
+          return undefined;
+        }
 
-          if ($.geo.proj) {
-            coordinates = $.geo.proj.fromGeodetic(coordinates);
-          }
+        if ( $.geo.proj ) {
+          coordinates = $.geo.proj.fromGeodetic( coordinates );
+        }
 
-          for (; curCoord < coordinates.length; curCoord++) {
-            result[0] = Math.min(coordinates[curCoord][0], result[0]);
-            result[1] = Math.min(coordinates[curCoord][1], result[1]);
-            result[2] = Math.max(coordinates[curCoord][0], result[2]);
-            result[3] = Math.max(coordinates[curCoord][1], result[3]);
-          }
-
-          $.data(geom, "geoBbox", result);
+        for ( ; curCoord < coordinates.length; curCoord++ ) {
+          result[0] = Math.min(coordinates[curCoord][0], result[0]);
+          result[1] = Math.min(coordinates[curCoord][1], result[1]);
+          result[2] = Math.max(coordinates[curCoord][0], result[2]);
+          result[3] = Math.max(coordinates[curCoord][1], result[3]);
         }
       }
 
@@ -2380,90 +2384,98 @@ $.Widget.prototype = {
 
       return {
         fromGeodeticPos: function (coordinate) {
+          if (!coordinate) {
+            debugger;
+          }
           return [
-            semiMajorAxis * coordinate[0] * radiansPerDegree,
-            semiMajorAxis * Math.log(Math.tan(quarterPi + coordinate[1] * radiansPerDegree / 2))
+            semiMajorAxis * coordinate[ 0 ] * radiansPerDegree,
+            semiMajorAxis * Math.log(Math.tan(quarterPi + coordinate[ 1 ] * radiansPerDegree / 2))
           ];
         },
 
         fromGeodetic: function (coordinates) {
-          var isArray = $.isArray(coordinates[0]),
+          var isMultiPointOrLineString = $.isArray(coordinates[ 0 ]),
               fromGeodeticPos = this.fromGeodeticPos;
 
-          if (!isArray && coordinates.length == 4) {
+          if (!isMultiPointOrLineString && coordinates.length == 4) {
             // bbox
-            var min = fromGeodeticPos([coordinates[0], coordinates[1]]),
-                max = fromGeodeticPos([coordinates[2], coordinates[3]]);
-            return [min[0], min[1], max[0], max[1]];
+            var min = fromGeodeticPos([ coordinates[ 0 ], coordinates[ 1 ] ]),
+                max = fromGeodeticPos([ coordinates[ 2 ], coordinates[ 3 ] ]);
+            return [ min[ 0 ], min[ 1 ], max[ 0 ], max[ 1 ] ];
           } else {
             // geometry
-            var isDblArray = isArray && $.isArray(coordinates[0][0]),
-                isTriArray = isDblArray && $.isArray(coordinates[0][0][0]),
-                result = [[[]]];
+            var isMultiLineStringOrPolygon = isMultiPointOrLineString && $.isArray(coordinates[ 0 ][ 0 ]),
+                isMultiPolygon = isMultiLineStringOrPolygon && $.isArray(coordinates[ 0 ][ 0 ][ 0 ]),
+                result = [ ],
+                i, j, k;
 
-            if (!isTriArray) {
-              if (!isDblArray) {
-                if (!isArray) {
-                  coordinates = [coordinates];
+            if (!isMultiPolygon) {
+              if (!isMultiLineStringOrPolygon) {
+                if (!isMultiPointOrLineString) {
+                  coordinates = [ coordinates ];
                 }
-                coordinates = [coordinates];
+                coordinates = [ coordinates ];
               }
-              coordinates = [coordinates];
+              coordinates = [ coordinates ];
             }
 
-            $.each(coordinates, function (i) {
-              $.each(this, function (j) {
-                $.each(this, function (k) {
-                  result[i][j][k] = fromGeodeticPos(this);
-                });
-              });
-            });
+            for ( i = 0; i < coordinates.length; i++ ) {
+              result[ i ] = [ ];
+              for ( j = 0; j < coordinates[ i ].length; j++ ) {
+                result[ i ][ j ] = [ ];
+                for ( k = 0; k < coordinates[ i ][ j ].length; k++ ) {
+                  result[ i ][ j ][ k ] = fromGeodeticPos(coordinates[ i ][ j ][ k ]);
+                }
+              }
+            }
 
-            return isTriArray ? result : isDblArray ? result[0] : isArray ? result[0][0] : result[0][0][0];
+            return isMultiPolygon ? result : isMultiLineStringOrPolygon ? result[ 0 ] : isMultiPointOrLineString ? result[ 0 ][ 0 ] : result[ 0 ][ 0 ][ 0 ];
           }
         },
 
         toGeodeticPos: function (coordinate) {
           return [
-            (coordinate[0] / semiMajorAxis) * degreesPerRadian,
-            (halfPi - 2 * Math.atan(1 / Math.exp(coordinate[1] / semiMajorAxis))) * degreesPerRadian
+            (coordinate[ 0 ] / semiMajorAxis) * degreesPerRadian,
+            (halfPi - 2 * Math.atan(1 / Math.exp(coordinate[ 1 ] / semiMajorAxis))) * degreesPerRadian
           ];
         },
 
         toGeodetic: function (coordinates) {
-          var isArray = $.isArray(coordinates[0]),
+          var isMultiPointOrLineString = $.isArray(coordinates[ 0 ]),
               toGeodeticPos = this.toGeodeticPos;
 
-          if (!isArray && coordinates.length == 4) {
+          if (!isMultiPointOrLineString && coordinates.length == 4) {
             // bbox
-            var min = toGeodeticPos([coordinates[0], coordinates[1]]),
-                max = toGeodeticPos([coordinates[2], coordinates[3]]);
-            return [min[0], min[1], max[0], max[1]];
+            var min = toGeodeticPos([ coordinates[ 0 ], coordinates[ 1 ] ]),
+                max = toGeodeticPos([ coordinates[ 2 ], coordinates[ 3 ] ]);
+            return [ min[ 0 ], min[ 1 ], max[ 0 ], max[ 1 ] ];
           } else {
             // geometry
-            var isDblArray = isArray && $.isArray(coordinates[0][0]),
-                isTriArray = isDblArray && $.isArray(coordinates[0][0][0]),
-                result = [[[]]];
+            var isMultiLineStringOrPolygon = isMultiPointOrLineString && $.isArray(coordinates[ 0 ][ 0 ]),
+                isMultiPolygon = isMultiLineStringOrPolygon && $.isArray(coordinates[ 0 ][ 0 ][ 0 ]),
+                result = [ ];
 
-            if (!isTriArray) {
-              if (!isDblArray) {
-                if (!isArray) {
-                  coordinates = [coordinates];
+            if (!isMultiPolygon) {
+              if (!isMultiLineStringOrPolygon) {
+                if (!isMultiPointOrLineString) {
+                  coordinates = [ coordinates ];
                 }
-                coordinates = [coordinates];
+                coordinates = [ coordinates ];
               }
-              coordinates = [coordinates];
+              coordinates = [ coordinates ];
             }
 
-            $.each(coordinates, function (i) {
-              $.each(this, function (j) {
-                $.each(this, function (k) {
-                  result[i][j][k] = toGeodeticPos(this);
-                });
-              });
-            });
+            for ( i = 0; i < coordinates.length; i++ ) {
+              result[ i ] = [ ];
+              for ( j = 0; j < coordinates[ i ].length; j++ ) {
+                result[ i ][ j ] = [ ];
+                for ( k = 0; k < coordinates[ i ][ j ].length; k++ ) {
+                  result[ i ][ j ][ k ] = toGeodeticPos(coordinates[ i ][ j ][ k ]);
+                }
+              }
+            }
 
-            return isTriArray ? result : isDblArray ? result[0] : isArray ? result[0][0] : result[0][0][0];
+            return isMultiPolygon ? result : isMultiLineStringOrPolygon ? result[ 0 ] : isMultiPointOrLineString ? result[ 0 ][ 0 ] : result[ 0 ][ 0 ][ 0 ];
           }
         }
       }
@@ -3160,64 +3172,84 @@ $.Widget.prototype = {
       }
     },
 
-    append: function (shape, style, refresh /* internal */) {
-      refresh = (refresh === undefined || refresh);
-
-      if (shape) {
-        var shapes, geomap = this;
-        if (shape.type == "FeatureCollection") {
+    append: function ( shape, style, refresh ) {
+      if ( shape ) {
+        var shapes, i = 0;
+        if ( shape.type == "FeatureCollection" ) {
           shapes = shape.features;
         } else {
-          shapes = $.isArray(shape) ? shape : [shape];
+          shapes = $.isArray( shape ) ? shape : [ shape ];
         }
 
-        $.each(shapes, function () {
-          geomap._graphicShapes[geomap._graphicShapes.length] = {
-            shape: this,
-            style: style
-          };
-        });
+        if ( typeof style === "boolean" ) {
+          refresh = style;
+          style = null;
+        }
 
-        if (refresh) {
-          this._refresh();
+        for ( ; i < shapes.length; i++ ) {
+          if ( shapes[ i ].type != "Point" ) {
+            var bbox = $.geo.bbox( shapes[ i ] );
+            if ( $.geo.proj ) {
+              bbox = $.geo.proj.fromGeodetic( bbox );
+            }
+            $.data( shapes[ i ], "geoBbox", bbox );
+          }
+
+          this._graphicShapes.push( {
+            shape: shapes[ i ],
+            style: style
+          } );
+        }
+
+        if ( refresh === undefined || refresh ) {
+          this._refresh( );
         }
       }
     },
 
-    empty: function () {
+    empty: function ( refresh ) {
+      $.each( this._graphicShapes, function( ) {
+        $.removeData( this, "geoBbox" );
+      } );
       this._graphicShapes = [];
-      this._refresh();
+      if ( refresh === undefined || refresh ) {
+        this._refresh();
+      }
     },
 
     find: function (point, pixelTolerance) {
-      var searchPixel = this.toPixel(point.coordinates),
-            mapTol = this._pixelSize * pixelTolerance,
-            result = [],
-            curGeom;
+      var searchPixel = this.toPixel( point.coordinates ),
+          mapTol = this._pixelSize * pixelTolerance,
+          result = [],
+          curGeom;
 
-      $.each(this._graphicShapes, function (i) {
-        if (this.shape.type == "Point") {
-          if ($.geo.distance(this.shape, point) <= mapTol) {
-            result.push(this.shape);
+      $.each( this._graphicShapes, function ( i ) {
+        if ( this.shape.type == "Point" ) {
+          if ( $.geo.distance(this.shape, point) <= mapTol ) {
+            result.push( this.shape );
           }
         } else {
-          var bbox = $.geo.bbox(this.shape),
-                bboxPolygon = {
-                  type: "Polygon",
-                  coordinates: [[
-                    [bbox[0], bbox[1]],
-                    [bbox[0], bbox[3]],
-                    [bbox[2], bbox[3]],
-                    [bbox[2], bbox[1]],
-                    [bbox[0], bbox[1]]
-                  ]]
-                };
+          var bbox = $.data( this.shape, "geoBbox" ),
+              bboxPolygon = {
+                type: "Polygon",
+                coordinates: [ [
+                  [bbox[0], bbox[1]],
+                  [bbox[0], bbox[3]],
+                  [bbox[2], bbox[3]],
+                  [bbox[2], bbox[1]],
+                  [bbox[0], bbox[1]]
+                ] ]
+              },
+              projectedPoint = {
+                type: "Point",
+                coordinates: $.geo.proj ? $.geo.proj.fromGeodetic( point.coordinates ) : point.coordinates
+              };
 
-          if ($.geo.distance(bboxPolygon, point) <= mapTol) {
-            var geometries = $.geo._flatten(this.shape);
-            for (curGeom = 0; curGeom < geometries.length; curGeom++) {
-              if ($.geo.distance(geometries[curGeom], point) <= mapTol) {
-                result.push(this.shape);
+          if ( $.geo.distance( bboxPolygon, projectedPoint, true ) <= mapTol ) {
+            var geometries = $.geo._flatten( this.shape );
+            for ( curGeom = 0; curGeom < geometries.length; curGeom++ ) {
+              if ( $.geo.distance( geometries[curGeom], point ) <= mapTol ) {
+                result.push( this.shape );
                 break;
               }
             }
@@ -3228,17 +3260,21 @@ $.Widget.prototype = {
       return result;
     },
 
-    remove: function (shape) {
+    remove: function ( shape, refresh ) {
       var geomap = this;
-      $.each(this._graphicShapes, function (i) {
-        if (this.shape == shape) {
-          var rest = geomap._graphicShapes.slice(i + 1 || geomap._graphicShapes.length);
-          geomap._graphicShapes.length = i < 0 ? geomap._graphicShapes.length + i : i;
+      $.each( this._graphicShapes, function ( i ) {
+        if ( this.shape == shape ) {
+          $.removeData( shape, "geoBbox" );
+          var rest = geomap._graphicShapes.slice( i + 1 );
+          geomap._graphicShapes.length = i;
           geomap._graphicShapes.push.apply(geomap._graphicShapes, rest);
           return false;
         }
       });
-      this._refresh();
+
+      if ( refresh === undefined || refresh ) {
+        this._refresh();
+      }
     },
 
     _getBbox: function (center, pixelSize) {
@@ -3384,7 +3420,7 @@ $.Widget.prototype = {
         shape = shape.geometry || shape;
         shapeBbox = $.data(shape, "geoBbox");
 
-        if (shapeBbox && !$.geo._in(bbox, shapeBbox)) {
+        if ( shapeBbox && $.geo._bboxDisjoint( bbox, shapeBbox ) ) {
           continue;
         }
 
@@ -4112,7 +4148,7 @@ $.Widget.prototype = {
         }
 
         this._$shapesContainer.geographics("clear");
-        if (this._graphicShapes.length > 0) {
+        if (this._graphicShapes.length > 0 && this._graphicShapes.length < 256) {
           this._refreshShapes(this._$shapesContainer, this._graphicShapes, this._graphicShapes, wheelCenterAndSize.center, wheelCenterAndSize.pixelSize);
         }
 

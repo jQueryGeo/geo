@@ -34,7 +34,7 @@ $(&quot;#map&quot;).geomap( &quot;empty&quot;, false )</code></pre></td>
         </tr>
       </table>
       <p>The empty method removes all shapes previously added with the append method.</p>
-      <p>The optional refresh argument determines if geomap refreshes the map graphics after this call to empty. It defaults to true. If you pass false, geomap will remove all shapes internally but not immediately redraw the graphics. If you do not refresh the map by calling the refresh method or passing true to a call to append, remove, or empty then the shapes will not update until the user pans or zooms the map.</p>
+      <p>The optional refresh argument determines if geomap refreshes the map graphics after this call to empty. It defaults to true. If you pass false, geomap will remove all shapes internally but not immediately redraw the graphics. The changes will display if the user moves the map or you call geomap's refresh method.</p>
       <p>The jQuery UI widget factory returns the original jQuery collection to maintain call chaining.</p>
     </div>
   </div> <!-- end of #container -->
