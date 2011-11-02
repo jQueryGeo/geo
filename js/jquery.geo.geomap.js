@@ -20,7 +20,7 @@
         mode: "pan",
         services: [
             {
-              id: "OSM",
+              "class": "osm",
               type: "tiled",
               getUrl: function (view) {
                 return "http://tile.openstreetmap.org/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
@@ -117,7 +117,7 @@
 
       this._graphicShapes = [];
 
-      this._initOptions = options;
+      this._initOptions = options || {};
 
       this._forcePosition(this._$elem);
 
@@ -288,7 +288,7 @@
 
         $(window).unbind("resize", this._windowHandler);
 
-        for (var i = 0; i < this._currentServices.length; i++) {
+        for ( var i = 0; i < this._currentServices.length; i++ ) {
           this._currentServices[i].serviceContainer.geomap("destroy");
           $.geo["_serviceTypes"][this._currentServices[i].type].destroy(this, this._$servicesContainer, this._currentServices[i]);
         }
@@ -323,9 +323,9 @@
         this._$elem.closest("[data-geo-map]").geomap("opacity", value, this._$elem);
       } else {
         if (value >= 0 || value <= 1) {
-          for (var i = 0; i < this._currentServices.length; i++) {
+          for ( var i = 0; i < this._currentServices.length; i++ ) {
             var service = this._currentServices[i];
-            if (!_serviceContainer || service.serviceContainer[0] == _serviceContainer[0]) {
+            if ( !_serviceContainer || service.serviceContainer[0] == _serviceContainer[0] ) {
               this._options["services"][i].opacity = service.opacity = value;
               $.geo["_serviceTypes"][service.type].opacity(this, service);
             }
@@ -433,64 +433,84 @@
       }
     },
 
-    append: function (shape, style, refresh /* internal */) {
-      refresh = (refresh === undefined || refresh);
-
-      if (shape) {
-        var shapes, geomap = this;
-        if (shape.type == "FeatureCollection") {
+    append: function ( shape, style, refresh ) {
+      if ( shape ) {
+        var shapes, i = 0;
+        if ( shape.type == "FeatureCollection" ) {
           shapes = shape.features;
         } else {
-          shapes = $.isArray(shape) ? shape : [shape];
+          shapes = $.isArray( shape ) ? shape : [ shape ];
         }
 
-        $.each(shapes, function () {
-          geomap._graphicShapes[geomap._graphicShapes.length] = {
-            shape: this,
-            style: style
-          };
-        });
+        if ( typeof style === "boolean" ) {
+          refresh = style;
+          style = null;
+        }
 
-        if (refresh) {
-          this._refresh();
+        for ( ; i < shapes.length; i++ ) {
+          if ( shapes[ i ].type != "Point" ) {
+            var bbox = $.geo.bbox( shapes[ i ] );
+            if ( $.geo.proj ) {
+              bbox = $.geo.proj.fromGeodetic( bbox );
+            }
+            $.data( shapes[ i ], "geoBbox", bbox );
+          }
+
+          this._graphicShapes.push( {
+            shape: shapes[ i ],
+            style: style
+          } );
+        }
+
+        if ( refresh === undefined || refresh ) {
+          this._refresh( );
         }
       }
     },
 
-    empty: function () {
+    empty: function ( refresh ) {
+      $.each( this._graphicShapes, function( ) {
+        $.removeData( this, "geoBbox" );
+      } );
       this._graphicShapes = [];
-      this._refresh();
+      if ( refresh === undefined || refresh ) {
+        this._refresh();
+      }
     },
 
     find: function (point, pixelTolerance) {
-      var searchPixel = this.toPixel(point.coordinates),
-            mapTol = this._pixelSize * pixelTolerance,
-            result = [],
-            curGeom;
+      var searchPixel = this.toPixel( point.coordinates ),
+          mapTol = this._pixelSize * pixelTolerance,
+          result = [],
+          curGeom;
 
-      $.each(this._graphicShapes, function (i) {
-        if (this.shape.type == "Point") {
-          if ($.geo.distance(this.shape, point, true) <= mapTol) {
-            result.push(this.shape);
+      $.each( this._graphicShapes, function ( i ) {
+        if ( this.shape.type == "Point" ) {
+          if ( $.geo.distance(this.shape, point) <= mapTol ) {
+            result.push( this.shape );
           }
         } else {
-          var bbox = $.geo.bbox(this.shape),
-                bboxPolygon = {
-                  type: "Polygon",
-                  coordinates: [[
-                    [bbox[0], bbox[1]],
-                    [bbox[0], bbox[3]],
-                    [bbox[2], bbox[3]],
-                    [bbox[2], bbox[1]],
-                    [bbox[0], bbox[1]]
-                  ]]
-                };
+          var bbox = $.data( this.shape, "geoBbox" ),
+              bboxPolygon = {
+                type: "Polygon",
+                coordinates: [ [
+                  [bbox[0], bbox[1]],
+                  [bbox[0], bbox[3]],
+                  [bbox[2], bbox[3]],
+                  [bbox[2], bbox[1]],
+                  [bbox[0], bbox[1]]
+                ] ]
+              },
+              projectedPoint = {
+                type: "Point",
+                coordinates: $.geo.proj ? $.geo.proj.fromGeodetic( point.coordinates ) : point.coordinates
+              };
 
-          if ($.geo.distance(bboxPolygon, point, true) <= mapTol) {
-            var geometries = $.geo._flatten(this.shape);
-            for (curGeom = 0; curGeom < geometries.length; curGeom++) {
-              if ($.geo.distance(geometries[curGeom], point, true) <= mapTol) {
-                result.push(this.shape);
+          if ( $.geo.distance( bboxPolygon, projectedPoint, true ) <= mapTol ) {
+            var geometries = $.geo._flatten( this.shape );
+            for ( curGeom = 0; curGeom < geometries.length; curGeom++ ) {
+              if ( $.geo.distance( geometries[curGeom], point ) <= mapTol ) {
+                result.push( this.shape );
                 break;
               }
             }
@@ -501,17 +521,21 @@
       return result;
     },
 
-    remove: function (shape) {
+    remove: function ( shape, refresh ) {
       var geomap = this;
-      $.each(this._graphicShapes, function (i) {
-        if (this.shape == shape) {
-          var rest = geomap._graphicShapes.slice(i + 1 || geomap._graphicShapes.length);
-          geomap._graphicShapes.length = i < 0 ? geomap._graphicShapes.length + i : i;
+      $.each( this._graphicShapes, function ( i ) {
+        if ( this.shape == shape ) {
+          $.removeData( shape, "geoBbox" );
+          var rest = geomap._graphicShapes.slice( i + 1 );
+          geomap._graphicShapes.length = i;
           geomap._graphicShapes.push.apply(geomap._graphicShapes, rest);
           return false;
         }
       });
-      this._refresh();
+
+      if ( refresh === undefined || refresh ) {
+        this._refresh();
+      }
     },
 
     _getBbox: function (center, pixelSize) {
@@ -614,7 +638,7 @@
 
       this._currentServices = [];
       for (i = 0; i < this._options["services"].length; i++) {
-        this._currentServices[i] = $.extend({}, this._options["services"][i]);
+        this._currentServices[i] = this._options["services"][i];
         this._currentServices[i].serviceContainer = $.geo["_serviceTypes"][this._currentServices[i].type].create(this, this._$servicesContainer, this._currentServices[i], i).geomap();
       }
     },
@@ -657,7 +681,7 @@
         shape = shape.geometry || shape;
         shapeBbox = $.data(shape, "geoBbox");
 
-        if (shapeBbox && !$.geo._in(bbox, shapeBbox)) {
+        if ( shapeBbox && $.geo._bboxDisjoint( bbox, shapeBbox ) ) {
           continue;
         }
 
@@ -1385,7 +1409,7 @@
         }
 
         this._$shapesContainer.geographics("clear");
-        if (this._graphicShapes.length > 0) {
+        if (this._graphicShapes.length > 0 && this._graphicShapes.length < 256) {
           this._refreshShapes(this._$shapesContainer, this._graphicShapes, this._graphicShapes, wheelCenterAndSize.center, wheelCenterAndSize.pixelSize);
         }
 

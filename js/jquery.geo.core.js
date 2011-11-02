@@ -78,6 +78,13 @@
              bbox1[3] >= bbox2[3];
     },
 
+    _bboxDisjoint: function( bbox1, bbox2 ) {
+      return bbox2[ 0 ] > bbox1[ 2 ] || 
+             bbox2[ 2 ] < bbox1[ 0 ] || 
+             bbox2[ 1 ] > bbox1[ 3 ] ||
+             bbox2[ 3 ] < bbox1[ 1 ];
+    },
+
     reaspect: function (bbox, ratio, _ignoreGeo /* Internal Use Only */ ) {
       // not in JTS
       if (!_ignoreGeo && $.geo.proj) {
@@ -127,33 +134,30 @@
 
     // bbox (Geometry.getEnvelope in JTS)
 
-    bbox: function (geom) {
-      var result = $.data(geom, "geoBbox");
-      if (!result) {
-        if (geom.bbox) {
-          $.data(geom, "geoBbox", (result = geom.bbox));
-        } else {
-          result = [pos_oo, pos_oo, neg_oo, neg_oo];
+    bbox: function ( geom, _ignoreGeo /* Internal Use Only */ ) {
+      if ( !geom ) {
+        return undefined;
+      } else if ( geom.bbox ) {
+        result = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic( geom.bbox ) : geom.bbox;
+      } else {
+        result = [ pos_oo, pos_oo, neg_oo, neg_oo ];
 
-          var coordinates = this._allCoordinates(geom),
-              curCoord = 0;
+        var coordinates = this._allCoordinates( geom ),
+            curCoord = 0;
 
-          if (coordinates.length == 0) {
-            return undefined;
-          }
+        if ( coordinates.length == 0 ) {
+          return undefined;
+        }
 
-          if ($.geo.proj) {
-            coordinates = $.geo.proj.fromGeodetic(coordinates);
-          }
+        if ( $.geo.proj ) {
+          coordinates = $.geo.proj.fromGeodetic( coordinates );
+        }
 
-          for (; curCoord < coordinates.length; curCoord++) {
-            result[0] = Math.min(coordinates[curCoord][0], result[0]);
-            result[1] = Math.min(coordinates[curCoord][1], result[1]);
-            result[2] = Math.max(coordinates[curCoord][0], result[2]);
-            result[3] = Math.max(coordinates[curCoord][1], result[3]);
-          }
-
-          $.data(geom, "geoBbox", result);
+        for ( ; curCoord < coordinates.length; curCoord++ ) {
+          result[0] = Math.min(coordinates[curCoord][0], result[0]);
+          result[1] = Math.min(coordinates[curCoord][1], result[1]);
+          result[2] = Math.max(coordinates[curCoord][0], result[2]);
+          result[3] = Math.max(coordinates[curCoord][1], result[3]);
         }
       }
 
@@ -586,90 +590,98 @@
 
       return {
         fromGeodeticPos: function (coordinate) {
+          if (!coordinate) {
+            debugger;
+          }
           return [
-            semiMajorAxis * coordinate[0] * radiansPerDegree,
-            semiMajorAxis * Math.log(Math.tan(quarterPi + coordinate[1] * radiansPerDegree / 2))
+            semiMajorAxis * coordinate[ 0 ] * radiansPerDegree,
+            semiMajorAxis * Math.log(Math.tan(quarterPi + coordinate[ 1 ] * radiansPerDegree / 2))
           ];
         },
 
         fromGeodetic: function (coordinates) {
-          var isArray = $.isArray(coordinates[0]),
+          var isMultiPointOrLineString = $.isArray(coordinates[ 0 ]),
               fromGeodeticPos = this.fromGeodeticPos;
 
-          if (!isArray && coordinates.length == 4) {
+          if (!isMultiPointOrLineString && coordinates.length == 4) {
             // bbox
-            var min = fromGeodeticPos([coordinates[0], coordinates[1]]),
-                max = fromGeodeticPos([coordinates[2], coordinates[3]]);
-            return [min[0], min[1], max[0], max[1]];
+            var min = fromGeodeticPos([ coordinates[ 0 ], coordinates[ 1 ] ]),
+                max = fromGeodeticPos([ coordinates[ 2 ], coordinates[ 3 ] ]);
+            return [ min[ 0 ], min[ 1 ], max[ 0 ], max[ 1 ] ];
           } else {
             // geometry
-            var isDblArray = isArray && $.isArray(coordinates[0][0]),
-                isTriArray = isDblArray && $.isArray(coordinates[0][0][0]),
-                result = [[[]]];
+            var isMultiLineStringOrPolygon = isMultiPointOrLineString && $.isArray(coordinates[ 0 ][ 0 ]),
+                isMultiPolygon = isMultiLineStringOrPolygon && $.isArray(coordinates[ 0 ][ 0 ][ 0 ]),
+                result = [ ],
+                i, j, k;
 
-            if (!isTriArray) {
-              if (!isDblArray) {
-                if (!isArray) {
-                  coordinates = [coordinates];
+            if (!isMultiPolygon) {
+              if (!isMultiLineStringOrPolygon) {
+                if (!isMultiPointOrLineString) {
+                  coordinates = [ coordinates ];
                 }
-                coordinates = [coordinates];
+                coordinates = [ coordinates ];
               }
-              coordinates = [coordinates];
+              coordinates = [ coordinates ];
             }
 
-            $.each(coordinates, function (i) {
-              $.each(this, function (j) {
-                $.each(this, function (k) {
-                  result[i][j][k] = fromGeodeticPos(this);
-                });
-              });
-            });
+            for ( i = 0; i < coordinates.length; i++ ) {
+              result[ i ] = [ ];
+              for ( j = 0; j < coordinates[ i ].length; j++ ) {
+                result[ i ][ j ] = [ ];
+                for ( k = 0; k < coordinates[ i ][ j ].length; k++ ) {
+                  result[ i ][ j ][ k ] = fromGeodeticPos(coordinates[ i ][ j ][ k ]);
+                }
+              }
+            }
 
-            return isTriArray ? result : isDblArray ? result[0] : isArray ? result[0][0] : result[0][0][0];
+            return isMultiPolygon ? result : isMultiLineStringOrPolygon ? result[ 0 ] : isMultiPointOrLineString ? result[ 0 ][ 0 ] : result[ 0 ][ 0 ][ 0 ];
           }
         },
 
         toGeodeticPos: function (coordinate) {
           return [
-            (coordinate[0] / semiMajorAxis) * degreesPerRadian,
-            (halfPi - 2 * Math.atan(1 / Math.exp(coordinate[1] / semiMajorAxis))) * degreesPerRadian
+            (coordinate[ 0 ] / semiMajorAxis) * degreesPerRadian,
+            (halfPi - 2 * Math.atan(1 / Math.exp(coordinate[ 1 ] / semiMajorAxis))) * degreesPerRadian
           ];
         },
 
         toGeodetic: function (coordinates) {
-          var isArray = $.isArray(coordinates[0]),
+          var isMultiPointOrLineString = $.isArray(coordinates[ 0 ]),
               toGeodeticPos = this.toGeodeticPos;
 
-          if (!isArray && coordinates.length == 4) {
+          if (!isMultiPointOrLineString && coordinates.length == 4) {
             // bbox
-            var min = toGeodeticPos([coordinates[0], coordinates[1]]),
-                max = toGeodeticPos([coordinates[2], coordinates[3]]);
-            return [min[0], min[1], max[0], max[1]];
+            var min = toGeodeticPos([ coordinates[ 0 ], coordinates[ 1 ] ]),
+                max = toGeodeticPos([ coordinates[ 2 ], coordinates[ 3 ] ]);
+            return [ min[ 0 ], min[ 1 ], max[ 0 ], max[ 1 ] ];
           } else {
             // geometry
-            var isDblArray = isArray && $.isArray(coordinates[0][0]),
-                isTriArray = isDblArray && $.isArray(coordinates[0][0][0]),
-                result = [[[]]];
+            var isMultiLineStringOrPolygon = isMultiPointOrLineString && $.isArray(coordinates[ 0 ][ 0 ]),
+                isMultiPolygon = isMultiLineStringOrPolygon && $.isArray(coordinates[ 0 ][ 0 ][ 0 ]),
+                result = [ ];
 
-            if (!isTriArray) {
-              if (!isDblArray) {
-                if (!isArray) {
-                  coordinates = [coordinates];
+            if (!isMultiPolygon) {
+              if (!isMultiLineStringOrPolygon) {
+                if (!isMultiPointOrLineString) {
+                  coordinates = [ coordinates ];
                 }
-                coordinates = [coordinates];
+                coordinates = [ coordinates ];
               }
-              coordinates = [coordinates];
+              coordinates = [ coordinates ];
             }
 
-            $.each(coordinates, function (i) {
-              $.each(this, function (j) {
-                $.each(this, function (k) {
-                  result[i][j][k] = toGeodeticPos(this);
-                });
-              });
-            });
+            for ( i = 0; i < coordinates.length; i++ ) {
+              result[ i ] = [ ];
+              for ( j = 0; j < coordinates[ i ].length; j++ ) {
+                result[ i ][ j ] = [ ];
+                for ( k = 0; k < coordinates[ i ][ j ].length; k++ ) {
+                  result[ i ][ j ][ k ] = toGeodeticPos(coordinates[ i ][ j ][ k ]);
+                }
+              }
+            }
 
-            return isTriArray ? result : isDblArray ? result[0] : isArray ? result[0][0] : result[0][0][0];
+            return isMultiPolygon ? result : isMultiLineStringOrPolygon ? result[ 0 ] : isMultiPointOrLineString ? result[ 0 ][ 0 ] : result[ 0 ][ 0 ][ 0 ];
           }
         }
       }

@@ -106,24 +106,24 @@
             },
             attr: "<p>National Broadband Map income demographics</p>"
           }
-        ],
-        click: function(e, geo) {
-          $.ajax({
-            url: "http://www.broadbandmap.gov/broadbandmap/demographic/fall2010/coordinates",
-            data: {
-              longitude: geo.coordinates[0],
-              latitude: geo.coordinates[1],
-              format: "jsonp"
-            },
-            dataType: "jsonp",
-            success: function(result) {
-              alert(result.Results.blockFips + ": " + result.Results.educationBachelorOrGreater);
-            },
-            error: function(xhr) {
-              alert(xhr.statusText);
-            }
-          })
-        }
+        ]
+//        click: function(e, geo) {
+//          $.ajax({
+//            url: "http://www.broadbandmap.gov/broadbandmap/demographic/fall2010/coordinates",
+//            data: {
+//              longitude: geo.coordinates[0],
+//              latitude: geo.coordinates[1],
+//              format: "jsonp"
+//            },
+//            dataType: "jsonp",
+//            success: function(result) {
+//              //alert(result.Results.blockFips + ": " + result.Results.educationBachelorOrGreater);
+//            },
+//            error: function(xhr) {
+//              alert(xhr.statusText);
+//            }
+//          })
+//        }
       });
 
       $.ajax({

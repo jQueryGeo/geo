@@ -28,7 +28,7 @@
         </tr>
         <tr>
           <td colspan=2><code><pre>[ {
-  class: &quot;osm&quot;,
+  &quot;class&quot;: &quot;osm&quot;,
   type: &quot;tiled&quot;,
   getUrl: function( view ) {
     return &quot;http://tile.openstreetmap.org/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png&quot;;
@@ -43,7 +43,7 @@
         </tr>
         <tr>
           <td colspan=2><pre><code>$( <i>selector</i> ).geomap( { services: [ {
-  class: &quot;osm&quot;,
+  &quot;class&quot;: &quot;osm&quot;,
   type: &quot;tiled&quot;,
   getUrl: function( view ) {
     return &quot;http://tile.openstreetmap.org/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png&quot;;
@@ -63,7 +63,7 @@
         <tr>
           <td colspan=2><pre><code>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;services&quot;, [ {
   id: &quot;mapquest-open&quot;,
-  class: &quot;basemap&quot;,
+  &quot;class&quot;: &quot;basemap&quot;,
   type: &quot;tiled&quot;,
   getUrl: function( view ) {
     return &quot;http://otile&quot; + ((view.index % 4) + 1) + &quot;.mqcdn.com/tiles/1.0.0/osm/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png&quot;;
@@ -80,6 +80,8 @@
       <p>Each service can have an id that distinguishes it from other service objects in the array. The id is a string and must be follow the HTML element id naming conditions. If present, the id must be unique across all services in all maps as well as unique from any other HTML element on the page. The default service object of a geomap widget does not have an id.</p>
       <h3>class</h3>
       <p>Each service can have a class as well. The class is a string and must be follow the CSS class naming conditions. You can consider this as the class of images the service will supply and usually name it after the service, such as osm, mass-gis, etc. The default service object of a geomap widget has the class: osm.</p>
+      <p>Unfortunately, class is a reserved word in JavaScript. When you specify class in your service object, you must quote the word class. This is exactly how it's done in jQuery itself when applying attributes to an element based on an object. To quote the jQuery API:</p>
+      <blockquote>The name &quot;class&quot; must be quoted since it is a JavaScript reserved word, and &quot;className&quot; cannot be used since it is not the correct attribute name.</blockquote>
       <h3>type</h3>
       <p>A service has a type property which is either &quot;tiled&quot; or &quot;shingled&quot;. Tiled servies will get one image request per tile needed to fill a given view when the map refreshes. The tile request's bbox will only be the size of the given tile. Shingled services will get only one image request each time the map refreshes and the bbox will be the extent of the whole map view.</p>
       <h3>getUrl</h3>

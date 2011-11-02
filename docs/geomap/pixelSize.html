@@ -6,30 +6,38 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
   <title>pixelSize | geomap</title>
-  <meta name="description" content="geomap pixelSize method">
+  <meta name="description" content="geomap pixelSize option">
   <meta name="author" content="Ryan Westphal">
 </head>
 
 <body>
 
   <div id="pixelSize" data-role="page">
-    <div data-role="header" data-theme="e">
+    <div data-role="header" data-theme="f">
       <h1>pixelSize</h1>
     </div>
     
     <div data-role="content">
       <table>
         <tr>
-          <th>return type</th>
+          <th>type</th>
           <td>Number</td>
         </tr>
         <tr>
-          <th>syntax</th>
-          <td>.geomap( &quot;pixelSize&quot; );</td>
+          <th>default</th>
+          <td>156543.03392799936</td>
         </tr>
         <tr>
-          <th>usage</th>
-          <td><pre><code>var pixelSize = $( <i>selector</i> ).geomap( &quot;pixelSize&quot; );</code></pre></td>
+          <th>init</th>
+          <td><i>cannot be initialized</i></td>
+        </tr>
+        <tr>
+          <th>get</th>
+          <td><pre><code>var pixelSize = $( <i>selector</i> ).geomap( &quot;option&quot;, &quot;pixelSize&quot; );</code></pre></td>
+        </tr>
+        <tr>
+          <th>set</th>
+          <td><i>read only</i></td>
         </tr>
       </table>
       <p>The pixel size is the number of map units a single pixel occupies in the current view. A more interesting way to think of it is the Earth-size of the pixel.</p>

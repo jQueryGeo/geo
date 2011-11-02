@@ -1872,6 +1872,13 @@ $.Widget.prototype = {
              bbox1[3] >= bbox2[3];
     },
 
+    _bboxDisjoint: function( bbox1, bbox2 ) {
+      return bbox2[ 0 ] > bbox1[ 2 ] || 
+             bbox2[ 2 ] < bbox1[ 0 ] || 
+             bbox2[ 1 ] > bbox1[ 3 ] ||
+             bbox2[ 3 ] < bbox1[ 1 ];
+    },
+
     reaspect: function (bbox, ratio, _ignoreGeo /* Internal Use Only */ ) {
       // not in JTS
       if (!_ignoreGeo && $.geo.proj) {
@@ -1921,33 +1928,30 @@ $.Widget.prototype = {
 
     // bbox (Geometry.getEnvelope in JTS)
 
-    bbox: function (geom) {
-      var result = $.data(geom, "geoBbox");
-      if (!result) {
-        if (geom.bbox) {
-          $.data(geom, "geoBbox", (result = geom.bbox));
-        } else {
-          result = [pos_oo, pos_oo, neg_oo, neg_oo];
+    bbox: function ( geom, _ignoreGeo /* Internal Use Only */ ) {
+      if ( !geom ) {
+        return undefined;
+      } else if ( geom.bbox ) {
+        result = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic( geom.bbox ) : geom.bbox;
+      } else {
+        result = [ pos_oo, pos_oo, neg_oo, neg_oo ];
 
-          var coordinates = this._allCoordinates(geom),
-              curCoord = 0;
+        var coordinates = this._allCoordinates( geom ),
+            curCoord = 0;
 
-          if (coordinates.length == 0) {
-            return undefined;
-          }
+        if ( coordinates.length == 0 ) {
+          return undefined;
+        }
 
-          if ($.geo.proj) {
-            coordinates = $.geo.proj.fromGeodetic(coordinates);
-          }
+        if ( $.geo.proj ) {
+          coordinates = $.geo.proj.fromGeodetic( coordinates );
+        }
 
-          for (; curCoord < coordinates.length; curCoord++) {
-            result[0] = Math.min(coordinates[curCoord][0], result[0]);
-            result[1] = Math.min(coordinates[curCoord][1], result[1]);
-            result[2] = Math.max(coordinates[curCoord][0], result[2]);
-            result[3] = Math.max(coordinates[curCoord][1], result[3]);
-          }
-
-          $.data(geom, "geoBbox", result);
+        for ( ; curCoord < coordinates.length; curCoord++ ) {
+          result[0] = Math.min(coordinates[curCoord][0], result[0]);
+          result[1] = Math.min(coordinates[curCoord][1], result[1]);
+          result[2] = Math.max(coordinates[curCoord][0], result[2]);
+          result[3] = Math.max(coordinates[curCoord][1], result[3]);
         }
       }
 
@@ -2380,90 +2384,98 @@ $.Widget.prototype = {
 
       return {
         fromGeodeticPos: function (coordinate) {
+          if (!coordinate) {
+            debugger;
+          }
           return [
-            semiMajorAxis * coordinate[0] * radiansPerDegree,
-            semiMajorAxis * Math.log(Math.tan(quarterPi + coordinate[1] * radiansPerDegree / 2))
+            semiMajorAxis * coordinate[ 0 ] * radiansPerDegree,
+            semiMajorAxis * Math.log(Math.tan(quarterPi + coordinate[ 1 ] * radiansPerDegree / 2))
           ];
         },
 
         fromGeodetic: function (coordinates) {
-          var isArray = $.isArray(coordinates[0]),
+          var isMultiPointOrLineString = $.isArray(coordinates[ 0 ]),
               fromGeodeticPos = this.fromGeodeticPos;
 
-          if (!isArray && coordinates.length == 4) {
+          if (!isMultiPointOrLineString && coordinates.length == 4) {
             // bbox
-            var min = fromGeodeticPos([coordinates[0], coordinates[1]]),
-                max = fromGeodeticPos([coordinates[2], coordinates[3]]);
-            return [min[0], min[1], max[0], max[1]];
+            var min = fromGeodeticPos([ coordinates[ 0 ], coordinates[ 1 ] ]),
+                max = fromGeodeticPos([ coordinates[ 2 ], coordinates[ 3 ] ]);
+            return [ min[ 0 ], min[ 1 ], max[ 0 ], max[ 1 ] ];
           } else {
             // geometry
-            var isDblArray = isArray && $.isArray(coordinates[0][0]),
-                isTriArray = isDblArray && $.isArray(coordinates[0][0][0]),
-                result = [[[]]];
+            var isMultiLineStringOrPolygon = isMultiPointOrLineString && $.isArray(coordinates[ 0 ][ 0 ]),
+                isMultiPolygon = isMultiLineStringOrPolygon && $.isArray(coordinates[ 0 ][ 0 ][ 0 ]),
+                result = [ ],
+                i, j, k;
 
-            if (!isTriArray) {
-              if (!isDblArray) {
-                if (!isArray) {
-                  coordinates = [coordinates];
+            if (!isMultiPolygon) {
+              if (!isMultiLineStringOrPolygon) {
+                if (!isMultiPointOrLineString) {
+                  coordinates = [ coordinates ];
                 }
-                coordinates = [coordinates];
+                coordinates = [ coordinates ];
               }
-              coordinates = [coordinates];
+              coordinates = [ coordinates ];
             }
 
-            $.each(coordinates, function (i) {
-              $.each(this, function (j) {
-                $.each(this, function (k) {
-                  result[i][j][k] = fromGeodeticPos(this);
-                });
-              });
-            });
+            for ( i = 0; i < coordinates.length; i++ ) {
+              result[ i ] = [ ];
+              for ( j = 0; j < coordinates[ i ].length; j++ ) {
+                result[ i ][ j ] = [ ];
+                for ( k = 0; k < coordinates[ i ][ j ].length; k++ ) {
+                  result[ i ][ j ][ k ] = fromGeodeticPos(coordinates[ i ][ j ][ k ]);
+                }
+              }
+            }
 
-            return isTriArray ? result : isDblArray ? result[0] : isArray ? result[0][0] : result[0][0][0];
+            return isMultiPolygon ? result : isMultiLineStringOrPolygon ? result[ 0 ] : isMultiPointOrLineString ? result[ 0 ][ 0 ] : result[ 0 ][ 0 ][ 0 ];
           }
         },
 
         toGeodeticPos: function (coordinate) {
           return [
-            (coordinate[0] / semiMajorAxis) * degreesPerRadian,
-            (halfPi - 2 * Math.atan(1 / Math.exp(coordinate[1] / semiMajorAxis))) * degreesPerRadian
+            (coordinate[ 0 ] / semiMajorAxis) * degreesPerRadian,
+            (halfPi - 2 * Math.atan(1 / Math.exp(coordinate[ 1 ] / semiMajorAxis))) * degreesPerRadian
           ];
         },
 
         toGeodetic: function (coordinates) {
-          var isArray = $.isArray(coordinates[0]),
+          var isMultiPointOrLineString = $.isArray(coordinates[ 0 ]),
               toGeodeticPos = this.toGeodeticPos;
 
-          if (!isArray && coordinates.length == 4) {
+          if (!isMultiPointOrLineString && coordinates.length == 4) {
             // bbox
-            var min = toGeodeticPos([coordinates[0], coordinates[1]]),
-                max = toGeodeticPos([coordinates[2], coordinates[3]]);
-            return [min[0], min[1], max[0], max[1]];
+            var min = toGeodeticPos([ coordinates[ 0 ], coordinates[ 1 ] ]),
+                max = toGeodeticPos([ coordinates[ 2 ], coordinates[ 3 ] ]);
+            return [ min[ 0 ], min[ 1 ], max[ 0 ], max[ 1 ] ];
           } else {
             // geometry
-            var isDblArray = isArray && $.isArray(coordinates[0][0]),
-                isTriArray = isDblArray && $.isArray(coordinates[0][0][0]),
-                result = [[[]]];
+            var isMultiLineStringOrPolygon = isMultiPointOrLineString && $.isArray(coordinates[ 0 ][ 0 ]),
+                isMultiPolygon = isMultiLineStringOrPolygon && $.isArray(coordinates[ 0 ][ 0 ][ 0 ]),
+                result = [ ];
 
-            if (!isTriArray) {
-              if (!isDblArray) {
-                if (!isArray) {
-                  coordinates = [coordinates];
+            if (!isMultiPolygon) {
+              if (!isMultiLineStringOrPolygon) {
+                if (!isMultiPointOrLineString) {
+                  coordinates = [ coordinates ];
                 }
-                coordinates = [coordinates];
+                coordinates = [ coordinates ];
               }
-              coordinates = [coordinates];
+              coordinates = [ coordinates ];
             }
 
-            $.each(coordinates, function (i) {
-              $.each(this, function (j) {
-                $.each(this, function (k) {
-                  result[i][j][k] = toGeodeticPos(this);
-                });
-              });
-            });
+            for ( i = 0; i < coordinates.length; i++ ) {
+              result[ i ] = [ ];
+              for ( j = 0; j < coordinates[ i ].length; j++ ) {
+                result[ i ][ j ] = [ ];
+                for ( k = 0; k < coordinates[ i ][ j ].length; k++ ) {
+                  result[ i ][ j ][ k ] = toGeodeticPos(coordinates[ i ][ j ][ k ]);
+                }
+              }
+            }
 
-            return isTriArray ? result : isDblArray ? result[0] : isArray ? result[0][0] : result[0][0][0];
+            return isMultiPolygon ? result : isMultiLineStringOrPolygon ? result[ 0 ] : isMultiPointOrLineString ? result[ 0 ][ 0 ] : result[ 0 ][ 0 ][ 0 ];
           }
         }
       }
@@ -2747,7 +2759,7 @@ $.Widget.prototype = {
         mode: "pan",
         services: [
             {
-              id: "OSM",
+              "class": "osm",
               type: "tiled",
               getUrl: function (view) {
                 return "http://tile.openstreetmap.org/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
@@ -2844,7 +2856,7 @@ $.Widget.prototype = {
 
       this._graphicShapes = [];
 
-      this._initOptions = options;
+      this._initOptions = options || {};
 
       this._forcePosition(this._$elem);
 
@@ -3015,7 +3027,7 @@ $.Widget.prototype = {
 
         $(window).unbind("resize", this._windowHandler);
 
-        for (var i = 0; i < this._currentServices.length; i++) {
+        for ( var i = 0; i < this._currentServices.length; i++ ) {
           this._currentServices[i].serviceContainer.geomap("destroy");
           $.geo["_serviceTypes"][this._currentServices[i].type].destroy(this, this._$servicesContainer, this._currentServices[i]);
         }
@@ -3050,9 +3062,9 @@ $.Widget.prototype = {
         this._$elem.closest("[data-geo-map]").geomap("opacity", value, this._$elem);
       } else {
         if (value >= 0 || value <= 1) {
-          for (var i = 0; i < this._currentServices.length; i++) {
+          for ( var i = 0; i < this._currentServices.length; i++ ) {
             var service = this._currentServices[i];
-            if (!_serviceContainer || service.serviceContainer[0] == _serviceContainer[0]) {
+            if ( !_serviceContainer || service.serviceContainer[0] == _serviceContainer[0] ) {
               this._options["services"][i].opacity = service.opacity = value;
               $.geo["_serviceTypes"][service.type].opacity(this, service);
             }
@@ -3160,64 +3172,84 @@ $.Widget.prototype = {
       }
     },
 
-    append: function (shape, style, refresh /* internal */) {
-      refresh = (refresh === undefined || refresh);
-
-      if (shape) {
-        var shapes, geomap = this;
-        if (shape.type == "FeatureCollection") {
+    append: function ( shape, style, refresh ) {
+      if ( shape ) {
+        var shapes, i = 0;
+        if ( shape.type == "FeatureCollection" ) {
           shapes = shape.features;
         } else {
-          shapes = $.isArray(shape) ? shape : [shape];
+          shapes = $.isArray( shape ) ? shape : [ shape ];
         }
 
-        $.each(shapes, function () {
-          geomap._graphicShapes[geomap._graphicShapes.length] = {
-            shape: this,
-            style: style
-          };
-        });
+        if ( typeof style === "boolean" ) {
+          refresh = style;
+          style = null;
+        }
 
-        if (refresh) {
-          this._refresh();
+        for ( ; i < shapes.length; i++ ) {
+          if ( shapes[ i ].type != "Point" ) {
+            var bbox = $.geo.bbox( shapes[ i ] );
+            if ( $.geo.proj ) {
+              bbox = $.geo.proj.fromGeodetic( bbox );
+            }
+            $.data( shapes[ i ], "geoBbox", bbox );
+          }
+
+          this._graphicShapes.push( {
+            shape: shapes[ i ],
+            style: style
+          } );
+        }
+
+        if ( refresh === undefined || refresh ) {
+          this._refresh( );
         }
       }
     },
 
-    empty: function () {
+    empty: function ( refresh ) {
+      $.each( this._graphicShapes, function( ) {
+        $.removeData( this, "geoBbox" );
+      } );
       this._graphicShapes = [];
-      this._refresh();
+      if ( refresh === undefined || refresh ) {
+        this._refresh();
+      }
     },
 
     find: function (point, pixelTolerance) {
-      var searchPixel = this.toPixel(point.coordinates),
-            mapTol = this._pixelSize * pixelTolerance,
-            result = [],
-            curGeom;
+      var searchPixel = this.toPixel( point.coordinates ),
+          mapTol = this._pixelSize * pixelTolerance,
+          result = [],
+          curGeom;
 
-      $.each(this._graphicShapes, function (i) {
-        if (this.shape.type == "Point") {
-          if ($.geo.distance(this.shape, point, true) <= mapTol) {
-            result.push(this.shape);
+      $.each( this._graphicShapes, function ( i ) {
+        if ( this.shape.type == "Point" ) {
+          if ( $.geo.distance(this.shape, point) <= mapTol ) {
+            result.push( this.shape );
           }
         } else {
-          var bbox = $.geo.bbox(this.shape),
-                bboxPolygon = {
-                  type: "Polygon",
-                  coordinates: [[
-                    [bbox[0], bbox[1]],
-                    [bbox[0], bbox[3]],
-                    [bbox[2], bbox[3]],
-                    [bbox[2], bbox[1]],
-                    [bbox[0], bbox[1]]
-                  ]]
-                };
+          var bbox = $.data( this.shape, "geoBbox" ),
+              bboxPolygon = {
+                type: "Polygon",
+                coordinates: [ [
+                  [bbox[0], bbox[1]],
+                  [bbox[0], bbox[3]],
+                  [bbox[2], bbox[3]],
+                  [bbox[2], bbox[1]],
+                  [bbox[0], bbox[1]]
+                ] ]
+              },
+              projectedPoint = {
+                type: "Point",
+                coordinates: $.geo.proj ? $.geo.proj.fromGeodetic( point.coordinates ) : point.coordinates
+              };
 
-          if ($.geo.distance(bboxPolygon, point, true) <= mapTol) {
-            var geometries = $.geo._flatten(this.shape);
-            for (curGeom = 0; curGeom < geometries.length; curGeom++) {
-              if ($.geo.distance(geometries[curGeom], point, true) <= mapTol) {
-                result.push(this.shape);
+          if ( $.geo.distance( bboxPolygon, projectedPoint, true ) <= mapTol ) {
+            var geometries = $.geo._flatten( this.shape );
+            for ( curGeom = 0; curGeom < geometries.length; curGeom++ ) {
+              if ( $.geo.distance( geometries[curGeom], point ) <= mapTol ) {
+                result.push( this.shape );
                 break;
               }
             }
@@ -3228,17 +3260,21 @@ $.Widget.prototype = {
       return result;
     },
 
-    remove: function (shape) {
+    remove: function ( shape, refresh ) {
       var geomap = this;
-      $.each(this._graphicShapes, function (i) {
-        if (this.shape == shape) {
-          var rest = geomap._graphicShapes.slice(i + 1 || geomap._graphicShapes.length);
-          geomap._graphicShapes.length = i < 0 ? geomap._graphicShapes.length + i : i;
+      $.each( this._graphicShapes, function ( i ) {
+        if ( this.shape == shape ) {
+          $.removeData( shape, "geoBbox" );
+          var rest = geomap._graphicShapes.slice( i + 1 );
+          geomap._graphicShapes.length = i;
           geomap._graphicShapes.push.apply(geomap._graphicShapes, rest);
           return false;
         }
       });
-      this._refresh();
+
+      if ( refresh === undefined || refresh ) {
+        this._refresh();
+      }
     },
 
     _getBbox: function (center, pixelSize) {
@@ -3341,7 +3377,7 @@ $.Widget.prototype = {
 
       this._currentServices = [];
       for (i = 0; i < this._options["services"].length; i++) {
-        this._currentServices[i] = $.extend({}, this._options["services"][i]);
+        this._currentServices[i] = this._options["services"][i];
         this._currentServices[i].serviceContainer = $.geo["_serviceTypes"][this._currentServices[i].type].create(this, this._$servicesContainer, this._currentServices[i], i).geomap();
       }
     },
@@ -3384,7 +3420,7 @@ $.Widget.prototype = {
         shape = shape.geometry || shape;
         shapeBbox = $.data(shape, "geoBbox");
 
-        if (shapeBbox && !$.geo._in(bbox, shapeBbox)) {
+        if ( shapeBbox && $.geo._bboxDisjoint( bbox, shapeBbox ) ) {
           continue;
         }
 
@@ -4112,7 +4148,7 @@ $.Widget.prototype = {
         }
 
         this._$shapesContainer.geographics("clear");
-        if (this._graphicShapes.length > 0) {
+        if (this._graphicShapes.length > 0 && this._graphicShapes.length < 256) {
           this._refreshShapes(this._$shapesContainer, this._graphicShapes, this._graphicShapes, wheelCenterAndSize.center, wheelCenterAndSize.pixelSize);
         }
 
@@ -4136,175 +4172,175 @@ $.Widget.prototype = {
   $.geo._serviceTypes.tiled = (function () {
     return {
       create: function (map, servicesContainer, service, index) {
-        var tiledServicesState = map._getServicesContainer().data("geoTiledServicesState") || {};
+        var serviceState = $.data(service, "geoServiceState");
 
-        if (!tiledServicesState[service.id]) {
-          tiledServicesState[service.id] = {
+        if ( !serviceState ) {
+          serviceState = {
             loadCount: 0,
-            reloadTiles: false,
-            serviceContainer: null
+            reloadTiles: false
           };
 
-          var scHtml = '<div data-geo-service="tiled" id="' + service.id + '" style="position:absolute; left:0; top:0; width:8px; height:8px; margin:0; padding:0; display:' + (service.visibility === undefined || service.visibility === "visible" ? "block" : "none") + ';"></div>';
+          var idString = service.id ? ' id="' + service.id + '"' : "",
+              classString = service["class"] ? ' class="' + service["class"] + '"' : "",
+              scHtml = '<div data-geo-service="tiled"' + idString + classString + ' style="position:absolute; left:0; top:0; width:8px; height:8px; margin:0; padding:0; display:' + (service.visibility === undefined || service.visibility === "visible" ? "block" : "none") + ';"></div>';
+
           servicesContainer.append(scHtml);
 
-          tiledServicesState[service.id].serviceContainer = servicesContainer.children(":last");
-          servicesContainer.data("geoTiledServicesState", tiledServicesState);
+          serviceState.serviceContainer = servicesContainer.children(":last");
+          $.data(service, "geoServiceState", serviceState);
         }
 
-        return tiledServicesState[service.id].serviceContainer;
+        return serviceState.serviceContainer;
       },
 
       destroy: function (map, servicesContainer, service) {
-        var tiledServicesState = map._getServicesContainer().data("geoTiledServicesState");
-        tiledServicesState[service.id].serviceContainer.remove();
-        delete tiledServicesState[service.id];
+        var serviceState = $.data(service, "geoServiceState");
+
+        serviceState.serviceContainer.remove();
+
+        $.removeData(service, "geoServiceState");
       },
 
-      interactivePan: function (map, service, dx, dy) {
-        var tiledServicesState = map._getServicesContainer().data("geoTiledServicesState");
-        if (!(tiledServicesState && tiledServicesState[service.id])) {
-          return;
-        }
+      interactivePan: function ( map, service, dx, dy ) {
+        var serviceState = $.data( service, "geoServiceState" );
 
-        this._cancelUnloaded(map, service);
-        tiledServicesState[service.id].serviceContainer.children().css({
-          left: function (index, value) {
-            return parseInt(value) + dx;
-          },
-          top: function (index, value) {
-            return parseInt(value) + dy;
-          }
-        });
+        if ( serviceState ) {
+          this._cancelUnloaded( map, service );
 
-        if (service && tiledServicesState[service.id] != null && (service.visibility === undefined || service.visibility === "visible")) {
+          serviceState.serviceContainer.children( ).css( {
+            left: function ( index, value ) {
+              return parseInt( value ) + dx;
+            },
+            top: function ( index, value ) {
+              return parseInt( value ) + dy;
+            }
+          });
 
-          var 
-          pixelSize = map.pixelSize(),
+          if ( service && ( service.visibility === undefined || service.visibility === "visible" ) ) {
+            var pixelSize = map.pixelSize(),
 
-          serviceState = tiledServicesState[service.id],
-          serviceContainer = serviceState.serviceContainer,
-          scaleContainer = serviceContainer.children("[data-pixelSize='" + pixelSize + "']"),
+                serviceContainer = serviceState.serviceContainer,
+                scaleContainer = serviceContainer.children("[data-pixelSize='" + pixelSize + "']"),
 
-          /* same as refresh 1 */
-          contentBounds = map._getContentBounds(),
-          mapWidth = contentBounds["width"],
-          mapHeight = contentBounds["height"],
+                /* same as refresh 1 */
+                contentBounds = map._getContentBounds(),
+                mapWidth = contentBounds["width"],
+                mapHeight = contentBounds["height"],
 
-          tilingScheme = map.options["tilingScheme"],
-          tileWidth = tilingScheme.tileWidth,
-          tileHeight = tilingScheme.tileHeight,
-          /* end same as refresh 1 */
+                tilingScheme = map.options["tilingScheme"],
+                tileWidth = tilingScheme.tileWidth,
+                tileHeight = tilingScheme.tileHeight,
+                /* end same as refresh 1 */
 
-          halfWidth = mapWidth / 2 * pixelSize,
-          halfHeight = mapHeight / 2 * pixelSize,
+                halfWidth = mapWidth / 2 * pixelSize,
+                halfHeight = mapHeight / 2 * pixelSize,
 
-          currentPosition = scaleContainer.position(),
-          scaleOriginParts = scaleContainer.data("scaleOrigin").split(","),
-          totalDx = parseInt(scaleOriginParts[0]) - currentPosition.left,
-          totalDy = parseInt(scaleOriginParts[1]) - currentPosition.top,
+                currentPosition = scaleContainer.position(),
+                scaleOriginParts = scaleContainer.data("scaleOrigin").split(","),
+                totalDx = parseInt(scaleOriginParts[0]) - currentPosition.left,
+                totalDy = parseInt(scaleOriginParts[1]) - currentPosition.top,
 
-          mapCenterOriginal = map._getCenter(),
-          mapCenter = [mapCenterOriginal[0] + totalDx * pixelSize, mapCenterOriginal[1] - totalDy * pixelSize],
+                mapCenterOriginal = map._getCenter(),
+                mapCenter = [mapCenterOriginal[0] + totalDx * pixelSize, mapCenterOriginal[1] - totalDy * pixelSize],
 
-          /* same as refresh 2 */
-          tileX = Math.floor(((mapCenter[0] - halfWidth) - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
-          tileY = Math.floor((tilingScheme.origin[1] - (mapCenter[1] + halfHeight)) / (pixelSize * tileHeight)),
-          tileX2 = Math.ceil(((mapCenter[0] + halfWidth) - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
-          tileY2 = Math.ceil((tilingScheme.origin[1] - (mapCenter[1] - halfHeight)) / (pixelSize * tileHeight)),
+                /* same as refresh 2 */
+                tileX = Math.floor(((mapCenter[0] - halfWidth) - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
+                tileY = Math.floor((tilingScheme.origin[1] - (mapCenter[1] + halfHeight)) / (pixelSize * tileHeight)),
+                tileX2 = Math.ceil(((mapCenter[0] + halfWidth) - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
+                tileY2 = Math.ceil((tilingScheme.origin[1] - (mapCenter[1] - halfHeight)) / (pixelSize * tileHeight)),
 
-          bboxMax = map._getBboxMax(),
-          pixelSizeAtZero = map._getTiledPixelSize(0),
-          ratio = pixelSizeAtZero / pixelSize,
-          fullXAtScale = Math.floor((bboxMax[0] - tilingScheme.origin[0]) / (pixelSizeAtZero * tileWidth)) * ratio,
-          fullYAtScale = Math.floor((tilingScheme.origin[1] - bboxMax[3]) / (pixelSizeAtZero * tileHeight)) * ratio,
+                bboxMax = map._getBboxMax(),
+                pixelSizeAtZero = map._getTiledPixelSize(0),
+                ratio = pixelSizeAtZero / pixelSize,
+                fullXAtScale = Math.floor((bboxMax[0] - tilingScheme.origin[0]) / (pixelSizeAtZero * tileWidth)) * ratio,
+                fullYAtScale = Math.floor((tilingScheme.origin[1] - bboxMax[3]) / (pixelSizeAtZero * tileHeight)) * ratio,
 
-          fullXMinX = tilingScheme.origin[0] + (fullXAtScale * tileWidth) * pixelSize,
-          fullYMaxY = tilingScheme.origin[1] - (fullYAtScale * tileHeight) * pixelSize,
-          /* end same as refresh 2 */
+                fullXMinX = tilingScheme.origin[0] + (fullXAtScale * tileWidth) * pixelSize,
+                fullYMaxY = tilingScheme.origin[1] - (fullYAtScale * tileHeight) * pixelSize,
+                /* end same as refresh 2 */
 
-          serviceLeft = Math.round((fullXMinX - (mapCenterOriginal[0] - halfWidth)) / pixelSize),
-          serviceTop = Math.round(((mapCenterOriginal[1] + halfHeight) - fullYMaxY) / pixelSize),
+                serviceLeft = Math.round((fullXMinX - (mapCenterOriginal[0] - halfWidth)) / pixelSize),
+                serviceTop = Math.round(((mapCenterOriginal[1] + halfHeight) - fullYMaxY) / pixelSize),
 
-          opacity = (service.opacity === undefined ? 1 : service.opacity),
+                opacity = (service.opacity === undefined ? 1 : service.opacity),
 
-          x, y;
+                x, y;
 
-          for (x = tileX; x < tileX2; x++) {
-            for (y = tileY; y < tileY2; y++) {
-              var 
-              tileStr = "" + x + "," + y,
-              $img = scaleContainer.children("[data-tile='" + tileStr + "']").removeAttr("data-dirty");
+            for ( x = tileX; x < tileX2; x++ ) {
+              for ( y = tileY; y < tileY2; y++ ) {
+                var tileStr = "" + x + "," + y,
+                    $img = scaleContainer.children("[data-tile='" + tileStr + "']").removeAttr("data-dirty");
 
-              if ($img.size() === 0) {
-                /* same as refresh 3 */
-                var bottomLeft = [
-                  tilingScheme.origin[0] + (x * tileWidth) * pixelSize,
-                  tilingScheme.origin[1] - (y * tileHeight) * pixelSize
-                ],
+                if ( $img.size( ) === 0 ) {
+                  /* same as refresh 3 */
+                  var bottomLeft = [
+                        tilingScheme.origin[0] + (x * tileWidth) * pixelSize,
+                        tilingScheme.origin[1] - (y * tileHeight) * pixelSize
+                      ],
 
-                topRight = [
-                  tilingScheme.origin[0] + ((x + 1) * tileWidth - 1) * pixelSize,
-                  tilingScheme.origin[1] - ((y + 1) * tileHeight - 1) * pixelSize
-                ],
+                      topRight = [
+                        tilingScheme.origin[0] + ((x + 1) * tileWidth - 1) * pixelSize,
+                        tilingScheme.origin[1] - ((y + 1) * tileHeight - 1) * pixelSize
+                      ],
 
-                tileBbox = [bottomLeft[0], bottomLeft[1], topRight[0], topRight[1]],
+                      tileBbox = [bottomLeft[0], bottomLeft[1], topRight[0], topRight[1]],
 
-                imageUrl = service.getUrl({
-                  bbox: tileBbox,
-                  width: tileWidth,
-                  height: tileHeight,
-                  zoom: map._getZoom(),
-                  tile: {
-                    row: y,
-                    column: x
-                  },
-                  index: Math.abs(y + x)
-                });
-                /* end same as refresh 3 */
+                      imageUrl = service.getUrl( {
+                        bbox: tileBbox,
+                        width: tileWidth,
+                        height: tileHeight,
+                        zoom: map._getZoom(),
+                        tile: {
+                          row: y,
+                          column: x
+                        },
+                        index: Math.abs(y + x)
+                      } );
+                  /* end same as refresh 3 */
 
-                serviceState.loadCount++;
-                //this._map._requestQueued();
+                  serviceState.loadCount++;
+                  //this._map._requestQueued();
 
-                if (serviceState.reloadTiles && $img.size() > 0) {
-                  $img.attr("src", imageUrl);
-                } else {
-                  /* same as refresh 4 */
-                  var imgMarkup = "<img style='position:absolute; " +
-                    "left:" + (((x - fullXAtScale) * 100) + (serviceLeft - (serviceLeft % tileWidth)) / tileWidth * 100) + "%; " +
-                    "top:" + (((y - fullYAtScale) * 100) + (serviceTop - (serviceTop % tileHeight)) / tileHeight * 100) + "%; ";
+                  if ( serviceState.reloadTiles && $img.size() > 0 ) {
+                    $img.attr( "src", imageUrl );
+                  } else {
+                    /* same as refresh 4 */
+                    var imgMarkup = "<img style='position:absolute; " +
+                          "left:" + (((x - fullXAtScale) * 100) + (serviceLeft - (serviceLeft % tileWidth)) / tileWidth * 100) + "%; " +
+                          "top:" + (((y - fullYAtScale) * 100) + (serviceTop - (serviceTop % tileHeight)) / tileHeight * 100) + "%; ";
 
-                  if ($("body")[0].filters === undefined) {
-                    imgMarkup += "width: 100%; height: 100%;";
+                    if ($("body")[0].filters === undefined) {
+                      imgMarkup += "width: 100%; height: 100%;";
+                    }
+
+                    imgMarkup += "margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;' unselectable='on' data-tile='" + tileStr + "' />";
+
+                    scaleContainer.append( imgMarkup );
+                    $img = scaleContainer.children(":last");
+                    $img.load(function (e) {
+                      if (opacity < 1) {
+                        $(e.target).fadeTo(0, opacity);
+                      } else {
+                        $(e.target).show();
+                      }
+
+                      serviceState.loadCount--;
+
+                      if (serviceState.loadCount <= 0) {
+                        serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+                        serviceState.loadCount = 0;
+                      }
+                    }).error(function (e) {
+                      $(e.target).remove();
+                      serviceState.loadCount--;
+
+                      if (serviceState.loadCount <= 0) {
+                        serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+                        serviceState.loadCount = 0;
+                      }
+                    }).attr("src", imageUrl);
+                    /* end same as refresh 4 */
                   }
-
-                  imgMarkup += "margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;' unselectable='on' data-tile='" + tileStr + "' />";
-
-                  scaleContainer.append(imgMarkup);
-                  $img = scaleContainer.children(":last");
-                  $img.load(function (e) {
-                    if (opacity < 1) {
-                      $(e.target).fadeTo(0, opacity);
-                    } else {
-                      $(e.target).show();
-                    }
-
-                    serviceState.loadCount--;
-
-                    if (serviceState.loadCount <= 0) {
-                      serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-                      serviceState.loadCount = 0;
-                    }
-                  }).error(function (e) {
-                    $(e.target).remove();
-                    serviceState.loadCount--;
-
-                    if (serviceState.loadCount <= 0) {
-                      serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-                      serviceState.loadCount = 0;
-                    }
-                  }).attr("src", imageUrl);
-                  /* end same as refresh 4 */
                 }
               }
             }
@@ -4313,57 +4349,53 @@ $.Widget.prototype = {
       },
 
       interactiveScale: function (map, service, center, pixelSize) {
-        var tiledServicesState = map._getServicesContainer().data("geoTiledServicesState");
-        if (!(tiledServicesState && tiledServicesState[service.id])) {
-          return;
-        }
+        var serviceState = $.data( service, "geoServiceState" );
 
-        this._cancelUnloaded(map, service);
+        if ( serviceState && service && ( service.visibility === undefined || service.visibility === "visible" ) ) {
+          this._cancelUnloaded(map, service);
 
-        var 
-        serviceContainer = tiledServicesState[service.id].serviceContainer,
+          var serviceContainer = serviceState.serviceContainer,
 
-        tilingScheme = map.options["tilingScheme"],
-        tileWidth = tilingScheme.tileWidth,
-        tileHeight = tilingScheme.tileHeight;
+              tilingScheme = map.options["tilingScheme"],
+              tileWidth = tilingScheme.tileWidth,
+              tileHeight = tilingScheme.tileHeight;
 
 
-        serviceContainer.children().each(function (i) {
-          var 
-          $scaleContainer = $(this),
-          scaleRatio = $scaleContainer.attr("data-pixelSize") / pixelSize;
+          serviceContainer.children( ).each( function ( i ) {
+            var $scaleContainer = $(this),
+                scaleRatio = $scaleContainer.attr("data-pixelSize") / pixelSize;
 
-          scaleRatio = Math.round(scaleRatio * 1000) / 1000;
+            scaleRatio = Math.round(scaleRatio * 1000) / 1000;
 
-          var 
-          scaleOriginParts = $scaleContainer.data("scaleOrigin").split(","),
-          oldMapCoord = map._toMap([scaleOriginParts[0], scaleOriginParts[1]]),
-          newPixelPoint = map._toPixel(oldMapCoord, center, pixelSize);
+            var scaleOriginParts = $scaleContainer.data("scaleOrigin").split(","),
+                oldMapCoord = map._toMap([scaleOriginParts[0], scaleOriginParts[1]]),
+                newPixelPoint = map._toPixel(oldMapCoord, center, pixelSize);
 
-          $scaleContainer.css({
-            left: Math.round(newPixelPoint[0]) + "px",
-            top: Math.round(newPixelPoint[1]) + "px",
-            width: tileWidth * scaleRatio,
-            height: tileHeight * scaleRatio
+            $scaleContainer.css( {
+              left: Math.round(newPixelPoint[0]) + "px",
+              top: Math.round(newPixelPoint[1]) + "px",
+              width: tileWidth * scaleRatio,
+              height: tileHeight * scaleRatio
+            } );
+
+            if ( $("body")[0].filters !== undefined ) {
+              $scaleContainer.children().each( function ( i ) {
+                $( this ).css( "filter", "progid:DXImageTransform.Microsoft.Matrix(FilterType=bilinear,M11=" + scaleRatio + ",M22=" + scaleRatio + ",sizingmethod='auto expand')" );
+              } );
+            }
           });
-
-          if ($("body")[0].filters !== undefined) {
-            $scaleContainer.children().each(function (i) {
-              $(this).css("filter", "progid:DXImageTransform.Microsoft.Matrix(FilterType=bilinear,M11=" + scaleRatio + ",M22=" + scaleRatio + ",sizingmethod='auto expand')");
-            });
-          }
-        });
+        }
       },
 
       refresh: function (map, service) {
-        var tiledServicesState = map._getServicesContainer().data("geoTiledServicesState");
-        if (service && tiledServicesState[service.id] && (service.visibility === undefined || service.visibility === "visible")) {
+        var serviceState = $.data( service, "geoServiceState" );
+
+        if ( serviceState && service && ( service.visibility === undefined || service.visibility === "visible" ) ) {
           this._cancelUnloaded(map, service);
 
           var bbox = map._getBbox(),
               pixelSize = map.pixelSize(),
 
-              serviceState = tiledServicesState[service.id],
               $serviceContainer = serviceState.serviceContainer,
 
               contentBounds = map._getContentBounds(),
@@ -4512,22 +4544,17 @@ $.Widget.prototype = {
       },
 
       opacity: function (map, service) {
-        var tiledServicesState = map._getServicesContainer().data("geoTiledServicesState");
-        // service.opacity has changed, update any existing images
-        var serviceState = tiledServicesState[service.id];
+        var serviceState = $.data( service, "geoServiceState" );
         serviceState.serviceContainer.find("img").stop(true).fadeTo("fast", service.opacity);
       },
 
       toggle: function (map, service) {
-        var tiledServicesState = map._getServicesContainer().data("geoTiledServicesState");
-        // service.visible has changed, update our service container
-        var serviceState = tiledServicesState[service.id];
+        var serviceState = $.data( service, "geoServiceState" );
         serviceState.serviceContainer.css("display", service.visibility === "visible" ? "block" : "none");
       },
 
       _cancelUnloaded: function (map, service) {
-        var tiledServicesState = map._getServicesContainer().data("geoTiledServicesState");
-        var serviceState = tiledServicesState[service.id];
+        var serviceState = $.data( service, "geoServiceState" );
 
         if (serviceState && serviceState.loadCount > 0) {
           serviceState.serviceContainer.find("img:hidden").remove();
@@ -4543,103 +4570,104 @@ $.Widget.prototype = {
   $.geo._serviceTypes.shingled = (function () {
     return {
       create: function (map, servicesContainer, service, index) {
-        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState") || {};
+        var serviceState = $.data(service, "geoServiceState");
 
-        if (!shingledServicesState[service.id]) {
-          shingledServicesState[service.id] = {
+        if ( !serviceState ) {
+          serviceState = {
             loadCount: 0
           };
 
-          var scHtml = '<div data-geo-service="shingled" id="' + service.id + '" style="position:absolute; left:0; top:0; width:16px; height:16px; margin:0; padding:0; display:' + (service.visibility === undefined || service.visibility === "visible" ? "block" : "none") + ';"></div>';
+          var idString = service.id ? ' id="' + service.id + '"' : "",
+              classString = service["class"] ? ' class="' + service["class"] + '"' : "",
+              scHtml = '<div data-geo-service="shingled"' + idString + classString + ' style="position:absolute; left:0; top:0; width:16px; height:16px; margin:0; padding:0; display:' + (service.visibility === undefined || service.visibility === "visible" ? "block" : "none") + ';"></div>';
+
           servicesContainer.append(scHtml);
 
-          shingledServicesState[service.id].serviceContainer = servicesContainer.children(":last");
-          servicesContainer.data("geoShingledServicesState", shingledServicesState);
+          serviceState.serviceContainer = servicesContainer.children(":last");
+          $.data(service, "geoServiceState", serviceState);
         }
 
-        return shingledServicesState[service.id].serviceContainer;
+        return serviceState.serviceContainer;
       },
 
       destroy: function (map, servicesContainer, service) {
-        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
-        shingledServicesState[service.id].serviceContainer.remove();
-        delete shingledServicesState[service.id];
+        var serviceState = $.data(service, "geoServiceState");
+
+        serviceState.serviceContainer.remove();
+
+        $.removeData(service, "geoServiceState");
       },
 
       interactivePan: function (map, service, dx, dy) {
-        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
-        if (!(shingledServicesState && shingledServicesState[service.id])) {
-          return;
-        }
+        var serviceState = $.data(service, "geoServiceState");
 
-        this._cancelUnloaded(map, service);
+        if ( serviceState ) {
+          this._cancelUnloaded(map, service);
 
-        var serviceState = shingledServicesState[service.id],
-            serviceContainer = serviceState.serviceContainer,
-            pixelSize = map.pixelSize(),
-            scaleContainer = serviceContainer.children("[data-pixelSize='" + pixelSize + "']"),
+          var serviceContainer = serviceState.serviceContainer,
+              pixelSize = map.pixelSize(),
+              scaleContainer = serviceContainer.children("[data-pixelSize='" + pixelSize + "']"),
+              panContainer = scaleContainer.children("div");
+
+          if ( !panContainer.length ) {
+            scaleContainer.children("img").wrap('<div style="position:absolute; left:0; top:0; width:100%; height:100%;"></div>');
             panContainer = scaleContainer.children("div");
-
-        if (!panContainer.length) {
-          scaleContainer.children("img").wrap('<div style="position:absolute; left:0; top:0; width:100%; height:100%;"></div>');
-          panContainer = scaleContainer.children("div");
-        }
-
-        panContainer.css({
-          left: function (index, value) {
-            return parseInt(value) + dx;
-          },
-          top: function (index, value) {
-            return parseInt(value) + dy;
           }
-        });
+
+          panContainer.css( {
+            left: function (index, value) {
+              return parseInt(value) + dx;
+            },
+            top: function (index, value) {
+              return parseInt(value) + dy;
+            }
+          } );
+        }
       },
 
       interactiveScale: function (map, service, center, pixelSize) {
-        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
-        if (!(shingledServicesState && shingledServicesState[service.id])) {
-          return;
-        }
+        var serviceState = $.data(service, "geoServiceState");
 
-        this._cancelUnloaded(map, service);
+        if ( serviceState ) {
+          this._cancelUnloaded(map, service);
 
-        var serviceState = shingledServicesState[service.id],
-            serviceContainer = serviceState.serviceContainer,
+          var serviceContainer = serviceState.serviceContainer,
 
-            contentBounds = map._getContentBounds(),
-            mapWidth = contentBounds["width"],
-            mapHeight = contentBounds["height"],
+              contentBounds = map._getContentBounds(),
+              mapWidth = contentBounds["width"],
+              mapHeight = contentBounds["height"],
 
-            halfWidth = mapWidth / 2,
-            halfHeight = mapHeight / 2,
+              halfWidth = mapWidth / 2,
+              halfHeight = mapHeight / 2,
 
-            bbox = [center[0] - halfWidth, center[1] - halfHeight, center[0] + halfWidth, center[1] + halfHeight];
+              bbox = [center[0] - halfWidth, center[1] - halfHeight, center[0] + halfWidth, center[1] + halfHeight];
 
-        serviceContainer.children().each(function (i) {
-          var $scaleContainer = $(this),
-              scalePixelSize = $scaleContainer.attr("data-pixelSize"),
-              ratio = scalePixelSize / pixelSize;
+          serviceContainer.children().each(function (i) {
+            var $scaleContainer = $(this),
+                scalePixelSize = $scaleContainer.attr("data-pixelSize"),
+                ratio = scalePixelSize / pixelSize;
 
-          $scaleContainer.css({ width: mapWidth * ratio, height: mapHeight * ratio }).children("img").each(function (i) {
-            var $img = $(this),
-                imgCenter = $img.data("center"),
-                x = (Math.round((imgCenter[0] - center[0]) / scalePixelSize) - halfWidth) * ratio,
-                y = (Math.round((center[1] - imgCenter[1]) / scalePixelSize) - halfHeight) * ratio;
+            $scaleContainer.css({ width: mapWidth * ratio, height: mapHeight * ratio }).children("img").each(function (i) {
+              var $img = $(this),
+                  imgCenter = $img.data("center"),
+                  x = (Math.round((imgCenter[0] - center[0]) / scalePixelSize) - halfWidth) * ratio,
+                  y = (Math.round((center[1] - imgCenter[1]) / scalePixelSize) - halfHeight) * ratio;
 
-            $img.css({ left: x + "px", top: y + "px" });
+              $img.css({ left: x + "px", top: y + "px" });
+            });
           });
-        });
+        }
       },
 
       refresh: function (map, service) {
-        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
-        if (service && shingledServicesState[service.id] && (service.visibility === undefined || service.visibility === "visible")) {
+        var serviceState = $.data(service, "geoServiceState");
+
+        if (serviceState && service && (service.visibility === undefined || service.visibility === "visible")) {
           this._cancelUnloaded(map, service);
 
           var bbox = map._getBbox(),
               pixelSize = map.pixelSize(),
 
-              serviceState = shingledServicesState[service.id],
               serviceContainer = serviceState.serviceContainer,
 
               contentBounds = map._getContentBounds(),
@@ -4655,7 +4683,7 @@ $.Widget.prototype = {
 
               $img;
 
-          if (!scaleContainer.size()) {
+          if ( !scaleContainer.size() ) {
             serviceContainer.append('<div style="position:absolute; left:' + halfWidth + 'px; top:' + halfHeight + 'px; width:' + mapWidth + 'px; height:' + mapHeight + 'px; margin:0; padding:0;" data-pixelSize="' + pixelSize + '"></div>');
             scaleContainer = serviceContainer.children(":last");
           }
@@ -4730,8 +4758,9 @@ $.Widget.prototype = {
       },
 
       resize: function (map, service) {
-        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
-        if (service && shingledServicesState[service.id] && (service.visibility === undefined || service.visibility === "visible")) {
+        var serviceState = $.data(service, "geoServiceState");
+
+        if ( serviceState && service && (service.visibility === undefined || service.visibility === "visible")) {
           this._cancelUnloaded(map, service);
 
           var serviceState = shingledServicesState[service.id],
@@ -4755,22 +4784,17 @@ $.Widget.prototype = {
       },
 
       opacity: function (map, service) {
-        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
-        // service.opacity has changed, update any existing images
-        var serviceState = shingledServicesState[service.id];
+        var serviceState = $.data(service, "geoServiceState");
         serviceState.serviceContainer.find("img").stop(true).fadeTo("fast", service.opacity);
       },
 
       toggle: function (map, service) {
-        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
-        // service.visible has changed, update our service container
-        var serviceState = shingledServicesState[service.id];
+        var serviceState = $.data(service, "geoServiceState");
         serviceState.serviceContainer.css("display", service.visibility === "visible" ? "block" : "none");
       },
 
       _cancelUnloaded: function (map, service) {
-        var shingledServicesState = map._getServicesContainer().data("geoShingledServicesState");
-        var serviceState = shingledServicesState[service.id];
+        var serviceState = $.data(service, "geoServiceState");
 
         if (serviceState && serviceState.loadCount > 0) {
           serviceState.serviceContainer.find("img:hidden").remove();

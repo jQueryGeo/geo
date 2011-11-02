@@ -59,6 +59,14 @@ Documentation is hosted at http://jquerygeo.com
 * geo - geometry - contains function
 * geomap - rename service.visible to visibility having either "visible" or "hidden" values
 * geo - geometry - centroid function
+* geomap - make service id property optional, add HTML id to serviceContainer if present
+* geomap - append should cache the shape's bbox (instead of the bbox function)
+* geomap - remove should remove the shape's bbox cache
+* geomap - empty should remove the bbox cache for all shapes
+* geomap - make the refresh argument in append public, add one to remove & empty
+* geomap - disable shape redraw during interactive zoom if more than 255 shapes
+* geomap - [bug] shape bbox culling hides shapes that are partially on screen & should be drawn
+* docs - geomap - make pixelSize a read-only option instead of a function
 
 === 1.0a2.5 (2011-08-03) ===
 * geomap - find - [bug] does not handle GeoJSON features

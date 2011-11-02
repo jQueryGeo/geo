@@ -109,6 +109,12 @@ h4 { font-style: italic; font-weight: normal; }
 
 code .comment { color: #393; }
 
+blockquote
+{
+  margin: 8px;
+  font-style: italic;
+}
+
 .ir { display: block; text-indent: -999em; overflow: hidden; background-repeat: no-repeat; text-align: left; direction: ltr; }
 .hidden { display: none; visibility: hidden; }
 .visuallyhidden { border: 0; clip: rect(0 0 0 0); height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute; width: 1px; }
