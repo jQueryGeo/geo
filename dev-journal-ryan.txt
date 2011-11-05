@@ -1,9 +1,7 @@
 ﻿== to do ==
 
 === 1.0a3 ===
-* geomap - make pixelSize a read-only option instead of a function
-* docs - geomap - make shapeStyle a service-targetting option
-* geomap - make shapeStyle a service-targetting option
+* geomap - make shapeStyle an option
 * geomap - [bug] changing services array (without changing all services) after initialization fails
 * geomap - [bug] multiple maps do not work on the same page
 * geomap - use _currentServices in all functions unless we actually need to update the public  options services object
@@ -16,11 +14,13 @@
 === 1.0a35 ===
 * geomap - use profiling to improve pan performance
 * geomap - remove this-style state properties
+* geomap - remove "px" from .css calls
 * geo - use Array.push instead of $.merge
 * docs - upgrade to jQuery Mobile rc2
 * docs - allow page refreshing
 
 === future ===
+* geomap - test jQuery widget call chaining when setting option values
 * docs - geomap - more modes: measureDistance, measureArea
 * docs - geomap - document the correct way to add a service after init
 * docs - geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null

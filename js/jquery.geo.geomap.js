@@ -35,7 +35,8 @@
           basePixelSize: 156543.03392799936,
           origin: [-20037508.342787, 20037508.342787]
         },
-        zoom: 0
+        zoom: 0,
+        pixelSize: 0
       };
 
   $.widget("geo.geomap", {
@@ -135,7 +136,7 @@
 
       this._center = this._centerMax = [0, 0];
 
-      this._pixelSize = this._pixelSizeMax = 156543.03392799936;
+      this.options["pixelSize"] = this._pixelSize = this._pixelSizeMax = 156543.03392799936;
 
       this._mouseDown =
           this._inOp =
@@ -227,7 +228,7 @@
     },
 
     _setOption: function (key, value, refresh) {
-      if (this._$elem.is("[data-geo-service]")) {
+      if ( this._$elem.is( "[data-geo-service]" ) || key == "pixelSize" ) {
         return;
       }
 
@@ -302,10 +303,6 @@
         this._$elem.removeAttr("data-geo-map");
       }
       $.Widget.prototype.destroy.apply(this, arguments);
-    },
-
-    pixelSize: function () {
-      return this._pixelSize;
     },
 
     toMap: function (p) {
@@ -933,7 +930,7 @@
       }
 
       this._center = center;
-      this._pixelSize = pixelSize;
+      this.options["pixelSize"] = this._pixelSize = pixelSize;
 
       if ($.geo.proj) {
         var bbox = this._getBbox();

@@ -181,7 +181,7 @@
             geocode = [
               center[1],
               center[0],
-              Math.min(2500, map.geomap("pixelSize") * $(document).width() / 2 / 1000) + "km"
+              Math.min(2500, map.geomap("option", "pixelSize") * $(document).width() / 2 / 1000) + "km"
             ],
             lastSearchTerm = searchTerm;
 

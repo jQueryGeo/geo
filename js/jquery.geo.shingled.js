@@ -37,7 +37,7 @@
           this._cancelUnloaded(map, service);
 
           var serviceContainer = serviceState.serviceContainer,
-              pixelSize = map.pixelSize(),
+              pixelSize = map._pixelSize,
               scaleContainer = serviceContainer.children("[data-pixelSize='" + pixelSize + "']"),
               panContainer = scaleContainer.children("div");
 
@@ -98,7 +98,7 @@
           this._cancelUnloaded(map, service);
 
           var bbox = map._getBbox(),
-              pixelSize = map.pixelSize(),
+              pixelSize = map._pixelSize,
 
               serviceContainer = serviceState.serviceContainer,
 

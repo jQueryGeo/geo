@@ -2774,7 +2774,8 @@ $.Widget.prototype = {
           basePixelSize: 156543.03392799936,
           origin: [-20037508.342787, 20037508.342787]
         },
-        zoom: 0
+        zoom: 0,
+        pixelSize: 0
       };
 
   $.widget("geo.geomap", {
@@ -2874,7 +2875,7 @@ $.Widget.prototype = {
 
       this._center = this._centerMax = [0, 0];
 
-      this._pixelSize = this._pixelSizeMax = 156543.03392799936;
+      this.options["pixelSize"] = this._pixelSize = this._pixelSizeMax = 156543.03392799936;
 
       this._mouseDown =
           this._inOp =
@@ -2966,7 +2967,7 @@ $.Widget.prototype = {
     },
 
     _setOption: function (key, value, refresh) {
-      if (this._$elem.is("[data-geo-service]")) {
+      if ( this._$elem.is( "[data-geo-service]" ) || key == "pixelSize" ) {
         return;
       }
 
@@ -3041,10 +3042,6 @@ $.Widget.prototype = {
         this._$elem.removeAttr("data-geo-map");
       }
       $.Widget.prototype.destroy.apply(this, arguments);
-    },
-
-    pixelSize: function () {
-      return this._pixelSize;
     },
 
     toMap: function (p) {
@@ -3672,7 +3669,7 @@ $.Widget.prototype = {
       }
 
       this._center = center;
-      this._pixelSize = pixelSize;
+      this.options["pixelSize"] = this._pixelSize = pixelSize;
 
       if ($.geo.proj) {
         var bbox = this._getBbox();
@@ -4217,7 +4214,7 @@ $.Widget.prototype = {
           });
 
           if ( service && ( service.visibility === undefined || service.visibility === "visible" ) ) {
-            var pixelSize = map.pixelSize(),
+            var pixelSize = map._pixelSize,
 
                 serviceContainer = serviceState.serviceContainer,
                 scaleContainer = serviceContainer.children("[data-pixelSize='" + pixelSize + "']"),
@@ -4394,7 +4391,7 @@ $.Widget.prototype = {
           this._cancelUnloaded(map, service);
 
           var bbox = map._getBbox(),
-              pixelSize = map.pixelSize(),
+              pixelSize = map._pixelSize,
 
               $serviceContainer = serviceState.serviceContainer,
 
@@ -4605,7 +4602,7 @@ $.Widget.prototype = {
           this._cancelUnloaded(map, service);
 
           var serviceContainer = serviceState.serviceContainer,
-              pixelSize = map.pixelSize(),
+              pixelSize = map._pixelSize,
               scaleContainer = serviceContainer.children("[data-pixelSize='" + pixelSize + "']"),
               panContainer = scaleContainer.children("div");
 
@@ -4666,7 +4663,7 @@ $.Widget.prototype = {
           this._cancelUnloaded(map, service);
 
           var bbox = map._getBbox(),
-              pixelSize = map.pixelSize(),
+              pixelSize = map._pixelSize,
 
               serviceContainer = serviceState.serviceContainer,
 
