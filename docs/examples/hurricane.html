@@ -60,7 +60,7 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
     <script src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
     <script src="js/iecors.js"></script>
-    <script src="http://jquerygeo.com/test/jquery.geo-test.min.js"></script>
+    <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
     <script>
       $(function () {
         $("#tmplHurricane").template("hurricane");
@@ -86,6 +86,7 @@
 
         $.ajax({
           url: "http://data.jquerygeo.com/hurricane.json",
+          dataType: "json",
           success: function (result) {
             var shapeStyle = {
               color: "gray",
@@ -115,7 +116,6 @@
                 }
               };
 
-              //console.log("accuracy: " + trackPoint.properties.accuracy);
               if (trackPoint.properties.date != null) {
                 var dateStr = trackPoint.properties.date.toString(),
                     year = dateStr.substr(0, 4),

@@ -1,181 +1,132 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-  <title>center/zoom test</title>
-  <link rel="stylesheet" href="css/style.css?v=2">
+  <title>center/zoom example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+  <meta name="description" content="An example of the center, zoom and pixelSize options">
+  <meta name="author" content="Ryan Westphal">
+  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/blitzer/jquery-ui.css" />
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
   <style type="text/css">
-    label
+    #map
     {
-      display: block;
-      margin: .25em;
-    }
-    label span
-    {
-      display: inline-block;
-      font-weight: bold;
-      width: 8em;
-    }
-    input[type="text"]
-    {
-      width: 60%;
-    }
-    #lblStatus
-    {
-      background: #ee4;
-      border-radius: .5em;
-      padding: .5em;
+      position: fixed;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
     }
   </style>
 </head>
 <body>
   <div>
-    <a href="../" class="docLink">&lt; docs</a>
-    <h1>
-      center/zoom test</h1>
-    <p>
-      This page tests getting and setting the center &amp; zoom properties for a tiled service both during init and at runtime. The center property is a <a href="http://geojson.org/geojson-spec.html#positions" rel="external">GeoJSON position</a>. The zoom property for a tiled service a whole number from zero to the number of levels defined by the tilingScheme minus one. $.geo.proj does not affect the value of zoom.</p>
-    <h2>
-      init properties</h2>
-    <p>
-      Change the $.geo.proj or center/zoom values and click set to refresh the page and re-initialize the map.</p>
-    <form action="center.html" method="get">
-    <fieldset>
-      <legend>$.geo.proj</legend>
-      <label>
-        <input type="radio" name="proj" value="default" checked />
-        default (center is geodetic lon/lat)
-      </label>
-      <label>
-        <input type="radio" name="proj" value="null" />
-        null (center is web mercator)
-      </label>
-    </fieldset>
-    <label>
-      center
-      <input type="text" name="initCenter" value="[-71,42]" /></label>
-    <label>
-      zoom
-      <input type="text" name="initZoom" value="7" /></label>
-    <button type="submit">
-      set</button>
-    </form>
-    <h2>
-      runtime properties</h2>
-    <p>
-      Change the center/zoom properties and click set to update the map without refreshing the page.</p>
-    <p>
-      Be careful to make sure your array values match the $.geo.proj setting above.</p>
-    <label>
-      center
-      <input type="text" name="runtimeCenter" value="[-74.5,40.3]" /></label>
-    <button id="cmdRuntimeCenter" type="button">
-      set</button>
-    <label>
-      zoom
-      <input type="text" name="runtimeZoom" value="10" /></label>
-    <button id="cmdRuntimeZoom" type="button">
-      set</button>
-    <h2>
-      actual values</h2>
-    <p>
-      If $.geo.proj is not null, the public center is in lon/lat but the internal center is in map units, web mercator by default.</p>
-    <table>
-      <tr>
-        <th>
-          actual public center
-        </th>
-        <td id="lblCenterPublic">
-        </td>
-      </tr>
-      <tr>
-        <th>
-          actual internal center
-        </th>
-        <td id="lblCenterInternal">
-        </td>
-      </tr>
-    </table>
-    <div id="map" style="position: relative; width: 480px; height: 320px; background: #e88;">
+    <div id="map">
+    </div>
+    <div class="info">
+      <div class="links">
+        <a href="../" class="docLink">&lt; docs</a>
+        <a href="http://jsfiddle.net/ryanttb/ku2eC/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
+      </div>
+      <h1>center &amp; zoom example</h1>
+      <p>This page tests getting and setting the center &amp; zoom options as well as getting the read-only pixelSize.</p>
+      <p class="not-mobile">The center option is a <a href="http://geojson.org/geojson-spec.html#positions">GeoJSON position</a>. The zoom option for a tiled service a whole number from zero to the number of levels defined by the tilingScheme minus one. The pixelSize is the number of map units that fit in a single pixel of the current view. By default, pixelSize is in meters because the default map service is in web mercator meters.</p>
+      <h2>runtime options</h2>
+      <p>Change the center or zoom option and click set to update the map.</p>
+      <div>
+        <label>center <input type="text" name="runtimeCenter" value="[-74.5,40.3]" /></label>
+        <button id="cmdRuntimeCenter" type="button">set</button>
+      </div>
+      <div>
+        <label>zoom <input type="number" name="runtimeZoom" value="8" /></label>
+        <button id="cmdRuntimeZoom" type="button">set</button>
+      </div>
+      <h2>actual values</h2>
+      <p class="not-mobile">The center option is in geodetic cooridinates, [lon, lat], but the internal center is in map units, web mercator by default.</p>
+      <table>
+        <tr>
+          <th>geodetic center</th>
+          <td id="lblCenterPublic"></td>
+        </tr>
+        <tr>
+          <th>internal center</th>
+          <td id="lblCenterInternal"></td>
+        </tr>
+        <tr>
+          <th>zoom</th>
+          <td id="lblZoom"></td>
+        </tr>
+        <tr>
+          <th>pixelSize</th>
+          <td id="lblPixelSize"></td>
+        </tr>
+      </table>
     </div>
   </div>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-  <script src="http://jquerygeo.com/test/jquery.geo-test.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
   <script>
     $(function () {
-      var 
-      initCenterInput = $("input[name='initCenter']"),
-      initZoomInput = $("input[name='initZoom']"),
-      runtimeCenter = $("input[name='runtimeCenter']"),
-      runtimeZoom = $("input[name='runtimeZoom']"),
-      search = window.location.search,
-      searchParts = search.length && search[0] == "?" ? search.slice(1).split("&") : null,
-      initProj = "default",
-      initCenter = null,
-      initZoom = 7;
+      // store references to the inputs
+      var runtimeCenter = $("input[name='runtimeCenter']"),
+          runtimeZoom = $("input[name='runtimeZoom']");
 
-      if (searchParts) {
-        $.each(searchParts, function () {
-          var kvp = this.split("=");
-          switch (kvp[0]) {
-            case "initCenter":
-              initCenter = decodeURIComponent(kvp[1]).replace(/\+/g, "");
-              break;
-
-            case "initZoom":
-              initZoom = parseInt(kvp[1]);
-              break;
-
-            case "proj":
-              initProj = kvp[1];
-              break;
-          }
-        });
-      }
-
-      $("input[name='proj'][value='" + initProj + "']").click();
-
-      if (initCenter) {
-        initCenterInput.val(initCenter);
-      }
-
-      initZoomInput.val(initZoom);
-
-      $("#cmdRuntimeCenter").click(function () {
-        $("#map").geomap("option", "center", $.parseJSON(runtimeCenter.val()));
-        refreshActual();
-      });
-
-      $("#cmdRuntimeZoom").click(function () {
-        $("#map").geomap("option", "zoom", parseInt(runtimeZoom.val()));
-      });
-
-      if (initProj == "null") {
-        $.geo.proj = null;
-      }
-
-      $("#map").geomap({
-        center: $.parseJSON(initCenterInput.val()),
-        zoom: initZoom,
+      // create a map, base the initial center and zoom on the inputs
+      var map = $("#map").geomap({
+        center: $.parseJSON(runtimeCenter.val()),
+        zoom: parseInt(runtimeZoom.val()),
         bboxchange: function (e, geo) {
+          // when the bbox changes, update the displayed values
           refreshActual();
         }
       });
 
+      $("#cmdRuntimeCenter").button().click(function () {
+        // when the user sets the center, pass the new value to geomap
+        // since plain JavaScript arrays are valid JSON,
+        // we can use $.parseJSON to convert the string into a value
+        map.geomap("option", "center", $.parseJSON(runtimeCenter.val()));
+
+        // geomap doesn't trigger the bbox event when options are set programmatically
+        // update the displayed values
+        refreshActual();
+      });
+
+      $("#cmdRuntimeZoom").button().click(function () {
+        // when the user sets the zoom, pass the new value to geomap
+        // zoom is always a whole number
+        map.geomap("option", "zoom", parseInt(runtimeZoom.val()));
+
+        // geomap doesn't trigger the bbox event when options are set programmatically
+        // update the displayed values
+        refreshActual();
+      });
+
+      // update the displayed values with how the map widget was initialized
       refreshActual();
 
       function refreshActual() {
-        var actualCenter = $("#map").geomap("option", "center");
+        // get the center
+        // by default, this is in geodetic coordinates, [lon, lat]
+        var actualCenter = map.geomap("option", "center");
         $("#lblCenterPublic").text("[" + actualCenter + "]");
-        if ($.geo.proj) {
-          var 
-          valuePoints = $.geo.proj.fromGeodetic([[actualCenter[0], actualCenter[1]]]),
-          internal = [valuePoints[0][0], valuePoints[0][1]];
 
+        if ($.geo.proj) {
+          // if there is a projection set, convert the geodetic center to map units
+          var internal = $.geo.proj.fromGeodetic(actualCenter);
           $("#lblCenterInternal").text("[" + internal + "]");
         } else {
+          // if not, then both the center option and internal center are the same
           $("#lblCenterInternal").text("[" + actualCenter + "]");
         }
 
+        // get and display the current zoom value
+        $("#lblZoom").text(map.geomap("option", "zoom"));
+
+        // get and display the current pixelSize value
+        // you cannot set pixelSize, it's read only
+        $("#lblPixelSize").text(map.geomap("option", "pixelSize"));
       }
     });  
   </script>

@@ -33,7 +33,7 @@
     </div>
   </div>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-  <script src="http://jquerygeo.com/test/jquery.geo-test.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
   <script>
     $(function () {
       var map = null;
@@ -41,19 +41,21 @@
       function initMap(center) {
         map = $("#map").geomap({
           center: center || [-71.0597732, 42.3584308],
-          zoom: 15
+          zoom: 15,
+          services: [
+            {
+              type: "tiled",
+              getUrl: function (view) {
+                return "http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/" + view.zoom + "/" + view.tile.row + "/" + view.tile.column
+              },
+              attr: "&copy; Esri"
+            }
+          ]
         });
-        var services = map.geomap("option", "services");
-        $.extend(services[0], {
-          getUrl: function (view) {
-            return "http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/" + view.zoom + "/" + view.tile.row + "/" + view.tile.column
-          }
-        });
-        map.geomap("option", "services", services);
       }
 
       if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(function (p) {
+        navigator.geolocation.watchPosition( function (p) {
           coord = [p.coords.longitude, p.coords.latitude];
           if (!map) {
             initMap(coord);
@@ -63,8 +65,13 @@
           map.geomap("empty");
           map.geomap("append", { type: "Point", coordinates: coord });
         }, function (error) {
-          initMap();
-        });
+          if ( !map ) {
+            initMap();
+          }
+        }, {
+          enableHighAccuracy: true,
+          maximumAge: 10000
+        } );
       } else {
         initMap();
       }

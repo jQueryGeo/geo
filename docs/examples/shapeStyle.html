@@ -6,169 +6,149 @@
   <meta name="description" content="geomap shapeStyle test" />
   <meta name="author" content="Ryan Westphal" />
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0" />
+  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/blitzer/jquery-ui.css" />
   <link rel="stylesheet" href="css/style.css" />
   <style type="text/css">
-    .styleDisplay:
+    #map
     {
-      max-width: 60%;
+      position: fixed;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
     }
-    .geomap
-    {
-      width: 640px;
-      height: 480px;
-    }
+
+    label { white-space: nowrap; }
+
+    label span { display: inline-block; width: 7rem; }
+    input { width: 6rem; }
+
+    button { width: 16rem; }
   </style>
 </head>
 <body>
   <div class="shapeStyle">
-    <a href="../" class="docLink">&lt; DOCS</a>
-    <h1>
-      shapeStyle test</h1>
-    <p>
-      This page tests various style options and using the shapeStyle method to change the default style.</p>
-    <h2>
-      modify</h2>
-    <p>
-      Modify a style by changing options. Then choose a target style and click <b>set</b>.</p>
-    <form action="" class="styleInputs">
-    <fieldset class="global">
-      <legend>global</legend>
-      <label>
-        <span>color</span>
-        <input type="color" name="color" value="#7f0000" /></label>
-      <label>
-        <span>opacity</span>
-        <input type="text" name="opacity" value="1.0" /></label>
-    </fieldset>
-    <fieldset class="visibility">
-      <legend>visibility</legend>
-      <label>
-        <input type="radio" name="visibility" value="visible" checked="checked" />
-        <span>visible</span></label>
-      <label>
-        <input type="radio" name="visibility" value="hidden" />
-        <span>hidden</span></label>
-    </fieldset>
-    <fieldset class="stroke">
-      <legend>stroke</legend>
-      <label>
-        <span>color</span>
-        <input type="color" name="stroke" value="" /></label>
-      <label>
-        <span>opacity</span>
-        <input type="text" name="strokeOpacity" value="1.0" /></label>
-      <label>
-        <span>width</span>
-        <input type="text" name="strokeWidth" value="2px" /></label>
-    </fieldset>
-    <fieldset class="fill">
-      <legend>fill</legend>
-      <label>
-        <span>color</span>
-        <input type="color" name="fill" value="" /></label>
-      <label>
-        <span>opacity</span>
-        <input type="text" name="fillOpacity" value="0.2" /></label>
-    </fieldset>
-    <fieldset class="size">
-      <legend>point size</legend>
-      <label>
-        <span>width</span>
-        <input type="text" name="width" value="8px" /></label>
-      <label>
-        <span>height</span>
-        <input type="text" name="height" value="8px" /></label>
-      <label>
-        <span>borderRadius</span>
-        <input type="text" name="borderRadius" value="8px" /></label>
-    </fieldset>
-    <fieldset class="target">
-      <legend>target style</legend>
-      <label>
-        <input type="radio" name="target" value="defaultShapeStyle" checked="checked" />
-        <span>default shapeStyle</span></label>
-      <label>
-        <input type="radio" name="target" value="appendStyle" />
-        <span>append override</span></label>
-      <button type="submit">
-        set</button>
-    </fieldset>
-    </form>
-    <h2>
-      current</h2>
-    <h3>
-      default shapeStyle</h3>
-    <div class="defaultShapeStyle styleDisplay">
+    <div id="map">
     </div>
-    <h3>
-      append override</h3>
-    <div class="appendStyle styleDisplay">
-    </div>
-    <h2>
-      map</h2>
-    <p>
-      Choose to use either the default style or override the default style with the append override specified above. Click the map to add points.</p>
-    <p>
-      Any points you add with default shapeStyle selected will update when you change the default shapeStyle above.</p>
-    <p>
-      If you draw on the map with append override selected, the shape's final style will be based on the default style extended with the override style. If the append override is null or undefined, append uses the default style and the shape is susceptible to default shapeStyle changes.</p>
-    <fieldset class="appendStyle">
-      <legend>append style</legend>
-      <label>
-        <input type="radio" name="appendStyle" value="default" checked="checked" />
-        <span>default shapeStyle</span></label>
-      <label>
-        <input type="radio" name="appendStyle" value="override" />
-        <span>append override</span></label>
-    </fieldset>
-    <div class="geomap">
+    <div class="info">
+      <div class="links">
+        <a href="../" class="docLink">&lt; docs</a>
+        <a href="http://jsfiddle.net/ryanttb/BXgV4/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
+      </div>
+      <h1>shapeStyle</h1>
+      <p>This page tests various style properties using the shapeStyle option to change the default style or and passing a shape-specific style to the append method.</p>
+      <form id="shapeStyle">
+        <fieldset>
+          <legend>base geomap shapeStyle option</legend>
+          <div>
+            <label><span>color</span> <input type="color" name="color" value="#7f0000" /></label>
+            <label><span>opacity</span> <input type="text" name="opacity" value="1.0" /></label>
+          </div>
+          <div>
+            <label><span>fill</span> <input type="color" name="fill" value="" /></label>
+            <label><span>fillOpacity</span> <input type="text" name="fillOpacity" value=".2" /></label>
+          </div>
+          <div>
+            <label><span>stroke</span> <input type="color" name="stroke" value="" /></label>
+            <label><span>strokeOpacity</span> <input type="text" name="strokeOpacity" value="1" /></label>
+            <label><span>strokeWidth</span> <input type="number" name="strokeWidth" value="2" /></label>
+          </div>
+          <div>
+            <label><span>width</span> <input type="number" name="width" value="8" /></label>
+            <label><span>height</span> <input type="number" name="height" value="8" /></label>
+            <label><span>borderRadius</span> <input type="number" name="borderRadius" value="8" /></label>
+          </div>
+        </fieldset>
+        <button type="button">set shapeStyle</button>
+        <button type="reset">reset shapeStyle</button>
+      </form>
+      <form id="append">
+        <fieldset>
+          <legend>specific append style argument</legend>
+          <div>
+            <label><span>color</span> <input type="color" name="color" value="" /></label>
+            <label><span>opacity</span> <input type="text" name="opacity" value="" /></label>
+          </div>
+          <div>
+            <label><span>fill</span> <input type="color" name="fill" value="" /></label>
+            <label><span>fillOpacity</span> <input type="text" name="fillOpacity" value="" /></label>
+          </div>
+          <div>
+            <label><span>stroke</span> <input type="color" name="stroke" value="" /></label>
+            <label><span>strokeOpacity</span> <input type="text" name="strokeOpacity" value="" /></label>
+            <label><span>strokeWidth</span> <input type="number" name="strokeWidth" value="" /></label>
+          </div>
+          <div>
+            <label><span>width</span> <input type="number" name="width" value="" /></label>
+            <label><span>height</span> <input type="number" name="height" value="" /></label>
+            <label><span>borderRadius</span> <input type="number" name="borderRadius" value="" /></label>
+          </div>
+        </fieldset>
+        <button type="reset">clear append style</button>
+      </form>
     </div>
   </div>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-  <script src="http://jquerygeo.com/test/jquery.geo-test.min.js"></script>
-  <script src="js/json2.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
   <script>
     $(function () {
-      $("form.styleInputs").submit(function (e) {
-        e.preventDefault();
+      // create a map
+      var map = $( "#map" ).geomap( {
+        center: [ -71.0595678, 42.3604823 ],
+        zoom: 8,
+        click: function ( e, geo ) {
+          // in the click handler append the shape to the map
+          // the final display style will be the base shapeStyle
+          // plus individual shape style property overrides via
+          // a style passed to the append method
+          var appendStyle = { };
 
-        var style = {};
+          $.each( $( "#append input" ).serializeArray( ), function( ) {
+            // run through each input in the append fieldset and
+            // build a style object if there are any style overrides
+            if ( this.value ) {
+              appendStyle[ this.name ] = this.value;
+            }
+          } );
 
-        $.each($(this).serializeArray(), function () {
-          if (this.name != "target") {
-            style[this.name] = this.value;
-          }
-        });
-
-        var targetStyle = $("input[name='target']:checked").val();
-
-        if (targetStyle == "defaultShapeStyle") {
-          geomap.geomap("shapeStyle", style);
-          style = geomap.geomap("shapeStyle");
-        } else if (targetStyle == "appendStyle") {
-          appendStyle = style;
+          // append the shape
+          // it will get the base shapeStyle (which can change later)
+          // plus any overrides from the append style (which cannot change)
+          map.geomap( "append", geo, appendStyle );
         }
+      } );
 
-        setStyleText(targetStyle, style);
-        return false;
-      });
+      $( "#shapeStyle input" ).change( function( ) {
+        // when an input of the shapeStyle section changes,
+        // immediately set the property of geomap's shapeStyle option
+        // this change will effect all appended shapes that don't have
+        // an explicit override for the style property that's changing
 
-      var geomap = $(".geomap").geomap({
-        center: [-76, 43],
-        zoom: 5,
-        click: function (e, geo) {
-          geomap.geomap("append", geo, ($("input[name='appendStyle']:checked").val() == "override" ? appendStyle : undefined));
-        }
-      });
+        // first, we can grab a jQuery reference to the input that changed
+        var $this = $( this );
 
-      var appendStyle = null;
+        // next, we can create an object that represents this change
+        // this example doesn't, but you can set more than one property
+        // on geomap's shapeStyle option at a time
+        var shapeOption = { };
+        shapeOption[ $this.attr( "name" ) ] = $this.val();
 
-      setStyleText("defaultShapeStyle", $(".geomap").geomap("shapeStyle"));
-      setStyleText("appendStyle", null);
+        map.geomap( "option", "shapeStyle", shapeOption );
+      } );
 
-      function setStyleText(target, style) {
-        $("." + target + ".styleDisplay").text(JSON.stringify(style).replace(/,/g, ', '));
-      }
+      // jQuery UI for pretty reset buttons
+      $( "button" ).button( );
+
+      // maintin a copy of the original shapeStyle so we can reset it later
+      var originalShapeStyle = map.geomap( "option", "shapeStyle" );
+
+      $( "#shapeStyle button[type='reset']" ).click( function( ) {
+        // when the user resets the shapeStyle form,
+        // we want to also reset the shapeStyle option
+        // back to its original state
+        map.geomap( "option", "shapeStyle", originalShapeStyle );
+      } );
     });
   </script>
 </body>

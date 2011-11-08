@@ -30,6 +30,10 @@
 
     h1, #demographic { display: inline-block; }
 
+    #demographic img { margin-left: 8px; }
+
+    tr { display: inline-block; }
+
     td:first-child { font-weight: bold }
   </style>
 </head>
@@ -63,16 +67,18 @@
         <input type="radio" id="optBlack" name="demographic" value="2" /><label for="optBlack">Black</label>
         <input type="radio" id="optAsian" name="demographic" value="3" /><label for="optAsian">Asian</label>
         <input type="radio" id="optHispanic" name="demographic" value="4" /><label for="optHispanic">Hispanic</label>
+        <img alt="" src="img/ajax-loader.gif" title="Loading 2011 MA voting district data" />
       </div>
       <h2 data-text="Name"></h2>
-      <div data-html="Description" style="display: none;">
+      <div data-html="Description">
+        <p>Once the data has loaded (which may take a while, even on broadband connections), you can dynamically change the demographic display color. You can also click a voting district to zoom in and see details.</p>
       </div>
     </div>
   </div>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
   <script src="js/iecors.js"></script>
-  <script src="http://jquerygeo.com/test/jquery.geo-test.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
   <script>
     $( function () {
       // create a map
@@ -96,7 +102,10 @@
 
                 // display some info about the voting district
                 $( "[data-text='Name']" ).text( selection.properties.Name );
-                $( "[data-html='Description']" ).html( selection.properties.Description ).show();
+                var $descTable = $( selection.properties.Description );
+                $descTable.find( "tr:eq(5)" ).remove( );
+                $descTable.find( "tr:eq(4) td:first-child" ).text( "Hispanic Origin" );
+                $( "[data-html='Description']" ).empty().append( $descTable ).show();
 
                 // set the map's bbox to the bbox of the feature
                 // but scale the bbox by 2x first to zoom out a little
@@ -109,7 +118,7 @@
           } );
 
       // set an initial shapeStyle for the demographic display, all white, no border
-      map.geomap( "shapeStyle", { strokeWidth: "0px", opacity: 1, color: "#fff" } );
+      map.geomap( "option", "shapeStyle", { strokeWidth: "0px", opacity: 1, color: "#fff" } );
 
       // jQuery UI for pretty sliders
 
@@ -136,7 +145,7 @@
           // set the shapeStyle to the new color and global opacity
           // since each individual shape only overrides fillOpacity,
           // this single call will modify all shapes without having to re-append them
-          map.geomap( "shapeStyle", {
+          map.geomap( "option", "shapeStyle", {
             color: "rgb( " + Math.floor( 255 * red / 100 )  + ", " + Math.floor( 255 * green / 100 ) + ", " + Math.floor( 255 * blue / 100 ) + " )",
             opacity: alpha / 100
           } , false );
@@ -161,6 +170,8 @@
           data = result;
           // generate new demographic shapes based on whichever input is checked
           showData( data, $( "#demographic input:checked" ).val( ) );
+
+          $( "#demographic img" ).remove();
         },
         error: function( xhr ) {
           // uh oh

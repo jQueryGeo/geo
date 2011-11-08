@@ -6,42 +6,74 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
   <title>shapeStyle | geomap</title>
-  <meta name="description" content="geomap shapeStyle method">
+  <meta name="description" content="geomap shapeStyle option">
   <meta name="author" content="Ryan Westphal">
 </head>
 
 <body>
 
   <div id="shapeStyle" data-role="page">
-    <div data-role="header" data-theme="e">
+    <div data-role="header" data-theme="f">
       <h1>shapeStyle</h1>
     </div>
     
     <div data-role="content">
       <table>
         <tr>
-          <th>return type</th>
-          <td>Object ( geomap style ) | jQuery collection</td>
+          <th>type</th>
+          <td>Object ( geomap style )</td>
         </tr>
         <tr>
-          <th>syntax</th>
-          <td>.geomap( &quot;shapeStyle&quot;, Object style )</td>
+          <th>default</th>
+          <td><pre><code>{
+  borderRadius: &quot;8px&quot;,
+  color: &quot;#7f0000&quot;,
+  fillOpacity: .2,
+  height: &quot;8px&quot;,
+  opacity: 1,
+  strokeOpacity: 1,
+  strokeWidth: &quot;2px&quot;,
+  visibility: &quot;visible&quot;,
+  width: &quot;8px&quot;
+}</code></pre>
+          </td>
         </tr>
         <tr>
-          <th>usage</th>
-          <td><pre><code>var currentStyle = $(&quot;#map&quot;).geomap( &quot;shapeStyle&quot; )
-$(&quot;#map&quot;).geomap( &quot;shapeStyle&quot;, { width: &quot;16px&quot;, height: &quot;16px&quot; } )</code></pre></td>
+          <th>init</th>
+          <td><pre><code>$( <i>selector</i> ).geomap( { shapeStyle: { color: &quot;green&quot; } } );</code></pre></td>
+        </tr>
+        <tr>
+          <th>get</th>
+          <td><pre><code>var shapeStyle = $( <i>selector</i> ).geomap( &quot;option&quot;, &quot;shapeStyle&quot; );</code></pre></td>
+        </tr>
+        <tr>
+          <th>set</th>
+          <td><pre><code>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;shapeStyle&quot;, { strokeWidth: &quot;4px&quot; } );</code></pre></td>
         </tr>
       </table>
-      <p>The shapeStyle method retrieves or updates the <i>base</i> style of shapes appended to the map. The reasons that this is a method instead of a property will be clearer in a future section of the internals documenation.</p>
+      <p>The shapeStyle option retrieves or updates the <i>base</i> style of shapes appended to the map.</p>
       <p>This differs from the drawStyle option which defines the style of incomplete lines and polygons as they are being drawn.</p>
-      <p>This method changes specific properties of the internal base style. If you send an incomplete style object, only the style properties you reference are updated.</p>
+      <p>Two extra color properties, stroke and fill, are not defined by default and use the value of the color property.</p>
+      <p>This option changes specific properties of the internal base style. If you send an incomplete style object, only the style properties you reference are updated.</p>
       <p>Similar to CSS, you can override this style on a per-shape basis by passing a different style to the append method.</p>
       <p>Changing this base style will update how geomap draws existing shapes that do not have their own style. For shapes that do have their own style, changing the base shapeStyle will update any style properties not referenced in the shape-specific style. For example, assume the following:</p>
       <ol>
-        <li>the base shapeStyle has a red stroke color and strokeWidth of 2px</li>
-        <li>you call append with a style that increases the stroke width to 4px but does not supply a stroke color</li>
-        <li>you later change the base shapeStyle's stroke color to blue</li>
+        <li>
+          <span>the base shapeStyle starts with its initial style having a red stroke color and strokeWidth of 2px</span>
+          <pre><code>$( &quot;#map&quot; ).geomap( );</code></pre>
+        </li>
+        <li>
+          <span>you call append with a style that increases the stroke width to 4px but does not supply a stroke color</span>
+          <pre><code>$( &quot;#map&quot; ).geomap(
+  &quot;append&quot;,
+  { type: &quot;Point&quot;, coordinates: [ -71, 42 ] },
+  { strokeWidth: &quot;4px&quot; }
+);</code></pre>
+        </li>
+        <li>
+          <span>you later change the base shapeStyle's stroke color to blue</span>
+          <pre><code>$( &quot;#map&quot; ).geomap( &quot;option&quot;, &quot;shapeStyle&quot;, { stroke: &quot;#00f&quot; } );</code></pre>
+        </li>
       </ol>
       <p>The shape described in the above example will draw with a blue stroke color and a strokeWidth of 4px.</p>
       <p>When called with a second argument to set the shapeStyle, the jQuery UI widget factory returns the original jQuery collection to maintain call chaining.</p>
