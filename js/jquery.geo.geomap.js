@@ -17,6 +17,7 @@
           drawPolygon: "crosshair"
         },
         drawStyle: {},
+        shapeStyle: {},
         mode: "pan",
         services: [
             {
@@ -204,7 +205,8 @@
       this._$drawContainer.geographics({ style: this._initOptions.drawStyle || {} });
       this._options["drawStyle"] = this._$drawContainer.geographics("option", "style");
 
-      this._$shapesContainer.geographics();
+      this._$shapesContainer.geographics( { style: this._initOptions.shapeStyle || { } } );
+      this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
 
       if (this._initOptions) {
         if (this._initOptions.bbox) {
@@ -261,6 +263,13 @@
           }
           break;
 
+        case "shapeStyle":
+          if (this._$shapesContainer) {
+            this._$shapesContainer.geographics("option", "style", value);
+            value = this._$shapesContainer.geographics("option", "style");
+          }
+          break;
+
         case "mode":
           this._$drawContainer.geographics("clear");
           this._$eventTarget.css("cursor", this._options["cursors"][value]);
@@ -278,6 +287,13 @@
           this._createServices();
           if (refresh) {
             this._refresh();
+          }
+          break;
+
+        case "shapeStyle":
+          if ( refresh ) {
+            this._$shapesContainer.geographics("clear");
+            this._refreshShapes( this._$shapesContainer, this._graphicShapes, this._graphicShapes );
           }
           break;
       }
@@ -419,15 +435,6 @@
       }
 
       this._setCenterAndSize(this._center, this._pixelSize, false, true);
-    },
-
-    shapeStyle: function (style) {
-      if (style) {
-        this._$shapesContainer.geographics("option", "style", style);
-        this._refresh();
-      } else {
-        return this._$shapesContainer.geographics("option", "style");
-      }
     },
 
     append: function ( shape, style, refresh ) {
@@ -643,16 +650,15 @@
     _refreshDrawing: function () {
       this._$drawContainer.geographics("clear");
 
-      if (this._drawPixels.length > 0) {
-        var mode = this._options["mode"],
-            drawPolygonCoords;
-        if (mode == "drawLineString") {
-          this._$drawContainer.geographics("drawLineString", this._drawPixels);
-        } else {
-          drawPolygonCoords = $.merge( [], this._drawPixels );
-          drawPolygonCoords.push( drawPolygonCoords );
-          this._$drawContainer.geographics( "drawPolygon", drawPolygonCoords );
+      if ( this._drawPixels.length > 0 ) {
+        var mode = this._options[ "mode" ],
+            coords = this._drawPixels;
+
+        if ( mode == "drawPolygon" ) {
+          coords = [ coords ];
         }
+
+        this._$drawContainer.geographics( mode, coords );
       }
     },
 
@@ -1152,7 +1158,6 @@
         this._downDate = downDate;
       }
 
-      e.preventDefault();
 
       this._mouseDown = true;
       this._anchor = this._current;
@@ -1162,6 +1167,7 @@
         this._$eventTarget.css("cursor", this._options["cursors"]["zoom"]);
       } else {
         this._inOp = true;
+
         switch (this._options["mode"]) {
           case "pan":
           case "drawPoint":
@@ -1172,11 +1178,15 @@
             if (e.currentTarget.setCapture) {
               e.currentTarget.setCapture();
             }
+
             break;
         }
       }
 
-      return false;
+      if ( this._inOp ) {
+        e.preventDefault();
+        return false;
+      }
     },
 
     _dragTarget_touchmove: function (e) {
@@ -1190,8 +1200,11 @@
         current = [e.pageX - offset.left, e.pageY - offset.top];
       }
 
-      if (current[0] == this._lastMove[0] && current[1] == this._lastMove[1]) {
-        return;
+      if (current[0] === this._lastMove[0] && current[1] === this._lastMove[1]) {
+        if ( this._inOp ) {
+          e.preventDefault();
+          return false;
+        }
       }
 
       if (this._softDblClick) {
@@ -1247,6 +1260,11 @@
       }
 
       this._lastMove = current;
+
+      if ( this._inOp ) {
+        e.preventDefault();
+        return false;
+      }
     },
 
     _dragTarget_touchstop: function (e) {
@@ -1374,6 +1392,11 @@
           this._$eventTarget.trigger("dblclick", e);
         }
       }
+
+      if ( this._inOp ) {
+        e.preventDefault();
+        return false;
+      }
     },
 
     _eventTarget_mousewheel: function (e, delta) {
@@ -1382,7 +1405,7 @@
       this._panFinalize();
 
       if (this._mouseDown) {
-        return;
+        return false;
       }
 
       if (delta != 0) {
@@ -1420,6 +1443,7 @@
           geomap._mouseWheelFinish();
         }, 1000);
       }
+
       return false;
     }
   }

@@ -19,13 +19,6 @@
       bottom: 0;
     }
 
-    fieldset { border: none; }
-
-    legend {
-      font-size: 14px;
-      font-weight: bold;
-    }
-
     #sliders
     {
       margin-top: 32px;
@@ -85,7 +78,7 @@
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
   <script src="js/iecors.js"></script>
-  <script src="http://jquerygeo.com/test/jquery.geo-test.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
   <script>
     $( function () {
       // create a map
@@ -125,7 +118,7 @@
           } );
 
       // set an initial shapeStyle for the demographic display, all white, no border
-      map.geomap( "shapeStyle", { strokeWidth: "0px", opacity: 1, color: "#fff" } );
+      map.geomap( "option", "shapeStyle", { strokeWidth: "0px", opacity: 1, color: "#fff" } );
 
       // jQuery UI for pretty sliders
 
@@ -152,7 +145,7 @@
           // set the shapeStyle to the new color and global opacity
           // since each individual shape only overrides fillOpacity,
           // this single call will modify all shapes without having to re-append them
-          map.geomap( "shapeStyle", {
+          map.geomap( "option", "shapeStyle", {
             color: "rgb( " + Math.floor( 255 * red / 100 )  + ", " + Math.floor( 255 * green / 100 ) + ", " + Math.floor( 255 * blue / 100 ) + " )",
             opacity: alpha / 100
           } , false );

@@ -1,15 +1,7 @@
 ﻿== to do ==
 
 === 1.0a3 ===
-* geomap - make shapeStyle an option
-* geomap - [bug] changing services array (without changing all services) after initialization fails
-* geomap - [bug] multiple maps do not work on the same page
-* geomap - use _currentServices in all functions unless we actually need to update the public  options services object
-* geomap - create _defaultState object, use for widget-local _widgetState property, reinit _widgetState on _createWidget
-* geomap - don't redraw shapes after interactiveScale, they've already been drawn at new scale
-* examples - geomap resize method
-* examples - multiple maps example
-* geomap - [bug] when a singled image hasn't loaded after pan and you double click on empty space, the zoomed bbox seems wrong
+* examples - geomap drawStyle option
 
 === 1.0a35 ===
 * geomap - use profiling to improve pan performance
@@ -18,15 +10,27 @@
 * geo - use Array.push instead of $.merge
 * docs - upgrade to jQuery Mobile rc2
 * docs - allow page refreshing
+* geomap - [bug] changing services array (without changing all services) after initialization fails
+* geomap - [bug] multiple maps do not work on the same page
+* geomap - use _currentServices in all functions unless we actually need to update the public  options services object
+* geomap - create _defaultState object, use for widget-local _widgetState property, reinit _widgetState on _createWidget
+* geomap - don't redraw shapes after interactiveScale, they've already been drawn at new scale
+* examples - geomap resize method
+* examples - multiple maps example
+* geomap - [bug] when a singled image hasn't loaded after pan and you double click on empty space, the zoomed bbox seems wrong
+* remove BOM from release files
+* add 3rd party license headers
 
 === future ===
 * geomap - test jQuery widget call chaining when setting option values
+* geomap - pan lags on first drag
 * docs - geomap - more modes: measureDistance, measureArea
 * docs - geomap - document the correct way to add a service after init
 * docs - geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
 * geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
 * docs - geomap - append label argument
 * geomap - port shape labels
+* geomap - unbind keydown handler on destroy, it's on the document
 * docs - $.geo.WKT object
 * geo - $.geo.WKT object
 * geomap - reenable graphics redraw on interactiveScale, if canvas...and scale canvas
@@ -46,6 +50,7 @@
 * geo - support up to GeometryCollection in centroid
 * docs - geo - empty function
 * geo - geometry - empty function
+* geomap - show a drawPoint style while the mouse is down, hide if toolPan or dbltap scale
 * geomap - android - [bug] cannot always pan map after appending shapes
 * geomap - deep extend existing service objects when services property is set
 * geomap - cache point bbox if $.geo.proj is not null?
@@ -90,6 +95,38 @@
 * docs - geomap - drawStop function
 ** in the drawing modes, this function ends drawing and triggers the shape event with whatever coordinates have already been added to the shape
 * geomap - drawStop
+
+==2011-11-07==
+===gzip===
+I added gzip to jquerygeo.com & all subdomains. jQuery Geo (minified & gzipped) is now 17k and falling!
+
+===move===
+I don't like that mouse move events seem laggy with this release. I need to find out what's different. I thought it was that I'm sending move events even while drawing that removing that hasn't helped.
+
+===drawing===
+Wow, geomap._refreshDRawing was terrible and geographics._drawLines needed a little tweaking.
+
+===return false===
+I didn't have any return falses at the end of my event handlers. I hope that plus the drawing fix makes panning better.
+
+Oops, I went too crazy and added too many and wasn't letting the browser grab events it needed. Chrome's type=number input went crazy up or down if you didn't move the mouse away.
+
+===chrome===
+I've done what I can. The issue appears to be with Chrome or something I'm doing with Chrome. Drawing and panning speed is tremendous in IE9 and Firefox 7.
+
+===geolocation===
+Wow, after any timeout, Firefox stops checking for watchPosition? Is that part of the spec? Nope, not part of the spec. Oh, it *is* part of the spec if it fails due to timeout. It does sound like it's not supposed to trigger until the position changes despite what you put in maximumAge.
+
+==2011-11-01==
+===shapeStyle===
+Time to redo the shapeStyle example in a much more awesome way.
+
+Did I miss something? jQuery UI widget factory isn't complaining that shapeStyle isn't an option on the widget even though I haven't added it yet.
+
+New demo is super-cool!
+
+===refreshShapes===
+I almost had this function clear the shapes geographics until I realized that it's recursive if there's a GeometryCollection. Can't do that.
 
 ==2011-11-01==
 ===refresh===

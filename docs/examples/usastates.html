@@ -18,19 +18,16 @@
     <div class="info">
       <div class="links">
         <a href="../" class="docLink">&lt; docs</a>
-        <a href="http://jsfiddle.net/ryanttb/==JSFIDDLE==/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
+        <a href="http://jsfiddle.net/ryanttb/sh8uH/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
       </div>
-      <h1>
-        USA States</h1>
-      <p>
-        This map reads USA state boundary data as a GeoJSON FeatureCollection and draws it on top of OpenStreetMap.</p>
-      <p>
-        Click a state to change its color!</p>
+      <h1>USA States</h1>
+      <p>This map reads USA state boundary data as a GeoJSON FeatureCollection and draws it on top of OpenStreetMap.</p>
+      <p>Click a state to change its color!</p>
     </div>
   </div>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.js"></script>
   <script src="js/iecors.js"></script>
-  <script src="http://jquerygeo.com/test/jquery.geo-test.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
   <script>
     $(function () {
       var map = $("#map").geomap({
@@ -50,6 +47,7 @@
 
       $.ajax({
         url: "http://data.jquerygeo.com/usastates.json",
+        dataType: "json",
         success: function (result) {
           states = result;
           map.geomap("append", states);

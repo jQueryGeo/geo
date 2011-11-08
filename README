@@ -12,6 +12,7 @@ Documentation is hosted at http://jquerygeo.com
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon
 * geomap - [bug] tiles do not show when pixel sizes are near or lower than 1.0
 * geo - cache bbox as geoBbox to match namespacing convention started by jQuery Mobile
+* docs - geo - initial bbox operations: center, height/width, expandBy, scaleBy & reaspect functions
 * docs - geo - initial geometry operations: bbox, distance, contains, centroid
 * docs - geomap - shape event
 * docs - geomap - refresh argument in append, remove & empty
@@ -69,6 +70,8 @@ Documentation is hosted at http://jquerygeo.com
 * docs - geomap - make pixelSize a read-only option instead of a function
 * geomap - make pixelSize a read-only option instead of a function
 * docs - geomap - make shapeStyle an option
+* geomap - make shapeStyle an option
+* examples - rewrite shapeStyle example
 
 === 1.0a2.5 (2011-08-03) ===
 * geomap - find - [bug] does not handle GeoJSON features

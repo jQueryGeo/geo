@@ -213,17 +213,14 @@
         this._context.beginPath();
         this._context.moveTo(coordinates[0][0][0], coordinates[0][0][1]);
 
-        var lastPoint = coordinates[0][coordinates[0].length - 1];
-
         for (i = 0; i < coordinates.length; i++) {
           for (j = 0; j < coordinates[i].length; j++) {
             this._context.lineTo(coordinates[i][j][0], coordinates[i][j][1]);
           }
+        }
 
-          if (close && i > 0) {
-            this._context.lineTo(lastPoint[0], lastPoint[1]);
-            this._context.closePath();
-          }
+        if (close) {
+          this._context.closePath();
         }
 
         if (close && style.doFill) {
@@ -233,7 +230,7 @@
         }
 
         if (style.doStroke) {
-          this._context.lineJoin = "round";
+          this._context.lineCap = this._context.lineJoin = "round";
           this._context.lineWidth = style.strokeWidthValue;
           this._context.strokeStyle = style.stroke;
 

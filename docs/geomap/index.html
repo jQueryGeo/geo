@@ -63,7 +63,7 @@
         </li>
       </ul>
       <h3>bbox events</h3>
-      <p>With bbox events the geo argument to your callback is an object with single property, bbox, which is a <a href="http://geojson.org/geojson-spec.html#bounding-boxes" rel="external">GeoJSON bounding box</a> in map coordinates. If $.geo.proj is not null, the bbox values are sent to your callback are geodetic. If $.geo.proj is null, the bbox values sent to your callback are in map coordinates based on the tilingScheme for tiled maps and bboxMax for shingled (dynamic) maps.</p>
+      <p>With bbox events the geo argument to your callback is an object with single property, bbox, which is a <a href="http://geojson.org/geojson-spec.html#bounding-boxes" rel="external">GeoJSON bounding box</a>. If $.geo.proj is not null, the bbox values are sent to your callback are geodetic. If $.geo.proj is null, the bbox values sent to your callback are in map coordinates based on the tilingScheme for tiled maps and bboxMax for shingled (dynamic) maps.</p>
       <!--<h3>geometry events</h3>
       <p>With geometry events the geo argument to your callback is a JavaScript object having two properties: pixels &amp; geometry. Both are multi-dimensional <a href="http://geojson.org/geojson-spec.html#positions" rel="external">GeoJSON positions</a>, i.e., an array containing the x and y value but pixel is in pixel coordinates based on the current map view and the other in map coordinates based on the tilingScheme for tiled maps and bboxMax for shingled (dynamic) maps.</p>-->
       <ul data-role="listview" data-inset="true">
