@@ -88,6 +88,7 @@ Documentation is hosted at http://jquerygeo.com
 * docs/geomap - scale map according to cursor location instead of re-centering during double-click zoom
 * geomap - iOS - [bug] second tap can be anywhere & cause a zoom
 * geomap - shingled - [bug] map doesn't resize correctly
+* examples - geomap drawStyle option
 
 === 1.0a2 (2011-06-29) ===
 * geomap - Support dynamic map services

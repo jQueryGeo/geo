@@ -1,9 +1,7 @@
 ﻿== to do ==
 
-=== 1.0a3 ===
-* examples - geomap drawStyle option
-
-=== 1.0a35 ===
+=== 1.0a4 ===
+* geomap - [bug] drawStyle disappears after window resize
 * geomap - use profiling to improve pan performance
 * geomap - remove this-style state properties
 * geomap - remove "px" from .css calls
