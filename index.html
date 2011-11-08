@@ -6,7 +6,7 @@
   <meta name="description" content="jQuery Geo - A spatial mapping plugin for jQuery" />
   <meta name="author" content="Ryan Westphal" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/themes/blitzer/jquery-ui.css" />
+  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/blitzer/jquery-ui.css" />
   <style type="text/css">
     html { font:13px/1.231 sans-serif; *font-size:small; }
     
@@ -100,37 +100,56 @@
   <div class="container">
     <div class="main" role="main">
       <div class="nav">
-        <a href="http://host.appgeo.com/libs/geo/alpha2/" title="Documentation and demos">Documentation &amp; Demos</a>
+        <a href="http://jquerygeo.com/1.0a3/" title="Documentation and demos">Documentation &amp; Demos</a>
         <a href="https://github.com/AppGeo/geo/" title="Source code on GitHub">GitHub Project</a>
       </div>
       <h2>jQuery Geo - an interactive mapping plugin</h2>
       <p>jQuery Geo, an open-source geospatial mapping project from Applied Geographics, provides a streamlined JavaScript API for a large percentage of your online mapping needs. Whether you just want to display a map on a wep page as quickly as possible or you are a more advanced GIS user, jQuery Geo can help!</p>
       <p>This project is considered alpha only because it does not yet fully implement the feature set of our scheduled beta release. Alpha releases are stable and should not change much as we port technology from our internal library to the open source one.</p>
-      <h2>Alpha 3 docs online!</h2>
-      <p>While alpha 2.5 is still the current stable release of code, the documentation for our third release is now available online. Click the Test docs link below to dive in!</p>
-      <h2>Alpha 2.5 released</h2>
-      <time>2011-08-02</time>
-      <p>jQuery Geo 1.0 Alpha 2.5 improves support for shape searches, shape drawing, projection and map interaction!</p>
-      <p>There are also a few new demos to play with that include drawing a full GeoJSON FeatureCollection of the United States and searching Twitter for geo-enabled tweets.</p>
+
+      <h2>Alpha 3 released!</h2>
+      <time>2011-11-01</time>
+      <h3>jQuery Geo 1.0 Alpha 3 is mostly about sketching!</h3>
+      <ul>
+        <li>new modes: drawPoint, drawLineString, and drawPolygon allow users to draw on your map</li>
+        <li>new event: shape triggers anytime a user draws a feature</li>
+        <li>new style option: drawStyle lets you change how the shapes look while being drawn</li>
+      </ul>
+      <h3>It's also about geometry functions!</h3>
+      <ul>
+        <li>$.geo's center, height/width, expandBy, scaleBy &amp; reaspect functions operate on bounding boxes</li>
+        <li>$.geo's bbox, distance, contains &amp; centroid functions operate on geometries</li>
+      </ul>
+      <p>Many examples have more class and now link to jsFiddles to further explain what's going on!</p>
+      <h3>And a tiny bit about size</h3>
+      <p>jQuery Geo is now hosted on a CDN with gzip enabled bringing the entire library to your neighborhood at under 18k.</p>
+      <h3>Breaking</h3>
+      <p>There are some minor breaking changes to make the API more consistent.</p>
+      <ul>
+        <li>The getPixelSize function is now a read-only option named pixelSize: <pre><code>$( &quot;#map&quot; ).geomap( &quot;option&quot;, &quot;pixelSize&quot; );</code></pre></li>
+        <li>The shapeStyle function is also now an option, e.g.: <pre><code>$( &quot;#map&quot; ).geomap( &quot;option&quot;, &quot;shapeStyle&quot;, { color: &quot;red&quot; } );</code></pre></li>
+        <li>
+          The boolean visible property on service objects is now the visibility property found in CSS and geomap styles and can be &quot;visible&quot; or &quot;hidden&quot;:
+          <pre><code>$( &quot;#map&quot; ).geomap( { services: [ { id: &quot;roads&quot;, visibility: &quot;hidden&quot;, ... } ] } );</code></pre>
+        </li>
+      </ul>
+
       <h2>Download</h2>
       <p>Using jQuery Geo requires adding one element, including one script (apart from jQuery itself) and calling one function. The following copy-and-paste snippet will help you get started.</p>
       <pre>&lt;div id=&quot;map&quot; style=&quot;height: 320px;&quot;&gt;&lt;/div&gt;
-&lt;script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"&gt;&lt;/script&gt;
-&lt;script src="http://host.appgeo.com/libs/geo/alpha2/jquery-geo-alpha2.min.js"&gt;&lt;/script&gt;
-&lt;script&gt;$(function() { $("#map").geomap(); });&lt;/script&gt;</pre>
+&lt;script src="http://code.jquery.com/jquery-1.6.4.min.js"&gt;&lt;/script&gt;
+&lt;script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;$(function() { $( &quot;#map&quot; ).geomap( ); });&lt;/script&gt;</pre>
       <h2>Edge</h2>
-      <p>
-        The links above will always point to the latest stable release. However, you can test the most recently committed docs, code &amp; demos by heading over to the test release.</p>
+      <p>The links above will always point to the latest stable release. However, you can test the most recently committed docs, code &amp; demos by heading over to the test release.</p>
       <a data-role="button" href="http://jquerygeo.com/test/" title="jQuery Geo test build">Test docs &amp; demos</a>
     </div>
   </div>
-  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/jquery-ui.min.js"></script>
-  <script type="text/javascript" src="http://host.appgeo.com/libs/geo/alpha2/jquery-geo-alpha2.min.js"></script>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
   <script type="text/javascript">
     $(function () {
-      var map;
-
       $(".nav").buttonset();
       $("a").filter("[data-role='button']").button();
 
@@ -150,7 +169,7 @@
           zoom: 7
         });
 
-        map.geomap("opacity", "OSM", .5);
+        $( ".geomap .osm" ).geomap("opacity", .5);
       }
    });
   </script>

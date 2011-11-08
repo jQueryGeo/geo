@@ -47,7 +47,7 @@
           });
 
           if ( service && ( service.visibility === undefined || service.visibility === "visible" ) ) {
-            var pixelSize = map.pixelSize(),
+            var pixelSize = map._pixelSize,
 
                 serviceContainer = serviceState.serviceContainer,
                 scaleContainer = serviceContainer.children("[data-pixelSize='" + pixelSize + "']"),
@@ -224,7 +224,7 @@
           this._cancelUnloaded(map, service);
 
           var bbox = map._getBbox(),
-              pixelSize = map.pixelSize(),
+              pixelSize = map._pixelSize,
 
               $serviceContainer = serviceState.serviceContainer,
 

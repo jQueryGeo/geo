@@ -33,6 +33,7 @@
         <li><a href="cursors.html">cursors</a></li>
         <li><a href="mode.html"><h3>mode</h3><p class="ui-li-desc">determines how the map, user &amp; developer interact</p></a></li>
         <li><a href="drawStyle.html"><h3>drawStyle</h3><p class="ui-li-desc">when drawing shapes, defines how they look during drawing</p></a></li>
+        <li><a href="shapeStyle.html"><h3>shapeStyle</h3><p class="ui-li-desc">defines how geomap draws shapes added via the append method</p></a></li>
         <li><a href="services.html"><h3>services</h3><p class="ui-li-desc">determine the content of the map</p></a></li>
         <li><a href="tilingScheme.html">tilingScheme</a></li>
         <li><a href="zoom.html">zoom</a></li>
@@ -62,7 +63,7 @@
         </li>
       </ul>
       <h3>bbox events</h3>
-      <p>With bbox events the geo argument to your callback is an object with single property, bbox, which is a <a href="http://geojson.org/geojson-spec.html#bounding-boxes" rel="external">GeoJSON bounding box</a> in map coordinates. If $.geo.proj is not null, the bbox values are sent to your callback are geodetic. If $.geo.proj is null, the bbox values sent to your callback are in map coordinates based on the tilingScheme for tiled maps and bboxMax for shingled (dynamic) maps.</p>
+      <p>With bbox events the geo argument to your callback is an object with single property, bbox, which is a <a href="http://geojson.org/geojson-spec.html#bounding-boxes" rel="external">GeoJSON bounding box</a>. If $.geo.proj is not null, the bbox values are sent to your callback are geodetic. If $.geo.proj is null, the bbox values sent to your callback are in map coordinates based on the tilingScheme for tiled maps and bboxMax for shingled (dynamic) maps.</p>
       <!--<h3>geometry events</h3>
       <p>With geometry events the geo argument to your callback is a JavaScript object having two properties: pixels &amp; geometry. Both are multi-dimensional <a href="http://geojson.org/geojson-spec.html#positions" rel="external">GeoJSON positions</a>, i.e., an array containing the x and y value but pixel is in pixel coordinates based on the current map view and the other in map coordinates based on the tilingScheme for tiled maps and bboxMax for shingled (dynamic) maps.</p>-->
       <ul data-role="listview" data-inset="true">
@@ -125,7 +126,6 @@
       <h3>shapes</h3>
       <p>These methods manage geometry or features drawn on the geomap widget <!--itself or on individual servies-->.</p>
       <ul data-role="listview" data-inset="true">
-        <li><a href="shapeStyle.html">shapeStyle</a></li>
         <li><a href="append.html">append</a></li>
         <li><a href="remove.html">remove</a></li>
         <li><a href="empty.html">empty</a></li>
@@ -133,8 +133,8 @@
       </ul>
       <h2>style</h2>
       <p>A geomap style is an object whose properties follow a subset of <a href="http://www.w3.org/TR/SVG/styling.html">SVG styling</a> properties. The specific styles that geomap recognizes and to which geometry they apply are listed below.</p>
-      <p>Use the drawStyle <b>option</b> of the geomap widget to define the style used on incomplete lines and polygons as they are being drawn when mode is drawLineString or drawPolygon.</p>
-      <p>Use the shapeStyle <b>method</b> to define the style of shapes drawn after being appended to the map via the append method.</p>
+      <p>Use the drawStyle option of the geomap widget to define the style used on incomplete lines and polygons as they are being drawn when mode is drawLineString or drawPolygon.</p>
+      <p>Use the shapeStyle option to define the style of shapes drawn after being appended to the map via the append method.</p>
       <p>Please note that in drawPoint mode, the shape event is triggered immediately and so no shape will appear until you append a point to the map at which time the shapeStyle will be used.</p>
       <h3>geomap style properties</h3>
       <table class="objectProperties">

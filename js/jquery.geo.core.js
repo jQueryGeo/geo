@@ -16,10 +16,10 @@
 
       for (; curGeom < geometries.length; curGeom++) {
         var coordinates = geometries[curGeom].coordinates,
-              isArray = $.isArray(coordinates[0]),
-              isDblArray = isArray && $.isArray(coordinates[0][0]),
-              isTriArray = isDblArray && $.isArray(coordinates[0][0][0]),
-              i, j, k;
+            isArray = coordinates && $.isArray(coordinates[0]),
+            isDblArray = isArray && $.isArray(coordinates[0][0]),
+            isTriArray = isDblArray && $.isArray(coordinates[0][0][0]),
+            i, j, k;
 
         if (!isTriArray) {
           if (!isDblArray) {

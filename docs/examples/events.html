@@ -1,9 +1,21 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-  <title>Events test</title>
+  <meta charset="utf-8">
+  <title>events example</title>
+  <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+  <meta name="description" content="An example of basic interaction events">
+  <meta name="author" content="Ryan Westphal">
   <link rel="stylesheet" type="text/css" href="css/style.css" />
   <style type="text/css">
+    #map
+    {
+      position: fixed;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+    }
     th
     {
       text-align: left;
@@ -17,24 +29,17 @@
   </style>
 </head>
 <body>
-  <div>
-    <a href="../" class="docLink">&lt; docs</a>
-    <h1>
-      Events test</h1>
-    <div id="map" style="position: relative; width: 320px; height: 240px;">
+  <div id="events">
+    <div id="map">
     </div>
-    <fieldset>
-      <legend>$.geo.proj</legend>
-      <label>
-        <input type="radio" name="proj" value="default" checked />
-        default (map values are geodetic lon,lat)
-      </label>
-      <label>
-        <input type="radio" name="proj" value="null" />
-        null (map values are web mercator)
-      </label>
-    </fieldset>
-    <table cellspacing="0">
+    <div class="info">
+      <div class="links">
+        <a href="../" class="docLink">&lt; docs</a>
+        <a href="http://jsfiddle.net/ryanttb/fg6wv/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
+      </div>
+      <h1>events</h1>
+      <p>The basic interaction events are: move, click, dblclick, and bboxchange. jQuery Geo triggers then when a user interacts with the map.</p>
+     <table cellspacing="0">
       <thead>
         <tr>
           <th>
@@ -46,74 +51,110 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
+        <tr class="geomapmove">
           <td>
-            move (<span class="movedate"></span>)
+            move (<span class="date"></span>)
           </td>
-          <td class="movedata">
+          <td class="data">
           </td>
         </tr>
-        <tr>
+        <tr class="geomapclick">
           <td>
-            click (<span class="clickdate"></span>)
+            click (<span class="date"></span>)
           </td>
-          <td class="clickdata">
+          <td class="data">
           </td>
         </tr>
-        <tr>
+        <tr class="geomapdblclick">
           <td>
-            dblclick (<span class="dblclickdate"></span>)
+            dblclick (<span class="date"></span>)
           </td>
-          <td class="dblclickdata">
+          <td class="data">
           </td>
         </tr>
-        <tr>
+        <tr class="geomapbboxchange">
           <td>
-            bboxchange (<span class="bboxdate"></span>)
+            bboxchange (<span class="date"></span>)
           </td>
-          <td class="bboxdata">
+          <td class="data">
           </td>
         </tr>
       </tbody>
     </table>
+   </div>
   </div>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-  <script src="http://jquerygeo.com/test/jquery.geo-test.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
   <script>
     $(function () {
-      var defaultProj = $.geo.proj;
-
+      // create a map
+      // hook into all the events and update the screen when they're triggered
+      // we don't need to prefix the events with the widget's name during initialization
       var map = $("#map").geomap({
-        move: function (e, geo) {
-          $(".movedate").text($.now());
-          $(".movedata").text("pixels: [ " + map.geomap("toPixel", geo.coordinates) + " ], coordinates: [ " + geo.coordinates + " ]");
-        },
-        click: function (e, geo) {
-          $(".clickdate").text($.now());
-          $(".clickdata").text("pixels: [ " + map.geomap("toPixel", geo.coordinates) + " ], coordinates: [ " + geo.coordinates + " ]");
-        },
-        dblclick: function (e, geo) {
-          $(".dblclickdate").text($.now());
-          $(".dblclickdata").text("pixels: [ " + map.geomap("toPixel", geo.coordinates) + " ], coordinates: [ " + geo.coordinates + " ]");
-        },
-        bboxchange: function (e, geo) {
-          $(".bboxdate").text($.now());
-          $(".bboxdata").text("[ " + geo.bbox + " ]");
-        }
+        center: [-71.0595678, 42.3604823],
+        zoom: 8,
+
+        // position events get a GeoJSON Point object
+        move: positionEventHandler,
+        click: positionEventHandler,
+        dblclick: positionEventHandler,
+
+        // bbox events get an object with a bbox property
+        bboxchange: bboxEventHandler
       });
 
-      $("input[name='proj']").click(function () {
-        switch ($(this).val()) {
-          case "null":
-            $.geo.proj = null;
-            break;
+      function positionEventHandler( e, geo ) {
+        // jQuery stores the event type in e.type
+        // outside of the initialization function,
+        // the jQuery UI widget events all have a widget prefix
+        // in this case it's: geomap
 
-          default:
-            $.geo.proj = defaultProj;
-            break;
-        }
-      });
+        // this example builds a selector for the class
+        // of the table's row for this event
+        // if the event is, e.g., move, e.type is geomapmove and the row we want is .geomapmove
+        var eventRowClass = "." + e.type;
+
+        // update the time stamp for this event
+        $(eventRowClass + " .date").text($.now());
+
+        // contained in the geo argument as a GeoJSON Point object
+
+        // the coordinates property is an array,
+        // this example joins them with an extra space so they look a little nicer
+        var displayCoords = geo.coordinates.join( ", " );
+
+            
+        // convert the map coordinates to pixel locations to show them as well
+        var displayPixels = map.geomap( "toPixel", geo.coordinates ).join( ", " );
+
+        // update the position data
+        $(eventRowClass + " .data").html("pixels: [ " + displayPixels + " ]<br>coordinates: [ " + displayCoords + " ]");
+      }
+
+      function bboxEventHandler( e, geo ) {
+        // again, build a selector for the class of the table's row for this event
+        // for example, the bboxchange event's e.type is geomapbboxchange
+        // and the row we want is .geomapbboxchange
+        var eventRowClass = "." + e.type;
+
+        // update the time stamp for this event
+        $( eventRowClass + " .date" ).text( $.now( ) );
+
+        // update the position data,
+        // contained in the geo argument as an object with a bbox property
+        // currently that's all the object has
+        $( eventRowClass + " .data" ).text( "[ " + geo.bbox.join( ", " ) + " ]" );
+      }
     });  
+  </script>
+
+  <script>
+    var _gaq = [['_setAccount', 'UA-26084853-1'], ['_trackPageview']];
+    (function (d, t) {
+      var g = d.createElement(t), s = d.getElementsByTagName(t)[0]; g.async = 1;
+      g.src = ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+      s.parentNode.insertBefore(g, s);
+    } (document, 'script'));
   </script>
 </body>
 </html>
