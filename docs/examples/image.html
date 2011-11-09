@@ -30,6 +30,7 @@
       </div>
       <h1>image</h1>
       <p></p>
+      <button id="cmdZoom" type="button">zoom in</button>
     </div>
   </div>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
@@ -46,10 +47,45 @@
   <!--<script src="http://jquerygeo.com/test/jquery.geo-test.min.js"></script>-->
   <script>
     $(function () {
+      // set $.geo.proj to null because images don't have a projection
+      $.geo.proj = null;
+
       // create a map
       var map = $("#map").geomap({
-        center: [-71.0595678, 42.3604823],
-        zoom: 8
+        center: [ 5616/2, 3744/2 ],
+        zoom: 0,
+        axisLayout: "image",
+        services: [
+          {
+            type: "tiled",
+            getUrl: function (view) {
+              return "http://localhost:36426/ObliqueViewer/tiles/RightImage/000230-101708154420-cam5/" + (10 - view.zoom) + "/" + view.tile.column + "/" + view.tile.row;
+            },
+            attr: "&copy; Sanborn"
+          }
+        ],
+        tilingScheme: {
+          tileWidth: 256,
+          tileHeight: 256,
+          pixelSizes: [
+            32,
+            22.627416997969520780827019587355,
+            16,
+            11.313708498984760390413509793678,
+            8,
+            5.6568542494923801952067548968388,
+            4,
+            2.8284271247461900976033774484194,
+            2,
+            1.4142135623730950488016887242097,
+            1
+          ],
+          origin: [ 0, 0 ]
+        },
+      });
+
+      $("#cmdZoom").button().click(function() {
+        map.geomap("zoom", +1);
       });
     });  
   </script>

@@ -96,6 +96,68 @@
 ** in the drawing modes, this function ends drawing and triggers the shape event with whatever coordinates have already been added to the shape
 * geomap - drawStop
 
+* geomap - [bug] setting services array during init does not wipe out default properties of initial service object
+* geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax
+* geomap - [bug] zoom in more than once with zoom method moves tiles to the wrong spot
+
+==2011-11-09==
+===axisLayout===
+Peter likes axisLayout as well...sold!
+
+===first===
+Trying this out for the first time. I can get image tiles from an image server but the zoom is all wrong and it's not centered. wheel zoom is also pretty wrong.
+
+===bbox===
+bbox min values are negative. I suppose that makes sense because it's trying to put the top-left corner of the image in the center of the window. It should be tring to put the center of the image in the center of the window. 
+
+===mapbox===
+MapBox uses an "official" tiling spec. In that spec the origin is in the bottom left. That doesn't mean the y-axis is flipped though but it does change how I calculate the tiling scheme. Maybe it does go up. That's awful, why would they do it different than web mercator?
+
+Crisis averted, maybe? It looks like V2 of the MapBox API uses top-left origin and XYZ tiling: http://mapbox.com/hosting/api/
+
+Maybe not averted? Calvin is saying that TileStream itself (as in not hosted by MapBox) only has one API. That doesn't sound right.
+
+===getTiledZoom===
+This is wrong for image types the way we want to understand pixelSize with images. A low zoom means a low pixelSize which is opposite of maps. I seem to have fixed that. I'm getting closer.
+
+===refresh===
+Refresh is ignoring tiles on the bottom & right edge of the viewport.
+
+===top-left===
+The image still starts out in the middle of the page but you can move it around and zoom. 
+
+===getUrl===
+I forgot that while Peter's image server determines zoom levels backwards, I was going to handle that in the getUrl function of the service and have the pixelSizes of the tilingScheme be like normal. This works much better. Now I only have the top-left issue. That's not true, zooming bounces the new image to somewhere else, i.e., isn't smooth or correct.
+
+===center====
+So, I realized that at geomap zoom level 0, the image is way zoomed out and my center should be the center of the full image in pixels, so pixel width /2, etc. I changed that but my tiles are still misaligned.
+
+Ha! I wasn't checking for undefined if you pass a zoom of 0. That means I wasn't setting the new center & pixelSize with updated values. All set. Now I'm only offset in the y location and I have a feeling that's because of the axisLayout.
+
+===osm===
+Somehow, the osm class i getting on the serviceContainer element even though I'm completely redoing the services array at init.
+
+===centerMax===
+I think for now I have to assume that at max zoom, the whole service fits in a tile and the center is in the center of the tile. I don't have a way yet to specify the center of a tiling scheme, only the top-left.
+
+===pan===
+Pan is backwards as well when it creates the new bbox.
+
+===zoom===
+Looking good! interactiveScale is last. Then maybe I should support shingled. Way, no, that was interactivePan, when pulling in new tiles.
+
+==2011-11-08==
+===image coords===
+I need a new property to determine the direction of the y-axis but I want it to be more generic. The difference is a different coordinate system, the side effect is the inverted ordinate axis.
+
+Maybe just "coordinateSystem". I don't want to confuse users with the difference between coordinateSystem and tilingScheme though.
+
+The full, proper term would be coordinateSystemAxisDirection or coordinateSystemAxisType. There seems to be a little precedence for CoordinateSystemAxis, found in GeoTools: http://docs.geotools.org/stable/javadocs/org/opengis/referencing/cs/CoordinateSystemAxis.html
+
+Nothing in JTS.
+
+Hmm, axisLayout? Why not, it's short and specific. axisLayout = "map" | "image". Yes. I like it.
+
 ==2011-11-07==
 ===gzip===
 I added gzip to jquerygeo.com & all subdomains. jQuery Geo (minified & gzipped) is now 17k and falling!
