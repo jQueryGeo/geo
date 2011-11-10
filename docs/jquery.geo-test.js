@@ -2772,6 +2772,7 @@ $.Widget.prototype = {
           basePixelSize: 156543.03392799936,
           origin: [-20037508.342787, 20037508.342787]
         },
+        axisLayout: "map",
         zoom: 0,
         pixelSize: 0
       };
@@ -2945,13 +2946,16 @@ $.Widget.prototype = {
       this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
 
       if (this._initOptions) {
+        if (this._initOptions.tilingScheme) {
+          this._setOption("tilingScheme", this._initOptions.tilingScheme, false);
+        }
         if (this._initOptions.bbox) {
           this._setOption("bbox", this._initOptions.bbox, false);
         }
         if (this._initOptions.center) {
           this._setOption("center", this._initOptions.center, false);
         }
-        if (this._initOptions.zoom) {
+        if (this._initOptions.zoom !== undefined) {
           this._setZoom(this._initOptions.zoom, false, false);
         }
       }
@@ -3019,6 +3023,14 @@ $.Widget.prototype = {
       $.Widget.prototype._setOption.apply(this, arguments);
 
       switch (key) {
+        case "tilingScheme":
+          this._pixelSizeMax = this._getTiledPixelSize(0);
+          this._centerMax = [
+            value.origin[ 0 ] + this._pixelSizeMax * value.tileWidth / 2,
+            value.origin[ 1 ] + this._pixelSizeMax * value.tileHeight / 2
+          ];
+          break;
+
         case "services":
           this._createServices();
           if (refresh) {
@@ -3516,7 +3528,7 @@ $.Widget.prototype = {
       var tilingScheme = this._options["tilingScheme"];
       if (tilingScheme.pixelSizes != null) {
         var roundedPixelSize = Math.floor(pixelSize * 1000),
-          levels = tilingScheme.pixelSizes != null ? tilingScheme.pixelSizes.length : tilingScheme.levels;
+          levels = tilingScheme.pixelSizes.length;
         for (var i = levels - 1; i >= 0; i--) {
           if (Math.floor(tilingScheme.pixelSizes[i] * 1000) >= roundedPixelSize) {
             return i;
@@ -3586,8 +3598,9 @@ $.Widget.prototype = {
 
         var dx = this._current[0] - this._anchor[0],
             dy = this._current[1] - this._anchor[1],
+            image = this._options[ "axisLayout" ] === "image",
             dxMap = -dx * this._pixelSize,
-            dyMap = dy * this._pixelSize;
+            dyMap = ( image ? -1 : 1 ) * dy * this._pixelSize;
 
         this._$shapesContainer.css({ left: 0, top: 0 });
 
@@ -3720,11 +3733,15 @@ $.Widget.prototype = {
           bbox = [center[0] - halfWidth, center[1] - halfHeight, center[0] + halfWidth, center[1] + halfHeight],
           xRatio = $.geo.width(bbox, true) / width,
           yRatio = $.geo.height(bbox, true) / height,
+          image = this._options[ "axisLayout" ] === "image",
           result = [];
 
       $.each(p, function (i) {
         var yOffset = (this[1] * yRatio);
-        result[i] = [bbox[0] + (this[0] * xRatio), bbox[3] - yOffset];
+        result[ i ] = [
+          bbox[ 0 ] + ( this[ 0 ] * xRatio ),
+          image ? bbox[ 1 ] + yOffset : bbox[ 3 ] - yOffset
+        ];
       });
 
       return isArray ? result : result[0];
@@ -3740,21 +3757,23 @@ $.Widget.prototype = {
       center = center || this._center;
       pixelSize = pixelSize || this._pixelSize;
 
-      var 
-        width = this._contentBounds["width"],
-        height = this._contentBounds["height"],
-        halfWidth = width / 2 * pixelSize,
-        halfHeight = height / 2 * pixelSize,
-        bbox = [center[0] - halfWidth, center[1] - halfHeight, center[0] + halfWidth, center[1] + halfHeight],
-        bboxWidth = $.geo.width(bbox, true),
-        bboxHeight = $.geo.height(bbox, true),
-        result = [];
+      var width = this._contentBounds["width"],
+          height = this._contentBounds["height"],
+          halfWidth = width / 2 * pixelSize,
+          halfHeight = height / 2 * pixelSize,
+          bbox = [center[0] - halfWidth, center[1] - halfHeight, center[0] + halfWidth, center[1] + halfHeight],
+          bboxWidth = $.geo.width(bbox, true),
+          bboxHeight = $.geo.height(bbox, true),
+          image = this._options[ "axisLayout" ] === "image",
+          xRatio = width / bboxWidth,
+          yRatio = height / bboxHeight,
+          result = [];
 
       $.each(p, function (i) {
-        result[i] = [
-            Math.round((this[0] - bbox[0]) * width / bboxWidth),
-            Math.round((bbox[3] - this[1]) * height / bboxHeight)
-          ];
+        result[ i ] = [
+          Math.round( ( this[ 0 ] - bbox[ 0 ] ) * xRatio ),
+          Math.round( ( image ? this[ 1 ] - bbox[ 1 ] : bbox[ 3 ] - this[ 1 ] ) * yRatio )
+        ];
       });
 
       return isArray ? result : result[0];
@@ -4245,6 +4264,9 @@ $.Widget.prototype = {
                 mapWidth = contentBounds["width"],
                 mapHeight = contentBounds["height"],
 
+                image = map.options[ "axisLayout" ] === "image",
+                ySign = image ? +1 : -1,
+
                 tilingScheme = map.options["tilingScheme"],
                 tileWidth = tilingScheme.tileWidth,
                 tileHeight = tilingScheme.tileHeight,
@@ -4259,26 +4281,29 @@ $.Widget.prototype = {
                 totalDy = parseInt(scaleOriginParts[1]) - currentPosition.top,
 
                 mapCenterOriginal = map._getCenter(),
-                mapCenter = [mapCenterOriginal[0] + totalDx * pixelSize, mapCenterOriginal[1] - totalDy * pixelSize],
+                mapCenter = [
+                  mapCenterOriginal[0] + totalDx * pixelSize,
+                  mapCenterOriginal[1] + ySign * totalDy * pixelSize
+                ],
 
                 /* same as refresh 2 */
                 tileX = Math.floor(((mapCenter[0] - halfWidth) - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
-                tileY = Math.floor((tilingScheme.origin[1] - (mapCenter[1] + halfHeight)) / (pixelSize * tileHeight)),
+                tileY = Math.floor(( image ? (mapCenter[1] - halfHeight) - tilingScheme.origin[1] : tilingScheme.origin[1] - (mapCenter[1] + halfHeight)) / (pixelSize * tileHeight)),
                 tileX2 = Math.ceil(((mapCenter[0] + halfWidth) - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
-                tileY2 = Math.ceil((tilingScheme.origin[1] - (mapCenter[1] - halfHeight)) / (pixelSize * tileHeight)),
+                tileY2 = Math.ceil(( image ? (mapCenter[1] + halfHeight) - tilingScheme.origin[1] : tilingScheme.origin[1] - (mapCenter[1] - halfHeight)) / (pixelSize * tileHeight)),
 
                 bboxMax = map._getBboxMax(),
                 pixelSizeAtZero = map._getTiledPixelSize(0),
                 ratio = pixelSizeAtZero / pixelSize,
                 fullXAtScale = Math.floor((bboxMax[0] - tilingScheme.origin[0]) / (pixelSizeAtZero * tileWidth)) * ratio,
-                fullYAtScale = Math.floor((tilingScheme.origin[1] - bboxMax[3]) / (pixelSizeAtZero * tileHeight)) * ratio,
+                fullYAtScale = Math.floor((tilingScheme.origin[1] + ySign * bboxMax[3]) / (pixelSizeAtZero * tileHeight)) * ratio,
 
                 fullXMinX = tilingScheme.origin[0] + (fullXAtScale * tileWidth) * pixelSize,
-                fullYMaxY = tilingScheme.origin[1] - (fullYAtScale * tileHeight) * pixelSize,
+                fullYMinOrMaxY = tilingScheme.origin[1] + ySign * (fullYAtScale * tileHeight) * pixelSize,
                 /* end same as refresh 2 */
 
                 serviceLeft = Math.round((fullXMinX - (mapCenterOriginal[0] - halfWidth)) / pixelSize),
-                serviceTop = Math.round(((mapCenterOriginal[1] + halfHeight) - fullYMaxY) / pixelSize),
+                serviceTop = Math.round(( image ? fullYMinOrMaxY - (mapCenterOriginal[1] - halfHeight) : (mapCenterOriginal[1] + halfHeight) - fullYMinOrMaxY  ) / pixelSize),
 
                 opacity = (service.opacity === undefined ? 1 : service.opacity),
 
@@ -4293,12 +4318,12 @@ $.Widget.prototype = {
                   /* same as refresh 3 */
                   var bottomLeft = [
                         tilingScheme.origin[0] + (x * tileWidth) * pixelSize,
-                        tilingScheme.origin[1] - (y * tileHeight) * pixelSize
+                        tilingScheme.origin[1] + ySign * (y * tileHeight) * pixelSize
                       ],
 
                       topRight = [
                         tilingScheme.origin[0] + ((x + 1) * tileWidth - 1) * pixelSize,
-                        tilingScheme.origin[1] - ((y + 1) * tileHeight - 1) * pixelSize
+                        tilingScheme.origin[1] + ySign * ((y + 1) * tileHeight - 1) * pixelSize
                       ],
 
                       tileBbox = [bottomLeft[0], bottomLeft[1], topRight[0], topRight[1]],
@@ -4420,26 +4445,29 @@ $.Widget.prototype = {
               mapWidth = contentBounds["width"],
               mapHeight = contentBounds["height"],
 
+              image = map.options[ "axisLayout" ] === "image",
+              ySign = image ? +1 : -1,
+
               tilingScheme = map.options["tilingScheme"],
               tileWidth = tilingScheme.tileWidth,
               tileHeight = tilingScheme.tileHeight,
 
               tileX = Math.floor((bbox[0] - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
-              tileY = Math.floor((tilingScheme.origin[1] - bbox[3]) / (pixelSize * tileHeight)),
+              tileY = Math.floor( ( image ? bbox[1] - tilingScheme.origin[1] : tilingScheme.origin[1] - bbox[ 3 ] ) / (pixelSize * tileHeight) ),
               tileX2 = Math.ceil((bbox[2] - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
-              tileY2 = Math.ceil((tilingScheme.origin[1] - bbox[1]) / (pixelSize * tileHeight)),
+              tileY2 = Math.ceil( ( image ? bbox[3] - tilingScheme.origin[1] : tilingScheme.origin[1] - bbox[ 1 ] ) / (pixelSize * tileHeight) ),
 
               bboxMax = map._getBboxMax(),
               pixelSizeAtZero = map._getTiledPixelSize(0),
               ratio = pixelSizeAtZero / pixelSize,
               fullXAtScale = Math.floor((bboxMax[0] - tilingScheme.origin[0]) / (pixelSizeAtZero * tileWidth)) * ratio,
-              fullYAtScale = Math.floor((tilingScheme.origin[1] - bboxMax[3]) / (pixelSizeAtZero * tileHeight)) * ratio,
+              fullYAtScale = Math.floor((tilingScheme.origin[1] + ySign * bboxMax[3]) / (pixelSizeAtZero * tileHeight)) * ratio,
 
               fullXMinX = tilingScheme.origin[0] + (fullXAtScale * tileWidth) * pixelSize,
-              fullYMaxY = tilingScheme.origin[1] - (fullYAtScale * tileHeight) * pixelSize,
+              fullYMinOrMaxY = tilingScheme.origin[1] + ySign * (fullYAtScale * tileHeight) * pixelSize,
 
               serviceLeft = Math.round((fullXMinX - bbox[0]) / pixelSize),
-              serviceTop = Math.round((bbox[3] - fullYMaxY) / pixelSize),
+              serviceTop = Math.round( ( image ? fullYMinOrMaxY - bbox[1] : bbox[3] - fullYMinOrMaxY ) / pixelSize),
 
               scaleContainers = $serviceContainer.children().show(),
               scaleContainer = scaleContainers.filter("[data-pixelSize='" + pixelSize + "']").appendTo($serviceContainer),
@@ -4479,19 +4507,18 @@ $.Widget.prototype = {
 
           for (x = tileX; x < tileX2; x++) {
             for (y = tileY; y < tileY2; y++) {
-              var 
-              tileStr = "" + x + "," + y,
-              $img = scaleContainer.children("[data-tile='" + tileStr + "']").removeAttr("data-dirty");
+              var tileStr = "" + x + "," + y,
+                  $img = scaleContainer.children("[data-tile='" + tileStr + "']").removeAttr("data-dirty");
 
               if ($img.size() === 0 || serviceState.reloadTiles) {
                 var bottomLeft = [
                   tilingScheme.origin[0] + (x * tileWidth) * pixelSize,
-                  tilingScheme.origin[1] - (y * tileHeight) * pixelSize
+                  tilingScheme.origin[1] + ySign * (y * tileHeight) * pixelSize
                 ],
 
                 topRight = [
                   tilingScheme.origin[0] + ((x + 1) * tileWidth - 1) * pixelSize,
-                  tilingScheme.origin[1] - ((y + 1) * tileHeight - 1) * pixelSize
+                  tilingScheme.origin[1] + ySign * ((y + 1) * tileHeight - 1) * pixelSize
                 ],
 
                 tileBbox = [bottomLeft[0], bottomLeft[1], topRight[0], topRight[1]],
@@ -4781,8 +4808,7 @@ $.Widget.prototype = {
         if ( serviceState && service && (service.visibility === undefined || service.visibility === "visible")) {
           this._cancelUnloaded(map, service);
 
-          var serviceState = shingledServicesState[service.id],
-              serviceContainer = serviceState.serviceContainer,
+          var serviceContainer = serviceState.serviceContainer,
 
               contentBounds = map._getContentBounds(),
               mapWidth = contentBounds["width"],

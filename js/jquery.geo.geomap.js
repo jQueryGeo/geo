@@ -36,6 +36,7 @@
           basePixelSize: 156543.03392799936,
           origin: [-20037508.342787, 20037508.342787]
         },
+        axisLayout: "map",
         zoom: 0,
         pixelSize: 0
       };
@@ -209,13 +210,16 @@
       this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
 
       if (this._initOptions) {
+        if (this._initOptions.tilingScheme) {
+          this._setOption("tilingScheme", this._initOptions.tilingScheme, false);
+        }
         if (this._initOptions.bbox) {
           this._setOption("bbox", this._initOptions.bbox, false);
         }
         if (this._initOptions.center) {
           this._setOption("center", this._initOptions.center, false);
         }
-        if (this._initOptions.zoom) {
+        if (this._initOptions.zoom !== undefined) {
           this._setZoom(this._initOptions.zoom, false, false);
         }
       }
@@ -283,6 +287,14 @@
       $.Widget.prototype._setOption.apply(this, arguments);
 
       switch (key) {
+        case "tilingScheme":
+          this._pixelSizeMax = this._getTiledPixelSize(0);
+          this._centerMax = [
+            value.origin[ 0 ] + this._pixelSizeMax * value.tileWidth / 2,
+            value.origin[ 1 ] + this._pixelSizeMax * value.tileHeight / 2
+          ];
+          break;
+
         case "services":
           this._createServices();
           if (refresh) {
@@ -780,7 +792,7 @@
       var tilingScheme = this._options["tilingScheme"];
       if (tilingScheme.pixelSizes != null) {
         var roundedPixelSize = Math.floor(pixelSize * 1000),
-          levels = tilingScheme.pixelSizes != null ? tilingScheme.pixelSizes.length : tilingScheme.levels;
+          levels = tilingScheme.pixelSizes.length;
         for (var i = levels - 1; i >= 0; i--) {
           if (Math.floor(tilingScheme.pixelSizes[i] * 1000) >= roundedPixelSize) {
             return i;
@@ -850,8 +862,9 @@
 
         var dx = this._current[0] - this._anchor[0],
             dy = this._current[1] - this._anchor[1],
+            image = this._options[ "axisLayout" ] === "image",
             dxMap = -dx * this._pixelSize,
-            dyMap = dy * this._pixelSize;
+            dyMap = ( image ? -1 : 1 ) * dy * this._pixelSize;
 
         this._$shapesContainer.css({ left: 0, top: 0 });
 
@@ -984,11 +997,15 @@
           bbox = [center[0] - halfWidth, center[1] - halfHeight, center[0] + halfWidth, center[1] + halfHeight],
           xRatio = $.geo.width(bbox, true) / width,
           yRatio = $.geo.height(bbox, true) / height,
+          image = this._options[ "axisLayout" ] === "image",
           result = [];
 
       $.each(p, function (i) {
         var yOffset = (this[1] * yRatio);
-        result[i] = [bbox[0] + (this[0] * xRatio), bbox[3] - yOffset];
+        result[ i ] = [
+          bbox[ 0 ] + ( this[ 0 ] * xRatio ),
+          image ? bbox[ 1 ] + yOffset : bbox[ 3 ] - yOffset
+        ];
       });
 
       return isArray ? result : result[0];
@@ -1004,21 +1021,23 @@
       center = center || this._center;
       pixelSize = pixelSize || this._pixelSize;
 
-      var 
-        width = this._contentBounds["width"],
-        height = this._contentBounds["height"],
-        halfWidth = width / 2 * pixelSize,
-        halfHeight = height / 2 * pixelSize,
-        bbox = [center[0] - halfWidth, center[1] - halfHeight, center[0] + halfWidth, center[1] + halfHeight],
-        bboxWidth = $.geo.width(bbox, true),
-        bboxHeight = $.geo.height(bbox, true),
-        result = [];
+      var width = this._contentBounds["width"],
+          height = this._contentBounds["height"],
+          halfWidth = width / 2 * pixelSize,
+          halfHeight = height / 2 * pixelSize,
+          bbox = [center[0] - halfWidth, center[1] - halfHeight, center[0] + halfWidth, center[1] + halfHeight],
+          bboxWidth = $.geo.width(bbox, true),
+          bboxHeight = $.geo.height(bbox, true),
+          image = this._options[ "axisLayout" ] === "image",
+          xRatio = width / bboxWidth,
+          yRatio = height / bboxHeight,
+          result = [];
 
       $.each(p, function (i) {
-        result[i] = [
-            Math.round((this[0] - bbox[0]) * width / bboxWidth),
-            Math.round((bbox[3] - this[1]) * height / bboxHeight)
-          ];
+        result[ i ] = [
+          Math.round( ( this[ 0 ] - bbox[ 0 ] ) * xRatio ),
+          Math.round( ( image ? this[ 1 ] - bbox[ 1 ] : bbox[ 3 ] - this[ 1 ] ) * yRatio )
+        ];
       });
 
       return isArray ? result : result[0];
