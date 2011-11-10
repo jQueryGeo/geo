@@ -1,8 +1,11 @@
 ﻿== to do ==
 
-=== 1.0a4 ===
 * geomap - [bug] drawStyle disappears after window resize
-* geomap - use profiling to improve pan performance
+* geomap - [bug] setting services array during init does not wipe out default properties of initial service object
+* geomap - [bug] zoom in more than once with zoom method moves tiles to the wrong spot
+* docs - geomap - support TMS
+* geomap - support TMS
+* geomap - [bug] ie highlights entire map div during shift-zoom
 * geomap - remove this-style state properties
 * geomap - remove "px" from .css calls
 * geo - use Array.push instead of $.merge
@@ -18,8 +21,6 @@
 * geomap - [bug] when a singled image hasn't loaded after pan and you double click on empty space, the zoomed bbox seems wrong
 * remove BOM from release files
 * add 3rd party license headers
-
-=== future ===
 * geomap - test jQuery widget call chaining when setting option values
 * geomap - pan lags on first drag
 * docs - geomap - more modes: measureDistance, measureArea
@@ -93,14 +94,7 @@
 * docs - geomap - drawStop function
 ** in the drawing modes, this function ends drawing and triggers the shape event with whatever coordinates have already been added to the shape
 * geomap - drawStop
-
-* geomap - [bug] setting services array during init does not wipe out default properties of initial service object
-* geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax
-* geomap - [bug] zoom in more than once with zoom method moves tiles to the wrong spot
-* geomap - [bug] shingled services throw exception during resize
-* docs - geomap - support TMS
-* geomap - support TMS
-* geomap - [bug] ie highlights entire map div during shift-zoom
+* geomap - use profiling to improve pan performance
 
 ==2011-11-09==
 ===axisLayout===

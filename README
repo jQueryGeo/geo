@@ -8,6 +8,10 @@ Documentation is hosted at http://jquerygeo.com
 
 == CHANGELOG ==
 
+=== 1.0a4 ===
+* geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax
+* geomap - [bug] shingled services throw exception during resize
+
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon
 * geomap - [bug] tiles do not show when pixel sizes are near or lower than 1.0
