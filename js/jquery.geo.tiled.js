@@ -57,6 +57,9 @@
                 mapWidth = contentBounds["width"],
                 mapHeight = contentBounds["height"],
 
+                image = map.options[ "axisLayout" ] === "image",
+                ySign = image ? +1 : -1,
+
                 tilingScheme = map.options["tilingScheme"],
                 tileWidth = tilingScheme.tileWidth,
                 tileHeight = tilingScheme.tileHeight,
@@ -71,26 +74,29 @@
                 totalDy = parseInt(scaleOriginParts[1]) - currentPosition.top,
 
                 mapCenterOriginal = map._getCenter(),
-                mapCenter = [mapCenterOriginal[0] + totalDx * pixelSize, mapCenterOriginal[1] - totalDy * pixelSize],
+                mapCenter = [
+                  mapCenterOriginal[0] + totalDx * pixelSize,
+                  mapCenterOriginal[1] + ySign * totalDy * pixelSize
+                ],
 
                 /* same as refresh 2 */
                 tileX = Math.floor(((mapCenter[0] - halfWidth) - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
-                tileY = Math.floor((tilingScheme.origin[1] - (mapCenter[1] + halfHeight)) / (pixelSize * tileHeight)),
+                tileY = Math.floor(( image ? (mapCenter[1] - halfHeight) - tilingScheme.origin[1] : tilingScheme.origin[1] - (mapCenter[1] + halfHeight)) / (pixelSize * tileHeight)),
                 tileX2 = Math.ceil(((mapCenter[0] + halfWidth) - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
-                tileY2 = Math.ceil((tilingScheme.origin[1] - (mapCenter[1] - halfHeight)) / (pixelSize * tileHeight)),
+                tileY2 = Math.ceil(( image ? (mapCenter[1] + halfHeight) - tilingScheme.origin[1] : tilingScheme.origin[1] - (mapCenter[1] - halfHeight)) / (pixelSize * tileHeight)),
 
                 bboxMax = map._getBboxMax(),
                 pixelSizeAtZero = map._getTiledPixelSize(0),
                 ratio = pixelSizeAtZero / pixelSize,
                 fullXAtScale = Math.floor((bboxMax[0] - tilingScheme.origin[0]) / (pixelSizeAtZero * tileWidth)) * ratio,
-                fullYAtScale = Math.floor((tilingScheme.origin[1] - bboxMax[3]) / (pixelSizeAtZero * tileHeight)) * ratio,
+                fullYAtScale = Math.floor((tilingScheme.origin[1] + ySign * bboxMax[3]) / (pixelSizeAtZero * tileHeight)) * ratio,
 
                 fullXMinX = tilingScheme.origin[0] + (fullXAtScale * tileWidth) * pixelSize,
-                fullYMaxY = tilingScheme.origin[1] - (fullYAtScale * tileHeight) * pixelSize,
+                fullYMinOrMaxY = tilingScheme.origin[1] + ySign * (fullYAtScale * tileHeight) * pixelSize,
                 /* end same as refresh 2 */
 
                 serviceLeft = Math.round((fullXMinX - (mapCenterOriginal[0] - halfWidth)) / pixelSize),
-                serviceTop = Math.round(((mapCenterOriginal[1] + halfHeight) - fullYMaxY) / pixelSize),
+                serviceTop = Math.round(( image ? fullYMinOrMaxY - (mapCenterOriginal[1] - halfHeight) : (mapCenterOriginal[1] + halfHeight) - fullYMinOrMaxY  ) / pixelSize),
 
                 opacity = (service.opacity === undefined ? 1 : service.opacity),
 
@@ -105,12 +111,12 @@
                   /* same as refresh 3 */
                   var bottomLeft = [
                         tilingScheme.origin[0] + (x * tileWidth) * pixelSize,
-                        tilingScheme.origin[1] - (y * tileHeight) * pixelSize
+                        tilingScheme.origin[1] + ySign * (y * tileHeight) * pixelSize
                       ],
 
                       topRight = [
                         tilingScheme.origin[0] + ((x + 1) * tileWidth - 1) * pixelSize,
-                        tilingScheme.origin[1] - ((y + 1) * tileHeight - 1) * pixelSize
+                        tilingScheme.origin[1] + ySign * ((y + 1) * tileHeight - 1) * pixelSize
                       ],
 
                       tileBbox = [bottomLeft[0], bottomLeft[1], topRight[0], topRight[1]],
@@ -232,26 +238,29 @@
               mapWidth = contentBounds["width"],
               mapHeight = contentBounds["height"],
 
+              image = map.options[ "axisLayout" ] === "image",
+              ySign = image ? +1 : -1,
+
               tilingScheme = map.options["tilingScheme"],
               tileWidth = tilingScheme.tileWidth,
               tileHeight = tilingScheme.tileHeight,
 
               tileX = Math.floor((bbox[0] - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
-              tileY = Math.floor((tilingScheme.origin[1] - bbox[3]) / (pixelSize * tileHeight)),
+              tileY = Math.floor( ( image ? bbox[1] - tilingScheme.origin[1] : tilingScheme.origin[1] - bbox[ 3 ] ) / (pixelSize * tileHeight) ),
               tileX2 = Math.ceil((bbox[2] - tilingScheme.origin[0]) / (pixelSize * tileWidth)),
-              tileY2 = Math.ceil((tilingScheme.origin[1] - bbox[1]) / (pixelSize * tileHeight)),
+              tileY2 = Math.ceil( ( image ? bbox[3] - tilingScheme.origin[1] : tilingScheme.origin[1] - bbox[ 1 ] ) / (pixelSize * tileHeight) ),
 
               bboxMax = map._getBboxMax(),
               pixelSizeAtZero = map._getTiledPixelSize(0),
               ratio = pixelSizeAtZero / pixelSize,
               fullXAtScale = Math.floor((bboxMax[0] - tilingScheme.origin[0]) / (pixelSizeAtZero * tileWidth)) * ratio,
-              fullYAtScale = Math.floor((tilingScheme.origin[1] - bboxMax[3]) / (pixelSizeAtZero * tileHeight)) * ratio,
+              fullYAtScale = Math.floor((tilingScheme.origin[1] + ySign * bboxMax[3]) / (pixelSizeAtZero * tileHeight)) * ratio,
 
               fullXMinX = tilingScheme.origin[0] + (fullXAtScale * tileWidth) * pixelSize,
-              fullYMaxY = tilingScheme.origin[1] - (fullYAtScale * tileHeight) * pixelSize,
+              fullYMinOrMaxY = tilingScheme.origin[1] + ySign * (fullYAtScale * tileHeight) * pixelSize,
 
               serviceLeft = Math.round((fullXMinX - bbox[0]) / pixelSize),
-              serviceTop = Math.round((bbox[3] - fullYMaxY) / pixelSize),
+              serviceTop = Math.round( ( image ? fullYMinOrMaxY - bbox[1] : bbox[3] - fullYMinOrMaxY ) / pixelSize),
 
               scaleContainers = $serviceContainer.children().show(),
               scaleContainer = scaleContainers.filter("[data-pixelSize='" + pixelSize + "']").appendTo($serviceContainer),
@@ -291,19 +300,18 @@
 
           for (x = tileX; x < tileX2; x++) {
             for (y = tileY; y < tileY2; y++) {
-              var 
-              tileStr = "" + x + "," + y,
-              $img = scaleContainer.children("[data-tile='" + tileStr + "']").removeAttr("data-dirty");
+              var tileStr = "" + x + "," + y,
+                  $img = scaleContainer.children("[data-tile='" + tileStr + "']").removeAttr("data-dirty");
 
               if ($img.size() === 0 || serviceState.reloadTiles) {
                 var bottomLeft = [
                   tilingScheme.origin[0] + (x * tileWidth) * pixelSize,
-                  tilingScheme.origin[1] - (y * tileHeight) * pixelSize
+                  tilingScheme.origin[1] + ySign * (y * tileHeight) * pixelSize
                 ],
 
                 topRight = [
                   tilingScheme.origin[0] + ((x + 1) * tileWidth - 1) * pixelSize,
-                  tilingScheme.origin[1] - ((y + 1) * tileHeight - 1) * pixelSize
+                  tilingScheme.origin[1] + ySign * ((y + 1) * tileHeight - 1) * pixelSize
                 ],
 
                 tileBbox = [bottomLeft[0], bottomLeft[1], topRight[0], topRight[1]],
