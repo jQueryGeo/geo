@@ -40,7 +40,9 @@
           <td><pre><code>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;axisLayout&quot;, &quot;image&quot; );</code></pre></td>
         </tr>
       </table>
-      <p>The axisLayout property determines direction of the coordinate system axes. It can be &quot;map&quot; or &quot;image&quot;. Maps have a traditional mathematical coordinate system where the ordinate-axis (y-axis) points up. However, images flip the y-axis so that down increases the positive value. This is important when you are connecting to a service supplying non-georeferenced (computer graphic) images and want your map control to match that coordinate system layout.</p>
+      <p>The axisLayout property determines direction of the coordinate system axes. It can be &quot;map&quot; or &quot;image&quot;.</p>
+      <p>Maps have a traditional mathematical coordinate system where the ordinate-axis (y-axis) points up. However, graphical images flip the y-axis so that moving down increases in value, which is appropriate in graphic contexts. This is important when you are connecting to a service supplying non-georeferenced (computer graphic) images and want your map control to match that coordinate system layout.</p>
+      <p>You will rarely have to change this unless you are using an graphic image server such as LizardTech Image Server or you just want to use the geomap widget to draw pixel-oriented graphics.</p>
       <p>This property will affect pixel-to-map coordinate calculation for all service types, i.e., tiled &amp; shingled services.</p>
     </div>
   </div> <!-- end of #container -->
