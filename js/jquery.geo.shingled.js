@@ -195,8 +195,7 @@
         if ( serviceState && service && (service.visibility === undefined || service.visibility === "visible")) {
           this._cancelUnloaded(map, service);
 
-          var serviceState = shingledServicesState[service.id],
-              serviceContainer = serviceState.serviceContainer,
+          var serviceContainer = serviceState.serviceContainer,
 
               contentBounds = map._getContentBounds(),
               mapWidth = contentBounds["width"],
