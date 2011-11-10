@@ -99,6 +99,10 @@
 * geomap - [bug] setting services array during init does not wipe out default properties of initial service object
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax
 * geomap - [bug] zoom in more than once with zoom method moves tiles to the wrong spot
+* geomap - [bug] shingled services throw exception during resize
+* docs - geomap - support TMS
+* geomap - support TMS
+* geomap - [bug] ie highlights entire map div during shift-zoom
 
 ==2011-11-09==
 ===axisLayout===
@@ -143,8 +147,26 @@ I think for now I have to assume that at max zoom, the whole service fits in a t
 ===pan===
 Pan is backwards as well when it creates the new bbox.
 
+Fixed pan.
+
 ===zoom===
-Looking good! interactiveScale is last. Then maybe I should support shingled. Way, no, that was interactivePan, when pulling in new tiles.
+Looking good! interactiveScale is last. Then maybe I should support shingled. Wait, no, that was interactivePan, when pulling in new tiles.
+
+Zooming twice is a bug but that's in core jQuery Geo, not this image addition.
+
+===shingled===
+Here's a link to a sample shingled image: http://lib.byu.edu/mrsid/bin/image_jpeg.pl?client=sample&image=sample.sid&x=1024&y=2048&level=0&width=1024&height=480
+
+Actually, there are levels so that's a tiled image. Yeah, definitely tiled because the level argument doesn't allow fractional numbers.
+
+===ie select===
+I think I forgot a userselect somewhere because if there are no inputs on the page and you pan, IE highlights everything in blue. Every map tile.
+
+Adding any input or link to the page fixes this. Also, adding this to inside the map div seems to fix it too: 
+
+ <input type="hidden" autofocus />
+
+That fixed nothing. The issue isn't with panning, it's with shift-zoom and happens no matter what's on the page with IE9.
 
 ==2011-11-08==
 ===image coords===

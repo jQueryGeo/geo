@@ -799,25 +799,6 @@
           }
         }
         return 0;
-        /*
-        switch ( this._options[ "axisLayout" ]  ) {
-          case "map":
-            for ( i = levels - 1; i >= 0; i-- ) {
-              if (Math.floor(tilingScheme.pixelSizes[i] * 1000) >= roundedPixelSize) {
-                return i;
-              }
-            }
-            return 0;
-
-          case "image":
-            for ( i = 0; i < levels; i++ ) {
-              if ( Math.floor( tilingScheme.pixelSizes[ i ] * 1000 ) <= roundedPixelSize ) {
-                return i;
-              }
-            }
-            return levels - 1;
-        }
-        */
       } else {
         return Math.max(Math.round(Math.log(tilingScheme.basePixelSize / pixelSize) / Math.log(2)), 0);
       }
