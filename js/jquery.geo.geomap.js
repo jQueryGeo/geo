@@ -14,7 +14,8 @@
           zoom: "crosshair",
           drawPoint: "crosshair",
           drawLineString: "crosshair",
-          drawPolygon: "crosshair"
+          drawPolygon: "crosshair",
+          measureDistance: "crosshair",
         },
         drawStyle: {},
         shapeStyle: {},
@@ -666,8 +667,14 @@
         var mode = this._options[ "mode" ],
             coords = this._drawPixels;
 
-        if ( mode == "drawPolygon" ) {
-          coords = [ coords ];
+        switch ( mode ) {
+          case "measureDistance":
+            mode = "drawLineString";
+            break;
+
+          case "drawPolygon":
+            coords = [ coords ];
+            break;
         }
 
         this._$drawContainer.geographics( mode, coords );
@@ -1130,6 +1137,10 @@
           }
           this._resetDrawing();
           break;
+
+        case "measureDistance":
+          this._resetDrawing();
+          break;
       }
 
       this._inOp = false;
@@ -1192,6 +1203,7 @@
           case "drawPoint":
           case "drawLineString":
           case "drawPolygon":
+          case "measureDistance":
             this._lastDrag = this._current;
 
             if (e.currentTarget.setCapture) {
@@ -1263,6 +1275,7 @@
 
         case "drawLineString":
         case "drawPolygon":
+        case "measureDistance":
           if (this._mouseDown || this._toolPan) {
             this._panMove();
           } else {
@@ -1385,6 +1398,7 @@
 
           case "drawLineString":
           case "drawPolygon":
+          case "measureDistance":
             if (wasToolPan) {
               this._panFinalize();
             } else {
