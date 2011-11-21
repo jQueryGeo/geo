@@ -3,11 +3,15 @@
 <html lang="en" class="no-js">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
   <title>geo namespace | $.geo</title>
   <meta name="description" content="$.geo namespace">
   <meta name="author" content="Ryan Westphal">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="../css/style.css?v=2">
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0rc3/jquery.mobile-1.0rc3.min.css" />
 </head>
 
 <body>
@@ -18,56 +22,17 @@
     </div>
     
     <div data-role="content">
-      <p>The $.geo namespace contains all geometry functions implemented in the plugin and an object having the plugin's two projection functions.</p>
+      <p>The $.geo namespace contains all geometry functions implemented in the plugin and an object having the plugin's four projection functions.</p>
       <h2>projection</h2>
-      <p>The $.geo namespace has a property named proj which is a JavaScript object having two methods: fromGeodetic and toGeodetic. These two functions control the type of argument and return coordinates for all $.geo static geometry functions, geomap widget properties, geomap widget events &amp; geomap widget methods (collectively referred to as plugin functions from now on).</p>
-      <p>If $.geo.proj is not null any plugin function that accepts a GeoJSON geometry object expects the geometry to be in longitude and latitude, i.e., each GeoJSON position in the geometry is an array where geometry[0] is the longitude and geometry[1] is latitude. The plugin function will automatically call $.geo.proj.fromGeodetic on incoming geometry positions and $.geo.proj.toGeodetic before returning values.</p>
-      <p>If you set $.geo.proj to null then plugin functions will not convert incoming geometry. They will assume the incoming geometry is in the same projection as your map widget. For example, you can set $.geo.proj to null and work directly in web mercator meters which is the projection of the default tiling scheme.</p>
-      <p>The default $.geo.proj object comes pre-built with functions that quickly convert between geodetic coordinates and web mercator meters, the default internal projection, so you can start using lon/lat right away with the default OpenStreetMap tiles. If your map service uses a different projection you need to set $.geo.proj to null or roll your own proj object. Read <a data-href="otherprojections" href="javascript:void(0);">Other projections</a> below for information on how to do that.</p>
-      <h3>Usage</h3>
-      <p>Both methods can take and return: a single bounding box, a single GeoJSON position (Point.coordinates), an array of GeoJSON positions (MultiPoint.coordinates or LineString.coordinates), an array of arrays of positions (MultiLineString.coordinates or Polygon.coordinates) or an array of arrays of arrays of positions (MultiPolygon.coordinates). In other words, the $.geo.proj functions convert the coordinates property of any of the GeoJSON geometry types. For example, you can use the following to convert the position contained in a GeoJSON point object:</p>
-      <pre><code>var projectedCoords = $.geo.proj.fromGeodetic( myPoint.coordinates );</code></pre>
-      <p>However, a LineString's coordinates property is an array of positions which you can also pass to the fromGeodetic method to get an array converted positions</p>
-      <pre><code>var projectedCoords = $.geo.proj.fromGeodetic( myLineString.coordinates );</code></pre>
-      <p>To convert a set of projected GeoJSON positions back to web mercator, call toGeodetic.</p>
-      <pre><code>var geodeticCoords = $.geo.proj.toGeodetic( myProjectedPolygon.coordinates );</code></pre>
-      <h3 id="otherprojections">Other projections</h3>
-      <p>The $.geo.proj property allows you to use whichever coordinate system or projection you want. By setting it to null you can directly use other projected coordinates, e.g., Massachusetts Mainland State Plane meters, in any plugin function, e.g., bbox.</p>
-      <pre><code>$.geo.proj = null;
-
-$('map').geomap( {
-  tilingScheme: null,
-  bboxMax: [ 31790, 790195, 337250, 961865 ],
-  bbox: [ 235644, 894775, 237775, 898523 ],
-  services: [ /* service object that supports MA State Plane */ ]
-} );</code></pre>
-      <p>jQuery Geo uses the two $.geo.proj functions throughout to convert between geodetic and projected coordinates. However, there are two other functions: fromGeodeticPos and toGeodeticPos which handle the conversion of individual GeoJSON positions. You can extend $.geo.proj with your own implementations of fromGeodeticPos and toGeodeticPos to change the internal projection used by all plugin functions and still use geodetic (longitude/latitude) coordinates as arguments and return values.</p>
-      <pre><code>$.extend($.geo.proj, {
-  fromGeodeticPos: function( coordinate ) {
-    var converted = [];
-    // convert the GeoJSON lon/lat position to MA State Plane
-    return converted;
-  },
-
-  toGeodeticPos: function( coordinate ) {
-    var converted = [];
-    // convert the GeoJSON MA State Plane position to lon/lat
-    return converted;
-  }
-});
-
-$('map').geomap( {
-  tilingScheme: null,
-  bboxMax: [ -73.5100, 41.3500, -69.8600, 42.8900 ],
-  bbox: [ -71.098709, 42.330322, -71.072617, 42.351608 ],
-  services: [ /* service object that supports MA State Plane */ ]
-} );</code></pre>
-      <p>Implementing custom from/to GeodeticPos functions is <i>currently</i> beyond the scope of this documentation but I assure you it involves using <a href="http://proj4js.org/" rel=external>Proj4js</a>.</p>
+      <p>The $.geo namespace has a property named proj which is a JavaScript object having four functions: fromGeodetic, fromGeodeticPos, toGeodetic, and toGeodeticPos. These four functions allow all $.geo static bbox/geometry functions, geomap widget properties, geomap widget events &amp; geomap widget methods (collectively referred to as plugin functions from now on) to work in geodetic (lon, lat) coordinates.</p>
+      <ul data-role="listview" data-inset="true">
+        <li><a href="proj.html">$.geo.proj</a></li>
+      </ul>
       <h2>geometry operations</h2>
-      <p>Geometry isn't much fun if you can't do anything with it. These functions help you analyze and manipulate bboxes and GeoJSON geometry objects. You call them directly from the $.geo namespace, e.g.,</p>
-      <pre><code>$.geo.distance(point1, point2)</code></pre>
+      <p>Geometry isn't much fun if you can't do anything with it. These functions help you analyze and manipulate bounding boxes and GeoJSON geometry objects. You call them directly from the $.geo namespace:</p>
+      <pre><code>$.geo.distance( point1, point2 )</code></pre>
 
-      <p>Except for a few name changes and switching from an object-oriented API to a function-based one, jQuery Geo attempts to follow the names and behavior of the <a href="http://www.vividsolutions.com/jts/jtshome.htm">Java Topology Suite</a> (JTS), the de-facto standard for geometry library APIs. JTS itself is an implementation of the <a href="http://www.opengis.org/techno/specs.htm">OGC Simple Features</a> specification but has made design decisions that improve the API for developers. The most notable of which is having Envelope (called bbox in jQuery Geo and GeoJSON) be its own class type.</p>
+      <p>Except for a few name changes and switching from an object-oriented API to a function-based one, jQuery Geo attempts to follow the names and behavior of the <a href="http://www.vividsolutions.com/jts/jtshome.htm">Java Topology Suite</a> (JTS), which is the de-facto standard for geometry library APIs. JTS itself is an implementation of the <a href="http://www.opengis.org/techno/specs.htm">OGC Simple Features</a> specification but has made design decisions that improve the API for developers. The most notable of which is having Envelope (called bbox in jQuery Geo and GeoJSON) be its own class type.</p>
       <h3>bbox functions</h3>
       <p>These functions operate on <a href="http://geojson.org/geojson-spec.html#bounding-boxes" rel="external">GeoJSON bounding box</a> array, i.e., a JavaScript array having four values:</p>
       <ul>
@@ -85,7 +50,7 @@ $('map').geomap( {
         <li><a href="reaspect.html">reaspect</a></li>
       </ul>
       <h3>geometry object functions</h3>
-      <p>These functions operate on <a href="http://geojson.org/geojson-spec.html" rel="external">GeoJSON geometry objects</a>: Point, LineString, Polygon, the Multi* variants and GeometryCollection. They do not operate on Feature or FeatureCollection objects, you have to call these methods on the geometry properties of Feature objects.</p>
+      <p>These functions operate on <a href="http://geojson.org/geojson-spec.html" rel="external">GeoJSON geometry objects</a>: Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon, and GeometryCollection. They do not operate on Feature or FeatureCollection objects, you have to call these functions on the geometry properties of Feature objects.</p>
       <p>The geometry functions allow you to analyze relationships between geometries such as their distance apart as well as obtain information about them such as bounding box and center point, called the centroid. This section will eventually expand to cover all of the important spatial operations available in the <a href="http://www.vividsolutions.com/jts/jtshome.htm">Java Topology Suite</a>.</p>
       <ul data-role="listview" data-inset="true">
         <li><a href="bbox.html">bbox</a></li>
@@ -96,6 +61,11 @@ $('map').geomap( {
     </div>
   </div> <!-- end of #container -->
 
+
+  <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
+  <script src="js/script.js"></script>
+  <script src="http://code.jquery.com/mobile/1.0rc3/jquery.mobile-1.0rc3.min.js"></script>
 </body>
 </html>
 

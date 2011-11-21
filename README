@@ -11,6 +11,11 @@ Documentation is hosted at http://jquerygeo.com
 === 1.0a4 ===
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax
 * geomap - [bug] shingled services throw exception during resize
+* docs - geomap - axisLayout option
+* geomap - axisLayout option
+* docs - upgrade to jQuery Mobile rc3
+* docs - allow page refreshing
+* docs - geomap - more modes: measureDistance, measureArea, static
 
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon

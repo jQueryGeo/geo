@@ -1,21 +1,28 @@
 ﻿== to do ==
 
+* docs - geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
+* docs - geomap - append label argument
+* docs - geomap - service-level shapes
+* docs - geomap - service-level shapeStyle
+* docs - geomap - shapes option
+* geomap - shapes option
 * geomap - [bug] drawStyle disappears after window resize
 * geomap - [bug] setting services array during init does not wipe out default properties of initial service object
 * geomap - [bug] zoom in more than once with zoom method moves tiles to the wrong spot
+* geomap - [bug] map panning is jumpy, appears to be related to shapes and/or drawing context
 * docs - geomap - support TMS
 * geomap - support TMS
 * geomap - [bug] ie highlights entire map div during shift-zoom
 * geomap - remove this-style state properties
 * geomap - remove "px" from .css calls
 * geo - use Array.push instead of $.merge
-* docs - upgrade to jQuery Mobile rc2
-* docs - allow page refreshing
 * geomap - [bug] changing services array (without changing all services) after initialization fails
 * geomap - [bug] multiple maps do not work on the same page
 * geomap - use _currentServices in all functions unless we actually need to update the public  options services object
 * geomap - create _defaultState object, use for widget-local _widgetState property, reinit _widgetState on _createWidget
 * geomap - don't redraw shapes after interactiveScale, they've already been drawn at new scale
+* geomap - [bug] exception when calling destroy on uninitialized div
+* expose jQuery Geo as an AMD module so asynchronous loaders like RequireJS and curl.js can use it
 * examples - geomap resize method
 * examples - multiple maps example
 * geomap - [bug] when a singled image hasn't loaded after pan and you double click on empty space, the zoomed bbox seems wrong
@@ -23,11 +30,8 @@
 * add 3rd party license headers
 * geomap - test jQuery widget call chaining when setting option values
 * geomap - pan lags on first drag
-* docs - geomap - more modes: measureDistance, measureArea
 * docs - geomap - document the correct way to add a service after init
-* docs - geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
 * geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
-* docs - geomap - append label argument
 * geomap - port shape labels
 * geomap - unbind keydown handler on destroy, it's on the document
 * docs - $.geo.WKT object
@@ -39,16 +43,12 @@
 * docs - write a full page about GeoJSON and what each object type is to $.geo
 * docs - geomap - allow name as service object property
 ** if a service has a name property, it will maintain a hidden input with the given name
-* docs - geomap - service-level shapes
-* docs - geomap - service-level shapeStyle
 * docs - geo - support up to GeometryCollection in distance
 * geo - support up to GeometryCollection in distance
 * docs - geo - support up to GeometryCollection in contains
 * geo - support up to GeometryCollection in contains
 * docs - geo - support up to GeometryCollection in centroid
 * geo - support up to GeometryCollection in centroid
-* docs - geo - empty function
-* geo - geometry - empty function
 * geomap - show a drawPoint style while the mouse is down, hide if toolPan or dbltap scale
 * geomap - android - [bug] cannot always pan map after appending shapes
 * geomap - deep extend existing service objects when services property is set
@@ -82,6 +82,8 @@
 * geomap - store a copy of shapes as WKT in a hidden input
 * geomap - only update WKT copy if shape is appended with refresh argument set to true
 * geomap - find - [maybe] after flatten, check more cached bboxes for non-Point geometrie
+* docs - geomap - toDataURL method
+* geomap - toDataURL method
 * docs - geomap - SVG & other neat elements/media in labels
 * docs - geo - $.geo.guessLocation function
 * geo - $.geo.guessLocation function
@@ -95,6 +97,28 @@
 ** in the drawing modes, this function ends drawing and triggers the shape event with whatever coordinates have already been added to the shape
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
+
+==2011-11-15==
+===twheat===
+I'm going to make this a real app with its own subdomain. I would like to use paging because the first page doesn't have enough results with a geo argument. What happens when there's no further pages. Is there a "next_page" property? Is is null?
+
+The page will be more impressive if I try to geocode the location property to get more results.
+
+Heh, this will blast a lot of queries at MapQuest. I'm going to have to store ids i've already processed.
+
+That's soo much nicer!
+
+Maybe I can get a couple old pages worth as well on the first search.
+
+Twheat exists!
+
+==2011-11-14==
+===a4===
+Time to start a4 docs. Hopefully this will be the last alpha.
+
+==2011-11-10==
+===merge===
+I merged in the changes to support photos. It amounts to only a few hundred bytes minified and can be pretty useful. I couldn't find a good example service to use for the axisLayout demo.
 
 ==2011-11-09==
 ===axisLayout===
