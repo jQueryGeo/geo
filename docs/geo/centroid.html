@@ -3,11 +3,15 @@
 <html lang="en" class="no-js">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
   <title>centroid | $.geo</title>
   <meta name="description" content="jQuery Geo centroid method">
   <meta name="author" content="Ryan Westphal">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="../css/style.css?v=2">
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0rc3/jquery.mobile-1.0rc3.min.css" />
 </head>
 
 <body>
@@ -44,10 +48,14 @@
       <p>Technically, only Polygons can be considered to have mass. However, a centroid can be calculated for other geometry type. This method operates on LineStrings as if they were closed polygons and the centroid will likely not lie along the line. The centroid of a Point is a clone of the Point.</p>
       <!--<p>With GeometryCollections containing multiple geometry types, the centroid of the geometries of highest dimension will be returned. In other words, one Polygon will override any number of LineStrings in the collection and the centroid will simply be the centroid of that Polygon.</p>-->
       <p>If the argument is not a basic GeoJSON geometry object, this function returns undefined.</p>
-      <p>To calculate an accurate centroid, this method must operate in non-geodetic coordinates. Therefore, if $.geo.proj is not null, this method first calls fromGeodetic on the incoming shape and toGeodetic on the return Point.</p>
       <p>This function is similar to Geometry.getCentroid in JTS.</p>
      </div>
   </div> <!-- end of #container -->
+
+  <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
+  <script src="js/script.js"></script>
+  <script src="http://code.jquery.com/mobile/1.0rc3/jquery.mobile-1.0rc3.min.js"></script>
 </body>
 </html>
 

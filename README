@@ -8,6 +8,15 @@ Documentation is hosted at http://jquerygeo.com
 
 == CHANGELOG ==
 
+=== 1.0a4 ===
+* geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax
+* geomap - [bug] shingled services throw exception during resize
+* docs - geomap - axisLayout option
+* geomap - axisLayout option
+* docs - upgrade to jQuery Mobile rc3
+* docs - allow page refreshing
+* docs - geomap - more modes: measureDistance, measureArea, static
+
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon
 * geomap - [bug] tiles do not show when pixel sizes are near or lower than 1.0
@@ -88,6 +97,7 @@ Documentation is hosted at http://jquerygeo.com
 * docs/geomap - scale map according to cursor location instead of re-centering during double-click zoom
 * geomap - iOS - [bug] second tap can be anywhere & cause a zoom
 * geomap - shingled - [bug] map doesn't resize correctly
+* examples - geomap drawStyle option
 
 === 1.0a2 (2011-06-29) ===
 * geomap - Support dynamic map services
