@@ -3,11 +3,15 @@
 <html lang="en" class="no-js">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
   <title>mode | geomap</title>
   <meta name="description" content="geomap mode property">
   <meta name="author" content="Ryan Westphal">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="../css/style.css?v=2">
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0rc3/jquery.mobile-1.0rc3.min.css" />
 </head>
 
 <body>
@@ -46,17 +50,13 @@
       <ul>
         <li>pan</li>
         <li>zoom</li>
+        <li>static</li>
         <li>drawPoint</li>
         <li>drawLineString</li>
         <li>drawPolygon</li>
-        <!--<li>measureDistance</li>
-        <li>measureArea</li>-->
+        <li>measureDistance</li>
+        <li>measureArea</li>
       </ul>
-      <!--<h2>static</h2>
-      <h3>user experience</h3>
-      <p>The map widget displays tiles and map images as normal but the user cannot interact with them, e.g., the user can't pan or zoom.</p>
-      <h3>events</h3>
-      <p>All regular browser events bubble up to parent controls and eventually the document. No widget-specific events trigger.</p>-->
       <h2>pan</h2>
       <h3>user experience</h3>
       <p>The default cursor is an open hand in browsers that support data URIs and a four point arrow otherwise.</p>
@@ -89,6 +89,16 @@
         <li>dblclick &ndash; when the user double-clicks or double-taps a point on the map</li>
         <li>bboxchange &ndash; when the user changes the bbox by zooming</li>
       </ul>
+
+      <h2>static</h2>
+
+      <h3>user experience</h3>
+      <p>The default cursor is the default arrow pointer.</p>
+      <p>The map widget displays tiles and map images as normal but the user cannot interact with them, e.g., the user can't pan or zoom in any way.</p>
+      <p>As a developer, you can still call geomap methods and set options in order to change the static map's appearance. Events are not triggered when you change the map programmatically.</p>
+
+      <h3>events</h3>
+      <p>All regular browser events bubble up to parent controls and eventually the document. No widget-specific events trigger.</p>
 
       <h2>drawPoint</h2>
 
@@ -141,15 +151,15 @@
         <li>shape &ndash; when the user double-clicks or taps a point on the map after beginning a drawing operation with a single click, this action will send a GeoJSON Polygon object to the developer</li>
       </ul>
 
-      <!--<h2>measureDistance</h2>
+      <h2>measureDistance</h2>
 
       <h3>user experience</h3>
       <p>The default cursor is a crosshair.</p>
 
-      <p>In this mode the user can visually measure a distance on the map. The first single-click or tap on the map will begin the measurement. Once initialized, subsequent single-clicks or taps will add points to a LineString being measured. Whenever the mouse moves, a label appears near the cursor that displays the total distance so far. The label also appears when the user adds a new point. Touch devices will only see an updated measurment when they add a new point. A double-click or tap will end the measurement and remove all graphics and labels.</p>
+      <p>In this mode the user can visually measure a distance on the map. The first single-click or tap on the map will begin the measurement. Once initialized, subsequent single-clicks or taps will add points to a LineString being measured. Whenever the mouse moves, a label follows the cursor which displays the total distance so far. Touch devices will only see an updated measurment when they add a new point. A double-click or tap will end the measurement and remove all graphics and labels.</p>
       <p>On a non-touch device a visual line will follow the mouse cursor from the last point to show the user the next segment of the line they are measuring and update the measurement. On all devices, the next segment becomes visible when the user confirms the next point location by clicking or tapping. At any point, the user can hit the escape key to remove one point or, if there is only one point, stop measuring alltogether.</p>
       <p>Similar to pan mode, the user can drag the map to pan, even while measuring. The map will continue panning a little after the user lets go. They can zoom in or out with the scroll wheel. While not measuring, they can also double-click or double-tap to zoom in one level.</p>
-      <p>By default the unit of measurment is meters because the default projection is web mercator meters. If you change the tilingScheme (on tiles services) or switch to a shingled service, the unit of measurment will be based on your new service's units.</p>
+      <p>By default the unit of measurment is meters because the default projection is web mercator meters. If you change the tilingScheme (on tiled services) or switch to a shingled service, the unit of measurment will be based on your new service's units.</p>
       <h3>events</h3>
       <p>In measureDistance mode, the geomap widget triggers the following events on the original map div.</p>
       <ul>
@@ -164,10 +174,10 @@
       <h3>user experience</h3>
       <p>The default cursor is a crosshair.</p>
 
-      <p>In this mode the user can visually measure an area on the map. The first single-click or tap on the map will begin the measurement. Once initialized, subsequent single-clicks or taps will add points to a Polygon being measured. Whenever the mouse moves, a label appears in the center of the polygon that displays the total area so far. The label also appears when the user adds a new point. Touch devices will only see an updated measurment when they add a new point. A double-click or tap will end the measurement and remove all graphics and labels.</p>
+      <p>In this mode the user can visually measure an area on the map. The first single-click or tap on the map will begin the measurement. Once initialized, subsequent single-clicks or taps will add points to a Polygon being measured. Whenever the mouse moves, a label follows the center of the polygon that displays the total area so far. Touch devices will only see an updated measurment when they add a new point. A double-click or tap will end the measurement and remove all graphics and labels.</p>
       <p>On a non-touch device two visual lines will follow the mouse cursor. One from the last point to show the user the next segment of the Polygon they will draw, the other from the first point to show the user an extra segment that will complete the Polygon we need to calculate area. On all devices, the next segment becomes visible when the user confirms the next point location by clicking or tapping. At any point, the user can hit the escape key to remove one point or, if there is only one point, stop measuring alltogether.</p>
       <p>Similar to pan mode, the user can drag the map to pan, even while measuring. The map will continue panning a little after the user lets go. They can zoom in or out with the scroll wheel. While not measuring, they can also double-click or double-tap to zoom in one level.</p>
-      <p>By default the unit of measurment is meters because the default projection is web mercator meters. If you change the tilingScheme (on tiles services) or switch to a shingled service, the unit of measurment will be based on your new service's units.</p>
+      <p>By default the unit of measurment is meters because the default projection is web mercator meters. If you change the tilingScheme (on tiled services) or switch to a shingled service, the unit of measurment will be based on your new service's units.</p>
       <h3>events</h3>
       <p>In measureArea mode, the geomap widget triggers the following events on the original map div.</p>
       <ul>
@@ -175,10 +185,15 @@
         <li>click &ndash; when the user clicks or taps a point on the map without initiating a pan, this event triggers even while measuring</li>
         <li>dblclick &ndash; when the user double-clicks or double-taps a point on the map but is not actively measuring</li>
         <li>bboxchange &ndash; when the user changes the bbox by panning or zooming</li>
-      </ul>-->
+      </ul>
 
     </div>
   </div> <!-- end of #container -->
+
+  <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
+  <script src="js/script.js"></script>
+  <script src="http://code.jquery.com/mobile/1.0rc3/jquery.mobile-1.0rc3.min.js"></script>
 </body>
 </html>
 

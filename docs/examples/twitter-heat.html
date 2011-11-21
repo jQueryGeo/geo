@@ -75,7 +75,7 @@
     <div class="info">
       <div class="links">
         <a href="../" class="docLink">&lt; docs</a>
-        <a href="http://jsfiddle.net/ryanttb/==JSFIDDLE==/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
+        <a href="http://jsfiddle.net/ryanttb/kjSGL/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
       </div>
       <h1>
         Twitter Heat Map</h1>
@@ -89,26 +89,36 @@
   <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
   <script>
     $(function () {
-      var map,
-          searchTerm = "",
-          currentXhr = null;
+      var map = null,
+          searchTerm = "", //< last search term
+          currentXhr = null; //< an ajax request reference if we need to cancel
 
       function initMap(center, zoom) {
+        // create a map using an optional center and zoom
         map = $("#map").geomap({
           center: center || [-71.0597732, 42.3584308],
           zoom: zoom || 10,
           move: function (e, geo) {
+            // when the user moves, search for appended tweets
+            // and show a popup
+
+            // clear the popup
             $("#popup").hide().html("");
+
             if (searchTerm) {
+              // spatial query, geo has the cursor location as a map point
+              // this will find appended tweets within 3 pixels
               var features = map.geomap("find", geo, 3),
                   popupHtml = "",
                   i = 0;
 
+              // for each tweet found, add some html to the popup
               for (; i < features.length; i++) {
                 popupHtml += "<p>" + features[i].properties.tweet + "</p>";
               }
 
               if (popupHtml) {
+                // if any tweets found, show the popup
                 $("#popup").append(popupHtml).css({
                   left: e.pageX,
                   top: e.pageY
@@ -118,6 +128,8 @@
           }
         });
 
+        // set the shape style to a largish solid but translucent circle
+        // to give the tweets a heat map effect
         map.geomap("option", "shapeStyle", {
           strokeOpacity: 0,
           fillOpacity: .3,
@@ -129,6 +141,8 @@
       }
 
       $("#loc").submit(function () {
+        // when the user clicks the location search button,
+        // send a request to nominatim for an OpenStreatMap data search
         $.ajax({
           url: "http://open.mapquestapi.com/nominatim/v1/search",
           data: {
@@ -137,8 +151,11 @@
           },
           dataType: "jsonp",
           jsonp: "json_callback",
-          success: function (results) {
+          success: function (results) {            
             if (results && results.length > 0) {
+              // if we a result, set the map's extent
+              // unfortunately, the nominatim search spec returns a bbox
+              // that is not properly GeoJSON formatted so we need to reorder
               $("#popup").hide().html("");
               var nbbox = results[0].boundingbox;
               map.geomap("option", "bbox", [
@@ -154,72 +171,99 @@
       });
 
       $("#twit").submit(function () {
+        // when the user clicks the tweet search button,
+        // send a request to twitter
+
         if (currentXhr) {
+          // if there's a search pending, cancel it
           currentXhr.abort();
           currentXhr = null;
         }
 
         $("#popup").hide().html("");
+
+        // clear the map of previous search tweets
         map.geomap("empty");
 
+        // save our search term
         searchTerm = $("#twit input").val();
+
+        // autoSearch will keep searching every five seconds
         autoSearch();
         return false;
       });
 
       function search() {
-        var center = map.geomap("option", "center"),
-            geocode = [
-              center[1],
-              center[0],
-              Math.min(2500, map.geomap("option", "pixelSize") * $(document).width() / 2 / 1000) + "km"
-            ],
-            lastSearchTerm = searchTerm;
+        // called by autoSearch, this function actually searches Twitter for geo-enabled tweets
 
-        currentXhr = $.ajax({
-          url: "http://search.twitter.com/search.json",
-          data: {
-            rpp: 100,
-            q: lastSearchTerm,
-            geocode: geocode.join(",")
-          },
-          dataType: "jsonp",
-          complete: function () {
-            currentXhr = null;
-          },
-          success: function (tweets) {
-            if (searchTerm == lastSearchTerm && tweets.results) {
-              $.each(tweets.results, function () {
-                if (this.geo) {
-                  this.geo.coordinates = [
-                    this.geo.coordinates[1],
-                    this.geo.coordinates[0]
-                  ];
+        if ( map !== null ) {
+          var center = map.geomap("option", "center"), //< the center of the map in lon, lat
+              // the geocode argument to Twitter search,
+              // it's an array with [ lat, lon, radius in km ]
+              // geomap's center is lon, lat so we have to switch
+              // for radius we'll use document width * pixelSize converted to km (from meters)
+              // Twitter search has a max of 2500km
+              geocode = [ 
+                center[1],
+                center[0],
+                Math.min(2500, map.geomap("option", "pixelSize") * $(document).width() / 2 / 1000) + "km"
+              ],
+              lastSearchTerm = searchTerm;
 
-                  if (map.geomap("find", this.geo, .01).length == 0) {
-                    var feature = {
-                      type: "Feature",
-                      geometry: this.geo,
-                      properties: {
-                        tweet: "<b>" + this.from_user + "</b>: " + this.text
-                      }
-                    };
-                    map.geomap("append", feature);
+          // actually send the request to Twitter
+          currentXhr = $.ajax({
+            url: "http://search.twitter.com/search.json",
+            data: {
+              rpp: 100,
+              q: lastSearchTerm,
+              geocode: geocode.join(",")
+            },
+            dataType: "jsonp",
+            complete: function () {
+              currentXhr = null;
+            },
+            success: function (tweets) {
+              if (searchTerm == lastSearchTerm && tweets.results) {
+                // if we have results, search each of them for the geo property
+                $.each(tweets.results, function () {
+                  if (this.geo) {
+                    // if there is one, flip the coordinates because Twitter search isn't
+                    // in proper GeoJSON spec order
+                    // Twitter uses [lat, lon] instead of [lon, lat]
+                    this.geo.coordinates = [
+                      this.geo.coordinates[1],
+                      this.geo.coordinates[0]
+                    ];
+
+                    // search for a tweet at the exact location so we don't add duplicates
+                    if (map.geomap("find", this.geo, .01).length == 0) {
+                      // if we don't have a tweet there, append a feature
+                      // store some tweet html as a property on the feature
+                      var feature = {
+                        type: "Feature",
+                        geometry: this.geo,
+                        properties: {
+                          tweet: "<b>" + this.from_user + "</b>: " + this.text
+                        }
+                      };
+                      map.geomap("append", feature);
+                    }
                   }
-                }
-              });
+                });
+              }
             }
-          }
-        });
+          });
+        }
       }
 
       function autoSearch() {
         if (searchTerm) {
           search();
-          setTimeout(autoSearch, 3000);
+          setTimeout(autoSearch, 5000);
         }
       }
 
+      // for fun, we support sending center, zoom and a tweet query in the query string
       var queryString = window.location.search.substring(1),
           params = queryString.split("&"),
           options = {};
@@ -237,6 +281,7 @@
           initMap($.parseJSON("[" + options.center + "]"));
         }
       } else {
+        // if there's no center in the query string, try to use geolocation
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(function (p) {
             initMap([p.coords.longitude, p.coords.latitude]);
@@ -244,6 +289,7 @@
             initMap();
           });
         } else {
+          // if all else fails, use defaults
           initMap();
         }
       }
