@@ -38,19 +38,26 @@
   <script src="../../js/excanvas.js"></script>
   <script src="../../js/jquery.mousewheel.min.js"></script>
   <script src="../../js/jquery.ui.widget.js"></script>
+  <script src="../../js/jsrender.js"></script>
   <script src="../../js/jquery.geo.core.js"></script>
   <script src="../../js/jquery.geo.geographics.js"></script>
   <script src="../../js/jquery.geo.geomap.js"></script>
   <script src="../../js/jquery.geo.tiled.js"></script>
   <script src="../../js/jquery.geo.shingled.js"></script>
-  <!--<script src="http://jquerygeo.com/test/jquery.geo-test.min.js"></script>-->
+  <!--<script src="../jquery.geo-test.min.js"></script>-->
   <script>
     $(function () {
       // create a map
       var map = $("#map").geomap({
         center: [-71.0595678, 42.3604823],
         zoom: 8,
-        mode: "measureDistance"
+        mode: "measureDistance",
+        measureLabels: {
+          distance: "{{=distance.toFixed( 4 )}} meters"
+        },
+        drawStyle: {
+          color: "blue"
+        }
       });
     });  
   </script>

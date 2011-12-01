@@ -1,0 +1,60 @@
+<!doctype html>  
+
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+
+  <title>area | $.geo</title>
+  <meta name="description" content="jQuery Geo area method">
+  <meta name="author" content="Ryan Westphal">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="../css/style.css?v=2">
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0rc3/jquery.mobile-1.0rc3.min.css" />
+</head>
+
+<body>
+
+  <div id="area" data-role="page">
+    <div data-role="header" data-theme="b">
+      <h1>area</h1>
+    </div>
+    
+    <div data-role="content">
+      <table>
+        <tr>
+          <th>return type</th>
+          <td>Number</td>
+        </tr>
+        <tr>
+          <th>syntax</th>
+          <td>$.geo.area( Object shape ( <a href="http://geojson.org/geojson-spec.html" rel="external">GeoJSON object</a> ) )</td>
+        </tr>
+        <tr>
+          <th>usage</th>
+          <td><pre><code>var area = $.geo.area( {
+      type: &quot;Polygon&quot;,
+      coordinates: [[
+        [-75, 39.7],
+        [-74.8, 39.3],
+        [-75.2, 39.3],
+        [-75, 39.7]
+      ]]
+} )</pre></code></td>
+        </tr>
+      </table>
+      <p>The area method calculates the area of a basic GeoJSON geometry object and returns it in non-geodetic units. The basic shapes are Point, LineString and Polygon. If you are using geomap with its default map service, the area is in meters because the default projection is web mercator meters.</p>
+      <p>While you can pass any basic geometry, this function returns the area of Polygon objects and 0 for objects of other shape types.</p>
+      <p>If the argument is not a basic GeoJSON geometry object, this function returns undefined.</p>
+      <p>This function is similar to Geometry.getArea in JTS.</p>
+    </div>
+  </div> <!-- end of #container -->
+
+  <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
+  <script src="js/script.js"></script>
+  <script src="http://code.jquery.com/mobile/1.0rc3/jquery.mobile-1.0rc3.min.js"></script>
+</body>
+</html>
+

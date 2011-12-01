@@ -1,17 +1,24 @@
 ﻿== to do ==
 
-* docs - geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
-* docs - geomap - append label argument
 * docs - geomap - service-level shapes
-* docs - geomap - service-level shapeStyle
+* docs - geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
 * docs - geomap - shapes option
 * geomap - shapes option
-* geomap - [bug] drawStyle disappears after window resize
 * geomap - [bug] setting services array during init does not wipe out default properties of initial service object
 * geomap - [bug] zoom in more than once with zoom method moves tiles to the wrong spot
 * geomap - [bug] map panning is jumpy, appears to be related to shapes and/or drawing context
+* docs - geomap - label method
+** redraw all shapes while searching for argument
+* docs - geomap - style method
+** redraw all shapes while searching for argument
+* geomap - getUrl string option
+* docs - geomap - wheel option
+* geomap - wheel option
+* geomap - cache label coordinates (the labelPixel cannot be cached, it will change each refresh)
+* geomap - rotate label based on segment
 * docs - geomap - support TMS
 * geomap - support TMS
+* geomap - replace data-geo attributes with classes
 * geomap - [bug] ie highlights entire map div during shift-zoom
 * geomap - remove this-style state properties
 * geomap - remove "px" from .css calls
@@ -26,6 +33,7 @@
 * examples - geomap resize method
 * examples - multiple maps example
 * geomap - [bug] when a singled image hasn't loaded after pan and you double click on empty space, the zoomed bbox seems wrong
+* geographics - merge label engine into geographics widget
 * remove BOM from release files
 * add 3rd party license headers
 * geomap - test jQuery widget call chaining when setting option values
@@ -49,13 +57,18 @@
 * geo - support up to GeometryCollection in contains
 * docs - geo - support up to GeometryCollection in centroid
 * geo - support up to GeometryCollection in centroid
+* geomap - stop using $.data to store bbox since it's only used for drawing; store on _graphicShapes instead
 * geomap - show a drawPoint style while the mouse is down, hide if toolPan or dbltap scale
 * geomap - android - [bug] cannot always pan map after appending shapes
 * geomap - deep extend existing service objects when services property is set
 * geomap - cache point bbox if $.geo.proj is not null?
+* geomap - spatially index shapes when a tilingScheme is in place
+* geomap - internal - add _getVisibleTiles method and use it in tiled service and shapes spatial index
+* geomap - remove wheel plugin and use built-in mousewheel event
 * code - prefer $.data over $.fn.data
 * docs - internal - explain what projection is and which one we use by default (3395) and maybe why we call it web mercator & why we can't get to +/- 90 lat
 * docs - internal - document how geomap draws shapes, the geomapgraphics widget and the reason shapeStyle is a method
+* docs - demo - location based notes/to do list
 * geomap - label divs should have class="geo-label" & style="position: relative;"
 * geomap - find should check labels first
 * geo - geometry - implement JTS note: "The centroid is equal to the centroid of the set of component Geometries of highest dimension (since the lower-dimension geometries contribute zero "weight" to the centroid)"
@@ -64,6 +77,7 @@
 * geo - support bbox in distance ( fix geomap.find )
 * docs - geomap - shapeLabel property
 ** template for labels for all shapes added via append
+* geomap - perf test putting all containers that need to move with panning in a single super-container
 * docs - geomap - multiple labels
 * geomap - multiple labels
 * geomap - service-level shapes
@@ -97,6 +111,97 @@
 ** in the drawing modes, this function ends drawing and triggers the shape event with whatever coordinates have already been added to the shape
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
+
+==2011-12-01==
+===getUrl===
+I was going to bring our urlFormat property over from the old code but now I think I want it to be the same property on the service object. I think getUrl can be a function, but can *also* be a string for shorthand. This will obviously be a jsrender template string.
+
+==2011-11-30==
+===twheat===
+I'm going to keep the twitter-heat demo and also leave twheat as its own app.
+
+===service-level===
+Finally writing some service-level shape docs for 1.0a4.
+
+===wheel===
+I would like to add a wheel option. We have a wheelMode property on the internal control that can be a few different things. I would like this to be simpler. Maybe just "wheel" and have it be "on" or "off". Or a boolean? But a boolean would limit future additions.
+
+==2011-11-23==
+===measure===
+I'm going to port measure over as pretty much how it's done in our original project, in that it will have its own dedicated label.
+
+===measure-label===
+Trying to make the measure label look nicer than before. I'm adding a style to the document head just for the measure tool. I'm prepending it so designers can override any of the properties.
+
+===jsrender===
+Pulling in jsrender for the measure label. I'm going to have to do it anyway for shapeLabel, may as well do it now. Works well for my needs, I'm going to document the measureLabels option.
+
+==2011-11-22==
+===jQuery 1.7.1===
+I'm still using 1.6.4 and will likely release that way. I'll have to test with 1.7. The notes say that .1 fixed a bug in mousewheel event. I didn't even know they had a mousewheel event. Maybe I can stop using the wheel plugin I've been using.
+
+===label-container===
+Judging from the layout below, I'm going to change textContainer to .geo-label-container and have it move around exactly like the shapesContainer. More like serviceContainer because it doesn't need to be the size of the frame.
+
+ #map .geo-map
+   .geo-event-target.geo-content-frame
+     .geo-services-container
+       .geo-service*
+     .geo-shapes-container
+       canvas
+     .geo-labels-container
+       .geo-label*
+     .geo-draw-container
+       canvas
+     .geo-measure-container
+       .geo-measure-label.geo-label
+
+===refresh polygon===
+I'm still curious why I don't use toPixel on Polygon shapes as a whole? Why the loops? Right, I was thinking toGeodetic. geomap's toPixel function only takes up to two dimensional arrays. Updated both functions.
+
+===pan===
+I need to pan both shapes and labels at the same time. I think I need a new container for these because drawing might be part of this as well.
+
+===length & area===
+Documenting and coding these because I'll need them for the measure tools.
+
+===LineString middle===
+There must be something in JTS that's similar to Esri's ILine.QueryPoint function but I can't find it. This is for getting the point along the line for the label. I want to add a generic function to $.geo. Ah, LineSegment.pointAlong.
+
+Documenting pointAlong. Also implementing it! Works pretty well.
+
+===line rotate===
+I would like to rotate the line label based on the current segment but that will have to wait.
+
+===geographics===
+I'm going to merge labeling into geographics so that I can move the tech as a whole to indivdual services. That'll come later when I need to do service-level shapes.
+
+==2011-11-21==
+===measure===
+I started porting measureDistance today but merged the branch in after being able to draw a line. The rest of it depends on being able to draw labels. Our internal library has _labelShape specifically for measuring but I'm going to merge that into the labeling engine for this release.
+
+===append===
+I need to update the append docs to include label before I do anything. Done. Since it's needed right away, I'm going to start porting labels over.
+
+===shapesContainer===
+Can I re-use $shapesContainer for labels? I'd rather not keep track of a second div. However, I think $shapesContainer *is* a canvas element so that's not going to work. Yeah, it's a geographics widget which...no, geographics appends the canvas. I can re-use that element...but semantically, it isn't correct.
+
+That won't work anyway, I need these to exist at the service div level so they can be targeted by CSS.
+
+However, labels not associated with a service would not be in a service div and would need their own div.
+
+===layout===
+Currently, the layout is, e.g.:
+
+ #map .geo-map
+   .geo-event-target
+     .geo-services-container
+       .geo-service
+     .geo-shapes-container
+       canvas
+     .geo-draw-container
+       canvas
+     ($textContainer)
 
 ==2011-11-15==
 ===twheat===

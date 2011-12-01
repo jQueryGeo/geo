@@ -12,7 +12,7 @@
 
           var idString = service.id ? ' id="' + service.id + '"' : "",
               classString = service["class"] ? ' class="' + service["class"] + '"' : "",
-              scHtml = '<div data-geo-service="tiled"' + idString + classString + ' style="position:absolute; left:0; top:0; width:8px; height:8px; margin:0; padding:0; display:' + (service.visibility === undefined || service.visibility === "visible" ? "block" : "none") + ';"></div>';
+              scHtml = '<div class="geo-service" data-geo-service="tiled"' + idString + classString + ' style="position:absolute; left:0; top:0; width:8px; height:8px; margin:0; padding:0; display:' + (service.visibility === undefined || service.visibility === "visible" ? "block" : "none") + ';"></div>';
 
           servicesContainer.append(scHtml);
 

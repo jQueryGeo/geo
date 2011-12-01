@@ -44,20 +44,20 @@
         </tr>
         <tr>
           <th>init</th>
-          <td><pre><code>$( <i>selector</i> ).geomap( { shapeStyle: { color: &quot;green&quot; } } );</code></pre></td>
+          <td><pre><code>$( <i>map or service selector</i> ).geomap( { shapeStyle: { color: &quot;green&quot; } } );</code></pre></td>
         </tr>
         <tr>
           <th>get</th>
-          <td><pre><code>var shapeStyle = $( <i>selector</i> ).geomap( &quot;option&quot;, &quot;shapeStyle&quot; );</code></pre></td>
+          <td><pre><code>var shapeStyle = $( <i>map or service selector</i> ).geomap( &quot;option&quot;, &quot;shapeStyle&quot; );</code></pre></td>
         </tr>
         <tr>
           <th>set</th>
-          <td><pre><code>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;shapeStyle&quot;, { strokeWidth: &quot;4px&quot; } );</code></pre></td>
+          <td><pre><code>$( <i>map or service selector</i> ).geomap( &quot;option&quot;, &quot;shapeStyle&quot;, { strokeWidth: &quot;4px&quot; } );</code></pre></td>
         </tr>
       </table>
       <p>The shapeStyle option retrieves or updates the <i>base</i> style of shapes appended to the map.</p>
       <p>This differs from the drawStyle option which defines the style of incomplete lines and polygons as they are being drawn.</p>
-      <p>Two extra color properties, stroke and fill, are not defined by default and use the value of the color property.</p>
+      <p>Two extra color properties, stroke and fill, are not defined by default and use the value of the color property until they are defined individually.</p>
       <p>This option changes specific properties of the internal base style. If you send an incomplete style object, only the style properties you reference are updated.</p>
       <p>Similar to CSS, you can override this style on a per-shape basis by passing a different style to the append method.</p>
       <p>Changing this base style will update how geomap draws existing shapes that do not have their own style. For shapes that do have their own style, changing the base shapeStyle will update any style properties not referenced in the shape-specific style. For example, assume the following:</p>
@@ -80,6 +80,26 @@
         </li>
       </ol>
       <p>The shape described in the above example will draw with a blue stroke color and a strokeWidth of 4px.</p>
+      <p>You can also set a base style for a specific service. These are called service-level styles and apply only to service-level shapes. To do this, target a service inside a map instead of the map itself for your call to geomap's shapeStyle option. To expand upon the above example, consider the following additional steps:</p>
+      <ol start="4">
+        <li>
+          <span>you change the shapeStyle option of the default service specifically so that points are twice as long as usual; the default service has the CSS class: osm</span>
+          <pre><code>$( &quot;#map .osm&quot; ).geomap( &quot;option&quot;, &quot;shapeStyle&quot;, { width: &quot;16px&quot; } )</code></pre>
+        </li>
+        <li>
+          <span>you append a second point directly to the default .osm service</span>
+          <pre><code>$( &quot;#map .osm&quot; ).geomap( 
+  &quot;append&quot;,
+  { type: &quot;Point&quot;, coordinates: [ -70.5, 42.5 ] }
+);</code></pre>
+        </li>
+      </ol>
+      <p>This second point will:</p>
+      <ul>
+        <li>have a blue stroke color because it cascades from the base shapeStyle for the map as a whole (which you set with your first call to shapeStyle)</li>
+        <li>have a strokeWidth of only 2px because it is unaffected by the style applied to the first shape during the first append call</li>
+        <li>have a width of 16px which it gets from the shapeStyle of the service where it was appended</li>
+      </ul>
       <p>When called with a second argument to set the shapeStyle, the jQuery UI widget factory returns the original jQuery collection to maintain call chaining.</p>
       <p>Please see the style section at the bottom of the <a href="#" onclick="javascript:window.history.back();">geomap widget</a> page for more information about the style object.</p>
     </div>

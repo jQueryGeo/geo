@@ -16,6 +16,18 @@ Documentation is hosted at http://jquerygeo.com
 * docs - upgrade to jQuery Mobile rc3
 * docs - allow page refreshing
 * docs - geomap - more modes: measureDistance, measureArea, static
+* docs - geomap - append label argument
+* docs - geomap - toPixel/toMap should take all coordinate dimensions like the proj functions
+* geomap - toPixel/toMap should take all coordinate dimensions like the proj functions
+* geomap - move the drawing container instead of individual points during pan
+* geomap - [bug] drawStyle resets after window resize
+* geomap - append label argument
+* docs - geomap - measureLabels option
+* geomap - measureLabels option
+* geomap - measureDistance mode
+* geomap - measureArea mode
+* docs - geomap - service-level shapeStyle
+* docs - geomap - getUrl string option
 
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon

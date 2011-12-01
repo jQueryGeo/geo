@@ -10,6 +10,7 @@ type js\jquery.geo.head.js > docs\jquery.geo-%1.js
 type js\excanvas.js >> docs\jquery.geo-%1.js
 type js\jquery.mousewheel.min.js >> docs\jquery.geo-%1.js
 type js\jquery.ui.widget.js >> docs\jquery.geo-%1.js
+type js\jsrender.js >> docs\jquery.geo-%1.js
 type js\jquery.geo.core.js >> docs\jquery.geo-%1.js
 type js\jquery.geo.geographics.js >> docs\jquery.geo-%1.js
 type js\jquery.geo.geomap.js >> docs\jquery.geo-%1.js

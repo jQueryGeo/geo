@@ -45,7 +45,7 @@
         </tr>
       </table>
       <p>The centroid method calculates the <b>center of mass</b> for the passed-in basic GeoJSON geometry object. The basic geometry types are Point, LineString and Polygon.</p>
-      <p>Technically, only Polygons can be considered to have mass. However, a centroid can be calculated for other geometry type. This method operates on LineStrings as if they were closed polygons and the centroid will likely not lie along the line. The centroid of a Point is a clone of the Point.</p>
+      <p>Technically, only Polygons can be considered to have mass. However, a centroid can be calculated for other geometry types. This method operates on LineStrings as if they were closed polygons and the centroid will likely not lie along the line. The centroid of a Point is a clone of the Point.</p>
       <!--<p>With GeometryCollections containing multiple geometry types, the centroid of the geometries of highest dimension will be returned. In other words, one Polygon will override any number of LineStrings in the collection and the centroid will simply be the centroid of that Polygon.</p>-->
       <p>If the argument is not a basic GeoJSON geometry object, this function returns undefined.</p>
       <p>This function is similar to Geometry.getCentroid in JTS.</p>
