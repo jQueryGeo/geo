@@ -167,6 +167,7 @@
           checkedIds = [], //< list of tweet ids we've checked
           appendedCount = 0, //< number of tweets we successfully appended
           searchTerm = "", //< last search term
+          searching = false,
           currentXhr = null, //< an ajax request reference if we need to cancel
           
           twitterButtonHtml = '<a href="https://twitter.com/share" class="twitter-share-button" data-count="vertical" data-via="ryanttb">Tweet</a><script src="//platform.twitter.com/widgets.js">\x3C/script>';
@@ -236,7 +237,7 @@
           }
         });
 
-        if ( searchTerm ) {
+        if ( searchTerm && !searching ) {
           autoSearch();
         }
       }
@@ -406,7 +407,8 @@
       }
 
       function autoSearch() {
-        if (searchTerm) {
+        searching = true;
+        if ( searchTerm ) {
           search();
           setTimeout(autoSearch, 5000);
         }
@@ -451,7 +453,7 @@
         $("#twit input").val(searchTerm);
         title += " " + searchTerm;
 
-        if ( map !== null ) {
+        if ( map !== null && !searching ) {
           autoSearch();
         }
       }
@@ -460,10 +462,6 @@
         var loc = decodeURIComponent(options.l);
         $("#loc input").val(loc);
         title += " " + loc;
-
-        if ( map !== null ) {
-          autoSearch();
-        }
       }
 
       $("title").html(title);

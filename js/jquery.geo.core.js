@@ -423,6 +423,130 @@
       return geometries;
     },
 
+    length: function( geom, _ignoreGeo /* Internal Use Only */ ) {
+      var sum = 0,
+          lineStringCoordinates,
+          i = 1, dx, dy;
+
+      switch ( geom.type ) {
+        case "Point":
+          return 0;
+
+        case "LineString":
+          lineStringCoordinates = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic(geom.coordinates) : geom.coordinates;
+          break;
+
+        case "Polygon":
+          lineStringCoordinates = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic(geom.coordinates[ 0 ]) : geom.coordinates[ 0 ];
+          break;
+      }
+
+      if ( lineStringCoordinates ) {
+        for ( ; i < lineStringCoordinates.length; i++ ) {
+          dx = lineStringCoordinates[ i ][0] - lineStringCoordinates[ i - 1 ][0];
+          dy = lineStringCoordinates[ i ][1] - lineStringCoordinates[ i - 1 ][1];
+          sum += Math.sqrt((dx * dx) + (dy * dy));
+        }
+        return sum;
+      }
+    },
+
+    area: function( geom, _ignoreGeo /* Internal Use Only */ ) {
+      var sum = 0,
+          polygonCoordinates,
+          i = 1, j;
+
+      switch ( geom.type ) {
+        case "Point":
+        case "LineString":
+          return 0;
+
+        case "Polygon":
+          polygonCoordinates = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic( geom.coordinates[ 0 ] ) : geom.coordinates[ 0 ];
+          break;
+      }
+
+
+      if ( polygonCoordinates ) {
+        for ( ; i <= polygonCoordinates.length; i++) {
+          j = i %  polygonCoordinates.length;
+          sum += ( polygonCoordinates[ i - 1 ][ 0 ] - polygonCoordinates[ j ][ 0 ] ) * ( polygonCoordinates[ i - 1 ][ 1 ] + polygonCoordinates[ j ][ 1 ] ) / 2;
+        }
+
+        return Math.abs( sum );
+      }
+    },
+
+    pointAlong: function( geom, percentage, _ignoreGeo /* Internal Use Only */ ) {
+      var totalLength = 0,
+          previousPercentageSum = 0,
+          percentageSum = 0,
+          remainderPercentageSum,
+          len,
+          lineStringCoordinates,
+          segmentLengths = [],
+          i = 1, dx, dy,
+          c, c0, c1;
+
+      switch ( geom.type ) {
+        case "Point":
+          return $.extend( { }, geom );
+
+        case "LineString":
+          lineStringCoordinates = geom.coordinates;
+          break;
+
+        case "Polygon":
+          lineStringCoordinates = geom.coordinates[ 0 ];
+          break;
+      }
+
+      if ( lineStringCoordinates ) {
+        if ( percentage === 0 ) {
+          return {
+            type: "Point",
+            coordinates: [ lineStringCoordinates[ 0 ][ 0 ], lineStringCoordinates[ 0 ][ 1 ] ]
+          };
+        } else if ( percentage === 1 ) {
+          i = lineStringCoordinates.length - 1;
+          return {
+            type: "Point",
+            coordinates: [ lineStringCoordinates[ i ][ 0 ], lineStringCoordinates[ i ][ 1 ] ]
+          };
+        } else {
+          lineStringCoordinates = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic( lineStringCoordinates ) : lineStringCoordinates;
+
+          for ( ; i < lineStringCoordinates.length; i++ ) {
+            dx = lineStringCoordinates[ i ][ 0 ] - lineStringCoordinates[ i - 1 ][ 0 ];
+            dy = lineStringCoordinates[ i ][ 1 ] - lineStringCoordinates[ i - 1 ][ 1 ];
+            len = Math.sqrt((dx * dx) + (dy * dy));
+            segmentLengths.push( len );
+            totalLength += len;
+          }
+
+          for ( i = 0; i < segmentLengths.length && percentageSum < percentage; i++ ) {
+            previousPercentageSum = percentageSum;
+            percentageSum += ( segmentLengths[ i ] / totalLength );
+          }
+
+          remainderPercentageSum = percentage - previousPercentageSum;
+
+          c0 = lineStringCoordinates[ i - 1 ];
+          c1 = lineStringCoordinates[ i ];
+
+          c = [
+            c0[ 0 ] + ( remainderPercentageSum * ( c1[ 0 ] - c0[ 0 ] ) ),
+            c0[ 1 ] + ( remainderPercentageSum * ( c1[ 1 ] - c0[ 1 ] ) )
+          ];
+
+          return {
+            type: "Point",
+            coordinates: !_ignoreGeo && $.geo.proj ? $.geo.proj.toGeodetic(c) : c
+          };
+        }
+      }
+    },
+
     //
     // WKT functions
     //

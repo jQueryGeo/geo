@@ -31,18 +31,19 @@
       <p>The options argument is a JavaScript object that configures the map widget during the first instantiation on a div. No options are required. By default the map will show the whole world using the OpenStreetMap tile set.</p>
       <p>The map view refreshes when you change these properties: bbox, center, services, tilingScheme &amp; zoom.</p>
       <ul data-role="listview" data-inset="true">
-        <li><a href="bbox.html">bbox</a></li>
-        <li><a href="bboxMax.html">bboxMax</a></li>
-        <li><a href="center.html">center</a></li>
-        <li><a href="cursors.html">cursors</a></li>
-        <li><a href="mode.html"><h3>mode</h3><p class="ui-li-desc">determines how the map, user &amp; developer interact</p></a></li>
-        <li><a href="drawStyle.html"><h3>drawStyle</h3><p class="ui-li-desc">when drawing shapes, defines how they look during drawing</p></a></li>
-        <li><a href="shapeStyle.html"><h3>shapeStyle</h3><p class="ui-li-desc">defines how geomap draws shapes added via the append method</p></a></li>
-        <li><a href="services.html"><h3>services</h3><p class="ui-li-desc">determine the content of the map</p></a></li>
-        <li><a href="tilingScheme.html">tilingScheme</a></li>
+        <li><a href="bbox.html"><h3>bbox</h3><p>bounds of the currently visible viewport</p></a></li>
+        <li><a href="bboxMax.html"><h3>bboxMax</h3><p>bounds of maximum viewport for non-tiled maps</p></a></li>
+        <li><a href="center.html"><h3>center</h3><p>center of the currently visible viewport</p></a></li>
+        <li><a href="zoom.html"><h3>zoom</h3><p>zoom level of the currently visible viewport</p></a></li>
+        <li><a href="pixelSize.html"><h3>pixelSize</h3><p>read-only Earth-size of a pixel in the current map viewport</p></a></li>
+        <li><a href="mode.html"><h3>mode</h3><p class="ui-li-desc">determines how the map, user, &amp; developer interact</p></a></li>
+        <li><a href="cursors.html"><h3>cursors</h3><p>cursors to display for each mode</p></a></li>
+        <li><a href="measureLabels.html"><h3>measureLabels</h3><p>format to apply to label while measuring</p></a></li>
+        <li><a href="drawStyle.html"><h3>drawStyle</h3><p>when drawing shapes, defines how they look during drawing</p></a></li>
+        <li><a href="shapeStyle.html"><h3>shapeStyle</h3><p>defines how geomap draws shapes added via the append method</p></a></li>
+        <li><a href="services.html"><h3>services</h3><p>determine the content of the map</p></a></li>
+        <li><a href="tilingScheme.html"><h3>tilingScheme</h3><p>defines how tiles are placed in the viewport</p></a></li>
         <li><a href="axisLayout.html"><h3>axisLayout</h3><p>&quot;map&quot; or &quot;image&quot;</p></a></li>
-        <li><a href="zoom.html">zoom</a></li>
-        <li><a href="pixelSize.html">pixelSize</a></li>
       </ul>
       <h2>events</h2>
       <p>All event callbacks receive two arguments: the original browser event and an object specific to the map action.</p>
@@ -125,7 +126,7 @@
         </li>
       </ul>
       <h3>shapes</h3>
-      <p>These methods manage geometry or features drawn on the geomap widget <!--itself or on individual servies-->.</p>
+      <p>These methods manage geometry or features drawn on the geomap widget itself or on individual servies within the map.</p>
       <ul data-role="listview" data-inset="true">
         <li><a href="append.html">append</a></li>
         <li><a href="remove.html">remove</a></li>
@@ -207,7 +208,7 @@
 
   <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
   <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
-  <script src="js/script.js"></script>
+  <script src="../js/script.js"></script>
   <script src="http://code.jquery.com/mobile/1.0rc3/jquery.mobile-1.0rc3.min.js"></script>
 </body>
 </html>

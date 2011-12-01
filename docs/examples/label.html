@@ -1,10 +1,10 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
+  <title>label examples</title>
   <meta charset="utf-8">
-  <title>TEMPLATE example</title>
-  <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
-  <meta name="description" content="An example of TEMPLATE">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
+  <meta name="description" content="An example of drawing shapes with labels">
   <meta name="author" content="Ryan Westphal">
   <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/blitzer/jquery-ui.css" />
   <link rel="stylesheet" type="text/css" href="css/style.css" />
@@ -26,10 +26,16 @@
     <div class="info">
       <div class="links">
         <a href="../" class="docLink">&lt; docs</a>
-        <a href="http://jsfiddle.net/ryanttb/==JSFIDDLE==/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
+        <a href="http://jsfiddle.net/ryanttb/2TAzc/embedded/" class="fiddleLink not-mobile"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
       </div>
-      <h1>TEMPLATE</h1>
-      <p></p>
+      <h1>label</h1>
+      <p class="not-mobile">This example builds on the drawing example by appending a label with shapes. Enter label text (HTML is ok), choose a tool below, and start labelling!</p>
+      <input type="text" name="label" value="a label" autofocus />
+      <div id="modes">
+        <input type="radio" id="drawPoint" name="mode" value="drawPoint" checked="checked" /><label for="drawPoint">point</label>
+        <input type="radio" id="drawLineString" name="mode" value="drawLineString" /><label for="drawLineString">line</label>
+        <input type="radio" id="drawPolygon" name="mode" value="drawPolygon" /><label for="drawPolygon">polygon</label>
+      </div>
     </div>
   </div>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
@@ -47,10 +53,28 @@
   <!--<script src="../jquery.geo-test.min.js"></script>-->
   <script>
     $(function () {
-      // create a map
+      // create a map, setting mode to drawPoint initially
       var map = $("#map").geomap({
         center: [-71.0595678, 42.3604823],
-        zoom: 8
+        zoom: 8,
+        mode: "drawPoint",
+        shape: function (e, geo) {
+          // the shape event triggers when a user draws a shape
+          // the geo object is a simple GeoJSON object: Point, LineString or Polygon
+          // we can append it directly to the map
+
+          // grab the text of the label input and send it as a label for this shape
+          map.geomap("append", geo, $("input[name='label']").val());
+        }
+      });
+
+      // jQuery UI for pretty buttons
+      $("#modes").buttonset();
+
+      $("#modes input").click(function () {
+        // set the map's mode option based on value of the input clicked
+        // this will change the map's mode to drawPoint, drawLineString or drawPolygon
+        map.geomap("option", "mode", $(this).val());
       });
     });  
   </script>

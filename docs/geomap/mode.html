@@ -5,7 +5,7 @@
   <meta charset="utf-8">
 
   <title>mode | geomap</title>
-  <meta name="description" content="geomap mode property">
+  <meta name="description" content="geomap mode option">
   <meta name="author" content="Ryan Westphal">
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -44,7 +44,7 @@
           <td><pre><code>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;mode&quot;, &quot;drawPoint&quot; );</code></pre></td>
         </tr>
       </table>
-      <p>The mode property determines how the map responds to user interaction and which events the developer receives.</p>
+      <p>The mode option determines how the map responds to user interaction and which events the developer receives.</p>
       
       <p>The current list of modes is:</p>
       <ul>
@@ -57,6 +57,20 @@
         <li>measureDistance</li>
         <li>measureArea</li>
       </ul>
+
+      <h2>options</h2>
+      <p>Each mode has a matching property on the <a href="cursors.html">cursors</a> option. For example, to change the cursor for drawPoint mode to an I-beam, you can initialize the geomap widget like this:</p>
+      <pre><code>$( <i>selector</i> ).geomap( { cursors: { drawPoint: &quot;text&quot; } } )</code></pre>
+
+      <p>The <a href="drawStyle.html">drawStyle</a> option determines how shapes look while being drawn in all of the draw modes and all of the measure modes.</p>
+
+      <p>The <a href="measureLabels.html">measureLabels</a> option determines how the text is formatted while using the measure modes.</p>
+
+      <h2>style</h2>
+      <p>The label containing the measure distance or area text has the geo-measure-label CSS class. To change how the measure text looks, you can update properties in that rule:</p>
+
+      <pre><code>.geo-measure-label { font-size: 1.5em; }</code></pre>
+
       <h2>pan</h2>
       <h3>user experience</h3>
       <p>The default cursor is an open hand in browsers that support data URIs and a four point arrow otherwise.</p>
@@ -95,6 +109,7 @@
       <h3>user experience</h3>
       <p>The default cursor is the default arrow pointer.</p>
       <p>The map widget displays tiles and map images as normal but the user cannot interact with them, e.g., the user can't pan or zoom in any way.</p>
+
       <p>As a developer, you can still call geomap methods and set options in order to change the static map's appearance. Events are not triggered when you change the map programmatically.</p>
 
       <h3>events</h3>
@@ -106,6 +121,11 @@
       <p>The default cursor is a crosshair.</p>
 
       <p>In this mode the user can digitize a Point shape by single-clicking or tapping the map. Apart from the default cursor, this mode is similar to pan in that the user can drag the map to pan. However, to allow a user more accuracy during digitization, the map will not continue panning a little after the user lets go. They can zoom in or out with the scroll wheel. They can also double-click or double-tap to zoom in one level.</p>
+
+      <p>A visual point will appear temporarily until they either let go to draw the point or begin panning.</p>
+
+      <p>Similar to pan mode, the user can drag the map to pan. However, to allow a user more accuracy during digitization, the map will not continue panning a little after the user lets go. They can zoom in or out with the scroll wheel. They can also double-click or double-tap to zoom in one level.</p>
+
       <h3>events</h3>
       <p>In drawPoint mode, the geomap widget triggers the following events on the original map div. Note that the shape event replaces the click event.</p>
       <ul>
@@ -121,8 +141,11 @@
       <p>The default cursor is a crosshair.</p>
 
       <p>In this mode the user can digitize a LineString shape. The first single-click or tap on the map will begin the shape drawing. Once initialized, subsequent single-clicks will add points to the LineString. Finally, a double-click or tap will end the digitization and trigger the shape event.</p>
+
       <p>On a non-touch device a visual line will follow the mouse cursor from the last point to show the user the next segment of the line they will draw. On all devices, the next segment becomes visible when the user confirms the next point location by clicking or tapping. At any point, the user can hit the escape key to remove one point or, if there is only one point, stop drawing the shape alltogether.</p>
+
       <p>Similar to pan mode, the user can drag the map to pan, even while drawing a shape. However, to allow a user more accuracy during digitization, the map will not continue panning a little after the user lets go. They can zoom in or out with the scroll wheel. While not drawing, they can also double-click or double-tap to zoom in one level.</p>
+
       <h3>events</h3>
       <p>In drawLineString mode, the geomap widget triggers the following events on the original map div.</p>
       <ul>
@@ -139,8 +162,11 @@
       <p>The default cursor is a crosshair.</p>
 
       <p>In this mode the user can digitize a Polygon shape. The first single-click or tap on the map will begin the shape drawing. Once initialized, subsequent single-clicks will add points to the Polygon. Finally, a double-click or tap will end the digitization and trigger the shape event.</p>
+
       <p>On a non-touch device two visual lines will follow the mouse cursor. One from the last point to show the user the next segment of the Polygon they will draw, the other from the first point to show the user an extra segment that will complete the Polygon. On all devices, the next segment becomes visible when the user confirms the next point location by clicking or tapping. At any point, the user can hit the escape key to remove one point or, if there is only one point, stop drawing the shape alltogether.</p>
+
       <p>Similar to pan mode, the user can drag the map to pan, even while drawing a shape. However, to allow a user more accuracy during digitization, the map will not continue panning a little after the user lets go. They can zoom in or out with the scroll wheel. While not drawing, they can also double-click or double-tap to zoom in one level.</p>
+
       <h3>events</h3>
       <p>In drawPolygon mode, the geomap widget triggers the following events on the original map div.</p>
       <ul>
@@ -157,7 +183,9 @@
       <p>The default cursor is a crosshair.</p>
 
       <p>In this mode the user can visually measure a distance on the map. The first single-click or tap on the map will begin the measurement. Once initialized, subsequent single-clicks or taps will add points to a LineString being measured. Whenever the mouse moves, a label follows the cursor which displays the total distance so far. Touch devices will only see an updated measurment when they add a new point. A double-click or tap will end the measurement and remove all graphics and labels.</p>
+
       <p>On a non-touch device a visual line will follow the mouse cursor from the last point to show the user the next segment of the line they are measuring and update the measurement. On all devices, the next segment becomes visible when the user confirms the next point location by clicking or tapping. At any point, the user can hit the escape key to remove one point or, if there is only one point, stop measuring alltogether.</p>
+
       <p>Similar to pan mode, the user can drag the map to pan, even while measuring. The map will continue panning a little after the user lets go. They can zoom in or out with the scroll wheel. While not measuring, they can also double-click or double-tap to zoom in one level.</p>
       <p>By default the unit of measurment is meters because the default projection is web mercator meters. If you change the tilingScheme (on tiled services) or switch to a shingled service, the unit of measurment will be based on your new service's units.</p>
       <h3>events</h3>
@@ -175,7 +203,9 @@
       <p>The default cursor is a crosshair.</p>
 
       <p>In this mode the user can visually measure an area on the map. The first single-click or tap on the map will begin the measurement. Once initialized, subsequent single-clicks or taps will add points to a Polygon being measured. Whenever the mouse moves, a label follows the center of the polygon that displays the total area so far. Touch devices will only see an updated measurment when they add a new point. A double-click or tap will end the measurement and remove all graphics and labels.</p>
+
       <p>On a non-touch device two visual lines will follow the mouse cursor. One from the last point to show the user the next segment of the Polygon they will draw, the other from the first point to show the user an extra segment that will complete the Polygon we need to calculate area. On all devices, the next segment becomes visible when the user confirms the next point location by clicking or tapping. At any point, the user can hit the escape key to remove one point or, if there is only one point, stop measuring alltogether.</p>
+
       <p>Similar to pan mode, the user can drag the map to pan, even while measuring. The map will continue panning a little after the user lets go. They can zoom in or out with the scroll wheel. While not measuring, they can also double-click or double-tap to zoom in one level.</p>
       <p>By default the unit of measurment is meters because the default projection is web mercator meters. If you change the tilingScheme (on tiled services) or switch to a shingled service, the unit of measurment will be based on your new service's units.</p>
       <h3>events</h3>
@@ -192,7 +222,7 @@
 
   <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
   <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
-  <script src="js/script.js"></script>
+  <script src="../js/script.js"></script>
   <script src="http://code.jquery.com/mobile/1.0rc3/jquery.mobile-1.0rc3.min.js"></script>
 </body>
 </html>

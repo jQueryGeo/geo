@@ -29,21 +29,78 @@
         </tr>
         <tr>
           <th>syntax</th>
-          <td>.geomap( &quot;append&quot; <!--[ , String serviceId ]--> , Object shape ( <a href="http://geojson.org/geojson-spec.html" rel="external">GeoJSON object</a> ) [ , Object style ( geomap style ) ] [ , Boolean refresh ] )</td>
+          <td>.geomap( &quot;append&quot; <!--[ , String serviceId ]--> , Object shape ( <a href="http://geojson.org/geojson-spec.html" rel="external">GeoJSON object</a> ) [ , Object style ( geomap style ) ] [ , String label ] [ , Boolean refresh ] )</td>
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>$(&quot;#map&quot;).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] } )
-$(&quot;#map&quot;).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, false )
-$(&quot;#map&quot;).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, { stroke: &quot;#11117f&quot;, strokeWidth: &quot;3px&quot; } )
-$(&quot;#map&quot;).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, { stroke: &quot;#11117f&quot;, strokeWidth: &quot;3px&quot; }, false )</code></pre></td>
+          <td><pre><code>$(<i>selector</i>).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] } )
+
+$(<i>selector</i>).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, false )
+
+$(<i>selector</i>).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, { stroke: &quot;#11117f&quot;, strokeWidth: &quot;3px&quot; } )
+
+$(<i>selector</i>).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, { stroke: &quot;#11117f&quot;, strokeWidth: &quot;3px&quot; }, false )
+
+$(<i>selector</i>).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, &quot;My Point&quot; )
+
+$(<i>selector</i>).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, &quot;My Point&quot;, false )
+
+$(<i>selector</i>).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, { color: &quot;#00f&quot; }, &quot;Blue Point&quot; )
+
+$(<i>selector</i>).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, { color: &quot;#00f&quot; }, '&lt;span style=&quot;color: #44f;&quot;&gt;Blue Point&lt;/span&gt;', false )</code></pre></td>
         </tr>
       </table>
       <p>The append method adds a shape to the map. In this documentation the word shape means a GeoJSON geometry object, GeoJSON feature or GeoJSON feature collection. Each feature in a FeatureCollection's features property is added as a separate shape whereas the other collection geometry types, e.g., MultiPoint, are added as a single shape. This is important distinction when considering the find method in that find can potentially return only one shape of a FeatureCollection but will return all shapes in a MultiPoint (as a reference to the original MultiPoint object supplied to append) even if only one intersects the find position.</p>
       <p>The geomap widget maintains a reference to your shape. It will not change the object in any way. You can use the same object in calls to remove in order to remove the shape from the map at any time.</p>
+      <p>The jQuery UI widget factory returns the original jQuery collection to maintain call chaining.</p>
+      <!--<p>geomap draws shapes ordered by geometry type and then by order of addition. It draws Polygon shapes first followed by LineString and finally Point shapes. </p>-->
+      <h2>styling</h2>
+      <p>The optional style argument modifies how geomap draws the specific geometry or feature you are adding. Properties supplied in this style will override ones of the same name in geomap&#39;s base shapeStyle. Properties not referenced are inheritied from the base style and can change with future changes to the shapeStyle option. Please see the shapeStyle method documentation for information about what properties are valid for this object.</p>
+      <h2>labeling</h2>
+      <p>The optional label argument will display a label near the shape. Labels are a powerful way to add text, pixel-based graphics, or other HTML and CSS effects to the map. The label string can be any text or HTML. For example, consider the following:</p>
+      <ul>
+        <li>you append a Point shape setting its style to have zero for width, height, and strokeWidth: <pre><code>{ width: &quot;0px&quot;, height: &quot;0px&quot;, strokeWidth: &quot;0px&quot; }</code></pre></li>
+        <li>you also supply a label of nothing more than a div element with a class: <pre><code>'&lt;div class=&quot;markers&quot;&gt;&lt;/div&gt;'</code></pre></li>
+        <li>in a CSS style sheet, you give the markers class a width, height, background image and negative relative position: <pre><code>.markers
+{
+  width: 8px;
+  height: 8px;
+  background: url(../img/marker.png);
+  position: relative;
+  left: -4px;
+  top: -4px;
+}</pre></code></li>
+      </ul>
+      <p>In the above example, marker.png will be centered on every point added with a similar label. The regular shape style will not show because the point style has no size or stroke.</p>
+      <p>For Point shapes, the top-left of the label is positioned at the Point's only coordinate. For LineString shapes, the label is usually positioned 50% along the shape but will be forced into view if its usual position is out of the map's current bbox. For Polygon shapes, the label is usually positioned at the centroid but will be forced into view if its usual position is out of the map's current bbox. All other non-basic shape types use the shape's centroid.</p>
+      <p>The geomap widget uses a div to position the labels. The div exists inside a container for the service. The div has the CSS class: geo-label. You can use this design to apply regular CSS style to all labels or all labels within a service. The following CSS snippet shows a couple examples of using this, assuming the main map div has the id &quot;map&quot; and the default map service (which has the CSS class &quot;osm&quot;) has not been changed.</p>
+      <pre><code>/* turn the color of all labels blue */
+#map .geo-label { color: blue; }
+
+/* make labels on the default basemap service bold */
+#map .osm .geo-label { font-weight: bold; }</code></pre>
+      <h2>delaying refresh</h2>
+      <p>The optional refresh argument determines if geomap refreshes the map graphics after this call to append. It defaults to true. If you pass false, geomap will add the shape internally but not immediately redraw the graphics. The changes will display if the user moves the map or you call geomap's refresh method.</p>
+      <h2>service-level shapes</h2>
+      <p>The geomap widget allows you to append a shape to a specific service. You do this by targeting a service inside a map instead of the map itself for your call to geomap's append method. For example, the default map service has the CSS class: osm. We can append a shape to that service specifically by using jQuery to target the service:</p>
+      <pre><code>$( &quot;#map .osm&quot; ).geomap( &quot;append&quot;, shape );</code></pre>
+      <p>Two of the important advantages with this syntax are:</p>
+      <ul>
+        <li>you can show or hide shapes as you toggle a service because shapes attached to a service are only visible if the service is visible</li>
+        <li>you can style shapes differently depending on their service using a service-level <a href="shapeStyle.html">shapeStyle option</a></li>
+      </ul>
+      <h2>duplicate shapes</h2>
+      <p>You can add the same GeoJSON object to more than one service, which allows you to give the same object two different styles at the same time. To do this, call append twice with the same object. Once on one service (or the map itself) and a second time on a different service.</p>
+      <h2>updating</h2>
+      <p>If you attempt to add a shape to the map or a service where it already exists, the shape will remain but you will update (or remove) the shape's style or label.</p>
+      <pre><code>// add the shape with a green color
+$( &quot;#map&quot; ).append( shape, { color: &quot;green&quot; } );
+
+// change the color to blue (shape is the same object as before in this case)
+$( &quot;#map&quot; ).append( shape, { color: &quot;blue&quot; } );</code></pre>
       <p>Changing the type of geometry, e.g., from Point to LineString, or coordinates of a shape you have appended is not recommended and geomap's behavior is currently undefined. If you wish to do either of these, you should first call remove on the original object and append on a new one.</p>
       <p>The following odd example will move the first coordinate of any clicked LineString 10 meters to the left. Notice it first removes the shape, then updates the first coordinate and finally appends the new shape.</p>
-      <pre><code>var map = $(&quot;#map&quot;).geomap( {
+      <pre><code>var map = $( &quot;#map&quot; ).geomap( {
   click: function(e, geo) {
     <span class="comment">// find any shapes within 4 pixels of the clicked point</span>
     var shapes = map.geomap(&quot;find&quot;, geo, 4);
@@ -52,7 +109,7 @@ $(&quot;#map&quot;).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coord
       <span class="comment">// move the first point in the line 10 meters to the left</span>
       <span class="comment">// you can edit the coordinates directly since you've removed the shape</span>
 
-      <span class="comment">// we use proj because we want to temporarilly work in meters</span>
+      <span class="comment">// we use proj because we want to temporarily work in meters</span>
       var firstCoord = $.geo.proj.fromGeodetic(shapes[0].coordinates[0]);
       <span class="comment">// firstCoord[0] is the x axis</span>
       firstCoord[0] -= 10;
@@ -64,11 +121,6 @@ $(&quot;#map&quot;).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coord
   }
 } );</code></pre>
  
-      <!--<p>geomap draws shapes ordered by geometry type and then by order of addition. It draws Polygon shapes first followed by LineString and finally Point shapes. </p>-->
-      <p>If $.geo.proj is not null, all coordinates of all geometry (whether plain or part of a feature) must be in geodetic coordinates, e.g., for a Point object coordinates[0] is longitude and coordinates[1] is latitude. If $.geo.proj is null, all coordinates must be in the widget's internal projection as defined by tilingScheme for tiled map services or bboxMax for shingled (dynamic) map services.</p>
-      <p>The optional style argument modifies how geomap draws the specific geometry or feature you are adding. Properties supplied in this style will override ones of the same name in geomap&#39;s base shapeStyle. Properties not referenced are inheritied from the base style and can change with future changes to the shapeStyle option. Please see the shapeStyle method documentation for information about what properties are valid for this object.</p>
-      <p>The optional refresh argument determines if geomap refreshes the map graphics after this call to append. It defaults to true. If you pass false, geomap will add the shape internally but not immediately redraw the graphics. The changes will display if the user moves the map or you call geomap's refresh method.</p>
-      <p>The jQuery UI widget factory returns the original jQuery collection to maintain call chaining.</p>
     </div>
   </div> <!-- end of #container -->
 

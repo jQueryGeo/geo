@@ -89,10 +89,14 @@
       <h3>type</h3>
       <p>A service has a type property which is either &quot;tiled&quot; or &quot;shingled&quot;. Tiled servies will get one image request per tile needed to fill a given view when the map refreshes. The tile request's bbox will only be the size of the given tile. Shingled services will get only one image request each time the map refreshes and the bbox will be the extent of the whole map view.</p>
       <h3>getUrl</h3>
-      <p>The getUrl property of a service object is a function that accepts an object specifying information about the current image request. It must return a URL to an image or null to indicate that no image is required.</p>
+      <p>The getUrl property of a service object is either:</p>
+      <ul>
+        <li>a function that accepts an object specifying information about the current image request that returns a URL to an image or null to indicate that no image is required or</li>
+        <li>a template string that the geomap widget can use to build a URL itself</li>
+      </ul>
       <p>For tiled services, the image is placed at the tile location specified. For shingled services, the image will fill the whole map view.</p>
       <p>If the browser's request of the image results in a 404 status the map will not show that tile or image.</p>
-      <p>The argument to the getUrl function has the following properties:</p>
+      <p>When getUrl is a function, the argument to that function has the following properties:</p>
       <table>
         <tr>
         <th>bbox (Array)</th><td>A <a href="http://geojson.org/geojson-spec.html#bounding-boxes" rel="external">GeoJSON bounding box</a> of the current tile or image in map units. If $.geo.proj is not null, the bbox array will be in geodectic coordinates: [ min_lon, min_lat, max_lon, max_lat ].</td>
@@ -113,6 +117,11 @@
         <th>index (Number)</th><td>A whole number which is usually incremented between requests that you can use to cycle image URLs to different index, e.g., if there are four servers hosting the same tile images named tile0, tile1, tile2 and tile3 you can target them in your getUrl function with the string: &quot;tile&quot; + (view.index % 4).</td>
         </tr>
       </table>
+      <p>You can use the properties of this argument to build and return your URL.</p>
+      <p>When getUrl is a string, those same properties can be used in the template by surrounding each property with: {{=propertyName}}.</p>
+      <p>The default value for getUrl is a function because it is slightly faster than rendering a template. However, as an example, we can rewrite the default getUrl function as a template string:</p>
+      <pre><code>getUrl: &quot;http://tile.openstreetmap.org/{{=zoom}}/{{=tile.column}}/{{=tile.row}}.png&quot;</code></pre>
+      <p>A couple advantages of using a string are that it is more concise and, unlike a function, can be stored as JSON.</p>
       <h3>attr</h3>
       <p>The attr property is optional. It stands for attribution and is a way to give credit to the source of your map imagery. It defaults to an empty string if not specified in a service object. When present, the map widget displays the HTML provided on the bottom-left corner of the map when the service is visible. Users can click links but cannot interact with all other text or images.</p>
       <h3>visibility</h3>
