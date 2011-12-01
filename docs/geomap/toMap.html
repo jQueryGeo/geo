@@ -29,7 +29,7 @@
         </tr>
         <tr>
           <th>syntax</th>
-          <td>.geomap( &quot;toMap&quot;, Array pixelPosition | Array^2 pixelPositions )</td>
+          <td>.geomap( &quot;toMap&quot;, Array pixelPositions )</td>
         </tr>
         <tr>
           <th>usage</th>
@@ -37,8 +37,7 @@
 var mapPositions = $(&quot;#map&quot;).geomap( &quot;toMap&quot;, [ [ 120, 240 ], [ 192, 48 ] ] )</code></pre></td>
         </tr>
       </table>
-      <p>The toMap method takes a single pixel position (which is an array of two values: the x and y of the pixel) or an array of pixel positions and returns the map coordinates for the pixels.</p>
-      <p>If $.geo.proj is not null, the widget returns the positions as geodetic coordinates. Otherwise, the widget returns positions in its internal projection as defined by tilingScheme for tiled map services or bboxMax for shingled (dynamic) map services.</p>
+      <p>The toMap method takes a single pixel position (which is an array of two values: the left and top of the pixel), an array of pixel positions, an array of arrays of pixel positions, or an array of arrays of arrays of pixel positions. In other words, it accepts the pixel representation of the coordinates of any geometry up to MultiPolygon. It returns the map coordinates for all of the pixel positions.</p>
     </div>
   </div> <!-- end of #container -->
 

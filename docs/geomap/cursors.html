@@ -29,12 +29,15 @@
         </tr>
         <tr>
           <th>default</th>
-          <!--<td><pre><code>{
-  pan: &quot;move&quot;,
-  zoom: &quot;crosshair&quot;
-}</code></pre></td>-->
           <td><pre><code>{
-  pan: &quot;move&quot;
+  pan: &quot;move&quot;,
+  zoom: &quot;crosshair&quot;,
+  static: &quot;default&quot;,
+  drawPoint: &quot;crosshair&quot;,
+  drawLineString: &quot;crosshair&quot;,
+  drawPolygon: &quot;crosshair&quot;,
+  measureDistance: &quot;crosshair&quot;,
+  measureArea: &quot;crosshair&quot;
 }</code></pre></td>
         </tr>
         <tr>
@@ -58,7 +61,7 @@
 
   <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
   <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
-  <script src="js/script.js"></script>
+  <script src="../js/script.js"></script>
   <script src="http://code.jquery.com/mobile/1.0rc3/jquery.mobile-1.0rc3.min.js"></script>
 </body>
 </html>

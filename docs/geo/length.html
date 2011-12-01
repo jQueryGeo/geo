@@ -1,0 +1,59 @@
+<!doctype html>  
+
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+
+  <title>length | $.geo</title>
+  <meta name="description" content="jQuery Geo length method">
+  <meta name="author" content="Ryan Westphal">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="../css/style.css?v=2">
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0rc3/jquery.mobile-1.0rc3.min.css" />
+</head>
+
+<body>
+
+  <div id="length" data-role="page">
+    <div data-role="header" data-theme="b">
+      <h1>length</h1>
+    </div>
+    
+    <div data-role="content">
+      <table>
+        <tr>
+          <th>return type</th>
+          <td>Number</td>
+        </tr>
+        <tr>
+          <th>syntax</th>
+          <td>$.geo.length( Object shape ( <a href="http://geojson.org/geojson-spec.html" rel="external">GeoJSON object</a> ) )</td>
+        </tr>
+        <tr>
+          <th>usage</th>
+          <td><pre><code>var length = $.geo.length( {
+      type: &quot;LineString&quot;,
+      coordinates: [[
+        [-75, 39.7],
+        [-74.8, 39.3],
+        [-75.2, 39.3]
+      ]]
+} )</pre></code></td>
+        </tr>
+      </table>
+      <p>The length method calculates the length of a basic GeoJSON geometry object and returns it in non-geodetic units. The basic shapes are Point, LineString and Polygon. If you are using geomap with its default map service, the length is in meters because the default projection is web mercator meters.</p>
+      <p>This function returns 0 for Point objects, the length of LineString objects and the perimeter of Polygon objects.</p>
+      <p>If the argument is not a basic GeoJSON geometry object, this function returns undefined.</p>
+      <p>This function is similar to Geometry.getLength in JTS.</p>
+    </div>
+  </div> <!-- end of #container -->
+
+  <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
+  <script src="js/script.js"></script>
+  <script src="http://code.jquery.com/mobile/1.0rc3/jquery.mobile-1.0rc3.min.js"></script>
+</body>
+</html>
+

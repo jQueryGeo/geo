@@ -15,7 +15,11 @@
           drawPoint: "crosshair",
           drawLineString: "crosshair",
           drawPolygon: "crosshair",
-          measureDistance: "crosshair",
+          measureDistance: "crosshair"
+        },
+        measureLabels: {
+          distance: "{{=distance.toFixed( 2 )}} m",
+          area: "{{=area.toFixed( 2 )}} sq m"
         },
         drawStyle: {},
         shapeStyle: {},
@@ -49,14 +53,17 @@
 
     _contentBounds: {},
 
+    _$eventTarget: undefined,
     _$contentFrame: undefined,
     _$existingChildren: undefined,
     _$servicesContainer: undefined,
-    _$drawContainer: undefined,
+
+    _$panContainer: undefined, //< all non-service elements that move while panning
     _$shapesContainer: undefined,
-    _$textContainer: undefined,
-    _$textContent: undefined,
-    _$eventTarget: undefined,
+    _$labelsContainer: undefined,
+    _$drawContainer: undefined,
+    _$measureContainer: undefined,
+    _$measureLabel: undefined,
 
     _dpi: 96,
 
@@ -112,12 +119,12 @@
     _createWidget: function (options, element) {
       this._$elem = $(element);
 
-      if (this._$elem.is("[data-geo-service]")) {
+      if (this._$elem.is(".geo-service")) {
         $.Widget.prototype._createWidget.apply(this, arguments);
         return;
       }
 
-      this._$elem.attr("data-geo-map", "data-geo-map");
+      this._$elem.addClass("geo-map");
 
       this._graphicShapes = [];
 
@@ -165,7 +172,7 @@
     },
 
     _create: function () {
-      if (this._$elem.is("[data-geo-service]")) {
+      if (this._$elem.is(".geo-service")) {
         return;
       }
 
@@ -225,6 +232,9 @@
         }
       }
 
+      $.template( "geoMeasureDistance", this._options[ "measureLabels" ].distance );
+      $.template( "geoMeasureArea", this._options[ "measureLabels" ].area );
+
       this._$eventTarget.css("cursor", this._options["cursors"][this._options["mode"]]);
 
       this._createServices();
@@ -235,7 +245,7 @@
     },
 
     _setOption: function (key, value, refresh) {
-      if ( this._$elem.is( "[data-geo-service]" ) || key == "pixelSize" ) {
+      if ( this._$elem.is( ".geo-service" ) || key == "pixelSize" ) {
         return;
       }
 
@@ -259,6 +269,12 @@
 
         case "center":
           this._setCenterAndSize($.geo.proj ? $.geo.proj.fromGeodetic([[value[0], value[1]]])[0] : value, this._pixelSize, false, refresh);
+          break;
+
+        case "measureLabels":
+          value = $.extend( this._options[ "measureLabels" ], value );
+          $.template( "geoMeasureDistance", value.distance );
+          $.template( "geoMeasureArea", value.area );
           break;
 
         case "drawStyle":
@@ -306,14 +322,15 @@
         case "shapeStyle":
           if ( refresh ) {
             this._$shapesContainer.geographics("clear");
-            this._refreshShapes( this._$shapesContainer, this._graphicShapes, this._graphicShapes );
+            this._$labelsContainer.html("");
+            this._refreshShapes( this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes );
           }
           break;
       }
     },
 
     destroy: function () {
-      if (this._$elem.is("[data-geo-map]")) {
+      if (this._$elem.is(".geo-map")) {
         this._created = false;
 
         $(window).unbind("resize", this._windowHandler);
@@ -329,7 +346,7 @@
         this._$existingChildren.detach();
         this._$elem.html("");
         this._$elem.append(this._$existingChildren);
-        this._$elem.removeAttr("data-geo-map");
+        this._$elem.removeClass("geo-map");
       }
       $.Widget.prototype.destroy.apply(this, arguments);
     },
@@ -345,8 +362,8 @@
     },
 
     opacity: function (value, _serviceContainer) {
-      if (this._$elem.is("[data-geo-service]")) {
-        this._$elem.closest("[data-geo-map]").geomap("opacity", value, this._$elem);
+      if (this._$elem.is(".geo-service")) {
+        this._$elem.closest(".geo-map").geomap("opacity", value, this._$elem);
       } else {
         if (value >= 0 || value <= 1) {
           for ( var i = 0; i < this._currentServices.length; i++ ) {
@@ -361,8 +378,8 @@
     },
 
     toggle: function (value, _serviceContainer) {
-      if (this._$elem.is("[data-geo-service]")) {
-        this._$elem.closest("[data-geo-map]").geomap("toggle", value, this._$elem);
+      if (this._$elem.is(".geo-service")) {
+        this._$elem.closest(".geo-map").geomap("toggle", value, this._$elem);
       } else {
         for (var i = 0; i < this._currentServices.length; i++) {
           var service = this._currentServices[i];
@@ -396,6 +413,8 @@
       var size = this._findMapSize(),
           dx = size["width"]/2 - this._contentBounds.width/2,
           dy = size["height"]/2 - this._contentBounds.height/2,
+          shapeStyle = this._$shapesContainer.geographics("option", "style"),
+          drawStyle = this._$drawContainer.geographics("option", "style"),
           i;
 
       this._contentBounds = {
@@ -420,27 +439,20 @@
         height: size["height"]
       });
 
-      var shapeStyle = this._$shapesContainer.geographics("option", "style");
-
-      this._$shapesContainer.geographics("destroy");
       this._$drawContainer.geographics("destroy");
+      this._$shapesContainer.geographics("destroy");
 
       for (i = 0; i < this._currentServices.length; i++) {
         $.geo["_serviceTypes"][this._currentServices[i].type].resize(this, this._currentServices[i]);
       }
 
-
-      this._$drawContainer.css({
+      this._$panContainer.css({
         width: size.width,
         height: size.height
       });
-      this._$drawContainer.geographics();
 
-      this._$shapesContainer.css({
-        width: size.width,
-        height: size.height
-      });
       this._$shapesContainer.geographics( { style: shapeStyle } );
+      this._$drawContainer.geographics( { style: drawStyle } );
 
       for (i = 0; i < this._drawPixels.length; i++) {
         this._drawPixels[i][0] += dx;
@@ -450,21 +462,29 @@
       this._setCenterAndSize(this._center, this._pixelSize, false, true);
     },
 
-    append: function ( shape, style, refresh ) {
-      if ( shape ) {
-        var shapes, i = 0;
+    append: function ( shape, style, label, refresh ) {
+      if ( shape && $.isPlainObject( shape ) ) {
+        var shapes, arg, i, realStyle, realLabel, realRefresh;
+
         if ( shape.type == "FeatureCollection" ) {
           shapes = shape.features;
         } else {
           shapes = $.isArray( shape ) ? shape : [ shape ];
         }
 
-        if ( typeof style === "boolean" ) {
-          refresh = style;
-          style = null;
+        for ( i = 1; i < arguments.length; i++ ) {
+          arg = arguments[ i ];
+
+          if ( typeof arg === "object" ) {
+            realStyle = arg;
+          } else if ( typeof arg === "number" || typeof arg === "string" ) {
+            realLabel = arg;
+          } else if ( typeof arg === "boolean" ) {
+            realRefresh = arg;
+          }
         }
 
-        for ( ; i < shapes.length; i++ ) {
+        for ( i = 0; i < shapes.length; i++ ) {
           if ( shapes[ i ].type != "Point" ) {
             var bbox = $.geo.bbox( shapes[ i ] );
             if ( $.geo.proj ) {
@@ -475,11 +495,12 @@
 
           this._graphicShapes.push( {
             shape: shapes[ i ],
-            style: style
+            style: realStyle,
+            label: realLabel
           } );
         }
 
-        if ( refresh === undefined || refresh ) {
+        if ( realRefresh === undefined || realRefresh ) {
           this._refresh( );
         }
       }
@@ -626,23 +647,35 @@
 
       this._$existingChildren.css("-moz-user-select", "none");
 
-      this._$elem.prepend("<div style='position:absolute; left:" + this._contentBounds.x + "px; top:" + this._contentBounds.y + "px; width:" + this._contentBounds["width"] + "px; height:" + this._contentBounds["height"] + "px; margin:0; padding:0; overflow:hidden; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none;' unselectable='on'></div>");
+      var contentSizeCss = "width:" + this._contentBounds["width"] + "px; height:" + this._contentBounds["height"] + "px; margin:0; padding:0;",
+          contentPosCss = "position:absolute; left:0; top:0;";
+
+      this._$elem.prepend('<div class="geo-event-target geo-content-frame" style="position:absolute; left:' + this._contentBounds.x + 'px; top:' + this._contentBounds.y + 'px;' + contentSizeCss + 'overflow:hidden; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none;" unselectable="on"></div>');
       this._$eventTarget = this._$contentFrame = this._$elem.children(':first');
 
-      this._$contentFrame.append('<div style="position:absolute; left:0; top:0; width:' + this._contentBounds["width"] + 'px; height:' + this._contentBounds["height"] + 'px; margin:0; padding:0;"></div>');
+      this._$contentFrame.append('<div class="geo-services-container" style="' + contentPosCss + contentSizeCss + '"></div>');
       this._$servicesContainer = this._$contentFrame.children(':last');
 
-      this._$contentFrame.append('<div style="position:absolute; left:0; top:0; width:' + this._contentBounds["width"] + 'px; height:' + this._contentBounds["height"] + 'px; margin:0; padding:0;"></div>');
+      this._$contentFrame.append('<div class="geo-shapes-container" style="' + contentPosCss + contentSizeCss + '"></div>');
       this._$shapesContainer = this._$contentFrame.children(':last');
 
-      this._$contentFrame.append('<div style="position:absolute; left:0; top:0; width:' + this._contentBounds["width"] + 'px; height:' + this._contentBounds["height"] + 'px; margin:0; padding:0;"></div>');
+      this._$contentFrame.append('<div class="geo-labels-container" style="' + contentPosCss + contentSizeCss + '"></div>');
+      this._$labelsContainer = this._$contentFrame.children(':last');
+
+      this._$contentFrame.append('<div class="geo-draw-container" style="' + contentPosCss + contentSizeCss + '"></div>');
       this._$drawContainer = this._$contentFrame.children(':last');
 
-      this._$contentFrame.append('<div class="ui-widget ui-widget-content ui-corner-all" style="position:absolute; left:0; top:0px; max-width:128px; display:none;"><div style="margin:.2em;"></div></div>');
-      this._$textContainer = this._$contentFrame.children(':last');
-      this._$textContent = this._$textContainer.children();
+      this._$contentFrame.append('<div class="geo-measure-container" style="' + contentPosCss + contentSizeCss + '"><div class="geo-measure-label" style="' + contentPosCss + '; display: none;"></div></div>');
+      this._$measureContainer = this._$contentFrame.children(':last');
+      this._$measureLabel = this._$measureContainer.children();
+
+      this._$panContainer = $( [ this._$shapesContainer[ 0 ], this._$labelsContainer[ 0 ], this._$drawContainer[ 0 ], this._$measureContainer[ 0 ] ] );
 
       this._$contentFrame.append(this._$existingChildren);
+
+      if ( ! $("#geo-measure-style").length ) {
+        $("head").prepend( '<style type="text/css" id="geo-measure-style">.geo-measure-label { margin: 4px 0 0 6px; font-family: sans-serif;' + ( _ieVersion ? 'letter-spacing: 2px; color: #444; filter:progid:DXImageTransform.Microsoft.DropShadow(Color=white, OffX=1, OffY=2, Positive=true);' : 'color: #000; text-shadow: #fff 1px 2px; font-weight: bold;' ) + ' }</style>' );
+      }
     },
 
     _createServices: function () {
@@ -660,24 +693,56 @@
       }
     },
 
-    _refreshDrawing: function () {
+    _refreshDrawing: function ( ) {
       this._$drawContainer.geographics("clear");
 
       if ( this._drawPixels.length > 0 ) {
         var mode = this._options[ "mode" ],
-            coords = this._drawPixels;
+            pixels = this._drawPixels,
+            coords = this._drawCoords,
+            label,
+            labelShape,
+            labelPixel,
+            widthOver,
+            heightOver;
 
         switch ( mode ) {
           case "measureDistance":
             mode = "drawLineString";
+            labelShape = {
+              type: "LineString",
+              coordinates: coords
+            };
+            label = $.render( { distance: $.geo.length( labelShape, true ) }, "geoMeasureDistance" );
+            labelPixel = $.merge( [], pixels[ pixels.length - 1 ] );
             break;
 
           case "drawPolygon":
-            coords = [ coords ];
+            pixels = [ pixels ];
             break;
         }
 
-        this._$drawContainer.geographics( mode, coords );
+        this._$drawContainer.geographics( mode, pixels );
+        
+        if ( label ) {
+          this._$measureLabel.html( label );
+
+          widthOver = this._contentBounds.width - ( this._$measureLabel.outerWidth( true ) + labelPixel[ 0 ] );
+          heightOver = this._contentBounds.height - ( this._$measureLabel.outerHeight( true ) + labelPixel[ 1 ] );
+
+          if ( widthOver < 0 ) {
+            labelPixel[ 0 ] += widthOver;
+          }
+
+          if ( heightOver < 0 ) {
+            labelPixel[ 1 ] += heightOver;
+          }
+
+          this._$measureLabel.css( {
+            left: labelPixel[ 0 ],
+            top: labelPixel[ 1 ]
+          } ).show();
+        }
       }
     },
 
@@ -686,17 +751,18 @@
       this._drawPixels = [];
       this._drawCoords = [];
       this._$drawContainer.geographics("clear");
+      this._$measureLabel.hide();
     },
 
-    _refreshShapes: function (geographics, shapes, styles, center, pixelSize) {
-      var i,
-          mgi,
+    _refreshShapes: function (geographics, shapes, styles, labels, center, pixelSize) {
+      var i, mgi,
           shape,
           shapeBbox,
           style,
-          pixelPositions,
-          bbox = this._getBbox(center, pixelSize),
-          geomap = this;
+          label,
+          hasLabel,
+          labelPixel,
+          bbox = this._getBbox(center, pixelSize);
 
       for (i = 0; i < shapes.length; i++) {
         shape = shapes[i].shape || shapes[i];
@@ -708,44 +774,59 @@
         }
 
         style = $.isArray(styles) ? styles[i].style : styles;
+        label = $.isArray(labels) ? labels[i].label : labels;
+        hasLabel = ( label !== undefined );
+        labelPixel = undefined;
 
-         switch (shape.type) {
+        switch (shape.type) {
           case "Point":
-            this._$shapesContainer.geographics("drawPoint", this.toPixel(shape.coordinates, center, pixelSize), style);
+            labelPixel = this.toPixel( shape.coordinates, center, pixelSize );
+            this._$shapesContainer.geographics("drawPoint", labelPixel, style);
             break;
           case "LineString":
             this._$shapesContainer.geographics("drawLineString", this.toPixel(shape.coordinates, center, pixelSize), style);
+            if ( hasLabel ) {
+              labelPixel = this.toPixel( $.geo.pointAlong( shape, .5 ).coordinates, center, pixelSize );
+            }
             break;
           case "Polygon":
-            pixelPositions = [];
-            $.each(shape.coordinates, function (i) {
-              pixelPositions[i] = geomap.toPixel(this, center, pixelSize);
-            });
-            this._$shapesContainer.geographics("drawPolygon", pixelPositions, style);
+            this._$shapesContainer.geographics("drawPolygon", this.toPixel(shape.coordinates, center, pixelSize), style);
+            if ( hasLabel ) {
+              labelPixel = this.toPixel( $.geo.centroid( shape ).coordinates, center, pixelSize );
+            }
             break;
           case "MultiPoint":
-            for (mgi = 0; mgi < shape.coordinates; mgi++) {
+            for (mgi = 0; mgi < shape.coordinates.length; mgi++) {
               this._$shapesContainer.geographics("drawPoint", this.toPixel(shape.coordinates[mgi], center, pixelSize), style);
+            }
+            if ( hasLabel ) {
+              labelPixel = this.toPixel( $.geo.centroid( shape ).coordinates, center, pixelSize );
             }
             break;
           case "MultiLineString":
-            for (mgi = 0; mgi < shape.coordinates; mgi++) {
+            for (mgi = 0; mgi < shape.coordinates.length; mgi++) {
               this._$shapesContainer.geographics("drawLineString", this.toPixel(shape.coordinates[mgi], center, pixelSize), style);
+            }
+            if ( hasLabel ) {
+              labelPixel = this.toPixel( $.geo.centroid( shape ).coordinates, center, pixelSize );
             }
             break;
           case "MultiPolygon":
-            for (mgi = 0; mgi < shape.coordinates; mgi++) {
-              pixelPositions = [];
-              $.each(shape.coordinates[mgi], function (i) {
-                pixelPositions[i] = geomap.toPixel(this, center, pixelSize);
-              });
-              this._$shapesContainer.geographics("drawPolygon", pixelPositions, style);
+            for (mgi = 0; mgi < shape.coordinates.length; mgi++) {
+              this._$shapesContainer.geographics("drawPolygon", this.toPixel(shape.coordinates[mgi], center, pixelSize), style);
+            }
+            if ( hasLabel ) {
+              labelPixel = this.toPixel( $.geo.centroid( shape ).coordinates, center, pixelSize );
             }
             break;
 
           case "GeometryCollection":
-            geomap._refreshShapes(geographics, shape.geometries, style, center, pixelSize);
+            this._refreshShapes(geographics, shape.geometries, style, label, center, pixelSize);
             break;
+        }
+
+        if ( hasLabel && labelPixel ) {
+          this._$labelsContainer.append( '<div class="geo-label" style="position:absolute; left:' + labelPixel[ 0 ] + 'px; top:' + labelPixel[ 1 ] + 'px;">' + label + '</div>');
         }
       }
     },
@@ -873,7 +954,7 @@
             dxMap = -dx * this._pixelSize,
             dyMap = ( image ? -1 : 1 ) * dy * this._pixelSize;
 
-        this._$shapesContainer.css({ left: 0, top: 0 });
+        this._$panContainer.css({ left: 0, top: 0 });
 
         this._setCenterAndSize([this._center[0] + dxMap, this._center[1] + dyMap], this._pixelSize, true, true);
 
@@ -910,7 +991,7 @@
             $.geo["_serviceTypes"][service.type].interactivePan(this, service, dx, dy);
           }
 
-          this._$shapesContainer.css({
+          this._$panContainer.css({
             left: function (index, value) {
               return parseInt(value) + dx;
             },
@@ -919,12 +1000,7 @@
             }
           });
 
-          for (i = 0; i < this._drawPixels.length; i++) {
-            this._drawPixels[i][0] += dx;
-            this._drawPixels[i][1] += dy;
-          }
-
-          this._refreshDrawing();
+          //this._refreshDrawing();
         }
       }
     },
@@ -939,8 +1015,9 @@
 
       if (this._$shapesContainer) {
         this._$shapesContainer.geographics("clear");
+        this._$labelsContainer.html("");
         if (this._graphicShapes.length > 0) {
-          this._refreshShapes(this._$shapesContainer, this._graphicShapes, this._graphicShapes);
+          this._refreshShapes(this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes);
         }
       }
     },
@@ -989,46 +1066,62 @@
 
     _toMap: function (p, center, pixelSize) {
       // ignores $.geo.proj
-      var isArray = $.isArray(p[0]);
-      if (!isArray) {
-        p = [p];
-      }
 
       center = center || this._center;
       pixelSize = pixelSize || this._pixelSize;
 
-      var width = this._contentBounds["width"],
+      var isMultiPointOrLineString = $.isArray( p[ 0 ] ),
+          isMultiLineStringOrPolygon = isMultiPointOrLineString && $.isArray( p[ 0 ][ 0 ] ),
+          isMultiPolygon = isMultiLineStringOrPolygon && $.isArray( p[ 0 ][ 0 ][ 0 ] ),
+          width = this._contentBounds["width"],
           height = this._contentBounds["height"],
           halfWidth = width / 2 * pixelSize,
           halfHeight = height / 2 * pixelSize,
           bbox = [center[0] - halfWidth, center[1] - halfHeight, center[0] + halfWidth, center[1] + halfHeight],
           xRatio = $.geo.width(bbox, true) / width,
           yRatio = $.geo.height(bbox, true) / height,
+          yOffset,
           image = this._options[ "axisLayout" ] === "image",
-          result = [];
+          result = [],
+          i, j, k;
 
-      $.each(p, function (i) {
-        var yOffset = (this[1] * yRatio);
-        result[ i ] = [
-          bbox[ 0 ] + ( this[ 0 ] * xRatio ),
-          image ? bbox[ 1 ] + yOffset : bbox[ 3 ] - yOffset
-        ];
-      });
+      if ( !isMultiPolygon ) {
+        if ( !isMultiLineStringOrPolygon ) {
+          if ( !isMultiPointOrLineString ) {
+            p = [ p ];
+          }
+          p = [ p ];
+        }
+        p = [ p ];
+      }
 
-      return isArray ? result : result[0];
+      for ( i = 0; i < p.length; i++ ) {
+        result[ i ] = [ ];
+        for ( j = 0; j < p[ i ].length; j++ ) {
+          result[ i ][ j ] = [ ];
+          for ( k = 0; k < p[ i ][ j ].length; k++ ) {
+            yOffset = (p[ i ][ j ][ k ][1] * yRatio);
+            result[ i ][ j ][ k ] = [
+              bbox[ 0 ] + ( p[ i ][ j ][ k ][ 0 ] * xRatio ),
+              image ? bbox[ 1 ] + yOffset : bbox[ 3 ] - yOffset
+            ];
+          }
+        }
+      }
+
+      return isMultiPolygon ? result : isMultiLineStringOrPolygon ? result[ 0 ] : isMultiPointOrLineString ? result[ 0 ][ 0 ] : result[ 0 ][ 0 ][ 0 ];
     },
 
     _toPixel: function (p, center, pixelSize) {
       // ignores $.geo.proj
-      var isArray = $.isArray(p[0]);
-      if (!isArray) {
-        p = [p];
-      }
 
       center = center || this._center;
       pixelSize = pixelSize || this._pixelSize;
 
-      var width = this._contentBounds["width"],
+      var isMultiPointOrLineString = $.isArray( p[ 0 ] ),
+          isMultiLineStringOrPolygon = isMultiPointOrLineString && $.isArray( p[ 0 ][ 0 ] ),
+          isMultiPolygon = isMultiLineStringOrPolygon && $.isArray( p[ 0 ][ 0 ][ 0 ] ),
+          width = this._contentBounds["width"],
           height = this._contentBounds["height"],
           halfWidth = width / 2 * pixelSize,
           halfHeight = height / 2 * pixelSize,
@@ -1038,16 +1131,33 @@
           image = this._options[ "axisLayout" ] === "image",
           xRatio = width / bboxWidth,
           yRatio = height / bboxHeight,
-          result = [];
+          result = [ ],
+          i, j, k;
 
-      $.each(p, function (i) {
-        result[ i ] = [
-          Math.round( ( this[ 0 ] - bbox[ 0 ] ) * xRatio ),
-          Math.round( ( image ? this[ 1 ] - bbox[ 1 ] : bbox[ 3 ] - this[ 1 ] ) * yRatio )
-        ];
-      });
+      if ( !isMultiPolygon ) {
+        if ( !isMultiLineStringOrPolygon ) {
+          if ( !isMultiPointOrLineString ) {
+            p = [ p ];
+          }
+          p = [ p ];
+        }
+        p = [ p ];
+      }
 
-      return isArray ? result : result[0];
+      for ( i = 0; i < p.length; i++ ) {
+        result[ i ] = [ ];
+        for ( j = 0; j < p[ i ].length; j++ ) {
+          result[ i ][ j ] = [ ];
+          for ( k = 0; k < p[ i ][ j ].length; k++ ) {
+            result[ i ][ j ][ k ] = [
+              Math.round( ( p[ i ][ j ][ k ][ 0 ] - bbox[ 0 ] ) * xRatio ),
+              Math.round( ( image ? p[ i ][ j ][ k ][ 1 ] - bbox[ 1 ] : bbox[ 3 ] - p[ i ][ j ][ k ][ 1 ] ) * yRatio )
+            ];
+          }
+        }
+      }
+
+      return isMultiPolygon ? result : isMultiLineStringOrPolygon ? result[ 0 ] : isMultiPointOrLineString ? result[ 0 ][ 0 ] : result[ 0 ][ 0 ][ 0 ];
     },
 
     _zoomTo: function (coord, zoom, trigger, refresh) {
@@ -1214,10 +1324,8 @@
         }
       }
 
-      if ( this._inOp ) {
-        e.preventDefault();
-        return false;
-      }
+      e.preventDefault();
+      return false;
     },
 
     _dragTarget_touchmove: function (e) {
@@ -1462,8 +1570,9 @@
         }
 
         this._$shapesContainer.geographics("clear");
+        this._$labelsContainer.html("");
         if (this._graphicShapes.length > 0 && this._graphicShapes.length < 256) {
-          this._refreshShapes(this._$shapesContainer, this._graphicShapes, this._graphicShapes, wheelCenterAndSize.center, wheelCenterAndSize.pixelSize);
+          this._refreshShapes(this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes, wheelCenterAndSize.center, wheelCenterAndSize.pixelSize);
         }
 
         if (this._drawCoords.length > 0) {
