@@ -54,7 +54,7 @@
         <li>drawPoint</li>
         <li>drawLineString</li>
         <li>drawPolygon</li>
-        <li>measureDistance</li>
+        <li>measureLength</li>
         <li>measureArea</li>
       </ul>
 
@@ -67,7 +67,7 @@
       <p>The <a href="measureLabels.html">measureLabels</a> option determines how the text is formatted while using the measure modes.</p>
 
       <h2>style</h2>
-      <p>The label containing the measure distance or area text has the geo-measure-label CSS class. To change how the measure text looks, you can update properties in that rule:</p>
+      <p>The label containing the measure length or area text has the geo-measure-label CSS class. To change how the measure text looks, you can update properties in that rule:</p>
 
       <pre><code>.geo-measure-label { font-size: 1.5em; }</code></pre>
 
@@ -177,19 +177,19 @@
         <li>shape &ndash; when the user double-clicks or taps a point on the map after beginning a drawing operation with a single click, this action will send a GeoJSON Polygon object to the developer</li>
       </ul>
 
-      <h2>measureDistance</h2>
+      <h2>measureLength</h2>
 
       <h3>user experience</h3>
       <p>The default cursor is a crosshair.</p>
 
-      <p>In this mode the user can visually measure a distance on the map. The first single-click or tap on the map will begin the measurement. Once initialized, subsequent single-clicks or taps will add points to a LineString being measured. Whenever the mouse moves, a label follows the cursor which displays the total distance so far. Touch devices will only see an updated measurment when they add a new point. A double-click or tap will end the measurement and remove all graphics and labels.</p>
+      <p>In this mode the user can visually measure the length of lines on the map. The first single-click or tap on the map will begin the measurement. Once initialized, subsequent single-clicks or taps will add points to a LineString being measured. Whenever the mouse moves, a label follows the cursor which displays the total length so far. Touch devices will only see an updated measurment when they add a new point. A double-click or tap will end the measurement and remove all graphics and labels.</p>
 
       <p>On a non-touch device a visual line will follow the mouse cursor from the last point to show the user the next segment of the line they are measuring and update the measurement. On all devices, the next segment becomes visible when the user confirms the next point location by clicking or tapping. At any point, the user can hit the escape key to remove one point or, if there is only one point, stop measuring alltogether.</p>
 
       <p>Similar to pan mode, the user can drag the map to pan, even while measuring. The map will continue panning a little after the user lets go. They can zoom in or out with the scroll wheel. While not measuring, they can also double-click or double-tap to zoom in one level.</p>
       <p>By default the unit of measurment is meters because the default projection is web mercator meters. If you change the tilingScheme (on tiled services) or switch to a shingled service, the unit of measurment will be based on your new service's units.</p>
       <h3>events</h3>
-      <p>In measureDistance mode, the geomap widget triggers the following events on the original map div.</p>
+      <p>In measureLength mode, the geomap widget triggers the following events on the original map div.</p>
       <ul>
         <li>move &ndash; when the user moves the mouse above the map but is not actively panning, this event triggers even while measuring</li>
         <li>click &ndash; when the user clicks or taps a point on the map without initiating a pan, this event triggers even while measuring</li>

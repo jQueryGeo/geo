@@ -3448,10 +3448,11 @@ function try$( selector ) {
           drawPoint: "crosshair",
           drawLineString: "crosshair",
           drawPolygon: "crosshair",
-          measureDistance: "crosshair"
+          measureLength: "crosshair",
+          measureArea: "crosshair"
         },
         measureLabels: {
-          distance: "{{=distance.toFixed( 2 )}} m",
+          length: "{{=length.toFixed( 2 )}} m",
           area: "{{=area.toFixed( 2 )}} sq m"
         },
         drawStyle: {},
@@ -3665,7 +3666,7 @@ function try$( selector ) {
         }
       }
 
-      $.template( "geoMeasureDistance", this._options[ "measureLabels" ].distance );
+      $.template( "geoMeasureLength", this._options[ "measureLabels" ].length );
       $.template( "geoMeasureArea", this._options[ "measureLabels" ].area );
 
       this._$eventTarget.css("cursor", this._options["cursors"][this._options["mode"]]);
@@ -3706,7 +3707,7 @@ function try$( selector ) {
 
         case "measureLabels":
           value = $.extend( this._options[ "measureLabels" ], value );
-          $.template( "geoMeasureDistance", value.distance );
+          $.template( "geoMeasureLength", value.length );
           $.template( "geoMeasureArea", value.area );
           break;
 
@@ -4140,14 +4141,28 @@ function try$( selector ) {
             heightOver;
 
         switch ( mode ) {
-          case "measureDistance":
+          case "measureLength":
             mode = "drawLineString";
             labelShape = {
               type: "LineString",
               coordinates: coords
             };
-            label = $.render( { distance: $.geo.length( labelShape, true ) }, "geoMeasureDistance" );
+            label = $.render( { length: $.geo.length( labelShape, true ) }, "geoMeasureLength" );
             labelPixel = $.merge( [], pixels[ pixels.length - 1 ] );
+            break;
+
+          case "measureArea":
+            mode = "drawPolygon";
+
+            labelShape = {
+              type: "Polygon",
+              coordinates: [ $.merge( [ ], coords ) ]
+            };
+            labelShape.coordinates[ 0 ].push( coords[ 0 ] );
+
+            label = $.render( { area: $.geo.area( labelShape, true ) }, "geoMeasureArea" );
+            labelPixel = $.merge( [], pixels[ pixels.length - 1 ] );
+            pixels = [ pixels ];
             break;
 
           case "drawPolygon":
@@ -4681,7 +4696,8 @@ function try$( selector ) {
           this._resetDrawing();
           break;
 
-        case "measureDistance":
+        case "measureLength":
+        case "measureArea":
           this._resetDrawing();
           break;
       }
@@ -4746,7 +4762,8 @@ function try$( selector ) {
           case "drawPoint":
           case "drawLineString":
           case "drawPolygon":
-          case "measureDistance":
+          case "measureLength":
+          case "measureArea":
             this._lastDrag = this._current;
 
             if (e.currentTarget.setCapture) {
@@ -4816,7 +4833,8 @@ function try$( selector ) {
 
         case "drawLineString":
         case "drawPolygon":
-        case "measureDistance":
+        case "measureLength":
+        case "measureArea":
           if (this._mouseDown || this._toolPan) {
             this._panMove();
           } else {
@@ -4939,7 +4957,8 @@ function try$( selector ) {
 
           case "drawLineString":
           case "drawPolygon":
-          case "measureDistance":
+          case "measureLength":
+          case "measureArea":
             if (wasToolPan) {
               this._panFinalize();
             } else {
