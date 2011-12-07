@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
   <meta name="description" content="Search Twitter based on location and draw the results as a heat map">
   <meta name="author" content="Ryan Westphal">
+  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/blitzer/jquery-ui.css" />
   <style type="text/css">
     html
     {
@@ -160,6 +161,7 @@
     </div>
   </div>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
   <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
   <script>
     $(function () {
@@ -299,6 +301,9 @@
 
         return false;
       });
+
+      // jQueryUI for pretty buttons
+      $( "button" ).button();
 
       function search() {
         // called by autoSearch, this function actually searches Twitter for geo-enabled tweets

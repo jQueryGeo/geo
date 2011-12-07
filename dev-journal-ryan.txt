@@ -112,6 +112,13 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 
+==2011-12-05==
+===measure area===
+I have to work on the measure area tool. Something's not quite right...oh yeah, I haven't implemented it yet.
+
+===length===
+measureDistance should be measureLength. The measureLabels object should have a length property.
+
 ==2011-12-01==
 ===getUrl===
 I was going to bring our urlFormat property over from the old code but now I think I want it to be the same property on the service object. I think getUrl can be a function, but can *also* be a string for shorthand. This will obviously be a jsrender template string.
