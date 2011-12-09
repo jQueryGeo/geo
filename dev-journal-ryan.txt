@@ -1,5 +1,6 @@
 ﻿== to do ==
 
+* geomap - [bug] destroy doesn't end measure tools
 * docs - geomap - service-level shapes
 * docs - geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
 * docs - geomap - shapes option
@@ -16,6 +17,11 @@
 * geomap - wheel option
 * geomap - cache label coordinates (the labelPixel cannot be cached, it will change each refresh)
 * geomap - rotate label based on segment
+* geomap - use pointer-events: none where appropriate
+* docs - geomap - allow service-level refresh
+* geomap - allow service-level refresh
+* geomap - add argument to refresh to force reload of images (in case of dynamic data)
+* geomap - test changing shingled service URL to get updated images (in case of dynamic data)
 * docs - geomap - support TMS
 * geomap - support TMS
 * geomap - replace data-geo attributes with classes
@@ -29,6 +35,8 @@
 * geomap - create _defaultState object, use for widget-local _widgetState property, reinit _widgetState on _createWidget
 * geomap - don't redraw shapes after interactiveScale, they've already been drawn at new scale
 * geomap - [bug] exception when calling destroy on uninitialized div
+* make a package for new jQuery plugin directory
+** https://github.com/jquery/plugins.jquery.com/blob/master/docs/package.md
 * expose jQuery Geo as an AMD module so asynchronous loaders like RequireJS and curl.js can use it
 * examples - geomap resize method
 * examples - multiple maps example
@@ -111,6 +119,12 @@
 ** in the drawing modes, this function ends drawing and triggers the shape event with whatever coordinates have already been added to the shape
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
+
+==2011-12-08==
+===semver===
+All that chatter about what version naming to use and then the jQuery blog points to this: http://semver.org/
+
+Also, here's the deal about the new plugins site: http://blog.jquery.com/2011/12/08/what-is-happening-to-the-jquery-plugins-site/
 
 ==2011-12-05==
 ===measure area===
