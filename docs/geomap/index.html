@@ -29,7 +29,13 @@
       <div class="geomap-indoc"></div>
       <h2>options</h2>
       <p>The options argument is a JavaScript object that configures the map widget during the first instantiation on a div. No options are required. By default the map will show the whole world using the OpenStreetMap tile set.</p>
-      <p>The map view refreshes when you change these properties: bbox, center, services, tilingScheme &amp; zoom.</p>
+      <p>After initializing a map with your first geomap call, you can get or set most of these options using the following syntax:</p>
+      <pre><code><span class="comment">// get the current values</span>
+var optionValue = $( <i>map selector</i> ).geomap( &quot;option&quot;, <i>optionName</i> );
+<span class="comment">// set a new value</span>
+$( <i>map selector</i> ).geomap( &quot;option&quot;, <i>optionName</i>, <i>newValue</i> );</code></pre>
+      <p>One exception is pixelSize, which is read-only.</p>
+      <p>The map view refreshes when you change these options: bbox, center, services, tilingScheme &amp; zoom.</p>
       <ul data-role="listview" data-inset="true">
         <li><a href="bbox.html"><h3>bbox</h3><p>bounds of the currently visible viewport</p></a></li>
         <li><a href="bboxMax.html"><h3>bboxMax</h3><p>bounds of maximum viewport for non-tiled maps</p></a></li>
@@ -49,7 +55,7 @@
       <p>All event callbacks receive two arguments: the original browser event and an object specific to the map action.</p>
       <p>The units in the map event arguments depend on the way you initialize the map widget. If you have set the center or bbox option using geodetic coordinates, the event arguments will also be in geodetic coordinates. Please see the documentation on $.geo.proj for more information.</p>
       <p>Like jQuery UI widgets, geomap triggers events directly on the original map div.</p>
-      <p>Programatic changes to properties do not trigger events.</p>
+      <p>Programatic changes to options do not trigger events.</p>
       <p>The dblclick event is special in that you can prevent the default action, 
         zoom-in one level, by calling e.preventDefault() in your callback. This is currently the only geomap event that you can prevent the default action. Calling preventDefault in the callback of any other geomap event has undefined results.</p>
       <p>There are three geomap event <i>types</i>. The type of event determines what is sent to your event handler as the second argument, geo.</p>
@@ -69,18 +75,13 @@
       </ul>
       <h3>bbox events</h3>
       <p>With bbox events the geo argument to your callback is an object with single property, bbox, which is a <a href="http://geojson.org/geojson-spec.html#bounding-boxes" rel="external">GeoJSON bounding box</a>.</p>
-      <!--<h3>geometry events</h3>
-      <p>With geometry events the geo argument to your callback is a JavaScript object having two properties: pixels &amp; geometry. Both are multi-dimensional <a href="http://geojson.org/geojson-spec.html#positions" rel="external">GeoJSON positions</a>, i.e., an array containing the x and y value but pixel is in pixel coordinates based on the current map view and the other in map coordinates based on the tilingScheme for tiled maps and bboxMax for shingled (dynamic) maps.</p>-->
       <ul data-role="listview" data-inset="true">
         <li>
             <a href="geomapbbox.html">bboxchange</a>
         </li>
       </ul>
       <h3>shape events</h3>
-      <p>With shape events, the geo argument to your callback is a GeoJSON geometry 
-        object having two properties: type &amp; coordinates. The object type will be either 
-        Point, LineString or Polygon depending on the current geomap mode: drawPoint, 
-        drawLineString, or drawPolygon.</p>
+      <p>With shape events, the geo argument to your callback is a GeoJSON geometry object having two properties: type &amp; coordinates. The object type will be either Point, LineString or Polygon depending on the current geomap mode: drawPoint, drawLineString, or drawPolygon.</p>
       <p>The geo argument to your callback is a true GeoJSON object and you can pass this object directly to the append method. You can also send it directly to a database for storage knowing that there are no non-GeoJSON properties wasting space.</p>
       <ul data-role="listview" data-inset="true">
         <li>
@@ -168,7 +169,7 @@
         <tr>
           <td>height</td>
           <td>&quot;8px&quot;</td>
-          <td>The height of a box drawn around Point shapes. Currently only pixel values are allowed.</td>
+          <td>The height of a box drawn around Point shapes. Currently only pixel values are allowed. If either width or height are zero, no shape is drawn for the Point.</td>
         </tr>
         <tr>
           <td>opacity</td>
@@ -198,11 +199,10 @@
         <tr>
           <td>width</td>
           <td>&quot;8px&quot;</td>
-          <td>The width of a box drawn around Point shapes. Currently only pixel values are allowed.</td>
+          <td>The width of a rounded rectangle drawn around Point shapes. Currently only pixel values are allowed. If either width or height are zero, no shape is drawn for the Point.</td>
         </tr>
       </table>
-      <p>
-        All properties apply to Point shapes which means that you can adjust the stroke and fill of the box surrounding the point location.</p>
+      <p>All properties apply to Point shapes which means that you can adjust the stroke and fill of the box surrounding the point location.</p>
     </div>
   </div> <!-- end of #container -->
 
