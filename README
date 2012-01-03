@@ -6,7 +6,7 @@ After years of internal development, we are pleased to bring our JavaScript map 
 
 Documentation is hosted at http://jquerygeo.com
 
-News and updates via ryanttb on Twitter: https://twitter.com/#!/ryanttb
+News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 
 == CHANGELOG ==
 
@@ -30,6 +30,8 @@ News and updates via ryanttb on Twitter: https://twitter.com/#!/ryanttb
 * geomap - measureArea mode
 * docs - geomap - service-level shapeStyle
 * docs - geomap - getUrl string option
+* geomap - [bug] create doesn't clear drawing shapes
+* docs - geomap - service-level shapes
 
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon

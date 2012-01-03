@@ -33,15 +33,25 @@
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>$( <i>selector</i> ).geomap( &quot;remove&quot;, existingShape )
-$( <i>selector</i> ).geomap( &quot;remove&quot;, existingShape, false )</code></pre></td>
+          <td><pre><code>$( <i>map or service selector</i> ).geomap( &quot;remove&quot;, existingShape )
+$( <i>map or service selector</i> ).geomap( &quot;remove&quot;, existingShape, false )</code></pre></td>
         </tr>
       </table>
       <p>The remove method removes a shape you have previously added with the append method. The existing shape can be an object reference used in a call to <a href="append.html">append</a> that you have held on to or one that you retrieved by using the <a href="find.html">find</a> method.</p>
       <p>The jQuery UI widget factory returns the original jQuery collection to maintain call chaining.</p>
       <h2>delaying refresh</h2>
       <p>The optional refresh argument determines if geomap refreshes the map graphics after this call to remove. It defaults to true. If you pass false, geomap will remove the shape internally but not immediately redraw the graphics. The changes will display if the user moves the map or you call geomap's refresh method.</p>
+      <p>If the shape is not found on the specified service, the map is not changed and will not be refreshed even if you pass true for the refresh argument.</p>
       <h2>service-level shapes</h2>
+      <p>Similar to how you can append shapes to specific services, you can remove shapes from specific services as well.</p>
+      <p>You do this by targeting a service inside a map instead of the map itself for your call to geomap's remove method. For example, the default map service has the CSS class: osm. We can remove a shape from that service specifically by using jQuery to target the service:</p>
+      <pre><code>$( &quot;#map .osm&quot; ).geomap( &quot;remove&quot;, shape );</code></pre>
+      <p>Shapes appended to a specific service will not be removed by calling remove on the map itself. For example, the shape will remain after this sequence:<p>
+      <pre><code>$( &quot;#map .osm&quot; ).geomap( &quot;append&quot;, shape );
+$( &quot;#map&quot; ).geomap( &quot;remove&quot;, shape );</code></pre>
+      <p>To remove all references to a shape from the map and all services, you can use the comma selector and the built-in geo-service CSS class:</p>
+      <pre><code><span class="comment">// remove the shape from both the map widget and any services</span>
+$( &quot;#map,#map .geo-service&quot; ).geomap( &quot;remove&quot;, shape );</code></pre>
     </div>
   </div> <!-- end of #container -->
 
