@@ -2757,6 +2757,38 @@ function try$( selector ) {
       return minDist;
     },
 
+    // buffer
+
+    _buffer: function( geom, distance, _ignoreGeo /* Internal Use Only */ ) {
+      switch ( geom.type ) {
+        case "Point":
+          var coord = ( !_ignoreGeo && $.geo.proj ) ? $.geo.proj.fromGeodetic(geom.coordinates) : geom.coordinates,
+              resultCoords = [],
+              slices = 180,
+              i = 0,
+              a;
+
+          for ( ; i <= slices; i++ ) {
+            a = ( i * 360 / slices ) * ( Math.PI / 180 );
+            resultCoords.push( [
+              coord[ 0 ] + Math.cos( a ) * distance,
+              coord[ 1 ] + Math.sin( a ) * distance
+            ] );
+          }
+
+          return {
+            type: "Polygon",
+            coordinates: [ ( !_ignoreGeo && $.geo.proj ? $.geo.proj.toGeodetic( resultCoords ) : resultCoords ) ]
+          };
+
+          break;
+
+        default:
+          return undefined;
+      }
+    },
+
+    
     //
     // feature
     //
@@ -3560,8 +3592,6 @@ function try$( selector ) {
 
       this._$elem.addClass("geo-map");
 
-      this._graphicShapes = [];
-
       this._initOptions = options || {};
 
       this._forcePosition(this._$elem);
@@ -3590,17 +3620,22 @@ function try$( selector ) {
           this._isTap =
           this._isDbltap = false;
 
-      this._anchor =
-          this._current =
-          this._lastMove =
-          this._lastDrag =
-          this._velocity = [0, 0];
+      this._anchor = [ 0, 0 ];
+      this._current = [ 0, 0 ];
+      this._lastMove = [ 0, 0 ];
+      this._lastDrag = [ 0, 0 ];
+      this._velocity = [ 0, 0 ];
 
       this._friction = [.8, .8];
 
       this._downDate =
           this._moveDate =
           this._clickDate = 0;
+
+      this._drawPixels = [];
+      this._drawCoords =  [];
+      this._graphicShapes = [];
+
 
       $.Widget.prototype._createWidget.apply(this, arguments);
     },

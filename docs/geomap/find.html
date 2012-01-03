@@ -33,12 +33,34 @@
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>var existingShape = $(&quot;#map&quot;).geomap( &quot;find&quot;, { type: &quot;Point&quot;, coordinates: [ -71.098709, 42.330322 ] }, 8 )</code></pre></td>
+          <td><pre><code>var existingShape = $( <i>map or service selector</i> ).geomap( &quot;find&quot;, { type: &quot;Point&quot;, coordinates: [ -71.098709, 42.330322 ] }, 8 )</code></pre></td>
         </tr>
       </table>
       <p>The find method takes a single GeoJSON map point and returns all shapes within a pixel radius of the given location that have been added with append. If there are no shapes at the location, this method returns an empty array.</p>
-      <p>If $.geo.proj is not null, the position argument must be in geodetic coordinates, point.coordinates[0] is longitude and point.coordinates[1] is latitude. If $.geo.proj is null, the position must be in the widget's internal projection as defined by tilingScheme for tiled map services or bboxMax for shingled (dynamic) map services.</p>
       <p>The pixelTolerance argument is always in pixels. This allows for pixel-based searches regardless of the map's current zoom. A high-zoom search is finer than a low-zoom one because at lower zoom levels, i.e., the map is zoomed out more, the Earth-size of a pixel is greater causing this search to reach out farther from the supplied position.</p>
+      <h2>service-level shapes</h2>
+      <p>Similar to how you can append shapes to specific services, you can find shapes in specific services as well.</p>
+      <p>You do this by targeting a service inside a map instead of the map itself for your call to geomap's find method. For example, the default map service has the CSS class: osm. We can find a shape from that service specifically by using jQuery to target the service:</p>
+      <pre><code>var osmShapes = $( &quot;#map .osm&quot; ).geomap( &quot;find&quot;, [ -71, 42 ], 8 );</code></pre>
+      <p>Shapes appended to a specific service will not be returned by calling find on the map itself. For example, the shapes variable will be an empty array after this sequence:<p>
+      <pre><code>var point = {
+      type: &quot;Point&quot;,
+      coordinates: [ -71, 42 ]
+    };
+
+<span class="comment">// add the shape to the osm service</span>
+$( &quot;#map .osm&quot; ).geomap( &quot;append&quot;, point );
+
+<span class="comment">// use the original point to search for shapes on the map widget</span>
+var shapes = $( &quot;#map&quot; ).geomap( &quot;find&quot;, point, 3 );</code></pre>
+      <p>Unlike the append, remove, and empty methods, the find method cannot currently be used on multiple targets simultaneously. For example, the return value of the following is undefined:</p>
+      <pre><code><span class="comment">// attempt to search the map widget and the osm service at the same time</span>
+var shapes = $( &quot;#map,#map .osm&quot; ).geomap( &quot;find&quot;, point, 8 );</code></pre>
+
+      <p>To find shapes in the map and/or more than one service, you should use two find calls:</p>
+      <pre><code><span class="comment">// find shapes on the map and the default service</span>
+var mapShapes = $( &quot;#map&quot; ).geomap( &quot;find&quot;, point, 8 ),
+    osmShapes = $( &quot;#map .osm&quot; ).geomap( &quot;find&quot;, point, 8 );</code></pre>
     </div>
   </div> <!-- end of #container -->
 

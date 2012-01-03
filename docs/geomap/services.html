@@ -84,6 +84,7 @@
       <p>Each service can have an id that distinguishes it from other service objects in the array. The id is a string and must be follow the HTML element id naming conditions. If present, the id must be unique across all services in all maps as well as unique from any other HTML element on the page. The default service object of a geomap widget does not have an id.</p>
       <h3>class</h3>
       <p>Each service can have a class as well. The class is a string and must be follow the CSS class naming conditions. You can consider this as the class of images the service will supply and usually name it after the service, such as osm, mass-gis, etc. The default service object of a geomap widget has the class: osm.</p>
+      <p>All services also get the class geo-service whether you supply a class to the service object or not. Therefore, the default service is both .osm (as part of its service object) and .geo-service (as added by the widget).</p>
       <p>Unfortunately, class is a reserved word in JavaScript. When you specify class in your service object, you must quote the word class. This is exactly how it's done in jQuery itself when applying attributes to an element based on an object. To quote the jQuery API:</p>
       <blockquote>The name &quot;class&quot; must be quoted since it is a JavaScript reserved word, and &quot;className&quot; cannot be used since it is not the correct attribute name.</blockquote>
       <h3>type</h3>

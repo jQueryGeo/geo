@@ -1,13 +1,18 @@
 ﻿== to do ==
 
-* geomap - [bug] destroy doesn't end measure tools
-* docs - geomap - service-level shapes
 * docs - geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
 * docs - geomap - shapes option
+* geomap - support pinch zoom on iOS
+* geo - add recenter function for bbox
 * geomap - shapes option
 * geomap - [bug] setting services array during init does not wipe out default properties of initial service object
 * geomap - [bug] zoom in more than once with zoom method moves tiles to the wrong spot
 * geomap - [bug] map panning is jumpy, appears to be related to shapes and/or drawing context
+* geomap - [bug] chaining doesn't work, e.g., .geomap(option,center).geomap(option,zoom)
+* geomap - maybe throw an error when setting center to an invalid object, such as the first number in a coordinate array: coordinates[ 0 ] <== wrong!
+* geomap - [bug] measure modes do not show text for shingled services?
+* geomap - [bug] mouse zoom doesn't work for shingled services?
+* geomap - [bug] zoom option doesn't return proper values for shingled services?
 * docs - geomap - label method
 ** redraw all shapes while searching for argument
 * docs - geomap - style method
@@ -19,6 +24,7 @@
 * geomap - rotate label based on segment
 * geomap - use pointer-events: none where appropriate
 * docs - geomap - allow service-level refresh
+* geomap - allow getUrl to return a callback function or Promise to delay image requests for some reason (multiple requests, etc.)
 * geomap - allow service-level refresh
 * geomap - add argument to refresh to force reload of images (in case of dynamic data)
 * geomap - test changing shingled service URL to get updated images (in case of dynamic data)
@@ -73,6 +79,7 @@
 * geomap - spatially index shapes when a tilingScheme is in place
 * geomap - internal - add _getVisibleTiles method and use it in tiled service and shapes spatial index
 * geomap - remove wheel plugin and use built-in mousewheel event
+* geomap - test how the comma selector works with the find method
 * code - prefer $.data over $.fn.data
 * docs - internal - explain what projection is and which one we use by default (3395) and maybe why we call it web mercator & why we can't get to +/- 90 lat
 * docs - internal - document how geomap draws shapes, the geomapgraphics widget and the reason shapeStyle is a method
@@ -119,6 +126,81 @@
 ** in the drawing modes, this function ends drawing and triggers the shape event with whatever coordinates have already been added to the shape
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
+
+==2012-1-2==
+===service===
+I'm still thinking about service-level methods. I'm not going to add the *All methods right now and I'm not going to have the single methods dive into the services (other than find, which even in jQuery digs into sub-elements not in your collection). The table I wrote below won't go into the docs. 
+
+Almost done with the docs for this. I wonder if I can have the jQuery UI widget method find merge results when more than one element are used in the selector. Unlikely but it would be cool. I'm going to have to assume not for now but keep that in mind.
+
+===geo-service===
+I am going to document that all service divs have the geo-service class. So, the default service will be both .osm and .geo-service.
+
+===find===
+It's quite clear to me that I should be able to call find on services. That will return shapes in that service. What does calling find on the map do? Should I have it search map and all services as planned or limit it to just map shapes? I have no idea what this would do in jQuery UI widget factory:
+
+var shapes = $( "#map,#map .osm" ).geomap( "find", { type: "Point", coordinates: [ -71, 42 ] }, 4 );
+
+What will be called, what's the return...just the first? Just the last?
+
+For this version, I'm going to have find on the map only return shapes appended to the map. That will match how the other functions work and document that you cannot use the comma selector with the find method.
+
+==2012-1-1==
+===offline===
+Responded to an email asking about offline support. I wrote a few things in my reply that should give him some ideas. I'll copy them here:
+
+I have thought of offline support. While something like that likely won't be directly part of jQuery Geo itself, there are different ways to approach it depending on needs. I have plans to put up some demos to give developers ideas but here's a short list:
+
+1. Using the getUrl function to cache downloaded tiles in session storage on IndexDB. Since this function in the service object can do anything you want, it's perfectly fine to check some HTML5 storage options for tiles and returning, e.g., a data URI before attempting to access the Internet. Users will get roaming charges only when the images aren't in the cache. However, the amount of images you can store in the cache is limited by what the browser sets for the cache's upper limit. Some mobile browsers allow users to increase this limit, others don't. This is an option better suited for sites that want to show large areas with many zoom levels.
+
+2. Pre-caching the whole tile set in HTML5's appcache. This is suited for a site that only serves a small area and not too many zoom levels. You would have to get a copy of all the tiles and list them in a cache manifest file. If the user zooms or pans outside the site's area, they can get some "no tile" image. The huge advantage is that users can first browse to the site on WiFi, the app will cache the entire map (which will take a while) but can then walk around and map tiles will instantly come from the local cache. The disadvantage is that HTML5 appcache is usually only 5MB which won't hold too many tiles.
+
+===remove===
+I'm still trying to decide about whether or not remove should remove all references in all services or whether I need removeAll. There is precedent for xAll methods in jQuery. I will also need empty. This is too much for a4. Maybe beta or beyond.
+
+method                   | map or service | function
+==========================================================================
+append( shape )          | map            | appends shapes 
+                         |                |   only to the map
+append( shape )          | service        | appends shapes 
+                         |                |   only to the specific service
+find( Point, radius )    | map            | finds shapes appended 
+                         |                |   only to the map
+find( Point, radius )    | service        | finds shapes appended 
+                         |                |   only to the specific service
+findAll( Point, radius ) | map            | finds shapes appended 
+                         |                |   to the map or any service,
+                         |                |   will not return duplicates
+remove( shape )          | map            | removes shapes appended 
+                         |                |   only to the map
+remove( shape )          | service        | removes shapes appended 
+                         |                |   only to the specific service
+removeAll( shape )       | map            | removes shapes appended 
+                         |                |   to the map or any service,
+                         |                |   will remove all duplicates
+
+==2011-12-22==
+===buffer===
+I'm going to implement buffer as an internal geo method for now & document it later. It's needed.
+
+==2011-12-21==
+===two finger===
+So, Google has settled on two finger single tap for zoom out. Fine.
+
+==2011-12-09==
+===measure===
+Previous measure shows up if you destroy & create map after originally double clicking to end a measure.
+
+In destroy, _drawCoords and _drawPixels are both empty. Where's the data come from?
+
+When back into the new control, _drawPixels has values. There isn't a _drawCoords. Ah, widget factory was using old data, I have to make sure everything is cleared during create, including these two arrays.
+
+===measure-pan===
+Problem when you pan the first time while drawing in axisLayout image.
+
+It's not just axisLayout image. It's also not measure, it's drawPolygon as well. Ok, this is new ;) I works fine in a3. Maybe something with the implementation of axisLayout.
+
+Doh! Another "don't set arrays equal to each other" issue. Does this happen to other devs?
 
 ==2011-12-08==
 ===semver===

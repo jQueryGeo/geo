@@ -169,7 +169,7 @@ $( <i>map selector</i> ).geomap( &quot;option&quot;, <i>optionName</i>, <i>newVa
         <tr>
           <td>height</td>
           <td>&quot;8px&quot;</td>
-          <td>The height of a box drawn around Point shapes. Currently only pixel values are allowed.</td>
+          <td>The height of a box drawn around Point shapes. Currently only pixel values are allowed. If either width or height are zero, no shape is drawn for the Point.</td>
         </tr>
         <tr>
           <td>opacity</td>
@@ -199,11 +199,10 @@ $( <i>map selector</i> ).geomap( &quot;option&quot;, <i>optionName</i>, <i>newVa
         <tr>
           <td>width</td>
           <td>&quot;8px&quot;</td>
-          <td>The width of a box drawn around Point shapes. Currently only pixel values are allowed.</td>
+          <td>The width of a rounded rectangle drawn around Point shapes. Currently only pixel values are allowed. If either width or height are zero, no shape is drawn for the Point.</td>
         </tr>
       </table>
-      <p>
-        All properties apply to Point shapes which means that you can adjust the stroke and fill of the box surrounding the point location.</p>
+      <p>All properties apply to Point shapes which means that you can adjust the stroke and fill of the box surrounding the point location.</p>
     </div>
   </div> <!-- end of #container -->
 
