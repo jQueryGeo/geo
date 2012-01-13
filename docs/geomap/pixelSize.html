@@ -11,7 +11,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0rc3/jquery.mobile-1.0rc3.min.css" />
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
 </head>
 
 <body>
@@ -45,16 +45,16 @@
         </tr>
       </table>
       <p>The pixel size is the number of map units a single pixel occupies in the current view. A more interesting way to think of it is the Earth-size of the pixel.</p>
-      <p>Because the default internal projection is web mercator meters, the default return value for pixelSize is in meters even though you set other map values in lon/lat degrees. The unit type will always match the type you set on tilingScheme for tiled maps or bboxMax for shingled (dynamic) maps. For more information on how the plugin handles projections, please read the geo section of this documentation.</p>
+      <p>Because the default internal projection is web mercator meters, the default return value for pixelSize is in meters even if you set other map values in geodetic coordinates, e.g., lon/lat. The unit type will always match the type you set on tilingScheme for tiled maps or bboxMax for shingled (dynamic) maps. For more information on how the plugin handles projections, please read the geo section of this documentation.</p>
       <p>The map's pixel size is read-only. To change it you will need to use one of the mutable properties such as bbox, center or zoom.</p>
-      <p>The default pixelSize is calculated based on the tilingScheme and zoom for tiled maps or bbox/bboxMax ratio for shingled maps.</p>
+      <p>pixelSize is calculated based on tilingScheme &amp; zoom for tiled maps. It is based on the bbox/bboxMax ratio for shingled maps.</p>
     </div>
   </div> <!-- end of #container -->
 
   <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
   <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
-  <script src="js/script.js"></script>
-  <script src="http://code.jquery.com/mobile/1.0rc3/jquery.mobile-1.0rc3.min.js"></script>
+  <script src="../js/script.js"></script>
+  <script src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
 </body>
 </html>
 

@@ -134,14 +134,25 @@
             serviceContainer.find("img").attr("data-keepAlive", "0");
           }
 
-          var imageUrl = service.getUrl({
+          var urlProp = ( "src" in service ? "src" : "getUrl" ),
+              urlArgs = {
                 bbox: bbox,
                 width: mapWidth,
                 height: mapHeight,
                 zoom: map._getZoom(),
                 tile: null,
                 index: 0
-              });
+              },
+              isFunc = $.isFunction( service[ urlProp ] ),
+              imageUrl;
+
+
+          if ( isFunc ) {
+            imageUrl = service[ urlProp ]( urlArgs );
+          } else {
+            $.template( "geoSrc", service[ urlProp ] );
+            imageUrl = $.render( urlArgs, "geoSrc" );
+          }
 
           serviceState.loadCount++;
           //this._map._requestQueued();

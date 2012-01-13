@@ -11,7 +11,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0rc3/jquery.mobile-1.0rc3.min.css" />
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
 </head>
 
 <body>
@@ -25,11 +25,11 @@
       <table>
         <tr>
           <th>return type</th>
-          <td>Array | Array^2 (<a href="http://geojson.org/geojson-spec.html#positions" rel="external">GeoJSON position</a>)</td>
+          <td>Array (<a href="http://geojson.org/geojson-spec.html#positions" rel="external">GeoJSON positions</a>)</td>
         </tr>
         <tr>
           <th>syntax</th>
-          <td>.geomap( &quot;toPixel&quot;, Array mapPosition | Array^2 mapPositions )</td>
+          <td>.geomap( &quot;toPixel&quot;, Array mapPositions )</td>
         </tr>
         <tr>
           <th>usage</th>
@@ -38,13 +38,14 @@ var pixelPositions = $(&quot;#map&quot;).geomap( &quot;toPixel&quot;, [ [ -71.09
         </tr>
       </table>
       <p>The toPixel method takes a single GeoJSON position (Point.coordinates), an array of GeoJSON positions (MultiPoint.coordinates or LineString.coordinates), an array of arrays of positions (MultiLineString.coordinates or Polygon.coordinates) or an array of arrays of arrays of positions (MultiPolygon.coordinates). It returns the pixel coordinates for all of the map positions.</p>
+      <p>You can pass geodetic (lon, lat) or projected coordinates regardless of how you last set the bbox or center options.</p>
     </div>
   </div> <!-- end of #container -->
 
   <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
   <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
-  <script src="js/script.js"></script>
-  <script src="http://code.jquery.com/mobile/1.0rc3/jquery.mobile-1.0rc3.min.js"></script>
+  <script src="../js/script.js"></script>
+  <script src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
 </body>
 </html>
 

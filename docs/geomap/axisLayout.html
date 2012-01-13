@@ -5,13 +5,13 @@
   <meta charset="utf-8">
 
   <title>axisLayout | geomap</title>
-  <meta name="description" content="geomap axisLayout property">
+  <meta name="description" content="geomap axisLayout option">
   <meta name="author" content="Ryan Westphal">
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0rc3/jquery.mobile-1.0rc3.min.css" />
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
 </head>
 
 <body>
@@ -44,17 +44,17 @@
           <td><pre><code>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;axisLayout&quot;, &quot;image&quot; );</code></pre></td>
         </tr>
       </table>
-      <p>The axisLayout property determines direction of the coordinate system axes. It can be &quot;map&quot; or &quot;image&quot;.</p>
+      <p>The axisLayout option determines direction of the coordinate system axes. It can be &quot;map&quot; or &quot;image&quot;.</p>
       <p>Maps have a traditional mathematical coordinate system where the ordinate-axis (y-axis) points up. However, graphical images flip the y-axis so that moving down increases in value, which is appropriate in graphic contexts. This is important when you are connecting to a service supplying non-georeferenced (computer graphic) images and want your map control to match that coordinate system layout.</p>
       <p>You will rarely have to change this unless you are using an graphic image server such as LizardTech Image Server or you just want to use the geomap widget to draw pixel-oriented graphics.</p>
-      <p>This property will affect pixel-to-map coordinate calculation for all service types, i.e., tiled &amp; shingled services.</p>
+      <p>This option will affect pixel-to-map coordinate calculation for all service types, i.e., tiled &amp; shingled services.</p>
     </div>
   </div> <!-- end of #container -->
 
   <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
   <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
-  <script src="js/script.js"></script>
-  <script src="http://code.jquery.com/mobile/1.0rc3/jquery.mobile-1.0rc3.min.js"></script>
+  <script src="../js/script.js"></script>
+  <script src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
 </body>
 </html>
 
