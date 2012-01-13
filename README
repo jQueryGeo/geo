@@ -32,6 +32,13 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * docs - geomap - getUrl string option
 * geomap - [bug] create doesn't clear drawing shapes
 * docs - geomap - service-level shapes
+* docs - geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
+* docs - geomap - add projection section explaining how bbox & center affect map unit type
+* docs - geomap - rename getUrl to src
+* docs - geomap - scroll option
+* docs - geomap - pannable option
+* geomap - src string option
+* examples - string service src
 
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon

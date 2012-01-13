@@ -4,6 +4,7 @@ $.ajaxTransport( function( options, originalOptions, jqXHR ) {
   return {
     send: function( _, completeCallback ) {
       xdr = new XDomainRequest();
+
       xdr.onload = function() {
         var responses = {
           text: xdr.responseText
@@ -31,12 +32,15 @@ $.ajaxTransport( function( options, originalOptions, jqXHR ) {
           // see bug https://connect.microsoft.com/IE/feedback/ViewFeedback.aspx?FeedbackID=334804
         }
       };
+
+      xdr.onprogress = function() { };
+
       xdr.onerror = xdr.ontimeout = function() {
         var responses = {
           text: xdr.responseText
         };
         completeCallback(400, 'failed', responses);
-      }
+      };
 
       xdr.open(options.type, options.url);
       xdr.send(options.data);

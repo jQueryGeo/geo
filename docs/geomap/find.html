@@ -11,7 +11,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0rc3/jquery.mobile-1.0rc3.min.css" />
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
 </head>
 
 <body>
@@ -32,17 +32,30 @@
           <td>.geomap( &quot;find&quot;, Object point (<a href="http://geojson.org/geojson-spec.html#point" rel="external">GeoJSON Point</a>), Number pixelTolerance )</td>
         </tr>
         <tr>
+          <td></td>
+          <td>.geomap( &quot;find&quot;, <i>shape selector</i> )</td>
+        </tr>
+        <tr>
           <th>usage</th>
-          <td><pre><code>var existingShape = $( <i>map or service selector</i> ).geomap( &quot;find&quot;, { type: &quot;Point&quot;, coordinates: [ -71.098709, 42.330322 ] }, 8 )</code></pre></td>
+          <td><pre><code>var existingShape = $( <i>map or service selector</i> ).geomap( &quot;find&quot;, { type: &quot;Point&quot;, coordinates: [ -71.098709, 42.330322 ] }, 8 )
+
+var allShapes = $( <i>map or service selector</i> ).geomap( &quot;find&quot;, &quot;*&quot; )</code></pre></td>
         </tr>
       </table>
-      <p>The find method takes a single GeoJSON map point and returns all shapes within a pixel radius of the given location that have been added with append. If there are no shapes at the location, this method returns an empty array.</p>
+      <p>The find method allows you to search for shapes appended to the map and/or services. There are two distinct ways to call this method.</p>
+      <h2>geometry search</h2>
+      <p>The find method can take a single GeoJSON map point and return all shapes within a pixel radius of the given location that have been added with append. If there are no shapes at the location, this method returns an empty array.</p>
       <p>The pixelTolerance argument is always in pixels. This allows for pixel-based searches regardless of the map's current zoom. A high-zoom search is finer than a low-zoom one because at lower zoom levels, i.e., the map is zoomed out more, the Earth-size of a pixel is greater causing this search to reach out farther from the supplied position.</p>
+      <p>Duplicate shape references are not included in the return value.</p>
+      <h2>selector search</h2>
+      <p>The find method can also take a single string. The string is in CSS selector syntax but currently only one selector is supported: *. Use the * selector to return an array of all shapes that have been appended to the map or service. If there are no shapes on the map or service, this method returns an empty array. Searching for all shapes at the map level will return all shapes that have been appended to the map or any service.</p>
+      <p>Duplicate shape references are not included in the return value.</p>
+      <p>The shape selector must be at the shape level which means that it cannot include service ids or classes. To search for shapes within a specific service, see below.</p>
       <h2>service-level shapes</h2>
       <p>Similar to how you can append shapes to specific services, you can find shapes in specific services as well.</p>
       <p>You do this by targeting a service inside a map instead of the map itself for your call to geomap's find method. For example, the default map service has the CSS class: osm. We can find a shape from that service specifically by using jQuery to target the service:</p>
       <pre><code>var osmShapes = $( &quot;#map .osm&quot; ).geomap( &quot;find&quot;, [ -71, 42 ], 8 );</code></pre>
-      <p>Shapes appended to a specific service will not be returned by calling find on the map itself. For example, the shapes variable will be an empty array after this sequence:<p>
+      <p>However, unlike the other three shape methods, shapes appended to a specific service <b>will be</b> returned by calling find on the map itself. In this way, calling find on the map is a deep search for shapes on all services. For example, after this sequence the shapes variable will contain the shape even though it was appended to a service specifically:<p>
       <pre><code>var point = {
       type: &quot;Point&quot;,
       coordinates: [ -71, 42 ]
@@ -53,21 +66,31 @@ $( &quot;#map .osm&quot; ).geomap( &quot;append&quot;, point );
 
 <span class="comment">// use the original point to search for shapes on the map widget</span>
 var shapes = $( &quot;#map&quot; ).geomap( &quot;find&quot;, point, 3 );</code></pre>
-      <p>Unlike the append, remove, and empty methods, the find method cannot currently be used on multiple targets simultaneously. For example, the return value of the following is undefined:</p>
-      <pre><code><span class="comment">// attempt to search the map widget and the osm service at the same time</span>
-var shapes = $( &quot;#map,#map .osm&quot; ).geomap( &quot;find&quot;, point, 8 );</code></pre>
+      <p>Another difference between the find method and the append, remove, and empty methods, is that the find method cannot currently be used on multiple targets simultaneously. For example, the return value of the following is undefined:</p>
+      <pre><code><span class="comment">// attempt to search the osm service and a second service at the same time</span>
+var shapes = $( &quot;#map .osm,#map .massgis&quot; ).geomap( &quot;find&quot;, point, 8 );</code></pre>
 
-      <p>To find shapes in the map and/or more than one service, you should use two find calls:</p>
-      <pre><code><span class="comment">// find shapes on the map and the default service</span>
-var mapShapes = $( &quot;#map&quot; ).geomap( &quot;find&quot;, point, 8 ),
-    osmShapes = $( &quot;#map .osm&quot; ).geomap( &quot;find&quot;, point, 8 );</code></pre>
+      <p>To find shapes in two specific services without searching all services you should use two find calls:</p>
+      <pre><code><span class="comment">// find shapes on the default service and a second service</span>
+var osmShapes = $( &quot;#map .osm&quot; ).geomap( &quot;find&quot;, point, 8 ),
+    massgisShapes = $( &quot;#map .massgis&quot; ).geomap( &quot;find&quot;, point, 8 );</code></pre>
+
+      <p>The selector-based version also follows this requirement. You cannot target more than one element with the initial selector and you cannot use the shape selector to search services. A multi-service selector-based search would be the same as above but with &quot;*&quot; instead of: point, 8.</p>
+      <pre><code><span class="comment">// the following are invalid and their return value is undefined</span>
+var multiTarget = $( &quot;#map .massgis,#map .osm&quot; ).geomap( &quot;find&quot;, &quot;*&quot; );
+var shapeSubSelector = $( &quot;#map&quot; ).geomap( &quot;find&quot;, &quot;.massgis *&quot; );
+
+<span class="comment">// proper way to get all shapes from multiple services</span>
+var osmShapes = $( &quot;#map .osm&quot; ).geomap( &quot;find&quot;, &quot;*&quot; ),
+    massgisShapes = $( &quot;#map .massgis&quot; ).geomap( &quot;find&quot;, &quot;*&quot; );</code></pre>
+
     </div>
   </div> <!-- end of #container -->
 
   <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
   <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
-  <script src="js/script.js"></script>
-  <script src="http://code.jquery.com/mobile/1.0rc3/jquery.mobile-1.0rc3.min.js"></script>
+  <script src="../js/script.js"></script>
+  <script src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
 </body>
 </html>
 

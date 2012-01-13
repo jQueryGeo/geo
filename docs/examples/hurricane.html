@@ -45,25 +45,25 @@
       </div>
     </div>
     <script id="tmplHurricane" type="text/x-jquery-tmpl">
-      <h2>${category}</h2>
+      <h2>{{=category}}</h2>
       <table>
-        <tr><th>date</th><td>${date}</td></tr>
-        <tr><th>accuracy</th><td>${accuracy}/40</td></tr>
-        <tr><th>eye diameter</th><td>${eyeDiameter}</td></tr>
-        <tr><th>direction</th><td>{{if direction}}${direction}&deg;{{/if}}</td></tr>
-        <tr><th>pressure</th><td>${pressure}</td></tr>
-        <tr><th>wind radii</th><td>${windRadii}</td></tr>
-        <tr><th>wind speed</th><td>${windSpeed}</td></tr>
-        <tr><th>gusts</th><td>${gusts}</td></tr>
+        <tr><th>date</th><td>{{=date}}</td></tr>
+        <tr><th>accuracy</th><td>{{=accuracy}}/40</td></tr>
+        <tr><th>eye diameter</th><td>{{=eyeDiameter}}</td></tr>
+        <tr><th>direction</th><td>{{#if direction}}{{=direction}}&deg{{/if}}</td></tr>
+        <tr><th>pressure</th><td>{{=pressure}}</td></tr>
+        <tr><th>wind radii</th><td>{{=windRadii}}</td></tr>
+        <tr><th>wind speed</th><td>{{=windSpeed}}</td></tr>
+        <tr><th>gusts</th><td>{{=gusts}}</td></tr>
       </table>
     </script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
-    <script src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+    <!--<script src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>-->
     <script src="js/iecors.js"></script>
-    <script src="../jquery.geo-test.min.js"></script>
+    <script src="../jquery.geo-test.js"></script>
     <script>
       $(function () {
-        $("#tmplHurricane").template("hurricane");
+        $.template( "hurricane", $( "#tmplHurricane" ) );
 
         var map = $("#map").geomap({
             center: [-76.6, 30.4],
@@ -74,7 +74,7 @@
 
               $.each(tracks, function() {
                 if (this.type == "Feature") {
-                  $.tmpl("hurricane", this.properties).appendTo("#popup");
+                  $( "#popup" ).append( $.render( this.properties, "hurricane" ) );
                   $("#popup").css({
                     left: e.pageX,
                     top: e.pageY

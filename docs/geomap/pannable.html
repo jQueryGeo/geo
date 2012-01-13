@@ -1,0 +1,62 @@
+<!doctype html>  
+
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+
+  <title>pannable | geomap</title>
+  <meta name="description" content="geomap pannable option">
+  <meta name="author" content="Ryan Westphal">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="../css/style.css?v=2">
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
+</head>
+
+<body>
+
+  <div id="pannable" data-role="page">
+    <div data-role="header" data-theme="f">
+      <h1>pannable</h1>
+    </div>
+    
+    <div data-role="content">
+      <table>
+        <tr>
+          <th>type</th>
+          <td>Boolean</td>
+        </tr>
+        <tr>
+          <th>default</th>
+          <td>true</td>
+        </tr>
+        <tr>
+          <th>init</th>
+          <td><pre><code>$( <i>map selector</i> ).geomap( { pannable: true } );</code></pre></td>
+        </tr>
+        <tr>
+          <th>get</th>
+          <td><pre><code>var pannable = $( <i>map selector</i> ).geomap( &quot;option&quot;, &quot;pannable&quot; );</code></pre></td>
+        </tr>
+        <tr>
+          <th>set</th>
+          <td><pre><code>$( <i>map selector</i> ).geomap( &quot;option&quot;, &quot;pannable&quot;, false );</code></pre></td>
+        </tr>
+      </table>
+
+      <p>The pannable option determines whether or not a user can pan the map.</p>
+      
+      <p>When true, the default, users can drag the map image or tiles to change the bbox in any <a href="mode.html">mode</a> except for &quot;static&quot;. For example, they can pan the map in the middle of drawing a polygon with the drawPolygon mode.</p>
+
+      <p>When false, a user's dragging of the map image will not cause it to move regardless of what mode the widget is in. Developers can still make programatic changes to the bbox, such as setting options and calling methods.</p>
+    </div>
+  </div> <!-- end of #container -->
+
+  <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
+  <script src="../js/script.js"></script>
+  <script src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
+</body>
+</html>
+
