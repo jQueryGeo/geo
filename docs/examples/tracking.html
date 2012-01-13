@@ -45,7 +45,7 @@
           services: [
             {
               type: "tiled",
-              getUrl: function (view) {
+              src: function (view) {
                 return "http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/" + view.zoom + "/" + view.tile.row + "/" + view.tile.column
               },
               attr: "&copy; Esri"

@@ -76,7 +76,7 @@
           {
             id: "GeoIQ-acetate",
             type: "tiled",
-            getUrl: function (view) {
+            src: function (view) {
               return "http://acetate.geoiq.com/tiles/acetate-base/"
                + view.zoom + "/"
                + view.tile.column + "/"
@@ -88,7 +88,7 @@
           {
             id: "broadbandmap-income-demographics",
             type: "tiled",
-            getUrl: function (view) {
+            src: function (view) {
               return "http://www.broadbandmap.gov/StamenTiles/demographics/education/"
                + view.zoom + "/"
                + view.tile.column + "/"

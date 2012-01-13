@@ -42,7 +42,7 @@
   {
     id: &quot;OSM&quot;,
     type: &quot;tiled&quot;,
-    getUrl: function (view) {
+    src: function (view) {
       return &quot;http://tile.openstreetmap.org/&quot;
        + view.zoom + &quot;/&quot;
        + view.tile.column + &quot;/&quot;
@@ -60,8 +60,8 @@
   {
     id: &quot;OSM_MapQuest&quot;,
     type: &quot;tiled&quot;,
-    getUrl: function (view) {
-      return &quot;http://otile&quot + ((view.index % 4) + 1) + &quot;.mqcdn.com/tiles/1.0.0/osm/&quot;
+    src: function (view) {
+      return &quot;http://otile&quot; + ((view.index % 4) + 1) + &quot;.mqcdn.com/tiles/1.0.0/osm/&quot;
        + view.zoom + &quot;/&quot;
        + view.tile.column + &quot;/&quot;
        + view.tile.row
@@ -78,8 +78,8 @@
   {
     id: &quot;Ortho_MapQuest&quot;,
     type: &quot;tiled&quot;,
-    getUrl: function (view) {
-      return &quot;http://oatile&quot + ((view.index % 4) + 1) + &quot;.mqcdn.com/naip/&quot;
+    src: function (view) {
+      return &quot;http://oatile&quot; + ((view.index % 4) + 1) + &quot;.mqcdn.com/naip/&quot;
        + view.zoom + &quot;/&quot;
        + view.tile.column + &quot;/&quot;
        + view.tile.row
@@ -96,8 +96,8 @@
   {
     id: &quot;Ortho_MapQuest&quot;,
     type: &quot;tiled&quot;,
-    getUrl: function (view) {
-      return &quot;http://oatile&quot + ((view.index % 4) + 1) + &quot;.mqcdn.com/naip/&quot;
+    src: function (view) {
+      return &quot;http://oatile&quot; + ((view.index % 4) + 1) + &quot;.mqcdn.com/naip/&quot;
        + view.zoom + &quot;/&quot;
        + view.tile.column + &quot;/&quot;
        + view.tile.row
@@ -107,7 +107,7 @@
   {
     id: &quot;OSM_MapQuest&quot;,
     type: &quot;tiled&quot;,
-    getUrl: function (view) {
+    src: function (view) {
       return &quot;http://otile&quot; + ((view.index % 4) + 1) + &quot;.mqcdn.com/tiles/1.0.0/osm/&quot;
        + view.zoom + &quot;/&quot;
        + view.tile.column + &quot;/&quot;
@@ -138,7 +138,7 @@
             {
               id: "OSM",
               type: "tiled",
-              getUrl: function (view) {
+              src: function (view) {
                 return "http://tile.openstreetmap.org/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
               },
               attr: "&copy; OpenStreetMap &amp; contributors, CC-BY-SA"
@@ -153,7 +153,7 @@
             {
               id: "OSM_MapQuest",
               type: "tiled",
-              getUrl: function (view) {
+              src: function (view) {
                 return "http://otile" + ((view.index % 4) + 1) + ".mqcdn.com/tiles/1.0.0/osm/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
               },
               attr: "<p>Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='http://developer.mapquest.com/content/osm/mq_logo.png'></p>"
@@ -168,7 +168,7 @@
             {
               id: "Ortho_MapQuest",
               type: "tiled",
-              getUrl: function (view) {
+              src: function (view) {
                 return "http://oatile" + ((view.index % 4) + 1) + ".mqcdn.com/naip/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
               },
               attr: "<p>Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='http://developer.mapquest.com/content/osm/mq_logo.png'></p>"
@@ -183,14 +183,14 @@
             {
               id: "Ortho_MapQuest",
               type: "tiled",
-              getUrl: function (view) {
+              src: function (view) {
                 return "http://oatile" + ((view.index % 4) + 1) + ".mqcdn.com/naip/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
               }
             },
             {
               id: "OSM_MapQuest",
               type: "tiled",
-              getUrl: function (view) {
+              src: function (view) {
                 return "http://otile" + ((view.index % 4) + 1) + ".mqcdn.com/tiles/1.0.0/osm/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
               },
               attr: "<p>Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='http://developer.mapquest.com/content/osm/mq_logo.png'></p>",

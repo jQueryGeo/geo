@@ -60,7 +60,7 @@
           {
             id: "massgis_basemap",
             type: "shingled",
-            getUrl: function (view) {
+            src: function (view) {
               return "http://giswebservices.massgis.state.ma.us/geoserver/wms?LAYERS=massgis_basemap&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX=" + view.bbox + "&WIDTH=" + view.width + "&HEIGHT=" + view.height;
             },
             attr: "&copy; 2011 Commonwealth of Massachusetts"
@@ -71,7 +71,7 @@
           {
             id: "massgis_interiorforest",
             type: "shingled",
-            getUrl: function (view) {
+            src: function (view) {
               return "http://giswebservices.massgis.state.ma.us/geoserver/wms?LAYERS=massgis%3AGISDATA.INTERIORFOREST_POLY&STYLES=GISDATA.INTERIORFOREST_POLY%3A%3ADefault&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX=" + view.bbox + "&WIDTH=" + view.width + "&HEIGHT=" + view.height;
             },
             attr: "&copy; 2011 Commonwealth of Massachusetts",
@@ -83,7 +83,7 @@
           {
             id: "massgis_hydrography",
             type: "shingled",
-            getUrl: function (view) {
+            src: function (view) {
               return "http://giswebservices.massgis.state.ma.us/geoserver/wms?LAYERS=massgis%3AGISDATA.MAJPOND_POLY,massgis%3AGISDATA.MAJSTRM_ARC&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX=" + view.bbox + "&WIDTH=" + view.width + "&HEIGHT=" + view.height;
             },
             attr: "&copy; 2011 Commonwealth of Massachusetts",

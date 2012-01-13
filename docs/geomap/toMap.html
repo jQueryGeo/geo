@@ -11,7 +11,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0rc3/jquery.mobile-1.0rc3.min.css" />
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
 </head>
 
 <body>
@@ -25,7 +25,7 @@
       <table>
         <tr>
           <th>return type</th>
-          <td>Array | Array^2 (<a href="http://geojson.org/geojson-spec.html#positions" rel="external">GeoJSON position</a>)</td>
+          <td>Array (<a href="http://geojson.org/geojson-spec.html#positions" rel="external">GeoJSON positions</a>)</td>
         </tr>
         <tr>
           <th>syntax</th>
@@ -38,13 +38,14 @@ var mapPositions = $(&quot;#map&quot;).geomap( &quot;toMap&quot;, [ [ 120, 240 ]
         </tr>
       </table>
       <p>The toMap method takes a single pixel position (which is an array of two values: the left and top of the pixel), an array of pixel positions, an array of arrays of pixel positions, or an array of arrays of arrays of pixel positions. In other words, it accepts the pixel representation of the coordinates of any geometry up to MultiPolygon. It returns the map coordinates for all of the pixel positions.</p>
+      <p>The return coordinates are in projected map units if you have previously set the bbox or center options using projected coordinates. Otherwise, they are in geodetic (lon, lat) coordinates.</p>
     </div>
   </div> <!-- end of #container -->
 
   <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
   <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
-  <script src="js/script.js"></script>
-  <script src="http://code.jquery.com/mobile/1.0rc3/jquery.mobile-1.0rc3.min.js"></script>
+  <script src="../js/script.js"></script>
+  <script src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
 </body>
 </html>
 

@@ -3494,7 +3494,7 @@ function try$( selector ) {
             {
               "class": "osm",
               type: "tiled",
-              getUrl: function (view) {
+              src: function (view) {
                 return "http://tile.openstreetmap.org/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
               },
               attr: "&copy; OpenStreetMap &amp; contributors, CC-BY-SA"
@@ -5202,7 +5202,8 @@ function try$( selector ) {
 
                       tileBbox = [bottomLeft[0], bottomLeft[1], topRight[0], topRight[1]],
 
-                      imageUrl = service.getUrl( {
+                      urlProp = ( "src" in service ? "src" : "getUrl" ),
+                      urlArgs = {
                         bbox: tileBbox,
                         width: tileWidth,
                         height: tileHeight,
@@ -5212,7 +5213,16 @@ function try$( selector ) {
                           column: x
                         },
                         index: Math.abs(y + x)
-                      } );
+                      },
+                      isFunc = $.isFunction( service[ urlProp ] ),
+                      imageUrl;
+
+                  if ( isFunc ) {
+                    imageUrl = service[ urlProp ]( urlArgs );
+                  } else {
+                    $.template( "geoSrc", service[ urlProp ] );
+                    imageUrl = $.render( urlArgs, "geoSrc" );
+                  }
                   /* end same as refresh 3 */
 
                   serviceState.loadCount++;
@@ -5386,28 +5396,38 @@ function try$( selector ) {
 
               if ($img.size() === 0 || serviceState.reloadTiles) {
                 var bottomLeft = [
-                  tilingScheme.origin[0] + (x * tileWidth) * pixelSize,
-                  tilingScheme.origin[1] + ySign * (y * tileHeight) * pixelSize
-                ],
+                      tilingScheme.origin[0] + (x * tileWidth) * pixelSize,
+                      tilingScheme.origin[1] + ySign * (y * tileHeight) * pixelSize
+                    ],
 
-                topRight = [
-                  tilingScheme.origin[0] + ((x + 1) * tileWidth - 1) * pixelSize,
-                  tilingScheme.origin[1] + ySign * ((y + 1) * tileHeight - 1) * pixelSize
-                ],
+                    topRight = [
+                      tilingScheme.origin[0] + ((x + 1) * tileWidth - 1) * pixelSize,
+                      tilingScheme.origin[1] + ySign * ((y + 1) * tileHeight - 1) * pixelSize
+                    ],
 
-                tileBbox = [bottomLeft[0], bottomLeft[1], topRight[0], topRight[1]],
+                    tileBbox = [bottomLeft[0], bottomLeft[1], topRight[0], topRight[1]],
 
-                imageUrl = service.getUrl({
-                  bbox: tileBbox,
-                  width: tileWidth,
-                  height: tileHeight,
-                  zoom: map._getZoom(),
-                  tile: {
-                    row: y,
-                    column: x
-                  },
-                  index: Math.abs(y + x)
-                });
+                    urlProp = ( "src" in service ? "src" : "getUrl" ),
+                    urlArgs = {
+                      bbox: tileBbox,
+                      width: tileWidth,
+                      height: tileHeight,
+                      zoom: map._getZoom(),
+                      tile: {
+                        row: y,
+                        column: x
+                      },
+                      index: Math.abs(y + x)
+                    },
+                    isFunc = $.isFunction( service[ urlProp ] ),
+                    imageUrl;
+
+                if ( isFunc ) {
+                  imageUrl = service[ urlProp ]( urlArgs );
+                } else {
+                  $.template( "geoSrc", service[ urlProp ] );
+                  imageUrl = $.render( urlArgs, "geoSrc" );
+                }
 
                 serviceState.loadCount++;
                 //this._map._requestQueued();
@@ -5621,14 +5641,25 @@ function try$( selector ) {
             serviceContainer.find("img").attr("data-keepAlive", "0");
           }
 
-          var imageUrl = service.getUrl({
+          var urlProp = ( "src" in service ? "src" : "getUrl" ),
+              urlArgs = {
                 bbox: bbox,
                 width: mapWidth,
                 height: mapHeight,
                 zoom: map._getZoom(),
                 tile: null,
                 index: 0
-              });
+              },
+              isFunc = $.isFunction( service[ urlProp ] ),
+              imageUrl;
+
+
+          if ( isFunc ) {
+            imageUrl = service[ urlProp ]( urlArgs );
+          } else {
+            $.template( "geoSrc", service[ urlProp ] );
+            imageUrl = $.render( urlArgs, "geoSrc" );
+          }
 
           serviceState.loadCount++;
           //this._map._requestQueued();

@@ -73,7 +73,7 @@ $(function () {
         {
           id: name,
           type: "tiled",
-          getUrl: function (view) {
+          src: function (view) {
             return "http://mapserv.utah.gov/ArcGIS/rest/services/" + name + "/MapServer/tile/" + view.zoom + "/" + view.tile.row + "/" + view.tile.column;
           }
         }

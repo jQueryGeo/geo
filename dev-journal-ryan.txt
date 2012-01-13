@@ -1,10 +1,13 @@
 ﻿== to do ==
 
-* docs - geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
-* docs - geomap - shapes option
+* geomap - pannable option
+* docs - geomap - rename pan mode to default, setting mode to any non-known mode will act as default anyway
+* geomap - scroll option
+* geomap - rename pan mode to default, setting mode to any non-known mode will act as default anyway
 * geomap - support pinch zoom on iOS
 * geo - add recenter function for bbox
-* geomap - shapes option
+* geomap - [bug] first use of mouse/touch in any mode moves map by one pixel on mousedown/touch
+* geomap - [bug] pan lags on first drag (related)
 * geomap - [bug] setting services array during init does not wipe out default properties of initial service object
 * geomap - [bug] zoom in more than once with zoom method moves tiles to the wrong spot
 * geomap - [bug] map panning is jumpy, appears to be related to shapes and/or drawing context
@@ -13,23 +16,13 @@
 * geomap - [bug] measure modes do not show text for shingled services?
 * geomap - [bug] mouse zoom doesn't work for shingled services?
 * geomap - [bug] zoom option doesn't return proper values for shingled services?
-* docs - geomap - label method
-** redraw all shapes while searching for argument
-* docs - geomap - style method
-** redraw all shapes while searching for argument
-* geomap - getUrl string option
-* docs - geomap - wheel option
-* geomap - wheel option
+* geomap - service object visibility and opacity options should be moved to a style property
+* geomap - static mode
 * geomap - cache label coordinates (the labelPixel cannot be cached, it will change each refresh)
 * geomap - rotate label based on segment
 * geomap - use pointer-events: none where appropriate
-* docs - geomap - allow service-level refresh
-* geomap - allow getUrl to return a callback function or Promise to delay image requests for some reason (multiple requests, etc.)
-* geomap - allow service-level refresh
 * geomap - add argument to refresh to force reload of images (in case of dynamic data)
 * geomap - test changing shingled service URL to get updated images (in case of dynamic data)
-* docs - geomap - support TMS
-* geomap - support TMS
 * geomap - replace data-geo attributes with classes
 * geomap - [bug] ie highlights entire map div during shift-zoom
 * geomap - remove this-style state properties
@@ -43,6 +36,9 @@
 * geomap - [bug] exception when calling destroy on uninitialized div
 * make a package for new jQuery plugin directory
 ** https://github.com/jquery/plugins.jquery.com/blob/master/docs/package.md
+* examples - remove tmpl from examples as it conflicts with jsrender
+* examples - redo the jVectorMap demo page using jQuery Geo
+** http://jvectormap.owl-hollow.net/ ( found via http://www.moretechtips.net/2011/12/22-most-popular-jquery-plugins-of-2011.html )
 * expose jQuery Geo as an AMD module so asynchronous loaders like RequireJS and curl.js can use it
 * examples - geomap resize method
 * examples - multiple maps example
@@ -50,14 +46,32 @@
 * geographics - merge label engine into geographics widget
 * remove BOM from release files
 * add 3rd party license headers
+* docs - geomap - pan events (pattern after HTML5 drag)
+* docs - geomap - zoom events (pattern after HTML5 drag)
+* docs - geomap - support two-finger vertical slide as zoom on mobile devices
+* geomap - pan events (pattern after HTML5 drag)
+* geomap - zoom events (pattern after HTML5 drag)
+* geomap - support two-finger vertical slide as zoom on mobile devices
 * geomap - test jQuery widget call chaining when setting option values
-* geomap - pan lags on first drag
+* geomap - when scroll is zoom, attempt to not zoom while user is scrolling the page anyway
+* geomap - allow src to return a callback function or Promise to delay image requests for some reason (multiple requests, etc.)
+* docs - geomap - option to allow disable pan during different modes
+* geomap - option to allow disable pan during different modes
 * docs - geomap - document the correct way to add a service after init
 * geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
+* geomap - remember last map unit type set with bbox and center, return all coords and arguments in that type
 * geomap - port shape labels
 * geomap - unbind keydown handler on destroy, it's on the document
+* docs - selector argument to find method
+* selector argument to find method
 * docs - $.geo.WKT object
 * geo - $.geo.WKT object
+* docs - geomap - wheel option
+* geomap - wheel option
+* docs - geomap - replace method
+* geomap - replace method
+* docs - geomap - allow service-level refresh
+* geomap - allow service-level refresh
 * geomap - reenable graphics redraw on interactiveScale, if canvas...and scale canvas
 * docs & examples - settle on the word "option" in all text (instead of property) to match widget function
 * docs - make all map examples live
@@ -80,6 +94,7 @@
 * geomap - internal - add _getVisibleTiles method and use it in tiled service and shapes spatial index
 * geomap - remove wheel plugin and use built-in mousewheel event
 * geomap - test how the comma selector works with the find method
+* geomap - compile service src templates, refresh when services changes
 * code - prefer $.data over $.fn.data
 * docs - internal - explain what projection is and which one we use by default (3395) and maybe why we call it web mercator & why we can't get to +/- 90 lat
 * docs - internal - document how geomap draws shapes, the geomapgraphics widget and the reason shapeStyle is a method
@@ -111,6 +126,8 @@
 * geomap - store a copy of shapes as WKT in a hidden input
 * geomap - only update WKT copy if shape is appended with refresh argument set to true
 * geomap - find - [maybe] after flatten, check more cached bboxes for non-Point geometrie
+* docs - geomap - support TMS
+* geomap - support TMS
 * docs - geomap - toDataURL method
 * geomap - toDataURL method
 * docs - geomap - SVG & other neat elements/media in labels
@@ -126,6 +143,26 @@
 ** in the drawing modes, this function ends drawing and triggers the shape event with whatever coordinates have already been added to the shape
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
+
+==2012-1-12==
+===getUrl===
+I would like to further have the service object's properties match html rather than css. I might rename this to just src.
+
+==2012-1-11==
+===scroll & drag===
+I need options to disable the default behavior of scrolling and dragging.
+
+===html attr===
+I think my options should reflect more like HTMl attributes than css properties. Including service object options. That might make me change visibility back to visible :( At least I'm not beta yet.
+
+Scratch that, it's a presentation option and all presentation options should follow CSS. However, I may move it to a style property of the service object. Are there other style properties?
+
+Only opacity.
+
+===scroll===
+I would like to support two-finger vertical slide as zoom on mobile devices but I'm not ready to write that up yet.
+
+Hmm. Can I handle scroll without an option? I can detect page scrolling and set a timeout. If the user has been scrolling the page, we don't want to scroll the map. But, what if the user's cursor just happens to be on the map when they want to scroll the page. I'm keeping scroll, the developer should have control to turn it off all together.
 
 ==2012-1-2==
 ===service===
@@ -144,6 +181,27 @@ var shapes = $( "#map,#map .osm" ).geomap( "find", { type: "Point", coordinates:
 What will be called, what's the return...just the first? Just the last?
 
 For this version, I'm going to have find on the map only return shapes appended to the map. That will match how the other functions work and document that you cannot use the comma selector with the find method.
+
+===proj===
+I need to get the final doc changes in for the $.geo.proj auto-handling. The definition of "map coordinates" is determined by the last use of center or bbox. The "map coordinates" are used as return values for the center, bbox, and the bbox property of the view object passed to getUrl. Now, how to write that...
+
+===replace===
+Removing the rather extraneous label and style methods from my to do list and adding the much more useful replace method.
+
+replace( existingShape, existingShape, style, label ) is the same as
+append( existingShape, style, label ) but that's fine. If you want to remove existingShape and add a new one, you won't need two calls (remove & append).
+
+===find===
+I'm not going to add a shapes method either. I want that to be part of find. The next version of the find method should take various selector strings such as * and return an array of shapes. This also makes me want to revisit whether or not find can dig into services...I'll see what Peter thinks.
+
+I feel like I want users to be able to write either:
+
+$("#map .osm").geomap("find", "*") or
+$("#map").geomap("find", ".osm *")
+
+append, replace and empty are very one-item specific but find is a digging query operation. I think I just convinced myself that it should be different. It should dig into the services. That's what I think devs will expect. I already can't use find with more than one target...so I'm already breaking the convention of the other three methods.
+
+I'm not going to support the service selector in find's selector argument at this point. But I documented how it will work with a service element selector and that seems pretty cool.
 
 ==2012-1-1==
 ===offline===

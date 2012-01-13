@@ -44,7 +44,7 @@
   {
     id: &quot;OSM&quot;,
     type: &quot;tiled&quot;,
-    getUrl: function (view) {
+    src: function (view) {
       return &quot;http://tile.openstreetmap.org/&quot;
        + view.zoom + &quot;/&quot;
        + view.tile.column + &quot;/&quot;
@@ -69,7 +69,7 @@ tilingScheme: {
   {
     id: &quot;NewJersey&quot;,
     type: &quot;tiled&quot;,
-    getUrl: function (view) {
+    src: function (view) {
       return &quot;http://njgin.state.nj.us/ArcGIS/rest/services/basemap_v4/MapServer/tile/&quot;
        + view.zoom + &quot;/&quot;
        + view.tile.row + &quot;/&quot;
@@ -119,7 +119,7 @@ tilingScheme: {
             {
               id: "OSM",
               type: "tiled",
-              getUrl: function (view) {
+              src: function (view) {
                 return "http://tile.openstreetmap.org/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
               },
               attr: "&copy; OpenStreetMap &amp; contributors, CC-BY-SA"
@@ -141,7 +141,7 @@ tilingScheme: {
             {
               id: "NewJersey",
               type: "tiled",
-              getUrl: function (view) {
+              src: function (view) {
                 return "http://njgin.state.nj.us/ArcGIS/rest/services/basemap_v4/MapServer/tile/" + view.zoom + "/" + view.tile.row + "/" + view.tile.column;
               }
             }

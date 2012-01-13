@@ -29,7 +29,7 @@
             {
               "class": "osm",
               type: "tiled",
-              getUrl: function (view) {
+              src: function (view) {
                 return "http://tile.openstreetmap.org/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
               },
               attr: "&copy; OpenStreetMap &amp; contributors, CC-BY-SA"
