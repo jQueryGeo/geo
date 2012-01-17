@@ -1,9 +1,4 @@
 ﻿== to do ==
-
-* geomap - pannable option
-* docs - geomap - rename pan mode to default, setting mode to any non-known mode will act as default anyway
-* geomap - scroll option
-* geomap - rename pan mode to default, setting mode to any non-known mode will act as default anyway
 * geomap - support pinch zoom on iOS
 * geo - add recenter function for bbox
 * geomap - [bug] first use of mouse/touch in any mode moves map by one pixel on mousedown/touch
@@ -34,6 +29,7 @@
 * geomap - create _defaultState object, use for widget-local _widgetState property, reinit _widgetState on _createWidget
 * geomap - don't redraw shapes after interactiveScale, they've already been drawn at new scale
 * geomap - [bug] exception when calling destroy on uninitialized div
+* upgrade jquery.mousewheel
 * make a package for new jQuery plugin directory
 ** https://github.com/jquery/plugins.jquery.com/blob/master/docs/package.md
 * examples - remove tmpl from examples as it conflicts with jsrender
@@ -43,6 +39,7 @@
 * examples - geomap resize method
 * examples - multiple maps example
 * geomap - [bug] when a singled image hasn't loaded after pan and you double click on empty space, the zoomed bbox seems wrong
+* geomap - consolidate interactive pan/zoom into one system
 * geographics - merge label engine into geographics widget
 * remove BOM from release files
 * add 3rd party license headers
@@ -143,6 +140,10 @@
 ** in the drawing modes, this function ends drawing and triggers the shape event with whatever coordinates have already been added to the shape
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
+
+==2012-1-16==
+===zoom===
+Accidentally moved some code to where it didn't belong & broke interactive zoom. Fixed.
 
 ==2012-1-12==
 ===getUrl===

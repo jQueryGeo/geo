@@ -25,6 +25,8 @@
         drawStyle: {},
         shapeStyle: {},
         mode: "pan",
+        pannable: true,
+        scroll: "default",
         services: [
             {
               "class": "osm",
@@ -254,6 +256,8 @@
       }
 
       refresh = (refresh === undefined || refresh);
+
+      this._panFinalize();
 
       switch (key) {
         case "bbox":
@@ -976,15 +980,19 @@
 
         this._setCenterAndSize([this._center[0] + dxMap, this._center[1] + dyMap], this._pixelSize, true, true);
 
+        this._$eventTarget.css("cursor", this._options["cursors"][this._options["mode"]]);
+
         this._inOp = false;
         this._anchor = this._current;
-        this._toolPan = this._panning = false;
-
-        this._$eventTarget.css("cursor", this._options["cursors"][this._options["mode"]]);
+        this._mouseDown = this._toolPan = this._panning = false;
       }
     },
 
     _panMove: function () {
+      if ( ! this._options[ "pannable" ] ) {
+        return;
+      }
+
       var dx = this._current[0] - this._lastDrag[0],
           dy = this._current[1] - this._lastDrag[1],
           i = 0,
@@ -1324,7 +1332,7 @@
       if (!this._inOp && e.shiftKey) {
         this._shiftZoom = true;
         this._$eventTarget.css("cursor", this._options["cursors"]["zoom"]);
-      } else {
+      } else if ( this._options[ "pannable" ] ) {
         this._inOp = true;
 
         switch (this._options["mode"]) {
@@ -1567,7 +1575,7 @@
 
       this._panFinalize();
 
-      if (this._mouseDown) {
+      if ( this._mouseDown || this._options[ "scroll" ] === "off" ) {
         return false;
       }
 

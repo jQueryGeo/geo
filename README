@@ -39,6 +39,9 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * docs - geomap - pannable option
 * geomap - src string option
 * examples - string service src
+* geomap - [bug] map tracks mouse when not panning if click on other elements
+* geomap - pannable option
+* geomap - scroll option
 
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon
