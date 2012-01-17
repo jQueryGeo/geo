@@ -981,11 +981,11 @@
         this._setCenterAndSize([this._center[0] + dxMap, this._center[1] + dyMap], this._pixelSize, true, true);
 
         this._$eventTarget.css("cursor", this._options["cursors"][this._options["mode"]]);
-      }
 
-      this._inOp = false;
-      this._anchor = this._current;
-      this._mouseDown = this._toolPan = this._panning = false;
+        this._inOp = false;
+        this._anchor = this._current;
+        this._mouseDown = this._toolPan = this._panning = false;
+      }
     },
 
     _panMove: function () {
@@ -1575,7 +1575,7 @@
 
       this._panFinalize();
 
-      if (this._mouseDown) {
+      if ( this._mouseDown || this._options[ "scroll" ] === "off" ) {
         return false;
       }
 
