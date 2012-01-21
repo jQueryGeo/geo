@@ -705,8 +705,8 @@
       }
 
       function pointParseUntagged(wkt) {
-        var pointString = wkt.match(/\(\s*([\d\.-]+)\s+([\d\.-]+)\s*\)/);
-        return pointString && pointString.length >= 2 ? {
+        var pointString = wkt.match( /\(\s*([\d\.-]+)\s+([\d\.-]+)\s*\)/ );
+        return pointString && pointString.length > 2 ? {
           type: "Point",
           coordinates: [
             parseFloat(pointString[1]),
@@ -715,14 +715,72 @@
         } : null;
       }
 
+      function lineStringParseUntagged(wkt) {
+        var lineString = wkt.match( /\s*\((.*)\)/ ),
+            coords = [],
+            pointStrings,
+            pointParts,
+            i = 0;
+
+        if ( lineString.length > 1 ) {
+          pointStrings = lineString[ 1 ].match( /[\d\.-]+\s+[\d\.-]+/g );
+
+          for ( ; i < pointStrings.length; i++ ) {
+            pointParts = pointStrings[ i ].match( /\s*([\d\.-]+)\s+([\d\.-]+)\s*/ );
+            coords[ i ] = [ parseFloat( pointParts[ 1 ] ), parseFloat( pointParts[ 2 ] ) ];
+          }
+
+          return {
+            type: "LineString",
+            coordinates: coords
+          };
+        } else {
+          return null
+        }
+      }
+
+      function polygonParseUntagged(wkt) {
+        var polygon = wkt.match( /\s*\(\s*\((.*)\)\s*\)/ ),
+            coords = [],
+            pointStrings,
+            pointParts,
+            i = 0;
+
+        if ( polygon.length > 1 ) {
+          pointStrings = polygon[ 1 ].match( /[\d\.-]+\s+[\d\.-]+/g );
+
+          for ( ; i < pointStrings.length; i++ ) {
+            pointParts = pointStrings[ i ].match( /\s*([\d\.-]+)\s+([\d\.-]+)\s*/ );
+            coords[ i ] = [ parseFloat( pointParts[ 1 ] ), parseFloat( pointParts[ 2 ] ) ];
+          }
+
+          return {
+            type: "Polygon",
+            coordinates: [ coords ]
+          };
+        } else {
+          return null;
+        }
+      }
+
       function parse(wkt) {
         wkt = $.trim(wkt);
 
-        var typeIndex = wkt.indexOf(" ");
+        var typeIndex = wkt.indexOf( " " ),
+            untagged = wkt.substr( typeIndex + 1 );
 
         switch (wkt.substr(0, typeIndex).toUpperCase()) {
           case "POINT":
-            return pointParseUntagged(wkt.substr(typeIndex + 1));
+            return pointParseUntagged( untagged );
+
+          case "LINESTRING":
+            return lineStringParseUntagged( untagged );
+
+          case "POLYGON":
+            return polygonParseUntagged( untagged );
+
+          default:
+            return null;
         }
       }
 
