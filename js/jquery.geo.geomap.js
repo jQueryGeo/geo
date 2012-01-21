@@ -1289,7 +1289,6 @@
     },
 
     _eventTarget_touchstart: function (e) {
-      $( "h1" ).text( "touchstart" );
       if (!this._supportTouch && e.which != 1) {
         return;
       }
@@ -1314,9 +1313,6 @@
           ];
 
           this._multiTouchAnchorBbox = $.merge( [ ], this._multiTouchCurrentBbox );
-
-          //$( "h1" ).text( "current:[" + this._multiTouchCurrentBbox.toString() + "]" );
-          //alert( "_isMultiTouch: { bbox: [ " + this._multiTouchCurrentBbox.toString() + " ] } " );
 
           this._current = $.geo.center( this._multiTouchCurrentBbox, true );
         } else {
@@ -1358,9 +1354,7 @@
       if (!this._inOp && e.shiftKey) {
         this._shiftZoom = true;
         this._$eventTarget.css("cursor", this._options["cursors"]["zoom"]);
-      } else if ( this._isMultiTouch ) {
-        // ignore?
-      } else if ( this._options[ "pannable" ] ) {
+      } else if ( !this._isMultiTouch && this._options[ "pannable" ] ) {
         this._inOp = true;
 
         switch (this._options["mode"]) {
@@ -1385,7 +1379,6 @@
     },
 
     _dragTarget_touchmove: function (e) {
-      //$( "h1" ).text( "touchmove" );
       var offset = this._$eventTarget.offset(),
           drawCoordsLen = this._drawCoords.length,
           touches = e.originalEvent.changedTouches,
@@ -1393,28 +1386,32 @@
           i = 0;
 
       if ( this._supportTouch ) {
-        /*
-        if ( !this._isMultiTouch && touches[ 0 ].identifier != this._multiTouchAnchor[ 0 ].identifier ) {
+        if ( !this._isMultiTouch && touches[ 0 ].identifier !== this._multiTouchAnchor[ 0 ].identifier ) {
+          // switch to multitouch
+          this._dragTarget_touchstop( e );
+
           this._isMultiTouch = true;
 
-          // same as start multitouch
-          this._multiTouchAnchor[ 1 ] = $.extend( { }, touches[ 0 ] );
+          touches = [
+            this._multiTouchAnchor[ 0 ],
+            touches[ 0 ]
+          ];
 
           this._multiTouchCurrentBbox = [
-            this._multiTouchAnchor[0].pageX - offset.left,
-            this._multiTouchAnchor[0].pageY - offset.top,
-            this._multiTouchAnchor[1].pageX - offset.left,
-            this._multiTouchAnchor[1].pageY - offset.top
+            touches[0].pageX - offset.left,
+            touches[0].pageY - offset.top,
+            touches[1].pageX - offset.left,
+            touches[1].pageY - offset.top
           ];
 
           this._multiTouchAnchorBbox = $.merge( [ ], this._multiTouchCurrentBbox );
 
-          this._current = $.geo.center( this._multiTouchCurrentBbox, true );
+          this._anchor = this._current = $.geo.center( this._multiTouchCurrentBbox, true );
+
+          return false;
         }
-        */
 
         if ( this._isMultiTouch ) {
-          //$( "h1" ).text( "still mt, len: " + touches.length );
           for ( ; i < touches.length; i++ ) {
             if ( touches[ i ].identifier === this._multiTouchAnchor[ 0 ].identifier ) {
               this._multiTouchCurrentBbox[ 0 ] = touches[ i ].pageX - offset.left;
@@ -1425,8 +1422,6 @@
             }
           }
 
-          //$( "h1" ).text( "current:[" + this._multiTouchCurrentBbox.toString() + "]" );
-
           current = $.geo.center( this._multiTouchCurrentBbox, true );
 
           var currentWidth = ( this._multiTouchCurrentBbox[ 2 ] - this._multiTouchCurrentBbox[ 0 ] ),
@@ -1436,13 +1431,11 @@
               ratioWidth = currentWidth / anchorWidth,
               ratioHeight = currentHeight / anchorHeight;
 
-          //$( "h1" ).text( "cW: " + currentWidth + ", aW: " + anchorWidth + ", r: " + ratioWidth );
-
-          this._wheelLevel = Math.abs( Math.floor( ( 1 - ratioWidth ) * 10 / 2 ) );
           if ( Math.abs( currentWidth ) < Math.abs( anchorWidth ) ) {
-            this._wheelLevel = -this._wheelLevel;
+            this._wheelLevel = - Math.abs( Math.floor( ( 1 - ratioWidth ) * 10 ) );
+          } else {
+            this._wheelLevel = Math.abs( Math.floor( ( 1 - ratioWidth ) * 10 / 2 ) );
           }
-          //$( "h1" ).text( "delta: " + delta );
 
           var pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, this._wheelZoomFactor );
 
@@ -1462,14 +1455,8 @@
             this._drawPixels = this._toPixel(this._drawCoords, pinchCenterAndSize.center, pinchCenterAndSize.pixelSize);
             this._refreshDrawing();
           }
-            
 
-
-
-          // alert( currentWidth );
-          //
-          // TODO: calculate delta/ratio from anchor
-          // TODO: interactiveScale
+          current = $.geo.center( this._multiTouchCurrentBbox, true );
         } else {
           current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
         }
@@ -1486,29 +1473,6 @@
 
       if (this._softDblClick) {
         this._isDbltap = this._isTap = false;
-      }
-
-      if ( this._supportTouch && !this._isMultiTouch && touches[ 0 ].identifier !== this._multiTouchAnchor[ 0 ].identifier ) {
-        $( "h1" ).text( "now multitouch" );
-
-        this._panFinalize( );
-
-        touches.push( this._multiTouchAnchor[ 0 ] );
-        this._isMultiTouch = true;
-
-        this._multiTouchCurrentBbox = [
-          touches[0].pageX - offset.left,
-          touches[0].pageY - offset.top,
-          touches[1].pageX - offset.left,
-          touches[1].pageY - offset.top
-        ];
-
-        this._multiTouchAnchorBbox = $.merge( [ ], this._multiTouchCurrentBbox );
-        
-        this._current = $.geo.center( this._multiTouchCurrentBbox, true );
-
-        e.preventDefault( );
-        return false;
       }
 
       if (this._mouseDown) {
@@ -1575,7 +1539,6 @@
     },
 
     _dragTarget_touchstop: function (e) {
-      $( "h1" ).text( "touchstop" );
       if (!this._mouseDown && _ieVersion == 7) {
         // ie7 doesn't appear to trigger dblclick on this._$eventTarget,
         // we fake regular click here to cause soft dblclick
@@ -1603,13 +1566,11 @@
       this._shiftZoom = this._mouseDown = this._toolPan = false;
 
       if ( this._isMultiTouch ) {
-        //$( "h1" ).text( "done!" );
         e.preventDefault( );
         this._isMultiTouch = false;
 
         var pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, this._wheelZoomFactor );
 
-        //$( "h1" ).text( "center: " + pinchCenterAndSize.center + ", pixelSize: " + pinchCenterAndSize.pixelSize );
         this._setCenterAndSize(pinchCenterAndSize.center, pinchCenterAndSize.pixelSize, true, true);
 
         this._wheelLevel = 0;
