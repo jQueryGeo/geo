@@ -1,34 +1,42 @@
 ﻿== to do ==
 * geomap - support pinch zoom on iOS
 * geo - add recenter function for bbox
+* geomap - service object visibility and opacity options should be moved to a style property
+* geomap - static mode
+* geomap - [bug] single touch pan jumps between fingers on failed multitouch
+** if _mouseIsDown, check against original touch identifier
 * geomap - [bug] first use of mouse/touch in any mode moves map by one pixel on mousedown/touch
-* geomap - [bug] pan lags on first drag (related)
+** possibly only when axisLayout is image
+* geomap - [bug] pan lags on first drag (related?)
 * geomap - [bug] setting services array during init does not wipe out default properties of initial service object
 * geomap - [bug] zoom in more than once with zoom method moves tiles to the wrong spot
 * geomap - [bug] map panning is jumpy, appears to be related to shapes and/or drawing context
 * geomap - [bug] chaining doesn't work, e.g., .geomap(option,center).geomap(option,zoom)
-* geomap - maybe throw an error when setting center to an invalid object, such as the first number in a coordinate array: coordinates[ 0 ] <== wrong!
 * geomap - [bug] measure modes do not show text for shingled services?
 * geomap - [bug] mouse zoom doesn't work for shingled services?
 * geomap - [bug] zoom option doesn't return proper values for shingled services?
-* geomap - service object visibility and opacity options should be moved to a style property
-* geomap - static mode
 * geomap - cache label coordinates (the labelPixel cannot be cached, it will change each refresh)
 * geomap - rotate label based on segment
 * geomap - use pointer-events: none where appropriate
-* geomap - add argument to refresh to force reload of images (in case of dynamic data)
 * geomap - test changing shingled service URL to get updated images (in case of dynamic data)
 * geomap - replace data-geo attributes with classes
 * geomap - [bug] ie highlights entire map div during shift-zoom
+* geomap - [bug] iPad 2 panning is visually jumpy but settles on the correct bbox in the end
+* geomap - [bug] iPad 2 measureLength puts current length on second to last coord instead of last coord
+* geomap - [bug] multiples of the same event trigger after creating more than one map on the same div, even after destroy
+** destroy should unbind all geomap events
 * geomap - remove this-style state properties
 * geomap - remove "px" from .css calls
-* geo - use Array.push instead of $.merge
+* geo - use Array.push instead of $.merge where needed
 * geomap - [bug] changing services array (without changing all services) after initialization fails
 * geomap - [bug] multiple maps do not work on the same page
+* docs - geomap - add argument to refresh to force reload of images (in case of dynamic data)
+* geomap - add argument to refresh to force reload of images (in case of dynamic data)
 * geomap - use _currentServices in all functions unless we actually need to update the public  options services object
 * geomap - create _defaultState object, use for widget-local _widgetState property, reinit _widgetState on _createWidget
 * geomap - don't redraw shapes after interactiveScale, they've already been drawn at new scale
 * geomap - [bug] exception when calling destroy on uninitialized div
+* geomap - maybe throw an error when setting center to an invalid object, such as the first number in a coordinate array: coordinates[ 0 ] <== wrong!
 * upgrade jquery.mousewheel
 * make a package for new jQuery plugin directory
 ** https://github.com/jquery/plugins.jquery.com/blob/master/docs/package.md
@@ -141,15 +149,53 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 
-==2012-1-16==
+==2012-01-20==
+===pinch===
+This is mostly ready for iOS. It's a little jumpy so I think I have to detect a second touch while the first one is down as long as they haven't started panning yet and move into pinch zoom.
+
+If the second finger is late, we still only get the touchmove event which will work great.
+
+===android===
+I am going to coin "hold scroll" for android to counter their lack of multitouch. When the user holds the map in the same place for between .5 seconds and before the browser takes over, the user can move the touch point vertically to start zooming as if there's a scroll wheel.
+
+I was going to have "expand zoom" (coined by Laura) where it works similar to "hold scroll" but instead of acting like a scroll wheel, it acted like the bbox was expanding from the hold position. In effect, a zoom in only fake pinch zoom. However, I like the zoom in/out ability of the fake wheel better. This will also work on iOS, I think and even desktop.
+
+===web workers===
+I eventually want the $.geo functions to allow the browser to use web workers but they'll have to be in a javascript file. Hopefully, I can use data URIs.
+
+I could always grab the worker js from the CDN but that would require internet access. What if it's all an internal site, like for government. Or, graphics only that doesn't need servers.
+
+I can use data URIs but I wasn't able to have a local variable in the function. You can, but you need all %20's instead of spaces.
+
+==2012-01-17==
+===geomapshape===
+May be getting multiple shape events when in drawPoint mode and attached via bind("geomapshape").
+
+Not just shape, all events. If you recreate a map on the same div & rebind an event to a new function, it will trigger more than once.
+
+===wkt===
+While not in this release, I have a need to fix WKT parsing. Finished parse LineString & (single ring) Polygons.
+
+===pinch===
+Next on the list is pinch zoom. I can hook this into the scroll zoom mechanics based on pinch center & ratio of initial pinch bbox to current pinch bbox to scale the tiles.
+
+Initially, I'm going to jump one scale level (or scale ratio) like wheel zoom. Later, when I update the whole interactive movement engine, I'm going to transition to the next scale level.
+
+This will tap into the _wheelLevel variable, which I should possibly rename later.
+
+Dropping out of multitouch (lifting one finger) will end interactive zoom & call setCenterAndZoom.
+
+We pick the largest ratio between x & y changes.
+
+==2012-01-16==
 ===zoom===
 Accidentally moved some code to where it didn't belong & broke interactive zoom. Fixed.
 
-==2012-1-12==
+==2012-01-12==
 ===getUrl===
 I would like to further have the service object's properties match html rather than css. I might rename this to just src.
 
-==2012-1-11==
+==2012-01-11==
 ===scroll & drag===
 I need options to disable the default behavior of scrolling and dragging.
 
@@ -165,7 +211,7 @@ I would like to support two-finger vertical slide as zoom on mobile devices but 
 
 Hmm. Can I handle scroll without an option? I can detect page scrolling and set a timeout. If the user has been scrolling the page, we don't want to scroll the map. But, what if the user's cursor just happens to be on the map when they want to scroll the page. I'm keeping scroll, the developer should have control to turn it off all together.
 
-==2012-1-2==
+==2012-01-2==
 ===service===
 I'm still thinking about service-level methods. I'm not going to add the *All methods right now and I'm not going to have the single methods dive into the services (other than find, which even in jQuery digs into sub-elements not in your collection). The table I wrote below won't go into the docs. 
 
@@ -204,7 +250,7 @@ append, replace and empty are very one-item specific but find is a digging query
 
 I'm not going to support the service selector in find's selector argument at this point. But I documented how it will work with a service element selector and that seems pretty cool.
 
-==2012-1-1==
+==2012-01-01==
 ===offline===
 Responded to an email asking about offline support. I wrote a few things in my reply that should give him some ideas. I'll copy them here:
 
