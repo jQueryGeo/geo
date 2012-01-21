@@ -1388,6 +1388,7 @@
       if ( this._supportTouch ) {
         if ( !this._isMultiTouch && touches[ 0 ].identifier !== this._multiTouchAnchor[ 0 ].identifier ) {
           // switch to multitouch
+          this._mouseDown = false;
           this._dragTarget_touchstop( e );
 
           this._isMultiTouch = true;
