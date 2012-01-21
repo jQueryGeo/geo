@@ -42,6 +42,7 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * geomap - [bug] map tracks mouse when not panning if click on other elements
 * geomap - pannable option
 * geomap - scroll option
+* geomap - [bug] shapesContainer is being cleared twice during mouse wheel zoom
 
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon
