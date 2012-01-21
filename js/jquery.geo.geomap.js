@@ -1424,12 +1424,9 @@
 
           current = $.geo.center( this._multiTouchCurrentBbox, true );
 
-          var currentWidth = ( this._multiTouchCurrentBbox[ 2 ] - this._multiTouchCurrentBbox[ 0 ] ),
-              currentHeight = ( this._multiTouchCurrentBbox[ 3 ] - this._multiTouchCurrentBbox[ 1 ] ),
-              anchorWidth = ( this._multiTouchAnchorBbox[ 2 ] - this._multiTouchAnchorBbox[ 0 ] ),
-              anchorHeight = ( this._multiTouchAnchorBbox[ 3 ] - this._multiTouchAnchorBbox[ 1 ] ),
-              ratioWidth = currentWidth / anchorWidth,
-              ratioHeight = currentHeight / anchorHeight;
+          var currentWidth = this._multiTouchCurrentBbox[ 2 ] - this._multiTouchCurrentBbox[ 0 ],
+              anchorWidth = this._multiTouchAnchorBbox[ 2 ] - this._multiTouchAnchorBbox[ 0 ],
+              ratioWidth = currentWidth / anchorWidth;
 
           if ( Math.abs( currentWidth ) < Math.abs( anchorWidth ) ) {
             this._wheelLevel = - Math.abs( Math.floor( ( 1 - ratioWidth ) * 10 ) );

@@ -37,6 +37,9 @@
 * geomap - don't redraw shapes after interactiveScale, they've already been drawn at new scale
 * geomap - [bug] exception when calling destroy on uninitialized div
 * geomap - maybe throw an error when setting center to an invalid object, such as the first number in a coordinate array: coordinates[ 0 ] <== wrong!
+* geomap - merge interactive pan and zoom into one, faster system
+** pan and zoom in same interactive session
+** delay image loading more during movement
 * upgrade jquery.mousewheel
 * make a package for new jQuery plugin directory
 ** https://github.com/jquery/plugins.jquery.com/blob/master/docs/package.md
