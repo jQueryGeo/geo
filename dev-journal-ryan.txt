@@ -1,10 +1,10 @@
 ﻿== to do ==
-* geomap - support pinch zoom on iOS
-* geo - add recenter function for bbox
-* geomap - service object visibility and opacity options should be moved to a style property
 * geomap - static mode
-* geomap - [bug] single touch pan jumps between fingers on failed multitouch
-** if _mouseIsDown, check against original touch identifier
+* geographics - merge label engine into geographics widget
+* geomap - service-level shapes
+* geo - add recenter function for bbox
+* geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
+* geomap - service object visibility and opacity options should be moved to a style property
 * geomap - [bug] first use of mouse/touch in any mode moves map by one pixel on mousedown/touch
 ** possibly only when axisLayout is image
 * geomap - [bug] pan lags on first drag (related?)
@@ -15,6 +15,8 @@
 * geomap - [bug] measure modes do not show text for shingled services?
 * geomap - [bug] mouse zoom doesn't work for shingled services?
 * geomap - [bug] zoom option doesn't return proper values for shingled services?
+* geomap - [bug] double tap to end shapes adds two points before ending the shape, in different places
+* geomap - [bug] lifting figers after pinch zoom in drawLineString or drawPolygon modes sometimes adds fake visual coordinate on touch point last lifted
 * geomap - cache label coordinates (the labelPixel cannot be cached, it will change each refresh)
 * geomap - rotate label based on segment
 * geomap - use pointer-events: none where appropriate
@@ -22,6 +24,7 @@
 * geomap - replace data-geo attributes with classes
 * geomap - [bug] ie highlights entire map div during shift-zoom
 * geomap - [bug] iPad 2 panning is visually jumpy but settles on the correct bbox in the end
+** possibly only when axisLayout is image
 * geomap - [bug] iPad 2 measureLength puts current length on second to last coord instead of last coord
 * geomap - [bug] multiples of the same event trigger after creating more than one map on the same div, even after destroy
 ** destroy should unbind all geomap events
@@ -50,8 +53,6 @@
 * examples - geomap resize method
 * examples - multiple maps example
 * geomap - [bug] when a singled image hasn't loaded after pan and you double click on empty space, the zoomed bbox seems wrong
-* geomap - consolidate interactive pan/zoom into one system
-* geographics - merge label engine into geographics widget
 * remove BOM from release files
 * add 3rd party license headers
 * docs - geomap - pan events (pattern after HTML5 drag)
@@ -59,23 +60,16 @@
 * docs - geomap - support two-finger vertical slide as zoom on mobile devices
 * geomap - pan events (pattern after HTML5 drag)
 * geomap - zoom events (pattern after HTML5 drag)
-* geomap - support two-finger vertical slide as zoom on mobile devices
 * geomap - test jQuery widget call chaining when setting option values
 * geomap - when scroll is zoom, attempt to not zoom while user is scrolling the page anyway
 * geomap - allow src to return a callback function or Promise to delay image requests for some reason (multiple requests, etc.)
-* docs - geomap - option to allow disable pan during different modes
-* geomap - option to allow disable pan during different modes
 * docs - geomap - document the correct way to add a service after init
-* geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
 * geomap - remember last map unit type set with bbox and center, return all coords and arguments in that type
-* geomap - port shape labels
 * geomap - unbind keydown handler on destroy, it's on the document
 * docs - selector argument to find method
 * selector argument to find method
 * docs - $.geo.WKT object
 * geo - $.geo.WKT object
-* docs - geomap - wheel option
-* geomap - wheel option
 * docs - geomap - replace method
 * geomap - replace method
 * docs - geomap - allow service-level refresh
@@ -118,12 +112,11 @@
 * geomap - perf test putting all containers that need to move with panning in a single super-container
 * docs - geomap - multiple labels
 * geomap - multiple labels
-* geomap - service-level shapes
 * geomap - [bug] mouse wheel on bad or missing tile doesn't zoom out on first rotate
 * docs/geomap - store WKT input for each service
 * geographics - rename the generated style properties to something simple or get better control over closure compiler
 * geographics - add a resize method, call from geomap.resize
-* geomap - Document and implement find's callback syntax
+* geomap - document and implement find's callback syntax
 * geomap - repeat horizontal tiles
 * geomap - custering demo/support
 * proj - take scale factor into account when calculating distance in web mercator
@@ -151,6 +144,18 @@
 ** in the drawing modes, this function ends drawing and triggers the shape event with whatever coordinates have already been added to the shape
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
+
+==2012-01-21==
+===pinch aftermath===
+Adding pinch was pretty easy. The only big issue was if a second finger touched a short time after the first. To counter, I fake as if all touch has stopped and initiate a new one. There's room to consolidate code here but I'll get to that later.
+
+===drawPoint===
+This acted funny with pinch zoom in that when the second finger hit late, a shape event got triggered at the first finger.
+
+===draw other===
+Similar issue, touchstop gets triggered after pinch zoom and a segment is added to the shape. Maybe related to calling touchstop. We get in an odd state, actually. The segment shows up but the next touch causes it to disappear and a new one appear instead.
+
+I'm going to put this as a bug and get back to it later. There's much more actual functionality to get into alpha 4.
 
 ==2012-01-20==
 ===pinch===
