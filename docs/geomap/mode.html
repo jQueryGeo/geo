@@ -77,6 +77,17 @@
 
       <pre><code>.geo-measure-label { font-size: 1.5em; }</code></pre>
 
+      <h2>static</h2>
+
+      <h3>user experience</h3>
+      <p>The default cursor is the default arrow pointer.</p>
+      <p>The map widget displays tiles and map images as normal but the user cannot interact with them, e.g., the user can't pan or zoom in any way, even if the <a href="pannable.html">pannable</a> option is set to true.</p>
+
+      <p>As a developer, you can still call geomap methods and set options in order to change the static map's appearance. Events are not triggered when you change the map programmatically.</p>
+
+      <h3>events</h3>
+      <p>All regular browser events bubble up to parent controls and eventually the document. No widget-specific events trigger.</p>
+
       <h2>pan</h2>
       <h3>user experience</h3>
       <p>The default cursor is an open hand in browsers that support data URIs and a four point arrow otherwise.</p>
@@ -110,17 +121,6 @@
         <li>dblclick &ndash; when the user double-clicks or double-taps a point on the map</li>
         <li>bboxchange &ndash; when the user changes the bbox by zooming</li>
       </ul>
-
-      <h2>static</h2>
-
-      <h3>user experience</h3>
-      <p>The default cursor is the default arrow pointer.</p>
-      <p>The map widget displays tiles and map images as normal but the user cannot interact with them, e.g., the user can't pan or zoom in any way, even if the <a href="pannable.html">pannable</a> option is set to true.</p>
-
-      <p>As a developer, you can still call geomap methods and set options in order to change the static map's appearance. Events are not triggered when you change the map programmatically.</p>
-
-      <h3>events</h3>
-      <p>All regular browser events bubble up to parent controls and eventually the document. No widget-specific events trigger.</p>
 
       <h2>drawPoint</h2>
 

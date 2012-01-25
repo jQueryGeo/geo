@@ -45,6 +45,7 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * geomap - [bug] shapesContainer is being cleared twice during mouse wheel zoom
 * geomap - support pinch zoom on iOS
 * docs - geo - add recenter function for bbox
+* geomap - static mode
 
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon

@@ -10,6 +10,7 @@
         bboxMax: [-180, -85, 180, 85],
         center: [0, 0],
         cursors: {
+          static: "default",
           pan: "move",
           zoom: "crosshair",
           drawPoint: "crosshair",
@@ -1233,6 +1234,10 @@
     },
 
     _eventTarget_dblclick: function (e) {
+      if ( this._options[ "mode" ] === "static" ) {
+        return;
+      }
+
       this._panFinalize();
 
       if (this._drawTimeout) {
@@ -1243,11 +1248,6 @@
       var offset = $(e.currentTarget).offset();
 
       switch (this._options["mode"]) {
-        case "pan":
-        case "drawPoint":
-          this._eventTarget_dblclick_zoom(e);
-          break;
-
         case "drawLineString":
           if ( this._drawCoords.length > 1 && ! ( this._drawCoords[0][0] == this._drawCoords[1][0] &&
                                                   this._drawCoords[0][1] == this._drawCoords[1][1] ) ) {
@@ -1283,13 +1283,25 @@
         case "measureArea":
           this._resetDrawing();
           break;
+
+        default:
+          this._eventTarget_dblclick_zoom(e);
+          break;
       }
 
       this._inOp = false;
     },
 
     _eventTarget_touchstart: function (e) {
-      if (!this._supportTouch && e.which != 1) {
+      if ( this._options[ "mode" ] === "static" ) {
+        return;
+      }
+
+      if ( !this._supportTouch && e.which != 1 ) {
+        return;
+      }
+
+      if ( this._options[ "mode" ] === "static" ) {
         return;
       }
 
@@ -1358,12 +1370,10 @@
         this._inOp = true;
 
         switch (this._options["mode"]) {
-          case "pan":
-          case "drawPoint":
-          case "drawLineString":
-          case "drawPolygon":
-          case "measureLength":
-          case "measureArea":
+          case "zoom":
+            break;
+
+          default:
             this._lastDrag = this._current;
 
             if (e.currentTarget.setCapture) {
@@ -1379,6 +1389,10 @@
     },
 
     _dragTarget_touchmove: function (e) {
+      if ( this._options[ "mode" ] === "static" ) {
+        return;
+      }
+
       var offset = this._$eventTarget.offset(),
           drawCoordsLen = this._drawCoords.length,
           touches = e.originalEvent.changedTouches,
@@ -1500,15 +1514,6 @@
           }
           break;
 
-        case "pan":
-        case "drawPoint":
-          if (this._mouseDown || this._toolPan) {
-            this._panMove();
-          } else {
-            this._trigger("move", e, { type: "Point", coordinates: this.toMap(current) });
-          }
-          break;
-
         case "drawLineString":
         case "drawPolygon":
         case "measureLength":
@@ -1526,6 +1531,14 @@
             this._trigger("move", e, { type: "Point", coordinates: this.toMap(current) });
           }
           break;
+
+        default:
+          if (this._mouseDown || this._toolPan) {
+            this._panMove();
+          } else {
+            this._trigger("move", e, { type: "Point", coordinates: this.toMap(current) });
+          }
+          break;
       }
 
       this._lastMove = current;
@@ -1537,6 +1550,10 @@
     },
 
     _dragTarget_touchstop: function (e) {
+      if ( this._options[ "mode" ] === "static" ) {
+        return;
+      }
+
       if (!this._mouseDown && _ieVersion == 7) {
         // ie7 doesn't appear to trigger dblclick on this._$eventTarget,
         // we fake regular click here to cause soft dblclick
@@ -1613,17 +1630,6 @@
             this._resetDrawing();
             break;
 
-          case "pan":
-            if (wasToolPan) {
-              this._panEnd();
-            } else {
-              if (clickDate - this._clickDate > 100) {
-                this._trigger("click", e, { type: "Point", coordinates: this.toMap(current) });
-                this._inOp = false;
-              }
-            }
-            break;
-
           case "drawPoint":
             if (this._drawTimeout) {
               window.clearTimeout(this._drawTimeout);
@@ -1667,6 +1673,17 @@
               this._refreshDrawing();
             }
             break;
+
+          default:
+            if (wasToolPan) {
+              this._panEnd();
+            } else {
+              if (clickDate - this._clickDate > 100) {
+                this._trigger("click", e, { type: "Point", coordinates: this.toMap(current) });
+                this._inOp = false;
+              }
+            }
+            break;
         }
 
         this._clickDate = clickDate;
@@ -1684,6 +1701,10 @@
     },
 
     _eventTarget_mousewheel: function (e, delta) {
+      if ( this._options[ "mode" ] === "static" ) {
+        return;
+      }
+
       e.preventDefault();
 
       this._panFinalize();
