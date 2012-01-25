@@ -1,5 +1,4 @@
 ﻿== to do ==
-* geographics - merge label engine into geographics widget
 * geomap - service-level shapes
 * geo - add recenter function for bbox
 * geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
@@ -154,6 +153,11 @@ What's next for a4? static mode.
 This shouldn't be too hard. Currently, any non-defined mode string will act close to static. That's different from how I want it to work. The mode "static" should be static and undefined modes should act like pan for now.
 
 The switch appears to have gone well. I can set the mode to "23" and it acts like it's in pan. That's a feature I will define more fully later and document before it's official.
+
+===labels===
+Time to merge labels into geographics. This is a huge step toward service-level shapes. I should be able to find all $labelsContainer references and move them into sections of geographics.
+
+Now that labelsContainer is part of shapesContainer, the next step is to put shapesContainer under a serviceContainer (which is inside servicesContainer). Got that?
 
 ==2012-01-23==
 ===addressing===

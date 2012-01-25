@@ -64,7 +64,7 @@
 
     _$panContainer: undefined, //< all non-service elements that move while panning
     _$shapesContainer: undefined,
-    _$labelsContainer: undefined,
+    //_$labelsContainer: undefined,
     _$drawContainer: undefined,
     _$measureContainer: undefined,
     _$measureLabel: undefined,
@@ -336,7 +336,7 @@
         case "shapeStyle":
           if ( refresh ) {
             this._$shapesContainer.geographics("clear");
-            this._$labelsContainer.html("");
+            //this._$labelsContainer.html("");
             this._refreshShapes( this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes );
           }
           break;
@@ -673,8 +673,8 @@
       this._$contentFrame.append('<div class="geo-shapes-container" style="' + contentPosCss + contentSizeCss + '"></div>');
       this._$shapesContainer = this._$contentFrame.children(':last');
 
-      this._$contentFrame.append('<div class="geo-labels-container" style="' + contentPosCss + contentSizeCss + '"></div>');
-      this._$labelsContainer = this._$contentFrame.children(':last');
+      //this._$contentFrame.append('<div class="geo-labels-container" style="' + contentPosCss + contentSizeCss + '"></div>');
+      //this._$labelsContainer = this._$contentFrame.children(':last');
 
       this._$contentFrame.append('<div class="geo-draw-container" style="' + contentPosCss + contentSizeCss + '"></div>');
       this._$drawContainer = this._$contentFrame.children(':last');
@@ -683,7 +683,8 @@
       this._$measureContainer = this._$contentFrame.children(':last');
       this._$measureLabel = this._$measureContainer.children();
 
-      this._$panContainer = $( [ this._$shapesContainer[ 0 ], this._$labelsContainer[ 0 ], this._$drawContainer[ 0 ], this._$measureContainer[ 0 ] ] );
+      //this._$panContainer = $( [ this._$shapesContainer[ 0 ], this._$labelsContainer[ 0 ], this._$drawContainer[ 0 ], this._$measureContainer[ 0 ] ] );
+      this._$panContainer = $( [ this._$shapesContainer[ 0 ], this._$drawContainer[ 0 ], this._$measureContainer[ 0 ] ] );
 
       this._$contentFrame.append(this._$existingChildren);
 
@@ -854,7 +855,7 @@
         }
 
         if ( hasLabel && labelPixel ) {
-          this._$labelsContainer.append( '<div class="geo-label" style="position:absolute; left:' + labelPixel[ 0 ] + 'px; top:' + labelPixel[ 1 ] + 'px;">' + label + '</div>');
+          this._$shapesContainer.geographics( "drawLabel", labelPixel, label );
         }
       }
     },
@@ -1047,7 +1048,7 @@
 
       if (this._$shapesContainer) {
         this._$shapesContainer.geographics("clear");
-        this._$labelsContainer.html("");
+        //this._$labelsContainer.html("");
         if (this._graphicShapes.length > 0) {
           this._refreshShapes(this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes);
         }
@@ -1452,7 +1453,7 @@
           var pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, this._wheelZoomFactor );
 
           this._$shapesContainer.geographics("clear");
-          this._$labelsContainer.html("");
+          //this._$labelsContainer.html("");
 
           for (i = 0; i < this._options["services"].length; i++) {
             var service = this._options["services"][i];
@@ -1727,7 +1728,7 @@
         var wheelCenterAndSize = this._getZoomCenterAndSize(this._anchor, this._wheelLevel, this._wheelZoomFactor);
 
         this._$shapesContainer.geographics("clear");
-        this._$labelsContainer.html("");
+        //this._$labelsContainer.html("");
 
         for (i = 0; i < this._options["services"].length; i++) {
           var service = this._options["services"][i];
