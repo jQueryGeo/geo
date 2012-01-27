@@ -404,7 +404,7 @@
             }
 
             this._options["services"][i].visibility = service.visibility = ( value ? "visible" : "hidden" );
-            $.geo["_serviceTypes"][service.type].toggle(this, service);
+            service.serviceContainer.toggle(value);
 
             if (value) {
               $.geo["_serviceTypes"][service.type].refresh(this, service);

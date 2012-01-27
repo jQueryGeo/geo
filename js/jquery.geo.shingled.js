@@ -1,7 +1,7 @@
 ﻿(function ($, undefined) {
   $.geo._serviceTypes.shingled = (function () {
     return {
-      create: function (map, servicesContainer, service, index) {
+      create: function (map, serviceContainer, service, index) {
         var serviceState = $.data(service, "geoServiceState");
 
         if ( !serviceState ) {
@@ -9,20 +9,18 @@
             loadCount: 0
           };
 
-          var idString = service.id ? ' id="' + service.id + '"' : "",
-              classString = service["class"] ? ' class="' + service["class"] + '"' : "",
-              scHtml = '<div class="geo-service" data-geo-service="shingled"' + idString + classString + ' style="position:absolute; left:0; top:0; width:16px; height:16px; margin:0; padding:0; display:' + (service.visibility === undefined || service.visibility === "visible" ? "block" : "none") + ';"></div>';
+          var scHtml = '<div data-geo-service="shingled" style="position:absolute; left:0; top:0; width:16px; height:16px; margin:0; padding:0;"></div>';
 
-          servicesContainer.append(scHtml);
+          serviceContainer.append(scHtml);
 
-          serviceState.serviceContainer = servicesContainer.children(":last");
+          serviceState.serviceContainer = serviceContainer.children(":last");
           $.data(service, "geoServiceState", serviceState);
         }
 
         return serviceState.serviceContainer;
       },
 
-      destroy: function (map, servicesContainer, service) {
+      destroy: function (map, serviceContainer, service) {
         var serviceState = $.data(service, "geoServiceState");
 
         serviceState.serviceContainer.remove();
