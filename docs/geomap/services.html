@@ -94,9 +94,10 @@
       <h3>type</h3>
       <p>A service has a type property which is either &quot;tiled&quot; or &quot;shingled&quot;. Tiled servies will get one image request per tile needed to fill a given view when the map refreshes. The tile request's bbox will only be the size of the given tile. Shingled services will get only one image request each time the map refreshes and the bbox will be the extent of the whole map view.</p>
       <h3>src</h3>
-      <p>The src property of a service object is either:</p>
+      <p>The src property of a service object can be one of the following three options:</p>
       <ul>
-        <li>a function that accepts an object specifying information about the current image request that returns a URL to an image or null to indicate that no image is required or</li>
+        <li>a function that accepts an object specifying information about the current image request which <b>returns a URL to an image</b> or null to indicate that no image is available or required</li>
+        <li>a function that accepts an object specifying information about the current image request which <b>returns a jQuery Promise object</b> and, later, calls either resolve passing a URL to an image or reject to indicate that no image is available</li>
         <li>a template string that the geomap widget can use to build a URL itself</li>
       </ul>
       <p>For tiled services, the image is placed at the tile location specified. For shingled services, the image will fill the whole map view.</p>
@@ -122,7 +123,9 @@
           <th>index (Number)</th><td>A whole number which is usually incremented between requests that you can use to cycle image URLs to different index, e.g., if there are four servers hosting the same tile images named tile0, tile1, tile2 and tile3 you can target them in your src function with the string: &quot;tile&quot; + (view.index % 4).</td>
         </tr>
       </table>
-      <p>You can use the properties of this argument to build and return your URL.</p>
+      <p>You can use the properties of this argument to build and return a URL (or initiate an AJAX request and return a Promise).</p>
+      <p>For more infomration about returning a jQuery Promise, please read the section on <a href="http://api.jquery.com/category/deferred-object/" rel="external">Deferred Objects</a> in the jQuery API documentation. It might useful to know that, as of jQuery 1.5, the <a href="http://api.jquery.com/jQuery.ajax/" rel="external">$.ajax method</a> returns a Promise object. If your ajax call return a URL to an image, your src function can look something like this:</p>
+      <pre><code>src: function ( view ) { return $.ajax( { ... } ); }</code></pre>
       <p>When src is a string, those same properties can be used in the template by surrounding each property with: {{=propertyName}}.</p>
       <p>The default value for src is a function because it is slightly faster than rendering a template. However, as an example, we can rewrite the default src function as a template string:</p>
       <pre><code>src: &quot;http://tile.openstreetmap.org/{{=zoom}}/{{=tile.column}}/{{=tile.row}}.png&quot;</code></pre>

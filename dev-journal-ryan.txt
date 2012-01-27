@@ -1,4 +1,5 @@
 ﻿== to do ==
+* geomap - allow Deferred or Promise as return value from src function
 * geomap - service-level shapes
 * geo - add recenter function for bbox
 * geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
@@ -144,6 +145,13 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-01-27==
+===Deferred===
+The src function will be allowed to return a Deferred (or Promise) object. If it does, geomap will wait for the done or fail events. The src function will call resolve or fail.
+
+===service shapes===
+The opacity method might have to stay as a service method because it must directly manipulate image elements in some cases. However, the toggle method can operate on the new service container.
 
 ==2012-01-24==
 ===a4===
