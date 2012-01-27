@@ -10,7 +10,7 @@
         bboxMax: [-180, -85, 180, 85],
         center: [0, 0],
         cursors: {
-          static: "default",
+          "static": "default",
           pan: "move",
           zoom: "crosshair",
           drawPoint: "crosshair",
@@ -350,6 +350,7 @@
         $(window).unbind("resize", this._windowHandler);
 
         for ( var i = 0; i < this._currentServices.length; i++ ) {
+          // TODO: destroy service-level geographics
           this._currentServices[i].serviceContainer.geomap("destroy");
           $.geo["_serviceTypes"][this._currentServices[i].type].destroy(this, this._$servicesContainer, this._currentServices[i]);
         }
@@ -457,7 +458,9 @@
       this._$shapesContainer.geographics("destroy");
 
       for (i = 0; i < this._currentServices.length; i++) {
+        // TODO: destroy service-level geographics
         $.geo["_serviceTypes"][this._currentServices[i].type].resize(this, this._currentServices[i]);
+        // TODO: recreate service-level geographics
       }
 
       this._$panContainer.css({
@@ -694,17 +697,30 @@
     },
 
     _createServices: function () {
-      var i;
+      var i, serviceContainer, service;
 
       for (i = 0; i < this._currentServices.length; i++) {
+        // TODO: destroy service-level geographics
         this._currentServices[i].serviceContainer.geomap("destroy");
         $.geo["_serviceTypes"][this._currentServices[i].type].destroy(this, this._$servicesContainer, this._currentServices[i]);
       }
 
       this._currentServices = [];
       for (i = 0; i < this._options["services"].length; i++) {
-        this._currentServices[i] = this._options["services"][i];
-        this._currentServices[i].serviceContainer = $.geo["_serviceTypes"][this._currentServices[i].type].create(this, this._$servicesContainer, this._currentServices[i], i).geomap();
+        service = this._options["services"][i];
+        this._currentServices[i] = service;
+
+        var idString = service.id ? ' id="' + service.id + '"' : "",
+            classString = 'class="geo-service ' + ( service["class"] ? service["class"] : '' ) + '"',
+            scHtml = '<div ' + idString + classString + ' style="position:absolute; left:0; top:0; width:32px; height:32px; margin:0; padding:0; display:' + (service.visibility === undefined || service.visibility === "visible" ? "block" : "none") + ';"></div>';
+
+        this._$servicesContainer.append( scHtml );
+        serviceContainer = this._$servicesContainer.children( ":last" );
+        this._currentServices[i].serviceContainer = serviceContainer;
+        
+        $.geo["_serviceTypes"][this._currentServices[i].type].create(this, serviceContainer, this._currentServices[i], i);
+
+        serviceContainer.geomap();
       }
     },
 

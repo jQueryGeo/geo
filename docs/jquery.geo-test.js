@@ -3293,6 +3293,7 @@ function try$( selector ) {
 
     _$canvas: undefined,
     _context: undefined,
+    _$labelsContainer: undefined,
 
     options: {
       style: {
@@ -3328,19 +3329,24 @@ function try$( selector ) {
         this._height = parseInt(this._$elem.css("height"));
       }
 
+      var sizeCss = 'style="position:absolute; left:0; top:0; width:' + this._width + 'px; height:' + this._height + 'px; margin:0; padding:0;"';
+
       if (document.createElement('canvas').getContext) {
-        this._$elem.append('<canvas width="' + this._width + '" height="' + this._height + '" style="position:absolute; left:0; top:0; width:' + this._width + 'px; height:' + this._height + 'px;"></canvas>');
+        this._$elem.append('<canvas width="' + this._width + '" height="' + this._height + '" ' + sizeCss + '></canvas>');
         this._$canvas = this._$elem.children(':last');
         this._context = this._$canvas[0].getContext("2d");
       } else if (_ieVersion <= 8) {
         this._trueCanvas = false;
-        this._$elem.append('<div width="' + this._width + '" height="' + this._height + '" style="position:absolute; left:0; top:0; width:' + this._width + 'px; height:' + this._height + 'px; margin:0; padding:0;"></div>');
+        this._$elem.append('<div width="' + this._width + '" height="' + this._height + '" ' + sizeCss + '></div>');
         this._$canvas = this._$elem.children(':last');
 
         G_vmlCanvasManager.initElement(this._$canvas[0]);
         this._context = this._$canvas[0].getContext("2d");
         this._$canvas.children().css({ backgroundColor: "transparent", width: this._width, height: this._height });
       }
+
+      this._$elem.append('<div class="geo-labels-container" ' + sizeCss + '></div>');
+      this._$labelsContainer = this._$elem.children(':last');
     },
 
     _setOption: function (key, value) {
@@ -3357,6 +3363,7 @@ function try$( selector ) {
 
     clear: function () {
       this._context.clearRect(0, 0, this._width, this._height);
+      this._$labelsContainer.html("");
     },
 
     drawArc: function (coordinates, startAngle, sweepAngle, style) {
@@ -3460,6 +3467,10 @@ function try$( selector ) {
       ]], true, style);
     },
 
+    drawLabel: function( coordinates, label ) {
+      this._$labelsContainer.append( '<div class="geo-label" style="position:absolute; left:' + coordinates[ 0 ] + 'px; top:' + coordinates[ 1 ] + 'px;">' + label + '</div>');
+    },
+
     _getGraphicStyle: function (style) {
       function safeParse(value) {
         value = parseInt(value);
@@ -3533,6 +3544,7 @@ function try$( selector ) {
         bboxMax: [-180, -85, 180, 85],
         center: [0, 0],
         cursors: {
+          "static": "default",
           pan: "move",
           zoom: "crosshair",
           drawPoint: "crosshair",
@@ -3586,7 +3598,7 @@ function try$( selector ) {
 
     _$panContainer: undefined, //< all non-service elements that move while panning
     _$shapesContainer: undefined,
-    _$labelsContainer: undefined,
+    //_$labelsContainer: undefined,
     _$drawContainer: undefined,
     _$measureContainer: undefined,
     _$measureLabel: undefined,
@@ -3858,7 +3870,7 @@ function try$( selector ) {
         case "shapeStyle":
           if ( refresh ) {
             this._$shapesContainer.geographics("clear");
-            this._$labelsContainer.html("");
+            //this._$labelsContainer.html("");
             this._refreshShapes( this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes );
           }
           break;
@@ -3872,6 +3884,7 @@ function try$( selector ) {
         $(window).unbind("resize", this._windowHandler);
 
         for ( var i = 0; i < this._currentServices.length; i++ ) {
+          // TODO: destroy service-level geographics
           this._currentServices[i].serviceContainer.geomap("destroy");
           $.geo["_serviceTypes"][this._currentServices[i].type].destroy(this, this._$servicesContainer, this._currentServices[i]);
         }
@@ -3979,7 +3992,9 @@ function try$( selector ) {
       this._$shapesContainer.geographics("destroy");
 
       for (i = 0; i < this._currentServices.length; i++) {
+        // TODO: destroy service-level geographics
         $.geo["_serviceTypes"][this._currentServices[i].type].resize(this, this._currentServices[i]);
+        // TODO: recreate service-level geographics
       }
 
       this._$panContainer.css({
@@ -4195,8 +4210,8 @@ function try$( selector ) {
       this._$contentFrame.append('<div class="geo-shapes-container" style="' + contentPosCss + contentSizeCss + '"></div>');
       this._$shapesContainer = this._$contentFrame.children(':last');
 
-      this._$contentFrame.append('<div class="geo-labels-container" style="' + contentPosCss + contentSizeCss + '"></div>');
-      this._$labelsContainer = this._$contentFrame.children(':last');
+      //this._$contentFrame.append('<div class="geo-labels-container" style="' + contentPosCss + contentSizeCss + '"></div>');
+      //this._$labelsContainer = this._$contentFrame.children(':last');
 
       this._$contentFrame.append('<div class="geo-draw-container" style="' + contentPosCss + contentSizeCss + '"></div>');
       this._$drawContainer = this._$contentFrame.children(':last');
@@ -4205,7 +4220,8 @@ function try$( selector ) {
       this._$measureContainer = this._$contentFrame.children(':last');
       this._$measureLabel = this._$measureContainer.children();
 
-      this._$panContainer = $( [ this._$shapesContainer[ 0 ], this._$labelsContainer[ 0 ], this._$drawContainer[ 0 ], this._$measureContainer[ 0 ] ] );
+      //this._$panContainer = $( [ this._$shapesContainer[ 0 ], this._$labelsContainer[ 0 ], this._$drawContainer[ 0 ], this._$measureContainer[ 0 ] ] );
+      this._$panContainer = $( [ this._$shapesContainer[ 0 ], this._$drawContainer[ 0 ], this._$measureContainer[ 0 ] ] );
 
       this._$contentFrame.append(this._$existingChildren);
 
@@ -4215,17 +4231,30 @@ function try$( selector ) {
     },
 
     _createServices: function () {
-      var i;
+      var i, serviceContainer, service;
 
       for (i = 0; i < this._currentServices.length; i++) {
+        // TODO: destroy service-level geographics
         this._currentServices[i].serviceContainer.geomap("destroy");
         $.geo["_serviceTypes"][this._currentServices[i].type].destroy(this, this._$servicesContainer, this._currentServices[i]);
       }
 
       this._currentServices = [];
       for (i = 0; i < this._options["services"].length; i++) {
-        this._currentServices[i] = this._options["services"][i];
-        this._currentServices[i].serviceContainer = $.geo["_serviceTypes"][this._currentServices[i].type].create(this, this._$servicesContainer, this._currentServices[i], i).geomap();
+        service = this._options["services"][i];
+        this._currentServices[i] = service;
+
+        var idString = service.id ? ' id="' + service.id + '"' : "",
+            classString = 'class="geo-service ' + ( service["class"] ? service["class"] : '' ) + '"',
+            scHtml = '<div ' + idString + classString + ' style="position:absolute; left:0; top:0; width:32px; height:32px; margin:0; padding:0; display:' + (service.visibility === undefined || service.visibility === "visible" ? "block" : "none") + ';"></div>';
+
+        this._$servicesContainer.append( scHtml );
+        serviceContainer = this._$servicesContainer.children( ":last" );
+        this._currentServices[i].serviceContainer = serviceContainer;
+        
+        $.geo["_serviceTypes"][this._currentServices[i].type].create(this, serviceContainer, this._currentServices[i], i);
+
+        serviceContainer.geomap();
       }
     },
 
@@ -4376,7 +4405,7 @@ function try$( selector ) {
         }
 
         if ( hasLabel && labelPixel ) {
-          this._$labelsContainer.append( '<div class="geo-label" style="position:absolute; left:' + labelPixel[ 0 ] + 'px; top:' + labelPixel[ 1 ] + 'px;">' + label + '</div>');
+          this._$shapesContainer.geographics( "drawLabel", labelPixel, label );
         }
       }
     },
@@ -4569,7 +4598,7 @@ function try$( selector ) {
 
       if (this._$shapesContainer) {
         this._$shapesContainer.geographics("clear");
-        this._$labelsContainer.html("");
+        //this._$labelsContainer.html("");
         if (this._graphicShapes.length > 0) {
           this._refreshShapes(this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes);
         }
@@ -4756,6 +4785,10 @@ function try$( selector ) {
     },
 
     _eventTarget_dblclick: function (e) {
+      if ( this._options[ "mode" ] === "static" ) {
+        return;
+      }
+
       this._panFinalize();
 
       if (this._drawTimeout) {
@@ -4766,11 +4799,6 @@ function try$( selector ) {
       var offset = $(e.currentTarget).offset();
 
       switch (this._options["mode"]) {
-        case "pan":
-        case "drawPoint":
-          this._eventTarget_dblclick_zoom(e);
-          break;
-
         case "drawLineString":
           if ( this._drawCoords.length > 1 && ! ( this._drawCoords[0][0] == this._drawCoords[1][0] &&
                                                   this._drawCoords[0][1] == this._drawCoords[1][1] ) ) {
@@ -4806,13 +4834,25 @@ function try$( selector ) {
         case "measureArea":
           this._resetDrawing();
           break;
+
+        default:
+          this._eventTarget_dblclick_zoom(e);
+          break;
       }
 
       this._inOp = false;
     },
 
     _eventTarget_touchstart: function (e) {
-      if (!this._supportTouch && e.which != 1) {
+      if ( this._options[ "mode" ] === "static" ) {
+        return;
+      }
+
+      if ( !this._supportTouch && e.which != 1 ) {
+        return;
+      }
+
+      if ( this._options[ "mode" ] === "static" ) {
         return;
       }
 
@@ -4881,12 +4921,10 @@ function try$( selector ) {
         this._inOp = true;
 
         switch (this._options["mode"]) {
-          case "pan":
-          case "drawPoint":
-          case "drawLineString":
-          case "drawPolygon":
-          case "measureLength":
-          case "measureArea":
+          case "zoom":
+            break;
+
+          default:
             this._lastDrag = this._current;
 
             if (e.currentTarget.setCapture) {
@@ -4902,6 +4940,10 @@ function try$( selector ) {
     },
 
     _dragTarget_touchmove: function (e) {
+      if ( this._options[ "mode" ] === "static" ) {
+        return;
+      }
+
       var offset = this._$eventTarget.offset(),
           drawCoordsLen = this._drawCoords.length,
           touches = e.originalEvent.changedTouches,
@@ -4911,6 +4953,7 @@ function try$( selector ) {
       if ( this._supportTouch ) {
         if ( !this._isMultiTouch && touches[ 0 ].identifier !== this._multiTouchAnchor[ 0 ].identifier ) {
           // switch to multitouch
+          this._mouseDown = false;
           this._dragTarget_touchstop( e );
 
           this._isMultiTouch = true;
@@ -4960,7 +5003,7 @@ function try$( selector ) {
           var pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, this._wheelZoomFactor );
 
           this._$shapesContainer.geographics("clear");
-          this._$labelsContainer.html("");
+          //this._$labelsContainer.html("");
 
           for (i = 0; i < this._options["services"].length; i++) {
             var service = this._options["services"][i];
@@ -5022,15 +5065,6 @@ function try$( selector ) {
           }
           break;
 
-        case "pan":
-        case "drawPoint":
-          if (this._mouseDown || this._toolPan) {
-            this._panMove();
-          } else {
-            this._trigger("move", e, { type: "Point", coordinates: this.toMap(current) });
-          }
-          break;
-
         case "drawLineString":
         case "drawPolygon":
         case "measureLength":
@@ -5048,6 +5082,14 @@ function try$( selector ) {
             this._trigger("move", e, { type: "Point", coordinates: this.toMap(current) });
           }
           break;
+
+        default:
+          if (this._mouseDown || this._toolPan) {
+            this._panMove();
+          } else {
+            this._trigger("move", e, { type: "Point", coordinates: this.toMap(current) });
+          }
+          break;
       }
 
       this._lastMove = current;
@@ -5059,6 +5101,10 @@ function try$( selector ) {
     },
 
     _dragTarget_touchstop: function (e) {
+      if ( this._options[ "mode" ] === "static" ) {
+        return;
+      }
+
       if (!this._mouseDown && _ieVersion == 7) {
         // ie7 doesn't appear to trigger dblclick on this._$eventTarget,
         // we fake regular click here to cause soft dblclick
@@ -5135,17 +5181,6 @@ function try$( selector ) {
             this._resetDrawing();
             break;
 
-          case "pan":
-            if (wasToolPan) {
-              this._panEnd();
-            } else {
-              if (clickDate - this._clickDate > 100) {
-                this._trigger("click", e, { type: "Point", coordinates: this.toMap(current) });
-                this._inOp = false;
-              }
-            }
-            break;
-
           case "drawPoint":
             if (this._drawTimeout) {
               window.clearTimeout(this._drawTimeout);
@@ -5189,6 +5224,17 @@ function try$( selector ) {
               this._refreshDrawing();
             }
             break;
+
+          default:
+            if (wasToolPan) {
+              this._panEnd();
+            } else {
+              if (clickDate - this._clickDate > 100) {
+                this._trigger("click", e, { type: "Point", coordinates: this.toMap(current) });
+                this._inOp = false;
+              }
+            }
+            break;
         }
 
         this._clickDate = clickDate;
@@ -5206,6 +5252,10 @@ function try$( selector ) {
     },
 
     _eventTarget_mousewheel: function (e, delta) {
+      if ( this._options[ "mode" ] === "static" ) {
+        return;
+      }
+
       e.preventDefault();
 
       this._panFinalize();
@@ -5228,7 +5278,7 @@ function try$( selector ) {
         var wheelCenterAndSize = this._getZoomCenterAndSize(this._anchor, this._wheelLevel, this._wheelZoomFactor);
 
         this._$shapesContainer.geographics("clear");
-        this._$labelsContainer.html("");
+        //this._$labelsContainer.html("");
 
         for (i = 0; i < this._options["services"].length; i++) {
           var service = this._options["services"][i];
@@ -5259,7 +5309,7 @@ function try$( selector ) {
 ﻿(function ($, undefined) {
   $.geo._serviceTypes.tiled = (function () {
     return {
-      create: function (map, servicesContainer, service, index) {
+      create: function (map, serviceContainer, service, index) {
         var serviceState = $.data(service, "geoServiceState");
 
         if ( !serviceState ) {
@@ -5268,20 +5318,19 @@ function try$( selector ) {
             reloadTiles: false
           };
 
-          var idString = service.id ? ' id="' + service.id + '"' : "",
-              classString = service["class"] ? ' class="' + service["class"] + '"' : "",
-              scHtml = '<div class="geo-service" data-geo-service="tiled"' + idString + classString + ' style="position:absolute; left:0; top:0; width:8px; height:8px; margin:0; padding:0; display:' + (service.visibility === undefined || service.visibility === "visible" ? "block" : "none") + ';"></div>';
+          var scHtml = '<div data-geo-service="tiled" style="position:absolute; left:0; top:0; width:8px; height:8px; margin:0; padding:0;"></div>';
 
-          servicesContainer.append(scHtml);
+          serviceContainer.append(scHtml);
 
-          serviceState.serviceContainer = servicesContainer.children(":last");
+          serviceState.serviceContainer = serviceContainer.children( ":last" );
+
           $.data(service, "geoServiceState", serviceState);
         }
 
         return serviceState.serviceContainer;
       },
 
-      destroy: function (map, servicesContainer, service) {
+      destroy: function (map, serviceContainer, service) {
         var serviceState = $.data(service, "geoServiceState");
 
         serviceState.serviceContainer.remove();

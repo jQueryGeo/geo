@@ -159,6 +159,13 @@ Time to merge labels into geographics. This is a huge step toward service-level 
 
 Now that labelsContainer is part of shapesContainer, the next step is to put shapesContainer under a serviceContainer (which is inside servicesContainer). Got that?
 
+===service-level shapes===
+Here we go! Each serviceContainer has a div that contains all the images. The geographics widget will be a sibling of that.
+
+I may need a new container :/ the extra div was the tiled service's scale container. I need a container for the service/graphics elements.
+
+The map itself will have to manage this new container. I think the internal service objects will get this container and now append their functionality and elements to it. It will no longer have to return a new div for which the map will create a sub-geomap. 
+
 ==2012-01-23==
 ===addressing===
 I think address parsing (cracking) will be a useful feature for geocoding to non-Google geocoders. I might want to add that to $.geo at some point. Christian has some Python code that does it already I can port.
