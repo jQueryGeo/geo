@@ -157,44 +157,59 @@
 
           scaleContainer.append('<img style="position:absolute; left:-' + halfWidth + 'px; top:-' + halfHeight + 'px; width:100%; height:100%; margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;" unselectable="on" />');
           $img = scaleContainer.children(":last").data("center", map._getCenter());
-          $img.load(function (e) {
-            if (opacity < 1) {
-              $(e.target).fadeTo(0, opacity);
-            } else {
-              $(e.target).show();
-            }
 
-            serviceState.loadCount--;
+          if ( typeof imageUrl === "string" ) {
+            loadImage( $img, imageUrl );
+          } else {
+            // assume Deferred
+            imageUrl.done( function( url ) {
+              loadImage( $img, url );
+            } ).fail( function( ) {
+              $img.remove( );
+              serviceState.loadCount--;
+            } );
+          }
 
-            if (serviceState.loadCount <= 0) {
-              serviceContainer.children(':not([data-pixelSize="' + pixelSize + '"])').remove();
-
-              var panContainer = serviceContainer.find('[data-pixelSize="' + pixelSize + '"]>div');
-              if (panContainer.size() > 0) {
-                var panContainerPos = panContainer.position();
-
-                panContainer.children("img").each(function (i) {
-                  var $thisimg = $(this),
-                      x = panContainerPos.left + parseInt($thisimg.css("left")),
-                      y = panContainerPos.top + parseInt($thisimg.css("top"));
-
-                  $thisimg.css({ left: x + "px", top: y + "px" });
-                }).unwrap();
-
-                panContainer.remove();
+          function loadImage( $img, url ) {
+            $img.load(function (e) {
+              if (opacity < 1) {
+                $(e.target).fadeTo(0, opacity);
+              } else {
+                $(e.target).show();
               }
 
-              serviceState.loadCount = 0;
-            }
-          }).error(function (e) {
-            $(e.target).remove();
-            serviceState.loadCount--;
+              serviceState.loadCount--;
 
-            if (serviceState.loadCount <= 0) {
-              serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-              serviceState.loadCount = 0;
-            }
-          }).attr("src", imageUrl);
+              if (serviceState.loadCount <= 0) {
+                serviceContainer.children(':not([data-pixelSize="' + pixelSize + '"])').remove();
+
+                var panContainer = serviceContainer.find('[data-pixelSize="' + pixelSize + '"]>div');
+                if (panContainer.size() > 0) {
+                  var panContainerPos = panContainer.position();
+
+                  panContainer.children("img").each(function (i) {
+                    var $thisimg = $(this),
+                        x = panContainerPos.left + parseInt($thisimg.css("left")),
+                        y = panContainerPos.top + parseInt($thisimg.css("top"));
+
+                    $thisimg.css({ left: x + "px", top: y + "px" });
+                  }).unwrap();
+
+                  panContainer.remove();
+                }
+
+                serviceState.loadCount = 0;
+              }
+            }).error(function (e) {
+              $(e.target).remove();
+              serviceState.loadCount--;
+
+              if (serviceState.loadCount <= 0) {
+                serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+                serviceState.loadCount = 0;
+              }
+            }).attr("src", url);
+          }
         }
       },
 

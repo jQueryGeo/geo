@@ -1,6 +1,4 @@
 ﻿== to do ==
-* geomap - [bug] geomap attempts to create and refresh services before services property is set by user
-* geomap - allow Deferred or Promise as return value from src function
 * geomap - service-level shapes
 * geo - add recenter function for bbox
 * geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null

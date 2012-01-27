@@ -48,6 +48,7 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * geomap - static mode
 * docs - geomap - allow Deferred or Promise as return value from src function
 * geomap - [bug] widget factory merges first service with default sometimes causing exceptions with shingled services
+* geomap - allow Deferred or Promise as return value from src function
 
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon

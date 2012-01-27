@@ -162,28 +162,43 @@
 
                     scaleContainer.append( imgMarkup );
                     $img = scaleContainer.children(":last");
-                    $img.load(function (e) {
-                      if (opacity < 1) {
-                        $(e.target).fadeTo(0, opacity);
-                      } else {
-                        $(e.target).show();
-                      }
 
-                      serviceState.loadCount--;
+                    if ( typeof imageUrl === "string" ) {
+                      loadImage( $img, imageUrl );
+                    } else {
+                      // assume Deferred
+                      imageUrl.done( function( url ) {
+                        loadImage( $img, url );
+                      } ).fail( function( ) {
+                        $img.remove( );
+                        serviceState.loadCount--;
+                      } );
+                    }
 
-                      if (serviceState.loadCount <= 0) {
-                        serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-                        serviceState.loadCount = 0;
-                      }
-                    }).error(function (e) {
-                      $(e.target).remove();
-                      serviceState.loadCount--;
+                    function loadImage( $img, url ) {
+                      $img.load(function (e) {
+                        if (opacity < 1) {
+                          $(e.target).fadeTo(0, opacity);
+                        } else {
+                          $(e.target).show();
+                        }
 
-                      if (serviceState.loadCount <= 0) {
-                        serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-                        serviceState.loadCount = 0;
-                      }
-                    }).attr("src", imageUrl);
+                        serviceState.loadCount--;
+
+                        if (serviceState.loadCount <= 0) {
+                          serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+                          serviceState.loadCount = 0;
+                        }
+                      }).error(function (e) {
+                        $(e.target).remove();
+                        serviceState.loadCount--;
+
+                        if (serviceState.loadCount <= 0) {
+                          serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+                          serviceState.loadCount = 0;
+                        }
+                      }).attr("src", url);
+                    }
                     /* end same as refresh 4 */
                   }
                 }
@@ -365,28 +380,43 @@
 
                   scaleContainer.append(imgMarkup);
                   $img = scaleContainer.children(":last");
-                  $img.load(function (e) {
-                    if (opacity < 1) {
-                      $(e.target).fadeTo(0, opacity);
-                    } else {
-                      $(e.target).show();
-                    }
 
-                    serviceState.loadCount--;
+                  if ( typeof imageUrl === "string" ) {
+                    loadImage( $img, imageUrl );
+                  } else {
+                    // assume Deferred
+                    imageUrl.done( function( url ) {
+                      loadImage( $img, url );
+                    } ).fail( function( ) {
+                      $img.remove( );
+                      serviceState.loadCount--;
+                    } );
+                  }
 
-                    if (serviceState.loadCount <= 0) {
-                      $serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-                      serviceState.loadCount = 0;
-                    }
-                  }).error(function (e) {
-                    $(e.target).remove();
-                    serviceState.loadCount--;
+                  function loadImage( $img, url ) {
+                    $img.load(function (e) {
+                      if (opacity < 1) {
+                        $(e.target).fadeTo(0, opacity);
+                      } else {
+                        $(e.target).show();
+                      }
 
-                    if (serviceState.loadCount <= 0) {
-                      $serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-                      serviceState.loadCount = 0;
-                    }
-                  }).attr("src", imageUrl);
+                      serviceState.loadCount--;
+
+                      if (serviceState.loadCount <= 0) {
+                        $serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+                        serviceState.loadCount = 0;
+                      }
+                    }).error(function (e) {
+                      $(e.target).remove();
+                      serviceState.loadCount--;
+
+                      if (serviceState.loadCount <= 0) {
+                        $serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+                        serviceState.loadCount = 0;
+                      }
+                    }).attr("src", url);
+                  }
                 }
               }
             }

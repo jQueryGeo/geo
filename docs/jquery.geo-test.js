@@ -3727,9 +3727,10 @@ function try$( selector ) {
       this._supportTouch = "ontouchend" in document;
       this._softDblClick = this._supportTouch || _ieVersion == 7;
 
-      var touchStartEvent = this._supportTouch ? "touchstart" : "mousedown",
-            touchStopEvent = this._supportTouch ? "touchend touchcancel" : "mouseup",
-            touchMoveEvent = this._supportTouch ? "touchmove" : "mousemove";
+      var geomap = this,
+          touchStartEvent = this._supportTouch ? "touchstart" : "mousedown",
+          touchStopEvent = this._supportTouch ? "touchend touchcancel" : "mouseup",
+          touchMoveEvent = this._supportTouch ? "touchmove" : "mousemove";
 
       $(document).keydown($.proxy(this._document_keydown, this));
 
@@ -3743,7 +3744,6 @@ function try$( selector ) {
 
       this._$eventTarget.mousewheel($.proxy(this._eventTarget_mousewheel, this));
 
-      var geomap = this;
       this._windowHandler = function () {
         if (geomap._resizeTimeout) {
           clearTimeout(geomap._resizeTimeout);
@@ -3767,6 +3767,10 @@ function try$( selector ) {
         if (this._initOptions.tilingScheme) {
           this._setOption("tilingScheme", this._initOptions.tilingScheme, false);
         }
+        if ( this._initOptions.services ) {
+          // jQuery UI Widget Factory merges user services with our default, we want to clobber the default
+          this._options[ "services" ] = $.merge( [ ], this._initOptions.services );
+        }
         if (this._initOptions.bbox) {
           this._setOption("bbox", this._initOptions.bbox, false);
         }
@@ -3784,7 +3788,6 @@ function try$( selector ) {
       this._$eventTarget.css("cursor", this._options["cursors"][this._options["mode"]]);
 
       this._createServices();
-
       this._refresh();
 
       this._created = true;
@@ -3938,7 +3941,7 @@ function try$( selector ) {
             }
 
             this._options["services"][i].visibility = service.visibility = ( value ? "visible" : "hidden" );
-            $.geo["_serviceTypes"][service.type].toggle(this, service);
+            service.serviceContainer.toggle(value);
 
             if (value) {
               $.geo["_serviceTypes"][service.type].refresh(this, service);
@@ -5428,7 +5431,7 @@ function try$( selector ) {
 
                       tileBbox = [bottomLeft[0], bottomLeft[1], topRight[0], topRight[1]],
 
-                      urlProp = ( "src" in service ? "src" : "getUrl" ),
+                      urlProp = ( service.hasOwnProperty("src") ? "src" : "getUrl" ),
                       urlArgs = {
                         bbox: tileBbox,
                         width: tileWidth,
@@ -5470,28 +5473,43 @@ function try$( selector ) {
 
                     scaleContainer.append( imgMarkup );
                     $img = scaleContainer.children(":last");
-                    $img.load(function (e) {
-                      if (opacity < 1) {
-                        $(e.target).fadeTo(0, opacity);
-                      } else {
-                        $(e.target).show();
-                      }
 
-                      serviceState.loadCount--;
+                    if ( typeof imageUrl === "string" ) {
+                      loadImage( $img, imageUrl );
+                    } else {
+                      // assume Deferred
+                      imageUrl.done( function( url ) {
+                        loadImage( $img, url );
+                      } ).fail( function( ) {
+                        $img.remove( );
+                        serviceState.loadCount--;
+                      } );
+                    }
 
-                      if (serviceState.loadCount <= 0) {
-                        serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-                        serviceState.loadCount = 0;
-                      }
-                    }).error(function (e) {
-                      $(e.target).remove();
-                      serviceState.loadCount--;
+                    function loadImage( $img, url ) {
+                      $img.load(function (e) {
+                        if (opacity < 1) {
+                          $(e.target).fadeTo(0, opacity);
+                        } else {
+                          $(e.target).show();
+                        }
 
-                      if (serviceState.loadCount <= 0) {
-                        serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-                        serviceState.loadCount = 0;
-                      }
-                    }).attr("src", imageUrl);
+                        serviceState.loadCount--;
+
+                        if (serviceState.loadCount <= 0) {
+                          serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+                          serviceState.loadCount = 0;
+                        }
+                      }).error(function (e) {
+                        $(e.target).remove();
+                        serviceState.loadCount--;
+
+                        if (serviceState.loadCount <= 0) {
+                          serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+                          serviceState.loadCount = 0;
+                        }
+                      }).attr("src", url);
+                    }
                     /* end same as refresh 4 */
                   }
                 }
@@ -5673,28 +5691,43 @@ function try$( selector ) {
 
                   scaleContainer.append(imgMarkup);
                   $img = scaleContainer.children(":last");
-                  $img.load(function (e) {
-                    if (opacity < 1) {
-                      $(e.target).fadeTo(0, opacity);
-                    } else {
-                      $(e.target).show();
-                    }
 
-                    serviceState.loadCount--;
+                  if ( typeof imageUrl === "string" ) {
+                    loadImage( $img, imageUrl );
+                  } else {
+                    // assume Deferred
+                    imageUrl.done( function( url ) {
+                      loadImage( $img, url );
+                    } ).fail( function( ) {
+                      $img.remove( );
+                      serviceState.loadCount--;
+                    } );
+                  }
 
-                    if (serviceState.loadCount <= 0) {
-                      $serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-                      serviceState.loadCount = 0;
-                    }
-                  }).error(function (e) {
-                    $(e.target).remove();
-                    serviceState.loadCount--;
+                  function loadImage( $img, url ) {
+                    $img.load(function (e) {
+                      if (opacity < 1) {
+                        $(e.target).fadeTo(0, opacity);
+                      } else {
+                        $(e.target).show();
+                      }
 
-                    if (serviceState.loadCount <= 0) {
-                      $serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-                      serviceState.loadCount = 0;
-                    }
-                  }).attr("src", imageUrl);
+                      serviceState.loadCount--;
+
+                      if (serviceState.loadCount <= 0) {
+                        $serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+                        serviceState.loadCount = 0;
+                      }
+                    }).error(function (e) {
+                      $(e.target).remove();
+                      serviceState.loadCount--;
+
+                      if (serviceState.loadCount <= 0) {
+                        $serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+                        serviceState.loadCount = 0;
+                      }
+                    }).attr("src", url);
+                  }
                 }
               }
             }
@@ -5734,7 +5767,7 @@ function try$( selector ) {
 ﻿(function ($, undefined) {
   $.geo._serviceTypes.shingled = (function () {
     return {
-      create: function (map, servicesContainer, service, index) {
+      create: function (map, serviceContainer, service, index) {
         var serviceState = $.data(service, "geoServiceState");
 
         if ( !serviceState ) {
@@ -5742,20 +5775,18 @@ function try$( selector ) {
             loadCount: 0
           };
 
-          var idString = service.id ? ' id="' + service.id + '"' : "",
-              classString = service["class"] ? ' class="' + service["class"] + '"' : "",
-              scHtml = '<div class="geo-service" data-geo-service="shingled"' + idString + classString + ' style="position:absolute; left:0; top:0; width:16px; height:16px; margin:0; padding:0; display:' + (service.visibility === undefined || service.visibility === "visible" ? "block" : "none") + ';"></div>';
+          var scHtml = '<div data-geo-service="shingled" style="position:absolute; left:0; top:0; width:16px; height:16px; margin:0; padding:0;"></div>';
 
-          servicesContainer.append(scHtml);
+          serviceContainer.append(scHtml);
 
-          serviceState.serviceContainer = servicesContainer.children(":last");
+          serviceState.serviceContainer = serviceContainer.children(":last");
           $.data(service, "geoServiceState", serviceState);
         }
 
         return serviceState.serviceContainer;
       },
 
-      destroy: function (map, servicesContainer, service) {
+      destroy: function (map, serviceContainer, service) {
         var serviceState = $.data(service, "geoServiceState");
 
         serviceState.serviceContainer.remove();
@@ -5867,7 +5898,7 @@ function try$( selector ) {
             serviceContainer.find("img").attr("data-keepAlive", "0");
           }
 
-          var urlProp = ( "src" in service ? "src" : "getUrl" ),
+          var urlProp = ( service.hasOwnProperty("src") ? "src" : "getUrl" ),
               urlArgs = {
                 bbox: bbox,
                 width: mapWidth,
@@ -5892,44 +5923,59 @@ function try$( selector ) {
 
           scaleContainer.append('<img style="position:absolute; left:-' + halfWidth + 'px; top:-' + halfHeight + 'px; width:100%; height:100%; margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;" unselectable="on" />');
           $img = scaleContainer.children(":last").data("center", map._getCenter());
-          $img.load(function (e) {
-            if (opacity < 1) {
-              $(e.target).fadeTo(0, opacity);
-            } else {
-              $(e.target).show();
-            }
 
-            serviceState.loadCount--;
+          if ( typeof imageUrl === "string" ) {
+            loadImage( $img, imageUrl );
+          } else {
+            // assume Deferred
+            imageUrl.done( function( url ) {
+              loadImage( $img, url );
+            } ).fail( function( ) {
+              $img.remove( );
+              serviceState.loadCount--;
+            } );
+          }
 
-            if (serviceState.loadCount <= 0) {
-              serviceContainer.children(':not([data-pixelSize="' + pixelSize + '"])').remove();
-
-              var panContainer = serviceContainer.find('[data-pixelSize="' + pixelSize + '"]>div');
-              if (panContainer.size() > 0) {
-                var panContainerPos = panContainer.position();
-
-                panContainer.children("img").each(function (i) {
-                  var $thisimg = $(this),
-                      x = panContainerPos.left + parseInt($thisimg.css("left")),
-                      y = panContainerPos.top + parseInt($thisimg.css("top"));
-
-                  $thisimg.css({ left: x + "px", top: y + "px" });
-                }).unwrap();
-
-                panContainer.remove();
+          function loadImage( $img, url ) {
+            $img.load(function (e) {
+              if (opacity < 1) {
+                $(e.target).fadeTo(0, opacity);
+              } else {
+                $(e.target).show();
               }
 
-              serviceState.loadCount = 0;
-            }
-          }).error(function (e) {
-            $(e.target).remove();
-            serviceState.loadCount--;
+              serviceState.loadCount--;
 
-            if (serviceState.loadCount <= 0) {
-              serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-              serviceState.loadCount = 0;
-            }
-          }).attr("src", imageUrl);
+              if (serviceState.loadCount <= 0) {
+                serviceContainer.children(':not([data-pixelSize="' + pixelSize + '"])').remove();
+
+                var panContainer = serviceContainer.find('[data-pixelSize="' + pixelSize + '"]>div');
+                if (panContainer.size() > 0) {
+                  var panContainerPos = panContainer.position();
+
+                  panContainer.children("img").each(function (i) {
+                    var $thisimg = $(this),
+                        x = panContainerPos.left + parseInt($thisimg.css("left")),
+                        y = panContainerPos.top + parseInt($thisimg.css("top"));
+
+                    $thisimg.css({ left: x + "px", top: y + "px" });
+                  }).unwrap();
+
+                  panContainer.remove();
+                }
+
+                serviceState.loadCount = 0;
+              }
+            }).error(function (e) {
+              $(e.target).remove();
+              serviceState.loadCount--;
+
+              if (serviceState.loadCount <= 0) {
+                serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+                serviceState.loadCount = 0;
+              }
+            }).attr("src", url);
+          }
         }
       },
 
