@@ -193,9 +193,10 @@
       this._supportTouch = "ontouchend" in document;
       this._softDblClick = this._supportTouch || _ieVersion == 7;
 
-      var touchStartEvent = this._supportTouch ? "touchstart" : "mousedown",
-            touchStopEvent = this._supportTouch ? "touchend touchcancel" : "mouseup",
-            touchMoveEvent = this._supportTouch ? "touchmove" : "mousemove";
+      var geomap = this,
+          touchStartEvent = this._supportTouch ? "touchstart" : "mousedown",
+          touchStopEvent = this._supportTouch ? "touchend touchcancel" : "mouseup",
+          touchMoveEvent = this._supportTouch ? "touchmove" : "mousemove";
 
       $(document).keydown($.proxy(this._document_keydown, this));
 
@@ -209,7 +210,6 @@
 
       this._$eventTarget.mousewheel($.proxy(this._eventTarget_mousewheel, this));
 
-      var geomap = this;
       this._windowHandler = function () {
         if (geomap._resizeTimeout) {
           clearTimeout(geomap._resizeTimeout);
@@ -233,6 +233,10 @@
         if (this._initOptions.tilingScheme) {
           this._setOption("tilingScheme", this._initOptions.tilingScheme, false);
         }
+        if ( this._initOptions.services ) {
+          // jQuery UI Widget Factory merges user services with our default, we want to clobber the default
+          this._options[ "services" ] = $.merge( [ ], this._initOptions.services );
+        }
         if (this._initOptions.bbox) {
           this._setOption("bbox", this._initOptions.bbox, false);
         }
@@ -250,7 +254,6 @@
       this._$eventTarget.css("cursor", this._options["cursors"][this._options["mode"]]);
 
       this._createServices();
-
       this._refresh();
 
       this._created = true;

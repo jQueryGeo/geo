@@ -47,6 +47,7 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * docs - geo - add recenter function for bbox
 * geomap - static mode
 * docs - geomap - allow Deferred or Promise as return value from src function
+* geomap - [bug] widget factory merges first service with default sometimes causing exceptions with shingled services
 
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon

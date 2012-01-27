@@ -1,4 +1,5 @@
 ﻿== to do ==
+* geomap - [bug] geomap attempts to create and refresh services before services property is set by user
 * geomap - allow Deferred or Promise as return value from src function
 * geomap - service-level shapes
 * geo - add recenter function for bbox
@@ -152,6 +153,14 @@ The src function will be allowed to return a Deferred (or Promise) object. If it
 
 ===service shapes===
 The opacity method might have to stay as a service method because it must directly manipulate image elements in some cases. However, the toggle method can operate on the new service container.
+
+===init services===
+So, the jQuery UI widget factory udpates non-array options fine, i.e., when I get into the _create method, this.options has whatever the user supplied merged in with the default options. However, array options are not copied so any changes to the initial service option are not maintained.
+
+Not true, but it does unfortunately merge the first user supplied service with the default service, osm.
+
+===options===
+I forget why I have _options and options. They are supposed to be internal vs exteternal but they are equal references.
 
 ==2012-01-24==
 ===a4===

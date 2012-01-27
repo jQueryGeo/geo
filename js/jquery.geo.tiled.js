@@ -120,7 +120,7 @@
 
                       tileBbox = [bottomLeft[0], bottomLeft[1], topRight[0], topRight[1]],
 
-                      urlProp = ( "src" in service ? "src" : "getUrl" ),
+                      urlProp = ( service.hasOwnProperty("src") ? "src" : "getUrl" ),
                       urlArgs = {
                         bbox: tileBbox,
                         width: tileWidth,

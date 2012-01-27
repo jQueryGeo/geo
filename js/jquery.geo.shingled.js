@@ -132,7 +132,7 @@
             serviceContainer.find("img").attr("data-keepAlive", "0");
           }
 
-          var urlProp = ( "src" in service ? "src" : "getUrl" ),
+          var urlProp = ( service.hasOwnProperty("src") ? "src" : "getUrl" ),
               urlArgs = {
                 bbox: bbox,
                 width: mapWidth,
