@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>pinch zoom example</title>
+  <title>static mode example</title>
   <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
-  <meta name="description" content="An example of pinch zoom">
+  <meta name="description" content="An example of static mode">
   <meta name="author" content="Ryan Westphal">
   <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/blitzer/jquery-ui.css" />
   <link rel="stylesheet" type="text/css" href="css/style.css" />
@@ -28,7 +28,8 @@
         <a href="../" class="docLink">&lt; docs</a>
         <a href="http://jsfiddle.net/ryanttb/==JSFIDDLE==/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
       </div>
-      <h1>pinch zoom</h1>
+      <h1>static mode</h1>
+      <p>When the mode option is set to &quot;static&quot; a developer can create a map that the user can see but cannot change.</p>
     </div>
   </div>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
@@ -46,10 +47,11 @@
   <!--<script src="../jquery.geo-test.min.js"></script>-->
   <script>
     $(function () {
-      // create a map
+      // create a map with mode set to static
       var map = $("#map").geomap({
         center: [-71.0595678, 42.3604823],
-        zoom: 8
+        zoom: 14,
+        mode: "static"
       });
     });  
   </script>

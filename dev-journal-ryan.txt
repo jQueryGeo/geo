@@ -1,10 +1,8 @@
 ﻿== to do ==
-* geomap - support pinch zoom on iOS
+* geographics - add a resize method, call from geomap.resize
 * geo - add recenter function for bbox
+* geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
 * geomap - service object visibility and opacity options should be moved to a style property
-* geomap - static mode
-* geomap - [bug] single touch pan jumps between fingers on failed multitouch
-** if _mouseIsDown, check against original touch identifier
 * geomap - [bug] first use of mouse/touch in any mode moves map by one pixel on mousedown/touch
 ** possibly only when axisLayout is image
 * geomap - [bug] pan lags on first drag (related?)
@@ -15,6 +13,8 @@
 * geomap - [bug] measure modes do not show text for shingled services?
 * geomap - [bug] mouse zoom doesn't work for shingled services?
 * geomap - [bug] zoom option doesn't return proper values for shingled services?
+* geomap - [bug] double tap to end shapes adds two points before ending the shape, in different places
+* geomap - [bug] lifting figers after pinch zoom in drawLineString or drawPolygon modes sometimes adds fake visual coordinate on touch point last lifted
 * geomap - cache label coordinates (the labelPixel cannot be cached, it will change each refresh)
 * geomap - rotate label based on segment
 * geomap - use pointer-events: none where appropriate
@@ -22,6 +22,7 @@
 * geomap - replace data-geo attributes with classes
 * geomap - [bug] ie highlights entire map div during shift-zoom
 * geomap - [bug] iPad 2 panning is visually jumpy but settles on the correct bbox in the end
+** possibly only when axisLayout is image
 * geomap - [bug] iPad 2 measureLength puts current length on second to last coord instead of last coord
 * geomap - [bug] multiples of the same event trigger after creating more than one map on the same div, even after destroy
 ** destroy should unbind all geomap events
@@ -49,9 +50,8 @@
 * expose jQuery Geo as an AMD module so asynchronous loaders like RequireJS and curl.js can use it
 * examples - geomap resize method
 * examples - multiple maps example
+* examples - merge all mode examples into one, called mode
 * geomap - [bug] when a singled image hasn't loaded after pan and you double click on empty space, the zoomed bbox seems wrong
-* geomap - consolidate interactive pan/zoom into one system
-* geographics - merge label engine into geographics widget
 * remove BOM from release files
 * add 3rd party license headers
 * docs - geomap - pan events (pattern after HTML5 drag)
@@ -59,23 +59,16 @@
 * docs - geomap - support two-finger vertical slide as zoom on mobile devices
 * geomap - pan events (pattern after HTML5 drag)
 * geomap - zoom events (pattern after HTML5 drag)
-* geomap - support two-finger vertical slide as zoom on mobile devices
 * geomap - test jQuery widget call chaining when setting option values
 * geomap - when scroll is zoom, attempt to not zoom while user is scrolling the page anyway
 * geomap - allow src to return a callback function or Promise to delay image requests for some reason (multiple requests, etc.)
-* docs - geomap - option to allow disable pan during different modes
-* geomap - option to allow disable pan during different modes
 * docs - geomap - document the correct way to add a service after init
-* geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
 * geomap - remember last map unit type set with bbox and center, return all coords and arguments in that type
-* geomap - port shape labels
 * geomap - unbind keydown handler on destroy, it's on the document
 * docs - selector argument to find method
 * selector argument to find method
 * docs - $.geo.WKT object
 * geo - $.geo.WKT object
-* docs - geomap - wheel option
-* geomap - wheel option
 * docs - geomap - replace method
 * geomap - replace method
 * docs - geomap - allow service-level refresh
@@ -118,12 +111,10 @@
 * geomap - perf test putting all containers that need to move with panning in a single super-container
 * docs - geomap - multiple labels
 * geomap - multiple labels
-* geomap - service-level shapes
 * geomap - [bug] mouse wheel on bad or missing tile doesn't zoom out on first rotate
 * docs/geomap - store WKT input for each service
 * geographics - rename the generated style properties to something simple or get better control over closure compiler
-* geographics - add a resize method, call from geomap.resize
-* geomap - Document and implement find's callback syntax
+* geomap - document and implement find's callback syntax
 * geomap - repeat horizontal tiles
 * geomap - custering demo/support
 * proj - take scale factor into account when calculating distance in web mercator
@@ -151,6 +142,79 @@
 ** in the drawing modes, this function ends drawing and triggers the shape event with whatever coordinates have already been added to the shape
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
+* geo - potentially add address cracking
+
+==2012-01-28==
+===service-level shapes===
+Where was I before I stopped to add Deferred & fix bugs? Right. The service-level geomap widgets should now initialize their own shapesContainer. 
+
+===resize===
+resize is a method on the service object because shingled need to stretch the current image.
+
+I need to finally add resize to geographics.
+
+===find===
+find will have to query and include service level shapes.
+
+===map===
+This will be simpler if I allow services to get to the private map variables (similar to how I allow the service object to do it?). No, probably during create.
+
+Can you have protected properties in a jQuery UI widget? I would like to be able to pass a reference to the map during create...I could also use .data. That worked fine. I now have this._map which will be the same as this for the map object and a reference to the map object for services. Nice! On parts that need to work the same between maps and services, (such as _refreshShapes), I can just call this._map.x and it will be correct.
+
+===shapeStyle===
+This should be fine for services.
+
+==2012-01-27==
+===Deferred===
+The src function will be allowed to return a Deferred (or Promise) object. If it does, geomap will wait for the done or fail events. The src function will call resolve or fail.
+
+===service shapes===
+The opacity method might have to stay as a service method because it must directly manipulate image elements in some cases. However, the toggle method can operate on the new service container.
+
+===init services===
+So, the jQuery UI widget factory udpates non-array options fine, i.e., when I get into the _create method, this.options has whatever the user supplied merged in with the default options. However, array options are not copied so any changes to the initial service option are not maintained.
+
+Not true, but it does unfortunately merge the first user supplied service with the default service, osm.
+
+===options===
+I forget why I have _options and options. They are supposed to be internal vs exteternal but they are equal references.
+
+==2012-01-24==
+===a4===
+What's next for a4? static mode.
+
+===static mode===
+This shouldn't be too hard. Currently, any non-defined mode string will act close to static. That's different from how I want it to work. The mode "static" should be static and undefined modes should act like pan for now.
+
+The switch appears to have gone well. I can set the mode to "23" and it acts like it's in pan. That's a feature I will define more fully later and document before it's official.
+
+===labels===
+Time to merge labels into geographics. This is a huge step toward service-level shapes. I should be able to find all $labelsContainer references and move them into sections of geographics.
+
+Now that labelsContainer is part of shapesContainer, the next step is to put shapesContainer under a serviceContainer (which is inside servicesContainer). Got that?
+
+===service-level shapes===
+Here we go! Each serviceContainer has a div that contains all the images. The geographics widget will be a sibling of that.
+
+I may need a new container :/ the extra div was the tiled service's scale container. I need a container for the service/graphics elements.
+
+The map itself will have to manage this new container. I think the internal service objects will get this container and now append their functionality and elements to it. It will no longer have to return a new div for which the map will create a sub-geomap. 
+
+==2012-01-23==
+===addressing===
+I think address parsing (cracking) will be a useful feature for geocoding to non-Google geocoders. I might want to add that to $.geo at some point. Christian has some Python code that does it already I can port.
+
+==2012-01-21==
+===pinch aftermath===
+Adding pinch was pretty easy. The only big issue was if a second finger touched a short time after the first. To counter, I fake as if all touch has stopped and initiate a new one. There's room to consolidate code here but I'll get to that later.
+
+===drawPoint===
+This acted funny with pinch zoom in that when the second finger hit late, a shape event got triggered at the first finger.
+
+===draw other===
+Similar issue, touchstop gets triggered after pinch zoom and a segment is added to the shape. Maybe related to calling touchstop. We get in an odd state, actually. The segment shows up but the next touch causes it to disappear and a new one appear instead.
+
+I'm going to put this as a bug and get back to it later. There's much more actual functionality to get into alpha 4.
 
 ==2012-01-20==
 ===pinch===
@@ -520,7 +584,7 @@ I added gzip to jquerygeo.com & all subdomains. jQuery Geo (minified & gzipped) 
 I don't like that mouse move events seem laggy with this release. I need to find out what's different. I thought it was that I'm sending move events even while drawing that removing that hasn't helped.
 
 ===drawing===
-Wow, geomap._refreshDRawing was terrible and geographics._drawLines needed a little tweaking.
+Wow, geomap._refreshDrawing was terrible and geographics._drawLines needed a little tweaking.
 
 ===return false===
 I didn't have any return falses at the end of my event handlers. I hope that plus the drawing fix makes panning better.

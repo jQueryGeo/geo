@@ -1,7 +1,7 @@
 ﻿(function ($, undefined) {
   $.geo._serviceTypes.shingled = (function () {
     return {
-      create: function (map, servicesContainer, service, index) {
+      create: function (map, serviceContainer, service, index) {
         var serviceState = $.data(service, "geoServiceState");
 
         if ( !serviceState ) {
@@ -9,20 +9,18 @@
             loadCount: 0
           };
 
-          var idString = service.id ? ' id="' + service.id + '"' : "",
-              classString = service["class"] ? ' class="' + service["class"] + '"' : "",
-              scHtml = '<div class="geo-service" data-geo-service="shingled"' + idString + classString + ' style="position:absolute; left:0; top:0; width:16px; height:16px; margin:0; padding:0; display:' + (service.visibility === undefined || service.visibility === "visible" ? "block" : "none") + ';"></div>';
+          var scHtml = '<div data-geo-service="shingled" style="position:absolute; left:0; top:0; width:16px; height:16px; margin:0; padding:0;"></div>';
 
-          servicesContainer.append(scHtml);
+          serviceContainer.append(scHtml);
 
-          serviceState.serviceContainer = servicesContainer.children(":last");
+          serviceState.serviceContainer = serviceContainer.children(":last");
           $.data(service, "geoServiceState", serviceState);
         }
 
         return serviceState.serviceContainer;
       },
 
-      destroy: function (map, servicesContainer, service) {
+      destroy: function (map, serviceContainer, service) {
         var serviceState = $.data(service, "geoServiceState");
 
         serviceState.serviceContainer.remove();
@@ -134,7 +132,7 @@
             serviceContainer.find("img").attr("data-keepAlive", "0");
           }
 
-          var urlProp = ( "src" in service ? "src" : "getUrl" ),
+          var urlProp = ( service.hasOwnProperty("src") ? "src" : "getUrl" ),
               urlArgs = {
                 bbox: bbox,
                 width: mapWidth,
@@ -159,44 +157,19 @@
 
           scaleContainer.append('<img style="position:absolute; left:-' + halfWidth + 'px; top:-' + halfHeight + 'px; width:100%; height:100%; margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;" unselectable="on" />');
           $img = scaleContainer.children(":last").data("center", map._getCenter());
-          $img.load(function (e) {
-            if (opacity < 1) {
-              $(e.target).fadeTo(0, opacity);
-            } else {
-              $(e.target).show();
-            }
 
-            serviceState.loadCount--;
+          if ( typeof imageUrl === "string" ) {
+            this._loadImage( $img, imageUrl, pixelSize, serviceState, serviceContainer, opacity );
+          } else {
+            // assume Deferred
+            imageUrl.done( function( url ) {
+              this._loadImage( $img, url, pixelSize, serviceState, serviceContainer, opacity );
+            } ).fail( function( ) {
+              $img.remove( );
+              serviceState.loadCount--;
+            } );
+          }
 
-            if (serviceState.loadCount <= 0) {
-              serviceContainer.children(':not([data-pixelSize="' + pixelSize + '"])').remove();
-
-              var panContainer = serviceContainer.find('[data-pixelSize="' + pixelSize + '"]>div');
-              if (panContainer.size() > 0) {
-                var panContainerPos = panContainer.position();
-
-                panContainer.children("img").each(function (i) {
-                  var $thisimg = $(this),
-                      x = panContainerPos.left + parseInt($thisimg.css("left")),
-                      y = panContainerPos.top + parseInt($thisimg.css("top"));
-
-                  $thisimg.css({ left: x + "px", top: y + "px" });
-                }).unwrap();
-
-                panContainer.remove();
-              }
-
-              serviceState.loadCount = 0;
-            }
-          }).error(function (e) {
-            $(e.target).remove();
-            serviceState.loadCount--;
-
-            if (serviceState.loadCount <= 0) {
-              serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-              serviceState.loadCount = 0;
-            }
-          }).attr("src", imageUrl);
         }
       },
 
@@ -244,6 +217,47 @@
             serviceState.loadCount--;
           }
         }
+      },
+
+      _loadImage: function ( $img, url, pixelSize, serviceState, serviceContainer, opacity ) {
+        $img.load(function (e) {
+          if (opacity < 1) {
+            $(e.target).fadeTo(0, opacity);
+          } else {
+            $(e.target).show();
+          }
+
+          serviceState.loadCount--;
+
+          if (serviceState.loadCount <= 0) {
+            serviceContainer.children(':not([data-pixelSize="' + pixelSize + '"])').remove();
+
+            var panContainer = serviceContainer.find('[data-pixelSize="' + pixelSize + '"]>div');
+            if (panContainer.size() > 0) {
+              var panContainerPos = panContainer.position();
+
+              panContainer.children("img").each(function (i) {
+                var $thisimg = $(this),
+                    x = panContainerPos.left + parseInt($thisimg.css("left")),
+                    y = panContainerPos.top + parseInt($thisimg.css("top"));
+
+                $thisimg.css({ left: x + "px", top: y + "px" });
+              }).unwrap();
+
+              panContainer.remove();
+            }
+
+            serviceState.loadCount = 0;
+          }
+        }).error(function (e) {
+          $(e.target).remove();
+          serviceState.loadCount--;
+
+          if (serviceState.loadCount <= 0) {
+            serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+            serviceState.loadCount = 0;
+          }
+        }).attr("src", url);
       }
     }
   })();

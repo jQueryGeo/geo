@@ -1,7 +1,7 @@
 ﻿(function ($, undefined) {
   $.geo._serviceTypes.tiled = (function () {
     return {
-      create: function (map, servicesContainer, service, index) {
+      create: function (map, serviceContainer, service, index) {
         var serviceState = $.data(service, "geoServiceState");
 
         if ( !serviceState ) {
@@ -10,20 +10,19 @@
             reloadTiles: false
           };
 
-          var idString = service.id ? ' id="' + service.id + '"' : "",
-              classString = service["class"] ? ' class="' + service["class"] + '"' : "",
-              scHtml = '<div class="geo-service" data-geo-service="tiled"' + idString + classString + ' style="position:absolute; left:0; top:0; width:8px; height:8px; margin:0; padding:0; display:' + (service.visibility === undefined || service.visibility === "visible" ? "block" : "none") + ';"></div>';
+          var scHtml = '<div data-geo-service="tiled" style="position:absolute; left:0; top:0; width:8px; height:8px; margin:0; padding:0;"></div>';
 
-          servicesContainer.append(scHtml);
+          serviceContainer.append(scHtml);
 
-          serviceState.serviceContainer = servicesContainer.children(":last");
+          serviceState.serviceContainer = serviceContainer.children( ":last" );
+
           $.data(service, "geoServiceState", serviceState);
         }
 
         return serviceState.serviceContainer;
       },
 
-      destroy: function (map, servicesContainer, service) {
+      destroy: function (map, serviceContainer, service) {
         var serviceState = $.data(service, "geoServiceState");
 
         serviceState.serviceContainer.remove();
@@ -121,7 +120,7 @@
 
                       tileBbox = [bottomLeft[0], bottomLeft[1], topRight[0], topRight[1]],
 
-                      urlProp = ( "src" in service ? "src" : "getUrl" ),
+                      urlProp = ( service.hasOwnProperty("src") ? "src" : "getUrl" ),
                       urlArgs = {
                         bbox: tileBbox,
                         width: tileWidth,
@@ -163,30 +162,21 @@
 
                     scaleContainer.append( imgMarkup );
                     $img = scaleContainer.children(":last");
-                    $img.load(function (e) {
-                      if (opacity < 1) {
-                        $(e.target).fadeTo(0, opacity);
-                      } else {
-                        $(e.target).show();
-                      }
-
-                      serviceState.loadCount--;
-
-                      if (serviceState.loadCount <= 0) {
-                        serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-                        serviceState.loadCount = 0;
-                      }
-                    }).error(function (e) {
-                      $(e.target).remove();
-                      serviceState.loadCount--;
-
-                      if (serviceState.loadCount <= 0) {
-                        serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-                        serviceState.loadCount = 0;
-                      }
-                    }).attr("src", imageUrl);
-                    /* end same as refresh 4 */
                   }
+
+                  if ( typeof imageUrl === "string" ) {
+                    this._loadImage( $img, imageUrl, pixelSize, serviceState, serviceContainer, opacity );
+                  } else {
+                    // assume Deferred
+                    imageUrl.done( function( url ) {
+                      this._loadImage( $img, url, pixelSize, serviceState, serviceContainer, opacity );
+                    } ).fail( function( ) {
+                      $img.remove( );
+                      serviceState.loadCount--;
+                    } );
+                  }
+
+                  /* end same as refresh 4 */
                 }
               }
             }
@@ -326,7 +316,7 @@
 
                     tileBbox = [bottomLeft[0], bottomLeft[1], topRight[0], topRight[1]],
 
-                    urlProp = ( "src" in service ? "src" : "getUrl" ),
+                    urlProp = ( service.hasOwnProperty( "src" ) ? "src" : "getUrl" ),
                     urlArgs = {
                       bbox: tileBbox,
                       width: tileWidth,
@@ -366,28 +356,18 @@
 
                   scaleContainer.append(imgMarkup);
                   $img = scaleContainer.children(":last");
-                  $img.load(function (e) {
-                    if (opacity < 1) {
-                      $(e.target).fadeTo(0, opacity);
-                    } else {
-                      $(e.target).show();
-                    }
+                }
 
+                if ( typeof imageUrl === "string" ) {
+                  this._loadImage( $img, imageUrl, pixelSize, serviceState, $serviceContainer, opacity );
+                } else {
+                  // assume Deferred
+                  imageUrl.done( function( url ) {
+                    this._loadImage( $img, url, pixelSize, serviceState, $serviceContainer, opacity );
+                  } ).fail( function( ) {
+                    $img.remove( );
                     serviceState.loadCount--;
-
-                    if (serviceState.loadCount <= 0) {
-                      $serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-                      serviceState.loadCount = 0;
-                    }
-                  }).error(function (e) {
-                    $(e.target).remove();
-                    serviceState.loadCount--;
-
-                    if (serviceState.loadCount <= 0) {
-                      $serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-                      serviceState.loadCount = 0;
-                    }
-                  }).attr("src", imageUrl);
+                  } );
                 }
               }
             }
@@ -420,6 +400,31 @@
             serviceState.loadCount--;
           }
         }
+      },
+
+      _loadImage: function ( $img, url, pixelSize, serviceState, serviceContainer, opacity ) {
+        $img.load(function (e) {
+          if (opacity < 1) {
+            $(e.target).fadeTo(0, opacity);
+          } else {
+            $(e.target).show();
+          }
+
+          serviceState.loadCount--;
+
+          if (serviceState.loadCount <= 0) {
+            serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+            serviceState.loadCount = 0;
+          }
+        }).error(function (e) {
+          $(e.target).remove();
+          serviceState.loadCount--;
+
+          if (serviceState.loadCount <= 0) {
+            serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+            serviceState.loadCount = 0;
+          }
+        }).attr("src", url);
       }
     };
   })();
