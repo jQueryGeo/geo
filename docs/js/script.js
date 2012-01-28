@@ -18,7 +18,7 @@ $(function () {
   });
 
   $(".ui-page").live("pageshow", function () {
-    $(this).find(".geomap-indoc").geomap({ zoom: 1 });
+    $(this).find(".geomap-indoc").geomap({ zoom: 1, scroll: "off" });
   });
 
   $(".ui-page").live("pagebeforehide", function () {

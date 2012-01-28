@@ -1,0 +1,52 @@
+<!doctype html>  
+
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+
+  <title>recenter | $.geo</title>
+  <meta name="description" content="jQuery Geo recenter method">
+  <meta name="author" content="Ryan Westphal">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="../css/style.css?v=2">
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
+</head>
+
+<body>
+
+  <div id="recenter" data-role="page">
+    <div data-role="header" data-theme="b">
+      <h1>recenter</h1>
+    </div>
+    
+    <div data-role="content">
+      <table>
+        <tr>
+          <th>return type</th>
+          <td>Array ( <a href="http://geojson.org/geojson-spec.html#bounding-boxes" rel="external">GeoJSON bounding box</a> ) </td>
+        </tr>
+        <tr>
+          <th>syntax</th>
+          <td>$.geo.recenter( Array bbox ( <a href="http://geojson.org/geojson-spec.html#bounding-boxes" rel="external">GeoJSON bounding box</a> ), Array (<a href="http://geojson.org/geojson-spec.html#positions" rel="external">GeoJSON position</a>) )</td>
+        </tr>
+        <tr>
+          <th>usage</th>
+          <td><pre><code>var moved = $.geo.recenter( bbox, [ -70, 42 ] )</pre></code></td>
+        </tr>
+      </table>
+
+      <p>The recenter method creates a new bbox with the same width and height as the original but moving the center to a new location.</p>
+
+      <p>This function is not defined in JTS.</p>
+    </div>
+  </div> <!-- end of #container -->
+
+  <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
+  <script src="../js/script.js"></script>
+  <script src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
+</body>
+</html>
+

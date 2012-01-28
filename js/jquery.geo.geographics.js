@@ -16,6 +16,7 @@
 
     _$canvas: undefined,
     _context: undefined,
+    _$labelsContainer: undefined,
 
     options: {
       style: {
@@ -51,19 +52,24 @@
         this._height = parseInt(this._$elem.css("height"));
       }
 
+      var sizeCss = 'style="position:absolute; left:0; top:0; width:' + this._width + 'px; height:' + this._height + 'px; margin:0; padding:0;"';
+
       if (document.createElement('canvas').getContext) {
-        this._$elem.append('<canvas width="' + this._width + '" height="' + this._height + '" style="position:absolute; left:0; top:0; width:' + this._width + 'px; height:' + this._height + 'px;"></canvas>');
+        this._$elem.append('<canvas width="' + this._width + '" height="' + this._height + '" ' + sizeCss + '></canvas>');
         this._$canvas = this._$elem.children(':last');
         this._context = this._$canvas[0].getContext("2d");
       } else if (_ieVersion <= 8) {
         this._trueCanvas = false;
-        this._$elem.append('<div width="' + this._width + '" height="' + this._height + '" style="position:absolute; left:0; top:0; width:' + this._width + 'px; height:' + this._height + 'px; margin:0; padding:0;"></div>');
+        this._$elem.append('<div width="' + this._width + '" height="' + this._height + '" ' + sizeCss + '></div>');
         this._$canvas = this._$elem.children(':last');
 
         G_vmlCanvasManager.initElement(this._$canvas[0]);
         this._context = this._$canvas[0].getContext("2d");
         this._$canvas.children().css({ backgroundColor: "transparent", width: this._width, height: this._height });
       }
+
+      this._$elem.append('<div class="geo-labels-container" ' + sizeCss + '></div>');
+      this._$labelsContainer = this._$elem.children(':last');
     },
 
     _setOption: function (key, value) {
@@ -80,6 +86,7 @@
 
     clear: function () {
       this._context.clearRect(0, 0, this._width, this._height);
+      this._$labelsContainer.html("");
     },
 
     drawArc: function (coordinates, startAngle, sweepAngle, style) {
@@ -181,6 +188,10 @@
         [bbox[2], bbox[1]],
         [bbox[0], bbox[1]]
       ]], true, style);
+    },
+
+    drawLabel: function( coordinates, label ) {
+      this._$labelsContainer.append( '<div class="geo-label" style="position:absolute; left:' + coordinates[ 0 ] + 'px; top:' + coordinates[ 1 ] + 'px;">' + label + '</div>');
     },
 
     _getGraphicStyle: function (style) {
