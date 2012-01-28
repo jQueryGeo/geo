@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>geomap empty service test</title>
+  <meta name="description" content="Small test of jQuery Geo's shape functions">
+  <meta name="author" content="Ryan Westphal">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+</head>
+<body>
+  <div>
+    <a href="../" class="docLink">&lt; docs</a>
+    <h1>geomap empty service test</h1>
+    <p>This page is similar to the regular empty example but tests removing all shapes from a specific service instead of the map itself.</p>
+    <button type="button">Empty</button>
+    <div class="geomap" style="width: 640px; height: 480px;">
+    </div>
+  </div>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+  <script src="../../js/jquery.geo.head.js"></script>
+  <script src="../../js/excanvas.js"></script>
+  <script src="../../js/jquery.mousewheel.min.js"></script>
+  <script src="../../js/jquery.ui.widget.js"></script>
+  <script src="../../js/jsrender.js"></script>
+  <script src="../../js/jquery.geo.core.js"></script>
+  <script src="../../js/jquery.geo.geographics.js"></script>
+  <script src="../../js/jquery.geo.geomap.js"></script>
+  <script src="../../js/jquery.geo.tiled.js"></script>
+  <script src="../../js/jquery.geo.shingled.js"></script>
+  <!--<script src="../jquery.geo-test.min.js"></script>-->
+  <script>
+    $(function () {
+      var geomap = $(".geomap").geomap({
+            center: [-71.05, 42.35],
+            zoom: 13,
+            click: function (e, geo) {
+              geomap.find( ".osm" ).geomap("append", geo);
+            }
+          }),
+          service = geomap.find( ".osm" );
+
+      $("button").click(function () {
+        service.geomap("empty");
+      });
+    });
+  </script>
+</body>
+</html>

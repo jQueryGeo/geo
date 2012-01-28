@@ -537,10 +537,12 @@
     },
 
     empty: function ( refresh ) {
-      $.each( this._graphicShapes, function( ) {
-        $.removeData( this, "geoBbox" );
-      } );
+      for ( var i = 0; i < this._graphicShapes.length; i++ ) {
+        $.removeData( this._graphicShapes[ i ].shape, "geoBbox" );
+      }
+
       this._graphicShapes = [];
+
       if ( refresh === undefined || refresh ) {
         this._refresh();
       }
@@ -590,18 +592,12 @@
     },
 
     remove: function ( shape, refresh ) {
-      var graphicShapes = this._graphicShapes,
-          graphicShape,
-          i = 0;
-
-      for ( ; i < graphicShapes.length; i++ ) {
-        graphicShape = graphicShapes[ i ];
-
-        if ( graphicShape.shape == shape ) {
+      for ( var i = 0; i < this._graphicShapes.length; i++ ) {
+        if ( this._graphicShapes[ i ].shape == shape ) {
           $.removeData( shape, "geoBbox" );
-          var rest = graphicShapes.slice( i + 1 );
-          graphicShapes.length = i;
-          graphicShapes.push.apply( graphicShapes, rest );
+          var rest = this._graphicShapes.slice( i + 1 );
+          this._graphicShapes.length = i;
+          this._graphicShapes.push.apply( this._graphicShapes, rest );
           break;
         }
       }

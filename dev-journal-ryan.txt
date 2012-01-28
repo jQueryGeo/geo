@@ -1,5 +1,5 @@
 ﻿== to do ==
-* geomap - service-level shapes
+* geomap - service-level find
 * geographics - add a resize method, call from geomap.resize
 * geo - add recenter function for bbox
 * geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
@@ -161,6 +161,9 @@ find will have to query and include service level shapes.
 This will be simpler if I allow services to get to the private map variables (similar to how I allow the service object to do it?). No, probably during create.
 
 Can you have protected properties in a jQuery UI widget? I would like to be able to pass a reference to the map during create...I could also use .data. That worked fine. I now have this._map which will be the same as this for the map object and a reference to the map object for services. Nice! On parts that need to work the same between maps and services, (such as _refreshShapes), I can just call this._map.x and it will be correct.
+
+===shapeStyle===
+This should be fine for services.
 
 ==2012-01-27==
 ===Deferred===
