@@ -5473,45 +5473,21 @@ function try$( selector ) {
 
                     scaleContainer.append( imgMarkup );
                     $img = scaleContainer.children(":last");
-
-                    if ( typeof imageUrl === "string" ) {
-                      loadImage( $img, imageUrl );
-                    } else {
-                      // assume Deferred
-                      imageUrl.done( function( url ) {
-                        loadImage( $img, url );
-                      } ).fail( function( ) {
-                        $img.remove( );
-                        serviceState.loadCount--;
-                      } );
-                    }
-
-                    function loadImage( $img, url ) {
-                      $img.load(function (e) {
-                        if (opacity < 1) {
-                          $(e.target).fadeTo(0, opacity);
-                        } else {
-                          $(e.target).show();
-                        }
-
-                        serviceState.loadCount--;
-
-                        if (serviceState.loadCount <= 0) {
-                          serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-                          serviceState.loadCount = 0;
-                        }
-                      }).error(function (e) {
-                        $(e.target).remove();
-                        serviceState.loadCount--;
-
-                        if (serviceState.loadCount <= 0) {
-                          serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-                          serviceState.loadCount = 0;
-                        }
-                      }).attr("src", url);
-                    }
-                    /* end same as refresh 4 */
                   }
+
+                  if ( typeof imageUrl === "string" ) {
+                    this._loadImage( $img, imageUrl, pixelSize, serviceState, serviceContainer, opacity );
+                  } else {
+                    // assume Deferred
+                    imageUrl.done( function( url ) {
+                      this._loadImage( $img, url, pixelSize, serviceState, serviceContainer, opacity );
+                    } ).fail( function( ) {
+                      $img.remove( );
+                      serviceState.loadCount--;
+                    } );
+                  }
+
+                  /* end same as refresh 4 */
                 }
               }
             }
@@ -5651,7 +5627,7 @@ function try$( selector ) {
 
                     tileBbox = [bottomLeft[0], bottomLeft[1], topRight[0], topRight[1]],
 
-                    urlProp = ( "src" in service ? "src" : "getUrl" ),
+                    urlProp = ( service.hasOwnProperty( "src" ) ? "src" : "getUrl" ),
                     urlArgs = {
                       bbox: tileBbox,
                       width: tileWidth,
@@ -5691,43 +5667,18 @@ function try$( selector ) {
 
                   scaleContainer.append(imgMarkup);
                   $img = scaleContainer.children(":last");
+                }
 
-                  if ( typeof imageUrl === "string" ) {
-                    loadImage( $img, imageUrl );
-                  } else {
-                    // assume Deferred
-                    imageUrl.done( function( url ) {
-                      loadImage( $img, url );
-                    } ).fail( function( ) {
-                      $img.remove( );
-                      serviceState.loadCount--;
-                    } );
-                  }
-
-                  function loadImage( $img, url ) {
-                    $img.load(function (e) {
-                      if (opacity < 1) {
-                        $(e.target).fadeTo(0, opacity);
-                      } else {
-                        $(e.target).show();
-                      }
-
-                      serviceState.loadCount--;
-
-                      if (serviceState.loadCount <= 0) {
-                        $serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-                        serviceState.loadCount = 0;
-                      }
-                    }).error(function (e) {
-                      $(e.target).remove();
-                      serviceState.loadCount--;
-
-                      if (serviceState.loadCount <= 0) {
-                        $serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-                        serviceState.loadCount = 0;
-                      }
-                    }).attr("src", url);
-                  }
+                if ( typeof imageUrl === "string" ) {
+                  this._loadImage( $img, imageUrl, pixelSize, serviceState, $serviceContainer, opacity );
+                } else {
+                  // assume Deferred
+                  imageUrl.done( function( url ) {
+                    this._loadImage( $img, url, pixelSize, serviceState, $serviceContainer, opacity );
+                  } ).fail( function( ) {
+                    $img.remove( );
+                    serviceState.loadCount--;
+                  } );
                 }
               }
             }
@@ -5760,6 +5711,31 @@ function try$( selector ) {
             serviceState.loadCount--;
           }
         }
+      },
+
+      _loadImage: function ( $img, url, pixelSize, serviceState, serviceContainer, opacity ) {
+        $img.load(function (e) {
+          if (opacity < 1) {
+            $(e.target).fadeTo(0, opacity);
+          } else {
+            $(e.target).show();
+          }
+
+          serviceState.loadCount--;
+
+          if (serviceState.loadCount <= 0) {
+            serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+            serviceState.loadCount = 0;
+          }
+        }).error(function (e) {
+          $(e.target).remove();
+          serviceState.loadCount--;
+
+          if (serviceState.loadCount <= 0) {
+            serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+            serviceState.loadCount = 0;
+          }
+        }).attr("src", url);
       }
     };
   })();
@@ -5925,57 +5901,17 @@ function try$( selector ) {
           $img = scaleContainer.children(":last").data("center", map._getCenter());
 
           if ( typeof imageUrl === "string" ) {
-            loadImage( $img, imageUrl );
+            this._loadImage( $img, imageUrl, pixelSize, serviceState, serviceContainer, opacity );
           } else {
             // assume Deferred
             imageUrl.done( function( url ) {
-              loadImage( $img, url );
+              this._loadImage( $img, url, pixelSize, serviceState, serviceContainer, opacity );
             } ).fail( function( ) {
               $img.remove( );
               serviceState.loadCount--;
             } );
           }
 
-          function loadImage( $img, url ) {
-            $img.load(function (e) {
-              if (opacity < 1) {
-                $(e.target).fadeTo(0, opacity);
-              } else {
-                $(e.target).show();
-              }
-
-              serviceState.loadCount--;
-
-              if (serviceState.loadCount <= 0) {
-                serviceContainer.children(':not([data-pixelSize="' + pixelSize + '"])').remove();
-
-                var panContainer = serviceContainer.find('[data-pixelSize="' + pixelSize + '"]>div');
-                if (panContainer.size() > 0) {
-                  var panContainerPos = panContainer.position();
-
-                  panContainer.children("img").each(function (i) {
-                    var $thisimg = $(this),
-                        x = panContainerPos.left + parseInt($thisimg.css("left")),
-                        y = panContainerPos.top + parseInt($thisimg.css("top"));
-
-                    $thisimg.css({ left: x + "px", top: y + "px" });
-                  }).unwrap();
-
-                  panContainer.remove();
-                }
-
-                serviceState.loadCount = 0;
-              }
-            }).error(function (e) {
-              $(e.target).remove();
-              serviceState.loadCount--;
-
-              if (serviceState.loadCount <= 0) {
-                serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-                serviceState.loadCount = 0;
-              }
-            }).attr("src", url);
-          }
         }
       },
 
@@ -6023,6 +5959,47 @@ function try$( selector ) {
             serviceState.loadCount--;
           }
         }
+      },
+
+      _loadImage: function ( $img, url, pixelSize, serviceState, serviceContainer, opacity ) {
+        $img.load(function (e) {
+          if (opacity < 1) {
+            $(e.target).fadeTo(0, opacity);
+          } else {
+            $(e.target).show();
+          }
+
+          serviceState.loadCount--;
+
+          if (serviceState.loadCount <= 0) {
+            serviceContainer.children(':not([data-pixelSize="' + pixelSize + '"])').remove();
+
+            var panContainer = serviceContainer.find('[data-pixelSize="' + pixelSize + '"]>div');
+            if (panContainer.size() > 0) {
+              var panContainerPos = panContainer.position();
+
+              panContainer.children("img").each(function (i) {
+                var $thisimg = $(this),
+                    x = panContainerPos.left + parseInt($thisimg.css("left")),
+                    y = panContainerPos.top + parseInt($thisimg.css("top"));
+
+                $thisimg.css({ left: x + "px", top: y + "px" });
+              }).unwrap();
+
+              panContainer.remove();
+            }
+
+            serviceState.loadCount = 0;
+          }
+        }).error(function (e) {
+          $(e.target).remove();
+          serviceState.loadCount--;
+
+          if (serviceState.loadCount <= 0) {
+            serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+            serviceState.loadCount = 0;
+          }
+        }).attr("src", url);
       }
     }
   })();
