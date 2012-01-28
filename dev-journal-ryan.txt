@@ -1,5 +1,6 @@
 ﻿== to do ==
 * geomap - service-level shapes
+* geographics - add a resize method, call from geomap.resize
 * geo - add recenter function for bbox
 * geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
 * geomap - service object visibility and opacity options should be moved to a style property
@@ -114,7 +115,6 @@
 * geomap - [bug] mouse wheel on bad or missing tile doesn't zoom out on first rotate
 * docs/geomap - store WKT input for each service
 * geographics - rename the generated style properties to something simple or get better control over closure compiler
-* geographics - add a resize method, call from geomap.resize
 * geomap - document and implement find's callback syntax
 * geomap - repeat horizontal tiles
 * geomap - custering demo/support
@@ -144,6 +144,23 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-01-28==
+===service-level shapes===
+Where was I before I stopped to add Deferred & fix bugs? Right. The service-level geomap widgets should now initialize their own shapesContainer. 
+
+===resize===
+resize is a method on the service object because shingled need to stretch the current image.
+
+I need to finally add resize to geographics.
+
+===find===
+find will have to query and include service level shapes.
+
+===map===
+This will be simpler if I allow services to get to the private map variables (similar to how I allow the service object to do it?). No, probably during create.
+
+Can you have protected properties in a jQuery UI widget? I would like to be able to pass a reference to the map during create...I could also use .data. That worked fine. I now have this._map which will be the same as this for the map object and a reference to the map object for services. Nice! On parts that need to work the same between maps and services, (such as _refreshShapes), I can just call this._map.x and it will be correct.
 
 ==2012-01-27==
 ===Deferred===
@@ -565,7 +582,7 @@ I added gzip to jquerygeo.com & all subdomains. jQuery Geo (minified & gzipped) 
 I don't like that mouse move events seem laggy with this release. I need to find out what's different. I thought it was that I'm sending move events even while drawing that removing that hasn't helped.
 
 ===drawing===
-Wow, geomap._refreshDRawing was terrible and geographics._drawLines needed a little tweaking.
+Wow, geomap._refreshDrawing was terrible and geographics._drawLines needed a little tweaking.
 
 ===return false===
 I didn't have any return falses at the end of my event handlers. I hope that plus the drawing fix makes panning better.

@@ -52,7 +52,8 @@
 
   $.widget("geo.geomap", {
     // private widget members
-    _$elem: undefined,
+    _$elem: undefined, //< map div for maps, service div for services
+    _map: undefined, //< only defined in services
     _created: false,
 
     _contentBounds: {},
@@ -129,6 +130,9 @@
       this._$elem = $(element);
 
       if (this._$elem.is(".geo-service")) {
+        var $contentFrame = this._$elem.closest( ".geo-content-frame" );
+        this._$elem.append('<div class="geo-shapes-container" style="position:absolute; left:0; top:0; width:' + $contentFrame.css( "width" ) + '; height:' + $contentFrame.css( "height" ) + '; margin:0; padding:0;"></div>');
+        this._$shapesContainer = this._$elem.children(':last');
         $.Widget.prototype._createWidget.apply(this, arguments);
         return;
       }
@@ -185,8 +189,13 @@
 
     _create: function () {
       if (this._$elem.is(".geo-service")) {
+        this._map = this._$elem.data( "geoMap" );
+        this._$shapesContainer.geographics( );
+        this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
         return;
       }
+
+      this._map = this;
 
       this._options = this.options;
 
@@ -214,7 +223,7 @@
         if (geomap._resizeTimeout) {
           clearTimeout(geomap._resizeTimeout);
         }
-        this._resizeTimeout = setTimeout(function () {
+        geomap._resizeTimeout = setTimeout(function () {
           if (geomap._created) {
             geomap._$elem.geomap("resize");
           }
@@ -347,13 +356,14 @@
     },
 
     destroy: function () {
-      if (this._$elem.is(".geo-map")) {
+      if ( this._$elem.is(".geo-service") ) {
+        this._$shapesContainer.geographics("destroy");
+      } else {
         this._created = false;
 
         $(window).unbind("resize", this._windowHandler);
 
         for ( var i = 0; i < this._currentServices.length; i++ ) {
-          // TODO: destroy service-level geographics
           this._currentServices[i].serviceContainer.geomap("destroy");
           $.geo["_serviceTypes"][this._currentServices[i].type].destroy(this, this._$servicesContainer, this._currentServices[i]);
         }
@@ -366,6 +376,7 @@
         this._$elem.append(this._$existingChildren);
         this._$elem.removeClass("geo-map");
       }
+
       $.Widget.prototype.destroy.apply(this, arguments);
     },
 
@@ -457,19 +468,18 @@
         height: size["height"]
       });
 
+      // TODO: call geographics resize on these and serviceShapesContainers
       this._$drawContainer.geographics("destroy");
       this._$shapesContainer.geographics("destroy");
 
       for (i = 0; i < this._currentServices.length; i++) {
-        // TODO: destroy service-level geographics
         $.geo["_serviceTypes"][this._currentServices[i].type].resize(this, this._currentServices[i]);
-        // TODO: recreate service-level geographics
       }
 
-      this._$panContainer.css({
+      this._$panContainer.css( {
         width: size.width,
         height: size.height
-      });
+      } );
 
       this._$shapesContainer.geographics( { style: shapeStyle } );
       this._$drawContainer.geographics( { style: drawStyle } );
@@ -580,16 +590,21 @@
     },
 
     remove: function ( shape, refresh ) {
-      var geomap = this;
-      $.each( this._graphicShapes, function ( i ) {
-        if ( this.shape == shape ) {
+      var graphicShapes = this._graphicShapes,
+          graphicShape,
+          i = 0;
+
+      for ( ; i < graphicShapes.length; i++ ) {
+        graphicShape = graphicShapes[ i ];
+
+        if ( graphicShape.shape == shape ) {
           $.removeData( shape, "geoBbox" );
-          var rest = geomap._graphicShapes.slice( i + 1 );
-          geomap._graphicShapes.length = i;
-          geomap._graphicShapes.push.apply(geomap._graphicShapes, rest);
-          return false;
+          var rest = graphicShapes.slice( i + 1 );
+          graphicShapes.length = i;
+          graphicShapes.push.apply( graphicShapes, rest );
+          break;
         }
-      });
+      }
 
       if ( refresh === undefined || refresh ) {
         this._refresh();
@@ -723,7 +738,7 @@
         
         $.geo["_serviceTypes"][this._currentServices[i].type].create(this, serviceContainer, this._currentServices[i], i);
 
-        serviceContainer.geomap();
+        serviceContainer.data( "geoMap", this ).geomap();
       }
     },
 
@@ -810,7 +825,7 @@
           label,
           hasLabel,
           labelPixel,
-          bbox = this._getBbox(center, pixelSize);
+          bbox = this._map._getBbox(center, pixelSize);
 
       for (i = 0; i < shapes.length; i++) {
         shape = shapes[i].shape || shapes[i];
@@ -828,43 +843,43 @@
 
         switch (shape.type) {
           case "Point":
-            labelPixel = this.toPixel( shape.coordinates, center, pixelSize );
+            labelPixel = this._map.toPixel( shape.coordinates, center, pixelSize );
             this._$shapesContainer.geographics("drawPoint", labelPixel, style);
             break;
           case "LineString":
-            this._$shapesContainer.geographics("drawLineString", this.toPixel(shape.coordinates, center, pixelSize), style);
+            this._$shapesContainer.geographics("drawLineString", this._map.toPixel(shape.coordinates, center, pixelSize), style);
             if ( hasLabel ) {
-              labelPixel = this.toPixel( $.geo.pointAlong( shape, .5 ).coordinates, center, pixelSize );
+              labelPixel = this._map.toPixel( $.geo.pointAlong( shape, .5 ).coordinates, center, pixelSize );
             }
             break;
           case "Polygon":
-            this._$shapesContainer.geographics("drawPolygon", this.toPixel(shape.coordinates, center, pixelSize), style);
+            this._$shapesContainer.geographics("drawPolygon", this._map.toPixel(shape.coordinates, center, pixelSize), style);
             if ( hasLabel ) {
-              labelPixel = this.toPixel( $.geo.centroid( shape ).coordinates, center, pixelSize );
+              labelPixel = this._map.toPixel( $.geo.centroid( shape ).coordinates, center, pixelSize );
             }
             break;
           case "MultiPoint":
             for (mgi = 0; mgi < shape.coordinates.length; mgi++) {
-              this._$shapesContainer.geographics("drawPoint", this.toPixel(shape.coordinates[mgi], center, pixelSize), style);
+              this._$shapesContainer.geographics("drawPoint", this._map.toPixel(shape.coordinates[mgi], center, pixelSize), style);
             }
             if ( hasLabel ) {
-              labelPixel = this.toPixel( $.geo.centroid( shape ).coordinates, center, pixelSize );
+              labelPixel = this._map.toPixel( $.geo.centroid( shape ).coordinates, center, pixelSize );
             }
             break;
           case "MultiLineString":
             for (mgi = 0; mgi < shape.coordinates.length; mgi++) {
-              this._$shapesContainer.geographics("drawLineString", this.toPixel(shape.coordinates[mgi], center, pixelSize), style);
+              this._$shapesContainer.geographics("drawLineString", this._map.toPixel(shape.coordinates[mgi], center, pixelSize), style);
             }
             if ( hasLabel ) {
-              labelPixel = this.toPixel( $.geo.centroid( shape ).coordinates, center, pixelSize );
+              labelPixel = this._map.toPixel( $.geo.centroid( shape ).coordinates, center, pixelSize );
             }
             break;
           case "MultiPolygon":
             for (mgi = 0; mgi < shape.coordinates.length; mgi++) {
-              this._$shapesContainer.geographics("drawPolygon", this.toPixel(shape.coordinates[mgi], center, pixelSize), style);
+              this._$shapesContainer.geographics("drawPolygon", this._map.toPixel(shape.coordinates[mgi], center, pixelSize), style);
             }
             if ( hasLabel ) {
-              labelPixel = this.toPixel( $.geo.centroid( shape ).coordinates, center, pixelSize );
+              labelPixel = this._map.toPixel( $.geo.centroid( shape ).coordinates, center, pixelSize );
             }
             break;
 
@@ -1058,16 +1073,17 @@
     },
 
     _refresh: function () {
-      for (var i = 0; i < this._options["services"].length; i++) {
-        var service = this._options["services"][i];
-        if (!this._mouseDown && $.geo["_serviceTypes"][service.type] != null) {
-          $.geo["_serviceTypes"][service.type].refresh(this, service);
+      if ( this._$elem.not( ".geo-service" ).length > 0 ) {
+        for (var i = 0; i < this._options["services"].length; i++) {
+          var service = this._options["services"][i];
+          if (!this._mouseDown && $.geo["_serviceTypes"][service.type] != null) {
+            $.geo["_serviceTypes"][service.type].refresh(this, service);
+          }
         }
       }
 
       if (this._$shapesContainer) {
         this._$shapesContainer.geographics("clear");
-        //this._$labelsContainer.html("");
         if (this._graphicShapes.length > 0) {
           this._refreshShapes(this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes);
         }
