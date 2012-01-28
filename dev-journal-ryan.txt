@@ -1,5 +1,4 @@
 ﻿== to do ==
-* geomap - service-level find
 * geographics - add a resize method, call from geomap.resize
 * geo - add recenter function for bbox
 * geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null

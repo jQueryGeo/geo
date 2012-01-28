@@ -269,13 +269,15 @@
     },
 
     _setOption: function (key, value, refresh) {
-      if ( this._$elem.is( ".geo-service" ) || key == "pixelSize" ) {
+      if ( key == "pixelSize" ) {
         return;
       }
 
       refresh = (refresh === undefined || refresh);
 
-      this._panFinalize();
+      if ( this._$elem.is( ".geo-map" ) ) {
+        this._panFinalize();
+      }
 
       switch (key) {
         case "bbox":
@@ -348,7 +350,6 @@
         case "shapeStyle":
           if ( refresh ) {
             this._$shapesContainer.geographics("clear");
-            //this._$labelsContainer.html("");
             this._refreshShapes( this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes );
           }
           break;
@@ -549,18 +550,23 @@
     },
 
     find: function (point, pixelTolerance) {
-      var searchPixel = this.toPixel( point.coordinates ),
-          mapTol = this._pixelSize * pixelTolerance,
+      var searchPixel = this._map.toPixel( point.coordinates ),
+          mapTol = this._map._pixelSize * pixelTolerance,
           result = [],
-          curGeom;
+          graphicShape,
+          geometries,
+          curGeom,
+          i = 0;
 
-      $.each( this._graphicShapes, function ( i ) {
-        if ( this.shape.type == "Point" ) {
-          if ( $.geo.distance(this.shape, point) <= mapTol ) {
-            result.push( this.shape );
+      for ( ; i < this._graphicShapes.length; i++ ) {
+        graphicShape = this._graphicShapes[ i ];
+
+        if ( graphicShape.shape.type == "Point" ) {
+          if ( $.geo.distance( graphicShape.shape, point ) <= mapTol ) {
+            result.push( graphicShape.shape );
           }
         } else {
-          var bbox = $.data( this.shape, "geoBbox" ),
+          var bbox = $.data( graphicShape.shape, "geoBbox" ),
               bboxPolygon = {
                 type: "Polygon",
                 coordinates: [ [
@@ -577,16 +583,22 @@
               };
 
           if ( $.geo.distance( bboxPolygon, projectedPoint, true ) <= mapTol ) {
-            var geometries = $.geo._flatten( this.shape );
+            geometries = $.geo._flatten( graphicShape.shape );
             for ( curGeom = 0; curGeom < geometries.length; curGeom++ ) {
-              if ( $.geo.distance( geometries[curGeom], point ) <= mapTol ) {
-                result.push( this.shape );
+              if ( $.geo.distance( geometries[ curGeom ], point ) <= mapTol ) {
+                result.push( graphicShape.shape );
                 break;
               }
             }
           }
         }
-      });
+      }
+
+      if ( this._$elem.is( ".geo-map" ) ) {
+        this._$elem.find( ".geo-service" ).each( function( ) {
+          result = $.merge( result, $( this ).geomap( "find", point, pixelTolerance ) );
+        } );
+      }
 
       return result;
     },

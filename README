@@ -51,6 +51,7 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * geomap - allow Deferred or Promise as return value from src function
 * geomap - [bug] resize event triggered too many times during resize
 * geomap - service-level shapes
+* geomap - service-level find
 
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon
