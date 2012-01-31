@@ -3321,6 +3321,8 @@ function try$( selector ) {
         this._$elem.css("position", "relative");
       }
 
+      this._$elem.addClass( "geo-graphics" );
+
       this._width = this._$elem.width();
       this._height = this._$elem.height();
 
@@ -3329,15 +3331,17 @@ function try$( selector ) {
         this._height = parseInt(this._$elem.css("height"));
       }
 
-      var sizeCss = 'style="position:absolute; left:0; top:0; width:' + this._width + 'px; height:' + this._height + 'px; margin:0; padding:0;"';
+      var posCss = 'position:absolute;left:0;top:0;margin:0;padding:0;',
+          sizeCss = 'width:' + this._width + 'px;height:' + this._height + 'px;',
+          sizeAttr = 'width="' + this._width + '" height="' + this._height + '"';
 
       if (document.createElement('canvas').getContext) {
-        this._$elem.append('<canvas width="' + this._width + '" height="' + this._height + '" ' + sizeCss + '></canvas>');
+        this._$elem.append('<canvas ' + sizeAttr + ' style="' + posCss + '"></canvas>');
         this._$canvas = this._$elem.children(':last');
         this._context = this._$canvas[0].getContext("2d");
       } else if (_ieVersion <= 8) {
         this._trueCanvas = false;
-        this._$elem.append('<div width="' + this._width + '" height="' + this._height + '" ' + sizeCss + '></div>');
+        this._$elem.append( '<div ' + sizeAttr + ' style="' + posCss + sizeCss + '"></div>');
         this._$canvas = this._$elem.children(':last');
 
         G_vmlCanvasManager.initElement(this._$canvas[0]);
@@ -3345,7 +3349,7 @@ function try$( selector ) {
         this._$canvas.children().css({ backgroundColor: "transparent", width: this._width, height: this._height });
       }
 
-      this._$elem.append('<div class="geo-labels-container" ' + sizeCss + '></div>');
+      this._$elem.append('<div class="geo-labels-container" style="' + posCss + sizeCss + '"></div>');
       this._$labelsContainer = this._$elem.children(':last');
     },
 
@@ -3359,6 +3363,7 @@ function try$( selector ) {
     destroy: function () {
       $.Widget.prototype.destroy.apply(this, arguments);
       this._$elem.html("");
+      this._$elem.removeClass( "geo-graphics" );
     },
 
     clear: function () {
@@ -3469,6 +3474,27 @@ function try$( selector ) {
 
     drawLabel: function( coordinates, label ) {
       this._$labelsContainer.append( '<div class="geo-label" style="position:absolute; left:' + coordinates[ 0 ] + 'px; top:' + coordinates[ 1 ] + 'px;">' + label + '</div>');
+    },
+
+    resize: function( ) {
+      this._width = this._$elem.width();
+      this._height = this._$elem.height();
+
+      if (!(this._width && this._height)) {
+        this._width = parseInt(this._$elem.css("width"));
+        this._height = parseInt(this._$elem.css("height"));
+      }
+
+      if ( this._trueCanvas ) {
+        this._$canvas[0].width = this._width;
+        this._$canvas[0].height = this._height;
+      } else {
+      }
+
+      this._$labelsContainer.css( {
+        width: this._width,
+        height: this._height
+      } );
     },
 
     _getGraphicStyle: function (style) {
@@ -3591,6 +3617,8 @@ function try$( selector ) {
     _created: false,
 
     _contentBounds: {},
+
+    _$resizeContainer: undefined, //< all elements that should match _contentBounds' size
 
     _$eventTarget: undefined,
     _$contentFrame: undefined,
@@ -3899,7 +3927,7 @@ function try$( selector ) {
         $(window).unbind("resize", this._windowHandler);
 
         for ( var i = 0; i < this._currentServices.length; i++ ) {
-          this._currentServices[i].serviceContainer.geomap("destroy");
+          this._currentServices[ i ].serviceContainer.geomap("destroy");
           $.geo["_serviceTypes"][this._currentServices[i].type].destroy(this, this._$servicesContainer, this._currentServices[i]);
         }
 
@@ -3977,8 +4005,6 @@ function try$( selector ) {
       var size = this._findMapSize(),
           dx = size["width"]/2 - this._contentBounds.width/2,
           dy = size["height"]/2 - this._contentBounds.height/2,
-          shapeStyle = this._$shapesContainer.geographics("option", "style"),
-          drawStyle = this._$drawContainer.geographics("option", "style"),
           i;
 
       this._contentBounds = {
@@ -3988,36 +4014,19 @@ function try$( selector ) {
         height: size["height"]
       };
 
-      this._$contentFrame.css({
+      this._$resizeContainer.css( {
         width: size["width"],
         height: size["height"]
-      });
-
-      this._$servicesContainer.css({
-        width: size["width"],
-        height: size["height"]
-      });
-
-      this._$eventTarget.css({
-        width: size["width"],
-        height: size["height"]
-      });
-
-      // TODO: call geographics resize on these and serviceShapesContainers
-      this._$drawContainer.geographics("destroy");
-      this._$shapesContainer.geographics("destroy");
+      } );
 
       for (i = 0; i < this._currentServices.length; i++) {
         $.geo["_serviceTypes"][this._currentServices[i].type].resize(this, this._currentServices[i]);
       }
 
-      this._$panContainer.css( {
-        width: size.width,
-        height: size.height
-      } );
-
-      this._$shapesContainer.geographics( { style: shapeStyle } );
-      this._$drawContainer.geographics( { style: drawStyle } );
+      this._$elem.find( ".geo-graphics" ).css( {
+        width: size["width"],
+        height: size["height"]
+      }).geographics( "resize" );
 
       for (i = 0; i < this._drawPixels.length; i++) {
         this._drawPixels[i][0] += dx;
@@ -4236,9 +4245,6 @@ function try$( selector ) {
       this._$contentFrame.append('<div class="geo-shapes-container" style="' + contentPosCss + contentSizeCss + '"></div>');
       this._$shapesContainer = this._$contentFrame.children(':last');
 
-      //this._$contentFrame.append('<div class="geo-labels-container" style="' + contentPosCss + contentSizeCss + '"></div>');
-      //this._$labelsContainer = this._$contentFrame.children(':last');
-
       this._$contentFrame.append('<div class="geo-draw-container" style="' + contentPosCss + contentSizeCss + '"></div>');
       this._$drawContainer = this._$contentFrame.children(':last');
 
@@ -4246,8 +4252,9 @@ function try$( selector ) {
       this._$measureContainer = this._$contentFrame.children(':last');
       this._$measureLabel = this._$measureContainer.children();
 
-      //this._$panContainer = $( [ this._$shapesContainer[ 0 ], this._$labelsContainer[ 0 ], this._$drawContainer[ 0 ], this._$measureContainer[ 0 ] ] );
       this._$panContainer = $( [ this._$shapesContainer[ 0 ], this._$drawContainer[ 0 ], this._$measureContainer[ 0 ] ] );
+
+      this._$resizeContainer = $( [ this._$contentFrame[ 0 ], this._$servicesContainer[ 0 ], this._$eventTarget[ 0 ], this._$measureContainer[ 0 ] ] ); 
 
       this._$contentFrame.append(this._$existingChildren);
 
@@ -4561,6 +4568,8 @@ function try$( selector ) {
 
         this._$panContainer.css({ left: 0, top: 0 });
 
+        this._$servicesContainer.find( ".geo-shapes-container" ).css( { left: 0, top: 0 } );
+
         this._setCenterAndSize([this._center[0] + dxMap, this._center[1] + dyMap], this._pixelSize, true, true);
 
         this._$eventTarget.css("cursor", this._options["cursors"][this._options["mode"]]);
@@ -4579,7 +4588,8 @@ function try$( selector ) {
       var dx = this._current[0] - this._lastDrag[0],
           dy = this._current[1] - this._lastDrag[1],
           i = 0,
-          service;
+          service,
+          translateObj;
 
       if (this._toolPan || dx > 3 || dx < -3 || dy > 3 || dy < -3) {
         if (!this._toolPan) {
@@ -4595,19 +4605,23 @@ function try$( selector ) {
           this._panning = true;
           this._lastDrag = this._current;
 
-          for (i = 0; i < this._options["services"].length; i++) {
-            service = this._options["services"][i];
-            $.geo["_serviceTypes"][service.type].interactivePan(this, service, dx, dy);
-          }
-
-          this._$panContainer.css({
+          translateObj = {
             left: function (index, value) {
               return parseInt(value) + dx;
             },
             top: function (index, value) {
               return parseInt(value) + dy;
             }
-          });
+          };
+
+          for ( i = 0; i < this._currentServices.length; i++ ) {
+            service = this._currentServices[ i ];
+            $.geo[ "_serviceTypes" ][ service.type ].interactivePan( this, service, dx, dy );
+            
+            service.serviceContainer.find( ".geo-shapes-container" ).css( translateObj );
+          }
+
+          this._$panContainer.css( translateObj );
 
           //this._refreshDrawing();
         }
@@ -4615,19 +4629,24 @@ function try$( selector ) {
     },
 
     _refresh: function () {
+      var service,
+          i = 0;
+
       if ( this._$elem.not( ".geo-service" ).length > 0 ) {
-        for (var i = 0; i < this._options["services"].length; i++) {
-          var service = this._options["services"][i];
-          if (!this._mouseDown && $.geo["_serviceTypes"][service.type] != null) {
-            $.geo["_serviceTypes"][service.type].refresh(this, service);
+        for ( ; i < this._currentServices.length; i++ ) {
+          service = this._currentServices[ i ];
+
+          if ( !this._mouseDown && $.geo[ "_serviceTypes" ][ service.type ] !== null ) {
+            $.geo[ "_serviceTypes" ][ service.type ].refresh( this, service );
+            service.serviceContainer.geomap( "refresh" );
           }
         }
       }
 
-      if (this._$shapesContainer) {
-        this._$shapesContainer.geographics("clear");
-        if (this._graphicShapes.length > 0) {
-          this._refreshShapes(this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes);
+      if ( this._$shapesContainer ) {
+        this._$shapesContainer.geographics( "clear" );
+        if ( this._graphicShapes.length > 0 ) {
+          this._refreshShapes( this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes );
         }
       }
     },
@@ -4635,7 +4654,7 @@ function try$( selector ) {
     _setCenterAndSize: function (center, pixelSize, trigger, refresh) {
       // the final call during any extent change
       if (this._pixelSize != pixelSize) {
-        this._$shapesContainer.geographics("clear");
+        this._$elem.find( ".geo-shapes-container" ).geographics("clear");
         for (var i = 0; i < this._options["services"].length; i++) {
           var service = this._options["services"][i];
           $.geo["_serviceTypes"][service.type].interactiveScale(this, service, center, pixelSize);
@@ -4975,6 +4994,7 @@ function try$( selector ) {
           drawCoordsLen = this._drawCoords.length,
           touches = e.originalEvent.changedTouches,
           current,
+          service,
           i = 0;
 
       if ( this._supportTouch ) {
@@ -5029,17 +5049,17 @@ function try$( selector ) {
 
           var pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, this._wheelZoomFactor );
 
-          this._$shapesContainer.geographics("clear");
-          //this._$labelsContainer.html("");
+          this._$elem.find( ".geo-shapes-container" ).geographics("clear");
 
-          for (i = 0; i < this._options["services"].length; i++) {
-            var service = this._options["services"][i];
-            $.geo["_serviceTypes"][service.type].interactiveScale(this, service, pinchCenterAndSize.center, pinchCenterAndSize.pixelSize);
+          for ( i = 0; i < this._currentServices.length; i++ ) {
+            service = this._currentServices[ i ];
+            $.geo[ "_serviceTypes" ][ service.type ].interactiveScale( this, service, pinchCenterAndSize.center, pinchCenterAndSize.pixelSize );
           }
 
           if (this._graphicShapes.length > 0 && this._graphicShapes.length < 256) {
             this._refreshShapes(this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes, pinchCenterAndSize.center, pinchCenterAndSize.pixelSize);
           }
+
 
           if (this._drawCoords.length > 0) {
             this._drawPixels = this._toPixel(this._drawCoords, pinchCenterAndSize.center, pinchCenterAndSize.pixelSize);
@@ -5302,13 +5322,14 @@ function try$( selector ) {
 
         this._wheelLevel += delta;
 
-        var wheelCenterAndSize = this._getZoomCenterAndSize(this._anchor, this._wheelLevel, this._wheelZoomFactor);
+        var wheelCenterAndSize = this._getZoomCenterAndSize(this._anchor, this._wheelLevel, this._wheelZoomFactor),
+            service,
+            i = 0;
 
-        this._$shapesContainer.geographics("clear");
-        //this._$labelsContainer.html("");
+        this._$elem.find( ".geo-shapes-container" ).geographics("clear");
 
-        for (i = 0; i < this._options["services"].length; i++) {
-          var service = this._options["services"][i];
+        for ( ; i < this._currentServices.length; i++ ) {
+          service = this._currentServices[ i ];
           $.geo["_serviceTypes"][service.type].interactiveScale(this, service, wheelCenterAndSize.center, wheelCenterAndSize.pixelSize);
         }
 

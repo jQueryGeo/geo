@@ -44,6 +44,8 @@
         this._$elem.css("position", "relative");
       }
 
+      this._$elem.addClass( "geo-graphics" );
+
       this._width = this._$elem.width();
       this._height = this._$elem.height();
 
@@ -52,15 +54,17 @@
         this._height = parseInt(this._$elem.css("height"));
       }
 
-      var sizeCss = 'style="position:absolute; left:0; top:0; width:' + this._width + 'px; height:' + this._height + 'px; margin:0; padding:0;"';
+      var posCss = 'position:absolute;left:0;top:0;margin:0;padding:0;',
+          sizeCss = 'width:' + this._width + 'px;height:' + this._height + 'px;',
+          sizeAttr = 'width="' + this._width + '" height="' + this._height + '"';
 
       if (document.createElement('canvas').getContext) {
-        this._$elem.append('<canvas width="' + this._width + '" height="' + this._height + '" ' + sizeCss + '></canvas>');
+        this._$elem.append('<canvas ' + sizeAttr + ' style="' + posCss + '"></canvas>');
         this._$canvas = this._$elem.children(':last');
         this._context = this._$canvas[0].getContext("2d");
       } else if (_ieVersion <= 8) {
         this._trueCanvas = false;
-        this._$elem.append('<div width="' + this._width + '" height="' + this._height + '" ' + sizeCss + '></div>');
+        this._$elem.append( '<div ' + sizeAttr + ' style="' + posCss + sizeCss + '"></div>');
         this._$canvas = this._$elem.children(':last');
 
         G_vmlCanvasManager.initElement(this._$canvas[0]);
@@ -68,7 +72,7 @@
         this._$canvas.children().css({ backgroundColor: "transparent", width: this._width, height: this._height });
       }
 
-      this._$elem.append('<div class="geo-labels-container" ' + sizeCss + '></div>');
+      this._$elem.append('<div class="geo-labels-container" style="' + posCss + sizeCss + '"></div>');
       this._$labelsContainer = this._$elem.children(':last');
     },
 
@@ -82,6 +86,7 @@
     destroy: function () {
       $.Widget.prototype.destroy.apply(this, arguments);
       this._$elem.html("");
+      this._$elem.removeClass( "geo-graphics" );
     },
 
     clear: function () {
@@ -192,6 +197,27 @@
 
     drawLabel: function( coordinates, label ) {
       this._$labelsContainer.append( '<div class="geo-label" style="position:absolute; left:' + coordinates[ 0 ] + 'px; top:' + coordinates[ 1 ] + 'px;">' + label + '</div>');
+    },
+
+    resize: function( ) {
+      this._width = this._$elem.width();
+      this._height = this._$elem.height();
+
+      if (!(this._width && this._height)) {
+        this._width = parseInt(this._$elem.css("width"));
+        this._height = parseInt(this._$elem.css("height"));
+      }
+
+      if ( this._trueCanvas ) {
+        this._$canvas[0].width = this._width;
+        this._$canvas[0].height = this._height;
+      } else {
+      }
+
+      this._$labelsContainer.css( {
+        width: this._width,
+        height: this._height
+      } );
     },
 
     _getGraphicStyle: function (style) {
