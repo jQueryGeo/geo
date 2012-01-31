@@ -124,7 +124,7 @@
         </tr>
       </table>
       <p>You can use the properties of this argument to build and return a URL (or initiate an AJAX request and return a Promise).</p>
-      <p>For more infomration about returning a jQuery Promise, please read the section on <a href="http://api.jquery.com/category/deferred-object/" rel="external">Deferred Objects</a> in the jQuery API documentation. It might useful to know that, as of jQuery 1.5, the <a href="http://api.jquery.com/jQuery.ajax/" rel="external">$.ajax method</a> returns a Promise object. If your ajax call return a URL to an image, your src function can look something like this:</p>
+      <p>For more infomration about returning a jQuery Promise, please read the section on <a href="http://api.jquery.com/category/deferred-object/" rel="external">Deferred Objects</a> in the jQuery API documentation. It might useful to know that, as of jQuery 1.5, the <a href="http://api.jquery.com/jQuery.ajax/" rel="external">$.ajax method</a> returns a Promise object. If your ajax call returns a URL to an image, your src function can look something like this:</p>
       <pre><code>src: function ( view ) { return $.ajax( { ... } ); }</code></pre>
       <p>When src is a string, those same properties can be used in the template by surrounding each property with: {{=propertyName}}.</p>
       <p>The default value for src is a function because it is slightly faster than rendering a template. However, as an example, we can rewrite the default src function as a template string:</p>
