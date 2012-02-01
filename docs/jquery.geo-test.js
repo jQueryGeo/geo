@@ -2473,7 +2473,27 @@ function try$( selector ) {
 
         bbox = [center[0] - dx, center[1] - dy, center[0] + dx, center[1] + dy];
       }
-      return $.geo.proj ? $.geo.proj.toGeodetic(bbox) : bbox;
+      return (!_ignoreGeo && $.geo.proj) ? $.geo.proj.toGeodetic(bbox) : bbox;
+    },
+
+    recenter: function( bbox, center, _ignoreGeo /* Internal Use Only */ ) {
+      // not in JTS
+      if (!_ignoreGeo && $.geo.proj) {
+        bbox = $.geo.proj.fromGeodetic(bbox);
+        center = $.geo.proj.fromGeodetic(center);
+      }
+
+      var halfWidth = ( bbox[ 2 ] - bbox[ 0 ] ) / 2,
+          halfHeight = ( bbox[ 3 ] - bbox[ 1 ] ) / 2;
+
+      bbox = [
+        center[ 0 ] - halfWidth,
+        center[ 1 ] - halfHeight,
+        center[ 0 ] + halfWidth,
+        center[ 1 ] + halfHeight
+      ];
+
+      return (!_ignoreGeo && $.geo.proj) ? $.geo.proj.toGeodetic(bbox) : bbox;
     },
 
     scaleBy: function ( bbox, scale, _ignoreGeo /* Internal Use Only */ ) {
@@ -3895,11 +3915,13 @@ function try$( selector ) {
 
       switch (key) {
         case "tilingScheme":
-          this._pixelSizeMax = this._getTiledPixelSize(0);
-          this._centerMax = [
-            value.origin[ 0 ] + this._pixelSizeMax * value.tileWidth / 2,
-            value.origin[ 1 ] + this._pixelSizeMax * value.tileHeight / 2
-          ];
+          if ( value != null ) {
+            this._pixelSizeMax = this._getTiledPixelSize(0);
+            this._centerMax = [
+              value.origin[ 0 ] + this._pixelSizeMax * value.tileWidth / 2,
+              value.origin[ 1 ] + this._pixelSizeMax * value.tileHeight / 2
+            ];
+          }
           break;
 
         case "services":
@@ -3921,6 +3943,7 @@ function try$( selector ) {
     destroy: function () {
       if ( this._$elem.is(".geo-service") ) {
         this._$shapesContainer.geographics("destroy");
+        this._$shapesContainer = undefined;
       } else {
         this._created = false;
 
@@ -3932,7 +3955,9 @@ function try$( selector ) {
         }
 
         this._$shapesContainer.geographics("destroy");
+        this._$shapesContainer = undefined;
         this._$drawContainer.geographics("destroy");
+        this._$drawContainer = undefined;
 
         this._$existingChildren.detach();
         this._$elem.html("");
@@ -4273,6 +4298,8 @@ function try$( selector ) {
       }
 
       this._currentServices = [];
+      this._$servicesContainer.html( "" );
+
       for (i = 0; i < this._options["services"].length; i++) {
         service = this._options["services"][i];
         this._currentServices[i] = service;
@@ -5404,6 +5431,7 @@ function try$( selector ) {
           if ( service && ( service.visibility === undefined || service.visibility === "visible" ) ) {
             var pixelSize = map._pixelSize,
 
+                serviceObj = this,
                 serviceContainer = serviceState.serviceContainer,
                 scaleContainer = serviceContainer.children("[data-pixelSize='" + pixelSize + "']"),
 
@@ -5521,11 +5549,11 @@ function try$( selector ) {
                   }
 
                   if ( typeof imageUrl === "string" ) {
-                    this._loadImage( $img, imageUrl, pixelSize, serviceState, serviceContainer, opacity );
+                    serviceObj._loadImage( $img, imageUrl, pixelSize, serviceState, serviceContainer, opacity );
                   } else {
                     // assume Deferred
                     imageUrl.done( function( url ) {
-                      this._loadImage( $img, url, pixelSize, serviceState, serviceContainer, opacity );
+                      serviceObj._loadImage( $img, url, pixelSize, serviceState, serviceContainer, opacity );
                     } ).fail( function( ) {
                       $img.remove( );
                       serviceState.loadCount--;
@@ -5582,12 +5610,14 @@ function try$( selector ) {
       refresh: function (map, service) {
         var serviceState = $.data( service, "geoServiceState" );
 
-        if ( serviceState && service && ( service.visibility === undefined || service.visibility === "visible" ) ) {
-          this._cancelUnloaded(map, service);
+        this._cancelUnloaded(map, service);
+
+        if ( serviceState && service && ( service.visibility === undefined || service.visibility === "visible" ) && !( serviceState.serviceContainer.is( ":hidden" ) ) ) {
 
           var bbox = map._getBbox(),
               pixelSize = map._pixelSize,
 
+              serviceObj = this,
               $serviceContainer = serviceState.serviceContainer,
 
               contentBounds = map._getContentBounds(),
@@ -5715,11 +5745,11 @@ function try$( selector ) {
                 }
 
                 if ( typeof imageUrl === "string" ) {
-                  this._loadImage( $img, imageUrl, pixelSize, serviceState, $serviceContainer, opacity );
+                  serviceObj._loadImage( $img, imageUrl, pixelSize, serviceState, $serviceContainer, opacity );
                 } else {
                   // assume Deferred
                   imageUrl.done( function( url ) {
-                    this._loadImage( $img, url, pixelSize, serviceState, $serviceContainer, opacity );
+                    serviceObj._loadImage( $img, url, pixelSize, serviceState, $serviceContainer, opacity );
                   } ).fail( function( ) {
                     $img.remove( );
                     serviceState.loadCount--;
@@ -5879,12 +5909,14 @@ function try$( selector ) {
       refresh: function (map, service) {
         var serviceState = $.data(service, "geoServiceState");
 
-        if (serviceState && service && (service.visibility === undefined || service.visibility === "visible")) {
-          this._cancelUnloaded(map, service);
+        this._cancelUnloaded(map, service);
+
+        if (serviceState && service && (service.visibility === undefined || service.visibility === "visible") && !( serviceState.serviceContainer.is( ":hidden" ) ) ) {
 
           var bbox = map._getBbox(),
               pixelSize = map._pixelSize,
 
+              serviceObj = this,
               serviceContainer = serviceState.serviceContainer,
 
               contentBounds = map._getContentBounds(),
@@ -5946,11 +5978,11 @@ function try$( selector ) {
           $img = scaleContainer.children(":last").data("center", map._getCenter());
 
           if ( typeof imageUrl === "string" ) {
-            this._loadImage( $img, imageUrl, pixelSize, serviceState, serviceContainer, opacity );
+            serviceObj._loadImage( $img, imageUrl, pixelSize, serviceState, serviceContainer, opacity );
           } else {
             // assume Deferred
             imageUrl.done( function( url ) {
-              this._loadImage( $img, url, pixelSize, serviceState, serviceContainer, opacity );
+              serviceObj._loadImage( $img, url, pixelSize, serviceState, serviceContainer, opacity );
             } ).fail( function( ) {
               $img.remove( );
               serviceState.loadCount--;

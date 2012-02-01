@@ -335,11 +335,13 @@
 
       switch (key) {
         case "tilingScheme":
-          this._pixelSizeMax = this._getTiledPixelSize(0);
-          this._centerMax = [
-            value.origin[ 0 ] + this._pixelSizeMax * value.tileWidth / 2,
-            value.origin[ 1 ] + this._pixelSizeMax * value.tileHeight / 2
-          ];
+          if ( value != null ) {
+            this._pixelSizeMax = this._getTiledPixelSize(0);
+            this._centerMax = [
+              value.origin[ 0 ] + this._pixelSizeMax * value.tileWidth / 2,
+              value.origin[ 1 ] + this._pixelSizeMax * value.tileHeight / 2
+            ];
+          }
           break;
 
         case "services":
@@ -361,6 +363,7 @@
     destroy: function () {
       if ( this._$elem.is(".geo-service") ) {
         this._$shapesContainer.geographics("destroy");
+        this._$shapesContainer = undefined;
       } else {
         this._created = false;
 
@@ -372,7 +375,9 @@
         }
 
         this._$shapesContainer.geographics("destroy");
+        this._$shapesContainer = undefined;
         this._$drawContainer.geographics("destroy");
+        this._$drawContainer = undefined;
 
         this._$existingChildren.detach();
         this._$elem.html("");
@@ -713,6 +718,8 @@
       }
 
       this._currentServices = [];
+      this._$servicesContainer.html( "" );
+
       for (i = 0; i < this._options["services"].length; i++) {
         service = this._options["services"][i];
         this._currentServices[i] = service;

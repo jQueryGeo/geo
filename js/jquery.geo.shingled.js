@@ -92,12 +92,14 @@
       refresh: function (map, service) {
         var serviceState = $.data(service, "geoServiceState");
 
-        if (serviceState && service && (service.visibility === undefined || service.visibility === "visible")) {
-          this._cancelUnloaded(map, service);
+        this._cancelUnloaded(map, service);
+
+        if (serviceState && service && (service.visibility === undefined || service.visibility === "visible") && !( serviceState.serviceContainer.is( ":hidden" ) ) ) {
 
           var bbox = map._getBbox(),
               pixelSize = map._pixelSize,
 
+              serviceObj = this,
               serviceContainer = serviceState.serviceContainer,
 
               contentBounds = map._getContentBounds(),
@@ -159,11 +161,11 @@
           $img = scaleContainer.children(":last").data("center", map._getCenter());
 
           if ( typeof imageUrl === "string" ) {
-            this._loadImage( $img, imageUrl, pixelSize, serviceState, serviceContainer, opacity );
+            serviceObj._loadImage( $img, imageUrl, pixelSize, serviceState, serviceContainer, opacity );
           } else {
             // assume Deferred
             imageUrl.done( function( url ) {
-              this._loadImage( $img, url, pixelSize, serviceState, serviceContainer, opacity );
+              serviceObj._loadImage( $img, url, pixelSize, serviceState, serviceContainer, opacity );
             } ).fail( function( ) {
               $img.remove( );
               serviceState.loadCount--;
