@@ -3647,7 +3647,6 @@ function try$( selector ) {
 
     _$panContainer: undefined, //< all non-service elements that move while panning
     _$shapesContainer: undefined,
-    //_$labelsContainer: undefined,
     _$drawContainer: undefined,
     _$measureContainer: undefined,
     _$measureLabel: undefined,
@@ -3692,7 +3691,7 @@ function try$( selector ) {
     _isDbltap: undefined,
 
     _isMultiTouch: undefined,
-    _multiTouchAnchor: undefined, //< TouchList
+    _multiTouchAnchor: [ ], //< TouchList
     _multiTouchAnchorBbox: undefined, //< bbox
     _multiTouchCurrentBbox: undefined, //< bbox
 
@@ -4292,7 +4291,6 @@ function try$( selector ) {
       var i, serviceContainer, service;
 
       for (i = 0; i < this._currentServices.length; i++) {
-        // TODO: destroy service-level geographics
         this._currentServices[i].serviceContainer.geomap("destroy");
         $.geo["_serviceTypes"][this._currentServices[i].type].destroy(this, this._$servicesContainer, this._currentServices[i]);
       }
@@ -4386,7 +4384,6 @@ function try$( selector ) {
     },
 
     _resetDrawing: function () {
-      //this._$textContainer.hide();
       this._drawPixels = [];
       this._drawCoords = [];
       this._$drawContainer.geographics("clear");
@@ -4936,9 +4933,9 @@ function try$( selector ) {
           touches = e.originalEvent.changedTouches;
 
       if ( this._supportTouch ) {
-        this._multiTouchAnchor = touches;
+        this._multiTouchAnchor = $.merge( [ ], touches );
 
-        this._isMultiTouch = touches.length > 1;
+        this._isMultiTouch = this._multiTouchAnchor.length > 1;
 
         if ( this._isMultiTouch ) {
           this._multiTouchCurrentBbox = [
@@ -4952,6 +4949,13 @@ function try$( selector ) {
 
           this._current = $.geo.center( this._multiTouchCurrentBbox, true );
         } else {
+          this._multiTouchCurrentBbox = [
+            touches[0].pageX - offset.left,
+            touches[0].pageY - offset.top,
+            touches[0].pageX - offset.left,
+            touches[0].pageY - offset.top
+          ];
+
           this._current = [ touches[0].pageX - offset.left, touches[0].pageY - offset.top ];
         }
       } else {
@@ -5032,20 +5036,18 @@ function try$( selector ) {
 
           this._isMultiTouch = true;
 
-          touches = [
-            this._multiTouchAnchor[ 0 ],
-            touches[ 0 ]
-          ];
+          this._multiTouchAnchor.push( touches[ 0 ] );
 
           this._multiTouchCurrentBbox = [
-            touches[0].pageX - offset.left,
-            touches[0].pageY - offset.top,
-            touches[1].pageX - offset.left,
-            touches[1].pageY - offset.top
+            this._multiTouchCurrentBbox[ 0 ],
+            this._multiTouchCurrentBbox[ 1 ],
+            this._multiTouchAnchor[1].pageX - offset.left,
+            this._multiTouchAnchor[1].pageY - offset.top
           ];
 
           this._multiTouchAnchorBbox = $.merge( [ ], this._multiTouchCurrentBbox );
 
+          this._mouseDown = true;
           this._anchor = this._current = $.geo.center( this._multiTouchCurrentBbox, true );
 
           return false;
@@ -5419,7 +5421,9 @@ function try$( selector ) {
         if ( serviceState ) {
           this._cancelUnloaded( map, service );
 
-          serviceState.serviceContainer.children( ).css( {
+          serviceState.serviceContainer.children( ).css( "-moz-transition", "").css( {
+            webkitTransition: "",
+            transition: "",
             left: function ( index, value ) {
               return parseInt( value ) + dx;
             },
@@ -5583,7 +5587,8 @@ function try$( selector ) {
 
           serviceContainer.children( ).each( function ( i ) {
             var $scaleContainer = $(this),
-                scaleRatio = $scaleContainer.attr("data-pixelSize") / pixelSize;
+                scaleRatio = $scaleContainer.attr("data-pixelSize") / pixelSize,
+                transitionCss = "width .25s ease-in, height .25s ease-in, left .25s ease-in, top .25s ease-in";
 
             scaleRatio = Math.round(scaleRatio * 1000) / 1000;
 
@@ -5591,7 +5596,9 @@ function try$( selector ) {
                 oldMapCoord = map._toMap([scaleOriginParts[0], scaleOriginParts[1]]),
                 newPixelPoint = map._toPixel(oldMapCoord, center, pixelSize);
 
-            $scaleContainer.css( {
+            $scaleContainer.css( "-moz-transition", transitionCss ).css( {
+              webkitTransition: transitionCss,
+              transition: transitionCss,
               left: Math.round(newPixelPoint[0]) + "px",
               top: Math.round(newPixelPoint[1]) + "px",
               width: tileWidth * scaleRatio,
@@ -5893,8 +5900,10 @@ function try$( selector ) {
             var $scaleContainer = $(this),
                 scalePixelSize = $scaleContainer.attr("data-pixelSize"),
                 ratio = scalePixelSize / pixelSize;
-
-            $scaleContainer.css({ width: mapWidth * ratio, height: mapHeight * ratio }).children("img").each(function (i) {
+                
+            $scaleContainer.css( {
+              width: mapWidth * ratio,
+              height: mapHeight * ratio } ).children("img").each(function (i) {
               var $img = $(this),
                   imgCenter = $img.data("center"),
                   x = (Math.round((imgCenter[0] - center[0]) / scalePixelSize) - halfWidth) * ratio,

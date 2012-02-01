@@ -76,8 +76,10 @@
             var $scaleContainer = $(this),
                 scalePixelSize = $scaleContainer.attr("data-pixelSize"),
                 ratio = scalePixelSize / pixelSize;
-
-            $scaleContainer.css({ width: mapWidth * ratio, height: mapHeight * ratio }).children("img").each(function (i) {
+                
+            $scaleContainer.css( {
+              width: mapWidth * ratio,
+              height: mapHeight * ratio } ).children("img").each(function (i) {
               var $img = $(this),
                   imgCenter = $img.data("center"),
                   x = (Math.round((imgCenter[0] - center[0]) / scalePixelSize) - halfWidth) * ratio,

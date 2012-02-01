@@ -56,6 +56,8 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * geo - add recenter function for bbox
 * geomap - [bug] errors creating second un-tiled map after destroying a first on same element
 * geomap - refresh shouldn't request new images if the map element is hidden
+* geomap - use transitions during interactiveScale of tiled maps
+* geomap - [bug] delayed multitouch isn't nearly as smooth as true multitouch
 
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon
