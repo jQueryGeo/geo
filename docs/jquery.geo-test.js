@@ -5419,7 +5419,9 @@ function try$( selector ) {
         if ( serviceState ) {
           this._cancelUnloaded( map, service );
 
-          serviceState.serviceContainer.children( ).css( {
+          serviceState.serviceContainer.children( ).css( "-moz-transition", "").css( {
+            webkitTransition: "",
+            transition: "",
             left: function ( index, value ) {
               return parseInt( value ) + dx;
             },
@@ -5583,7 +5585,8 @@ function try$( selector ) {
 
           serviceContainer.children( ).each( function ( i ) {
             var $scaleContainer = $(this),
-                scaleRatio = $scaleContainer.attr("data-pixelSize") / pixelSize;
+                scaleRatio = $scaleContainer.attr("data-pixelSize") / pixelSize,
+                transitionCss = "width .25s ease-in, height .25s ease-in, left .25s ease-in, top .25s ease-in";
 
             scaleRatio = Math.round(scaleRatio * 1000) / 1000;
 
@@ -5591,7 +5594,9 @@ function try$( selector ) {
                 oldMapCoord = map._toMap([scaleOriginParts[0], scaleOriginParts[1]]),
                 newPixelPoint = map._toPixel(oldMapCoord, center, pixelSize);
 
-            $scaleContainer.css( {
+            $scaleContainer.css( "-moz-transition", transitionCss ).css( {
+              webkitTransition: transitionCss,
+              transition: transitionCss,
               left: Math.round(newPixelPoint[0]) + "px",
               top: Math.round(newPixelPoint[1]) + "px",
               width: tileWidth * scaleRatio,
@@ -5893,8 +5898,10 @@ function try$( selector ) {
             var $scaleContainer = $(this),
                 scalePixelSize = $scaleContainer.attr("data-pixelSize"),
                 ratio = scalePixelSize / pixelSize;
-
-            $scaleContainer.css({ width: mapWidth * ratio, height: mapHeight * ratio }).children("img").each(function (i) {
+                
+            $scaleContainer.css( {
+              width: mapWidth * ratio,
+              height: mapHeight * ratio } ).children("img").each(function (i) {
               var $img = $(this),
                   imgCenter = $img.data("center"),
                   x = (Math.round((imgCenter[0] - center[0]) / scalePixelSize) - halfWidth) * ratio,
