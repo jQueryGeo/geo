@@ -1,5 +1,4 @@
 ﻿== to do ==
-* geomap - fake multitouch isn't nearly as smooth as real multitouch
 * geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
 * geomap - service object visibility and opacity options should be moved to a style property
 * geomap - [bug] first use of mouse/touch in any mode moves map by one pixel on mousedown/touch

@@ -3647,7 +3647,6 @@ function try$( selector ) {
 
     _$panContainer: undefined, //< all non-service elements that move while panning
     _$shapesContainer: undefined,
-    //_$labelsContainer: undefined,
     _$drawContainer: undefined,
     _$measureContainer: undefined,
     _$measureLabel: undefined,
@@ -3692,7 +3691,7 @@ function try$( selector ) {
     _isDbltap: undefined,
 
     _isMultiTouch: undefined,
-    _multiTouchAnchor: undefined, //< TouchList
+    _multiTouchAnchor: [ ], //< TouchList
     _multiTouchAnchorBbox: undefined, //< bbox
     _multiTouchCurrentBbox: undefined, //< bbox
 
@@ -4292,7 +4291,6 @@ function try$( selector ) {
       var i, serviceContainer, service;
 
       for (i = 0; i < this._currentServices.length; i++) {
-        // TODO: destroy service-level geographics
         this._currentServices[i].serviceContainer.geomap("destroy");
         $.geo["_serviceTypes"][this._currentServices[i].type].destroy(this, this._$servicesContainer, this._currentServices[i]);
       }
@@ -4386,7 +4384,6 @@ function try$( selector ) {
     },
 
     _resetDrawing: function () {
-      //this._$textContainer.hide();
       this._drawPixels = [];
       this._drawCoords = [];
       this._$drawContainer.geographics("clear");
@@ -4936,9 +4933,9 @@ function try$( selector ) {
           touches = e.originalEvent.changedTouches;
 
       if ( this._supportTouch ) {
-        this._multiTouchAnchor = touches;
+        this._multiTouchAnchor = $.merge( [ ], touches );
 
-        this._isMultiTouch = touches.length > 1;
+        this._isMultiTouch = this._multiTouchAnchor.length > 1;
 
         if ( this._isMultiTouch ) {
           this._multiTouchCurrentBbox = [
@@ -4952,6 +4949,13 @@ function try$( selector ) {
 
           this._current = $.geo.center( this._multiTouchCurrentBbox, true );
         } else {
+          this._multiTouchCurrentBbox = [
+            touches[0].pageX - offset.left,
+            touches[0].pageY - offset.top,
+            touches[0].pageX - offset.left,
+            touches[0].pageY - offset.top
+          ];
+
           this._current = [ touches[0].pageX - offset.left, touches[0].pageY - offset.top ];
         }
       } else {
@@ -5032,20 +5036,18 @@ function try$( selector ) {
 
           this._isMultiTouch = true;
 
-          touches = [
-            this._multiTouchAnchor[ 0 ],
-            touches[ 0 ]
-          ];
+          this._multiTouchAnchor.push( touches[ 0 ] );
 
           this._multiTouchCurrentBbox = [
-            touches[0].pageX - offset.left,
-            touches[0].pageY - offset.top,
-            touches[1].pageX - offset.left,
-            touches[1].pageY - offset.top
+            this._multiTouchCurrentBbox[ 0 ],
+            this._multiTouchCurrentBbox[ 1 ],
+            this._multiTouchAnchor[1].pageX - offset.left,
+            this._multiTouchAnchor[1].pageY - offset.top
           ];
 
           this._multiTouchAnchorBbox = $.merge( [ ], this._multiTouchCurrentBbox );
 
+          this._mouseDown = true;
           this._anchor = this._current = $.geo.center( this._multiTouchCurrentBbox, true );
 
           return false;
