@@ -106,7 +106,27 @@
 
         bbox = [center[0] - dx, center[1] - dy, center[0] + dx, center[1] + dy];
       }
-      return $.geo.proj ? $.geo.proj.toGeodetic(bbox) : bbox;
+      return (!_ignoreGeo && $.geo.proj) ? $.geo.proj.toGeodetic(bbox) : bbox;
+    },
+
+    recenter: function( bbox, center, _ignoreGeo /* Internal Use Only */ ) {
+      // not in JTS
+      if (!_ignoreGeo && $.geo.proj) {
+        bbox = $.geo.proj.fromGeodetic(bbox);
+        center = $.geo.proj.fromGeodetic(center);
+      }
+
+      var halfWidth = ( bbox[ 2 ] - bbox[ 0 ] ) / 2,
+          halfHeight = ( bbox[ 3 ] - bbox[ 1 ] ) / 2;
+
+      bbox = [
+        center[ 0 ] - halfWidth,
+        center[ 1 ] - halfHeight,
+        center[ 0 ] + halfWidth,
+        center[ 1 ] + halfHeight
+      ];
+
+      return (!_ignoreGeo && $.geo.proj) ? $.geo.proj.toGeodetic(bbox) : bbox;
     },
 
     scaleBy: function ( bbox, scale, _ignoreGeo /* Internal Use Only */ ) {

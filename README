@@ -53,6 +53,7 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * geomap - service-level shapes
 * geomap - service-level find
 * geographics - add a resize method, call from geomap.resize
+* geo - add recenter function for bbox
 
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon
