@@ -5,7 +5,6 @@
 ** possibly only when axisLayout is image
 * geomap - show attr text
 * geomap - [bug] pan lags on first drag (related?)
-* geomap - [bug] setting services array during init does not wipe out default properties of initial service object
 * geomap - [bug] zoom in more than once with zoom method moves tiles to the wrong spot
 * geomap - [bug] map panning is jumpy, appears to be related to shapes and/or drawing context
 * geomap - [bug] chaining doesn't work, e.g., .geomap(option,center).geomap(option,zoom)
@@ -90,6 +89,7 @@
 * geomap - stop using $.data to store bbox since it's only used for drawing; store on _graphicShapes instead
 * geomap - show a drawPoint style while the mouse is down, hide if toolPan or dbltap scale
 * geomap - android - [bug] cannot always pan map after appending shapes
+* geomap - re-use services that have the same id as existing services
 * geomap - deep extend existing service objects when services property is set
 * geomap - cache point bbox if $.geo.proj is not null?
 * geomap - spatially index shapes when a tilingScheme is in place
@@ -146,6 +146,13 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-02-01==
+===destroy===
+There's a bug with shingled services if I call destroy and try to re-create.
+
+===services===
+Changing the services option will destroy all service-level shapes. I'm not sure what to do about that. Eventually, I will re-use serviceContainers (and service-geomaps) based on the new services array coming in but I currently don't do that.
 
 ==2012-01-31==
 ===shapes zoom===

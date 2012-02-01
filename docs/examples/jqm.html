@@ -1,0 +1,138 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>TEMPLATE example</title>
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+  <meta name="description" content="An example of TEMPLATE">
+  <meta name="author" content="Ryan Westphal">
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.css" />
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+  <style type="text/css">
+    #mapTab
+    {
+      min-height: 99%;
+    }
+
+    #map
+    {
+      position: relative;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" data-role="page">
+    <div data-role="header">
+      <h1><span data-text="DisplayName">Amherst</span></h1>
+    </div>
+
+    <div data-role="content">
+      <div class="have-mapTabs">
+        <p>Which map would you like?</p>
+        <ul data-role="listview" data-inset="true">
+          <li><a href="#mapTab" data-map-tab="{&quot;MapTabID&quot;:&quot;ParcelMap&quot;,&quot;DisplayName&quot;:&quot;Parcel Map&quot;}">Parcel Map</a></li>
+          <li><a href="#mapTab" data-map-tab="{&quot;MapTabID&quot;:&quot;ZoningMap&quot;,&quot;DisplayName&quot;:&quot;Zoning Map&quot;}">Zoning Map</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  
+  <div id="mapTab" data-role="page" data-fullscreen="true">
+    <div data-role="header" data-position="fixed">
+      <h1><span data-text="DisplayName">Parcel App</span></h1>
+      <a href="#app" data-role="button" data-icon="arrow-d" data-iconpos="notext" data-transition="slidedown" class="mapTab-switch ui-btn-right">Select Tab</a>
+    </div>
+
+    <div id="map">
+    </div>
+
+    <div data-role="footer" data-position="fixed">
+      <p>&nbsp;</p>
+    </div>
+  </div>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+  <script src="../../js/jquery.geo.head.js"></script>
+  <script src="../../js/excanvas.js"></script>
+  <script src="../../js/jquery.mousewheel.min.js"></script>
+  <script src="../../js/jquery.ui.widget.js"></script>
+  <script src="../../js/jsrender.js"></script>
+  <script src="../../js/jquery.geo.core.js"></script>
+  <script src="../../js/jquery.geo.geographics.js"></script>
+  <script src="../../js/jquery.geo.geomap.js"></script>
+  <script src="../../js/jquery.geo.tiled.js"></script>
+  <script src="../../js/jquery.geo.shingled.js"></script>
+  <!--<script src="../jquery.geo-test.min.js"></script>-->
+  <script>
+  (function() {
+    var mapTab = window.sessionStorage.getItem("mapTab") || null,
+        map = null,
+        bbox = window.sessionStorage.getItem("bbox") || null;
+
+    $("#app").delegate("a", "click", function() {
+      mapTab = $(this).data("mapTab");
+      window.sessionStorage.setItem("mapTab", JSON.stringify(mapTab));
+    });
+
+    $("#mapTab").bind("pageinit", function() {
+      $.mobile.fixedToolbars.setTouchToggleEnabled(false);
+    });
+
+    $("#mapTab").bind("pagebeforeshow", function() {
+      $("#mapTab [data-text='DisplayName']").text(mapTab.DisplayName);
+      $("title").text(mapTab.DisplayName);
+    });
+
+    $("#mapTab").bind("pageshow", function() {
+      $.geo.proj = null;
+
+      // create a map
+      if ( map == null ) {
+        map = $("#map").geomap({
+          tilingScheme: null,
+          bboxMax: [ 372440,2935595,396368,2985633 ],
+          bbox: bbox ? JSON.parse(bbox) : [ 372440,2935595,396368,2985633 ],
+          services: [{
+            id: "gpv",
+            type: "shingled",
+            src: function(view) {
+              var mapState = {
+                    Application: "ParcelApp",
+                    MapTab: mapTab.MapTabID,
+                    Extent: {
+                      bbox: view.bbox
+                    }
+                  };
+
+              return "http://alpha.appgeo.com/GPV/Services/MapImage.ashx?m=GetMapImage&state=" + JSON.stringify(mapState) + "&width=" + view.width + "&height=" + view.height;
+            }
+          }],
+          bboxchange: function(e, geo) {
+            bbox = "[" + geo.bbox.toString() + "]";
+            window.sessionStorage.setItem("bbox", bbox);
+          }
+        });
+      } else {
+        map.geomap( "refresh" );
+      }
+    });  
+
+    /*
+    $("#mapTab").bind("pagebeforehide", function() {
+      if (map) {
+        map.geomap("destroy");
+        map = null;
+      }
+    });
+    */
+  })();
+  </script>
+
+  <script src="http://code.jquery.com/mobile/1.0.1/jquery.mobile-1.0.1.min.js"></script>
+</body>
+</html>
