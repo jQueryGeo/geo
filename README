@@ -55,6 +55,7 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * geographics - add a resize method, call from geomap.resize
 * geo - add recenter function for bbox
 * geomap - [bug] errors creating second un-tiled map after destroying a first on same element
+* geomap - refresh shouldn't request new images if the map element is hidden
 
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon

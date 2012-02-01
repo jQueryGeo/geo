@@ -5610,8 +5610,9 @@ function try$( selector ) {
       refresh: function (map, service) {
         var serviceState = $.data( service, "geoServiceState" );
 
-        if ( serviceState && service && ( service.visibility === undefined || service.visibility === "visible" ) ) {
-          this._cancelUnloaded(map, service);
+        this._cancelUnloaded(map, service);
+
+        if ( serviceState && service && ( service.visibility === undefined || service.visibility === "visible" ) && !( serviceState.serviceContainer.is( ":hidden" ) ) ) {
 
           var bbox = map._getBbox(),
               pixelSize = map._pixelSize,
@@ -5908,8 +5909,9 @@ function try$( selector ) {
       refresh: function (map, service) {
         var serviceState = $.data(service, "geoServiceState");
 
-        if (serviceState && service && (service.visibility === undefined || service.visibility === "visible")) {
-          this._cancelUnloaded(map, service);
+        this._cancelUnloaded(map, service);
+
+        if (serviceState && service && (service.visibility === undefined || service.visibility === "visible") && !( serviceState.serviceContainer.is( ":hidden" ) ) ) {
 
           var bbox = map._getBbox(),
               pixelSize = map._pixelSize,
