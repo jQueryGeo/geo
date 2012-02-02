@@ -5089,13 +5089,12 @@ function try$( selector ) {
               ratioWidth = currentWidth / anchorWidth;
 
           if ( Math.abs( currentWidth ) < Math.abs( anchorWidth ) ) {
-            this._wheelLevel = - Math.abs( Math.floor( ( 1 - ratioWidth ) * 10 ) );
+            this._wheelLevel = - Math.abs( Math.ceil( ( 1 - ratioWidth ) * 10 ) );
           } else {
             this._wheelLevel = Math.abs( Math.floor( ( 1 - ratioWidth ) * 10 / 2 ) );
           }
 
           var pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, false );
-
           this._$elem.find( ".geo-shapes-container" ).geographics("clear");
 
           for ( i = 0; i < this._currentServices.length; i++ ) {
@@ -5606,9 +5605,10 @@ function try$( selector ) {
           serviceContainer.children( ).each( function ( i ) {
             var $scaleContainer = $(this),
                 scaleRatio = $scaleContainer.attr("data-pixelSize") / pixelSize,
-                transitionCss = "width .25s ease-in, height .25s ease-in, left .25s ease-in, top .25s ease-in";
+                transitionCss = ""; //"width .25s ease-in, height .25s ease-in, left .25s ease-in, top .25s ease-in";
 
             scaleRatio = Math.round(scaleRatio * 1000) / 1000;
+
 
             var scaleOriginParts = $scaleContainer.data("scaleOrigin").split(","),
                 oldMapCoord = map._toMap([scaleOriginParts[0], scaleOriginParts[1]]),

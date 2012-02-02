@@ -1,5 +1,4 @@
 ﻿== to do ==
-* geomap - [bug] pinch zoom doesn't refresh tiles when zooming out
 * geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
 * geomap - service object visibility and opacity options should be moved to a style property
 * geomap - [bug] first use of mouse/touch in any mode moves map by one pixel on mousedown/touch
@@ -14,6 +13,8 @@
 * geomap - [bug] zoom option doesn't return proper values for shingled services?
 * geomap - [bug] double tap to end shapes adds two points before ending the shape, in different places
 * geomap - [bug] lifting figers after pinch zoom in drawLineString or drawPolygon modes sometimes adds fake visual coordinate on touch point last lifted
+* geomap - don't request tiles that are -y index or > max possible y for scale
+* geomap - repeat horizontal tiles
 * geomap - cache label coordinates (the labelPixel cannot be cached, it will change each refresh)
 * geomap - rotate label based on segment
 * geomap - use pointer-events: none where appropriate
@@ -23,6 +24,8 @@
 * geomap - [bug] iPad 2 panning is visually jumpy but settles on the correct bbox in the end
 ** possibly only when axisLayout is image
 * geomap - [bug] iPad 2 measureLength puts current length on second to last coord instead of last coord
+* geomap - [bug] pinch zoom on iPad 2 (iOS 5) doesn't refresh tiles when zooming out
+** oddly, iPod Touch 4 (iOS 4) is fine
 * geomap - [bug] multiples of the same event trigger after creating more than one map on the same div, even after destroy
 ** destroy should unbind all geomap events
 * geomap - remove this-style state properties
@@ -40,6 +43,7 @@
 * geomap - merge interactive pan and zoom into one, faster system
 ** pan and zoom in same interactive session (_interactiveCenter & _interactivePixelSize)
 ** delay image loading more during movement
+* geomap - use CSS transition or transform for smoother tiling
 * geomap - implement service-level shape redrawing during interactive movement
 * upgrade jquery.mousewheel
 * make a package for new jQuery plugin directory
@@ -147,6 +151,10 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-02-02==
+===transition===
+They look cool, but I don't think this project is ready for transitions, they have some unexpected side-effects. I would like to rewrite the interactive portion anyway.
 
 ==2012-02-01==
 ===destroy===

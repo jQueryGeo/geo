@@ -1495,13 +1495,12 @@
               ratioWidth = currentWidth / anchorWidth;
 
           if ( Math.abs( currentWidth ) < Math.abs( anchorWidth ) ) {
-            this._wheelLevel = - Math.abs( Math.floor( ( 1 - ratioWidth ) * 10 ) );
+            this._wheelLevel = - Math.abs( Math.ceil( ( 1 - ratioWidth ) * 10 ) );
           } else {
             this._wheelLevel = Math.abs( Math.floor( ( 1 - ratioWidth ) * 10 / 2 ) );
           }
 
           var pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, false );
-
           this._$elem.find( ".geo-shapes-container" ).geographics("clear");
 
           for ( i = 0; i < this._currentServices.length; i++ ) {
