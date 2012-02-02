@@ -58,6 +58,7 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * geomap - refresh shouldn't request new images if the map element is hidden
 * geomap - use transitions during interactiveScale of tiled maps
 * geomap - [bug] delayed multitouch isn't nearly as smooth as true multitouch
+* geomap - [bug] tiled pinch zoom isn't smooth
 
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon

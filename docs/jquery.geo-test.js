@@ -2409,6 +2409,20 @@ function try$( selector ) {
       return result;
     },
 
+    _isGeodetic: function( coords ) {
+      // returns true if the first coordinate it can find is geodetic
+
+      while ( $.isArray( coords ) ) {
+        if ( coords.length > 1 && ! $.isArray( coords[ 0 ] ) ) {
+          return ( coords[ 0 ] >= -180 && coords[ 0 ] <= 180 && coords[ 1 ] >= -85 && coords[ 1 ] <= 85 );
+        } else {
+          coords = coords[ 0 ];
+        }
+      }
+
+      return false;
+    },
+
     //
     // bbox functions
     //
@@ -3660,11 +3674,13 @@ function try$( selector ) {
     _centerMax: undefined,
     _pixelSizeMax: undefined,
 
-    _wheelZoomFactor: 1.18920711500273,
     _wheelTimeout: null,
     _wheelLevel: 0,
 
-    _zoomFactor: 2,
+    _zoomFactor: 2, //< determines what a zoom level means
+
+    _fullZoomFactor: 2, //< interactiveScale factor needed to zoom a whole level
+    _partialZoomFactor: 1.18920711500273, //< interactiveScale factor needed to zoom a fraction of a level (the fourth root of 2)
 
     _mouseDown: undefined,
     _inOp: undefined,
@@ -3691,7 +3707,7 @@ function try$( selector ) {
     _isDbltap: undefined,
 
     _isMultiTouch: undefined,
-    _multiTouchAnchor: [ ], //< TouchList
+    _multiTouchAnchor: undefined, //< TouchList
     _multiTouchAnchorBbox: undefined, //< bbox
     _multiTouchCurrentBbox: undefined, //< bbox
 
@@ -4528,21 +4544,23 @@ function try$( selector ) {
       }
     },
 
-    _getZoomCenterAndSize: function (anchor, zoomDelta, zoomFactor) {
-      var pixelSize, zoomLevel, scale;
+    _getZoomCenterAndSize: function ( anchor, zoomDelta, full ) {
+      var zoomFactor = ( full ? this._fullZoomFactor : this._partialZoomFactor ),
+          scale = Math.pow( zoomFactor, -zoomDelta ),
+          pixelSize,
+          zoomLevel;
+
       if (this._options["tilingScheme"]) {
-        zoomLevel = this._getTiledZoom(this._pixelSize) + zoomDelta;
+        zoomLevel = this._getTiledZoom(this._pixelSize * scale);
         pixelSize = this._getTiledPixelSize(zoomLevel);
       } else {
-        scale = Math.pow(zoomFactor, -zoomDelta);
         pixelSize = this._pixelSize * scale;
       }
 
-      var 
-        ratio = pixelSize / this._pixelSize,
-        anchorMapCoord = this._toMap(anchor),
-        centerDelta = [(this._center[0] - anchorMapCoord[0]) * ratio, (this._center[1] - anchorMapCoord[1]) * ratio],
-        scaleCenter = [anchorMapCoord[0] + centerDelta[0], anchorMapCoord[1] + centerDelta[1]];
+      var ratio = pixelSize / this._pixelSize,
+          anchorMapCoord = this._toMap(anchor),
+          centerDelta = [(this._center[0] - anchorMapCoord[0]) * ratio, (this._center[1] - anchorMapCoord[1]) * ratio],
+          scaleCenter = [anchorMapCoord[0] + centerDelta[0], anchorMapCoord[1] + centerDelta[1]];
 
       return { pixelSize: pixelSize, center: scaleCenter };
     },
@@ -4551,7 +4569,7 @@ function try$( selector ) {
       this._wheelTimeout = null;
 
       if (this._wheelLevel != 0) {
-        var wheelCenterAndSize = this._getZoomCenterAndSize(this._anchor, this._wheelLevel, this._wheelZoomFactor);
+        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, this._options[ "tilingScheme" ] != null );
 
         this._setCenterAndSize(wheelCenterAndSize.center, wheelCenterAndSize.pixelSize, true, true);
 
@@ -4849,7 +4867,7 @@ function try$( selector ) {
     _eventTarget_dblclick_zoom: function(e) {
       this._trigger("dblclick", e, { type: "Point", coordinates: this.toMap(this._current) });
       if (!e.isDefaultPrevented()) {
-        var centerAndSize = this._getZoomCenterAndSize(this._current, 1, this._zoomFactor);
+        var centerAndSize = this._getZoomCenterAndSize(this._current, 1, true );
         this._setCenterAndSize(centerAndSize.center, centerAndSize.pixelSize, true, true);
       }
     },
@@ -4952,8 +4970,8 @@ function try$( selector ) {
           this._multiTouchCurrentBbox = [
             touches[0].pageX - offset.left,
             touches[0].pageY - offset.top,
-            touches[0].pageX - offset.left,
-            touches[0].pageY - offset.top
+            NaN,
+            NaN
           ];
 
           this._current = [ touches[0].pageX - offset.left, touches[0].pageY - offset.top ];
@@ -5076,7 +5094,7 @@ function try$( selector ) {
             this._wheelLevel = Math.abs( Math.floor( ( 1 - ratioWidth ) * 10 / 2 ) );
           }
 
-          var pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, this._wheelZoomFactor );
+          var pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, false );
 
           this._$elem.find( ".geo-shapes-container" ).geographics("clear");
 
@@ -5211,7 +5229,7 @@ function try$( selector ) {
         e.preventDefault( );
         this._isMultiTouch = false;
 
-        var pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, this._wheelZoomFactor );
+        var pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, false );
 
         this._setCenterAndSize(pinchCenterAndSize.center, pinchCenterAndSize.pixelSize, true, true);
 
@@ -5351,7 +5369,7 @@ function try$( selector ) {
 
         this._wheelLevel += delta;
 
-        var wheelCenterAndSize = this._getZoomCenterAndSize(this._anchor, this._wheelLevel, this._wheelZoomFactor),
+        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, this._options[ "tilingScheme" ] != null ),
             service,
             i = 0;
 
