@@ -1,9 +1,8 @@
 ﻿== to do ==
-* geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
 * geomap - service object visibility and opacity options should be moved to a style property
+* geomap - show attr text
 * geomap - [bug] first use of mouse/touch in any mode moves map by one pixel on mousedown/touch
 ** possibly only when axisLayout is image
-* geomap - show attr text
 * geomap - [bug] pan lags on first drag (related?)
 * geomap - [bug] zoom in more than once with zoom method moves tiles to the wrong spot
 * geomap - [bug] map panning is jumpy, appears to be related to shapes and/or drawing context
@@ -13,6 +12,11 @@
 * geomap - [bug] zoom option doesn't return proper values for shingled services?
 * geomap - [bug] double tap to end shapes adds two points before ending the shape, in different places
 * geomap - [bug] lifting figers after pinch zoom in drawLineString or drawPolygon modes sometimes adds fake visual coordinate on touch point last lifted
+* examples - jQuery Mobile
+* examples - drag shapes
+* examples - multi-service-level shapes
+* geomap - don't request tiles that are -y index or > max possible y for scale
+* geomap - repeat horizontal tiles
 * geomap - cache label coordinates (the labelPixel cannot be cached, it will change each refresh)
 * geomap - rotate label based on segment
 * geomap - use pointer-events: none where appropriate
@@ -22,6 +26,8 @@
 * geomap - [bug] iPad 2 panning is visually jumpy but settles on the correct bbox in the end
 ** possibly only when axisLayout is image
 * geomap - [bug] iPad 2 measureLength puts current length on second to last coord instead of last coord
+* geomap - [bug] pinch zoom on iPad 2 (iOS 5) doesn't refresh tiles when zooming out
+** oddly, iPod Touch 4 (iOS 4) is fine
 * geomap - [bug] multiples of the same event trigger after creating more than one map on the same div, even after destroy
 ** destroy should unbind all geomap events
 * geomap - remove this-style state properties
@@ -39,6 +45,7 @@
 * geomap - merge interactive pan and zoom into one, faster system
 ** pan and zoom in same interactive session (_interactiveCenter & _interactivePixelSize)
 ** delay image loading more during movement
+* geomap - use CSS transition or transform for smoother tiling
 * geomap - implement service-level shape redrawing during interactive movement
 * upgrade jquery.mousewheel
 * make a package for new jQuery plugin directory
@@ -147,12 +154,29 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2012-02-04==
+===options===
+Right, this._options does equal this.options but only because the latter must be called so and we can minify the former for internal use.
+
+==2012-02-03==
+===proj===
+I seem to be able to detect geodetic coordinates ok. I'm switching all of the $.geo functions to use it. So far, so good.
+
+==2012-02-02==
+===transition===
+They look cool, but I don't think this project is ready for transitions, they have some unexpected side-effects. I would like to rewrite the interactive portion anyway.
+
 ==2012-02-01==
 ===destroy===
 There's a bug with shingled services if I call destroy and try to re-create.
 
 ===services===
 Changing the services option will destroy all service-level shapes. I'm not sure what to do about that. Eventually, I will re-use serviceContainers (and service-geomaps) based on the new services array coming in but I currently don't do that.
+
+===proj===
+Finally, to get rid of proj. The point is, you should be able to use projected coordinates even when $.geo.proj is not null.
+
+The same geodetic test applies to both bbox & coords because the first two elements of either are the x and y of some number. Nice!
 
 ==2012-01-31==
 ===shapes zoom===

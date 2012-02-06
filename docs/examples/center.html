@@ -45,19 +45,23 @@
       <p class="not-mobile">The center option is in geodetic cooridinates, [lon, lat], but the internal center is in map units, web mercator by default.</p>
       <table>
         <tr>
-          <th>geodetic center</th>
+          <th>.geomap( &quot;option&quot;, &quot;center&quot; )</th>
           <td id="lblCenterPublic"></td>
         </tr>
         <tr>
-          <th>internal center</th>
+          <th>$.geo.proj.toGeodetic( center )</th>
+          <td id="lblCenterGeodetic"></td>
+        </tr>
+        <tr>
+          <th><i>internal center, always projected</i></th>
           <td id="lblCenterInternal"></td>
         </tr>
         <tr>
-          <th>zoom</th>
+          <th>.geomap( &quot;option&quot;, &quot;zoom&quot; )</th>
           <td id="lblZoom"></td>
         </tr>
         <tr>
-          <th>pixelSize</th>
+          <th>.geomap( &quot;option&quot;, &quot;pixelSize&quot; )</th>
           <td id="lblPixelSize"></td>
         </tr>
       </table>
@@ -65,7 +69,17 @@
   </div>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
-  <script src="../jquery.geo-test.min.js"></script>
+  <script src="../../js/jquery.geo.head.js"></script>
+  <script src="../../js/excanvas.js"></script>
+  <script src="../../js/jquery.mousewheel.min.js"></script>
+  <script src="../../js/jquery.ui.widget.js"></script>
+  <script src="../../js/jsrender.js"></script>
+  <script src="../../js/jquery.geo.core.js"></script>
+  <script src="../../js/jquery.geo.geographics.js"></script>
+  <script src="../../js/jquery.geo.geomap.js"></script>
+  <script src="../../js/jquery.geo.tiled.js"></script>
+  <script src="../../js/jquery.geo.shingled.js"></script>
+  <!--<script src="../jquery.geo-test.min.js"></script>-->
   <script>
     $(function () {
       // store references to the inputs
@@ -109,16 +123,25 @@
       function refreshActual() {
         // get the center
         // by default, this is in geodetic coordinates, [lon, lat]
+        // but the developer can use projected coordinates
         var actualCenter = map.geomap("option", "center");
         $("#lblCenterPublic").text("[" + actualCenter + "]");
 
         if ($.geo.proj) {
-          // if there is a projection set, convert the geodetic center to map units
+          // if there is a projection set,
+          // we can display the center in both geodetic and projected units
+
+          var geodetic = $.geo.proj.toGeodetic(actualCenter);
+          $("#lblCenterGeodetic").text("[" + geodetic + "]");
+
+          // the internal center is always projected
           var internal = $.geo.proj.fromGeodetic(actualCenter);
           $("#lblCenterInternal").text("[" + internal + "]");
         } else {
           // if not, then both the center option and internal center are the same
           $("#lblCenterInternal").text("[" + actualCenter + "]");
+
+          // also, we have no way to display the center in lon, lat
         }
 
         // get and display the current zoom value

@@ -80,11 +80,15 @@
     _centerMax: undefined,
     _pixelSizeMax: undefined,
 
-    _wheelZoomFactor: 1.18920711500273,
+    _userGeodetic: true,
+
     _wheelTimeout: null,
     _wheelLevel: 0,
 
-    _zoomFactor: 2,
+    _zoomFactor: 2, //< determines what a zoom level means
+
+    _fullZoomFactor: 2, //< interactiveScale factor needed to zoom a whole level
+    _partialZoomFactor: 1.18920711500273, //< interactiveScale factor needed to zoom a fraction of a level (the fourth root of 2)
 
     _mouseDown: undefined,
     _inOp: undefined,
@@ -189,6 +193,8 @@
     },
 
     _create: function () {
+      this._options = this.options;
+
       if (this._$elem.is(".geo-service")) {
         this._map = this._$elem.data( "geoMap" );
         this._$shapesContainer.geographics( );
@@ -197,8 +203,6 @@
       }
 
       this._map = this;
-
-      this._options = this.options;
 
       this._supportTouch = "ontouchend" in document;
       this._softDblClick = this._supportTouch || _ieVersion == 7;
@@ -282,22 +286,22 @@
 
       switch (key) {
         case "bbox":
-          if ($.geo.proj) {
-            value = $.geo.proj.fromGeodetic([[value[0], value[1]], [value[2], value[3]]]);
-            value = [value[0][0], value[0][1], value[1][0], value[1][1]];
+          this._userGeodetic = $.geo.proj && $.geo._isGeodetic( value );
+          if ( this._userGeodetic ) {
+            value = $.geo.proj.fromGeodetic( value );
           }
 
           this._setBbox(value, false, refresh);
           value = this._getBbox();
-
-          if ($.geo.proj) {
-            value = $.geo.proj.toGeodetic([[value[0], value[1]], [value[2], value[3]]]);
-            value = [value[0][0], value[0][1], value[1][0], value[1][1]];
-          }
           break;
 
         case "center":
-          this._setCenterAndSize($.geo.proj ? $.geo.proj.fromGeodetic([[value[0], value[1]]])[0] : value, this._pixelSize, false, refresh);
+          this._userGeodetic = $.geo.proj && $.geo._isGeodetic( value );
+          if ( this._userGeodetic ) {
+            value = $.geo.proj.fromGeodetic( value );
+          }
+
+          this._setCenterAndSize( value, this._pixelSize, false, refresh );
           break;
 
         case "measureLabels":
@@ -332,7 +336,15 @@
 
       $.Widget.prototype._setOption.apply(this, arguments);
 
-      switch (key) {
+      switch ( key ) {
+        case "bbox":
+        case "center":
+          if ( this._userGeodetic ) {
+            this._options[ "bbox" ] = $.geo.proj.toGeodetic( this._options[ "bbox" ] );
+            this._options[ "center" ] = $.geo.proj.toGeodetic( this._center );
+          }
+          break;
+
         case "tilingScheme":
           if ( value != null ) {
             this._pixelSizeMax = this._getTiledPixelSize(0);
@@ -389,12 +401,11 @@
 
     toMap: function (p) {
       p = this._toMap(p);
-      return $.geo.proj ? $.geo.proj.toGeodetic(p) : p;
+      return this._userGeodetic ? $.geo.proj.toGeodetic(p) : p;
     },
 
     toPixel: function ( p, _center /* Internal Use Only */, _pixelSize /* Internal Use Only */ ) {
-      p = $.geo.proj ? $.geo.proj.fromGeodetic(p) : p;
-      return this._toPixel(p, _center, _pixelSize);
+      return this._toPixel( $.geo.proj.fromGeodetic( p ), _center, _pixelSize );
     },
 
     opacity: function (value, _serviceContainer) {
@@ -505,7 +516,7 @@
         for ( i = 0; i < shapes.length; i++ ) {
           if ( shapes[ i ].type != "Point" ) {
             var bbox = $.geo.bbox( shapes[ i ] );
-            if ( $.geo.proj ) {
+            if ( $.geo.proj && $.geo._isGeodetic( bbox ) ) {
               bbox = $.geo.proj.fromGeodetic( bbox );
             }
             $.data( shapes[ i ], "geoBbox", bbox );
@@ -566,7 +577,7 @@
               },
               projectedPoint = {
                 type: "Point",
-                coordinates: $.geo.proj ? $.geo.proj.fromGeodetic( point.coordinates ) : point.coordinates
+                coordinates: $.geo.proj && $.geo._isGeodetic( point.coordinates ) ? $.geo.proj.fromGeodetic( point.coordinates ) : point.coordinates
               };
 
           if ( $.geo.distance( bboxPolygon, projectedPoint, true ) <= mapTol ) {
@@ -948,21 +959,23 @@
       }
     },
 
-    _getZoomCenterAndSize: function (anchor, zoomDelta, zoomFactor) {
-      var pixelSize, zoomLevel, scale;
+    _getZoomCenterAndSize: function ( anchor, zoomDelta, full ) {
+      var zoomFactor = ( full ? this._fullZoomFactor : this._partialZoomFactor ),
+          scale = Math.pow( zoomFactor, -zoomDelta ),
+          pixelSize,
+          zoomLevel;
+
       if (this._options["tilingScheme"]) {
-        zoomLevel = this._getTiledZoom(this._pixelSize) + zoomDelta;
+        zoomLevel = this._getTiledZoom(this._pixelSize * scale);
         pixelSize = this._getTiledPixelSize(zoomLevel);
       } else {
-        scale = Math.pow(zoomFactor, -zoomDelta);
         pixelSize = this._pixelSize * scale;
       }
 
-      var 
-        ratio = pixelSize / this._pixelSize,
-        anchorMapCoord = this._toMap(anchor),
-        centerDelta = [(this._center[0] - anchorMapCoord[0]) * ratio, (this._center[1] - anchorMapCoord[1]) * ratio],
-        scaleCenter = [anchorMapCoord[0] + centerDelta[0], anchorMapCoord[1] + centerDelta[1]];
+      var ratio = pixelSize / this._pixelSize,
+          anchorMapCoord = this._toMap(anchor),
+          centerDelta = [(this._center[0] - anchorMapCoord[0]) * ratio, (this._center[1] - anchorMapCoord[1]) * ratio],
+          scaleCenter = [anchorMapCoord[0] + centerDelta[0], anchorMapCoord[1] + centerDelta[1]];
 
       return { pixelSize: pixelSize, center: scaleCenter };
     },
@@ -971,7 +984,7 @@
       this._wheelTimeout = null;
 
       if (this._wheelLevel != 0) {
-        var wheelCenterAndSize = this._getZoomCenterAndSize(this._anchor, this._wheelLevel, this._wheelZoomFactor);
+        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, this._options[ "tilingScheme" ] != null );
 
         this._setCenterAndSize(wheelCenterAndSize.center, wheelCenterAndSize.pixelSize, true, true);
 
@@ -1106,18 +1119,13 @@
       }
 
       this._center = center;
-      this.options["pixelSize"] = this._pixelSize = pixelSize;
+      this._options["pixelSize"] = this._pixelSize = pixelSize;
 
-      if ($.geo.proj) {
-        var bbox = this._getBbox();
-        bbox = $.geo.proj.toGeodetic([[bbox[0], bbox[1]], [bbox[2], bbox[3]]]);
-        bbox = [bbox[0][0], bbox[0][1], bbox[1][0], bbox[1][1]];
-        this._options["bbox"] = bbox;
-
-        this._options["center"] = $.geo.proj.toGeodetic([[this._center[0], this._center[1]]])[0];
+      if ( this._userGeodetic ) {
+        this._options["bbox"] = $.geo.proj.toGeodetic( this._getBbox() );
+        this._options["center"] = $.geo.proj.toGeodetic( this._center );
       } else {
         this._options["bbox"] = this._getBbox();
-
         this._options["center"] = this._center;
       }
 
@@ -1269,7 +1277,7 @@
     _eventTarget_dblclick_zoom: function(e) {
       this._trigger("dblclick", e, { type: "Point", coordinates: this.toMap(this._current) });
       if (!e.isDefaultPrevented()) {
-        var centerAndSize = this._getZoomCenterAndSize(this._current, 1, this._zoomFactor);
+        var centerAndSize = this._getZoomCenterAndSize(this._current, 1, true );
         this._setCenterAndSize(centerAndSize.center, centerAndSize.pixelSize, true, true);
       }
     },
@@ -1295,7 +1303,7 @@
               this._drawCoords.length--;
               this._trigger( "shape", e, {
                 type: "LineString",
-                coordinates: $.geo.proj ? $.geo.proj.toGeodetic(this._drawCoords) : this._drawCoords
+                coordinates: this._userGeodetic ? $.geo.proj.toGeodetic(this._drawCoords) : this._drawCoords
               } );
           } else {
             this._eventTarget_dblclick_zoom(e);
@@ -1311,7 +1319,7 @@
               this._drawCoords[endIndex] = $.merge( [], this._drawCoords[0] );
               this._trigger( "shape", e, {
                 type: "Polygon",
-                coordinates: [ $.geo.proj ? $.geo.proj.toGeodetic(this._drawCoords) : this._drawCoords ]
+                coordinates: [ this._userGeodetic ? $.geo.proj.toGeodetic(this._drawCoords) : this._drawCoords ]
               } );
             }
           } else {
@@ -1490,14 +1498,12 @@
               anchorWidth = this._multiTouchAnchorBbox[ 2 ] - this._multiTouchAnchorBbox[ 0 ],
               ratioWidth = currentWidth / anchorWidth;
 
+          this._wheelLevel = Math.abs( Math.floor( ( 1 - ratioWidth ) * 10 ) );
           if ( Math.abs( currentWidth ) < Math.abs( anchorWidth ) ) {
-            this._wheelLevel = - Math.abs( Math.floor( ( 1 - ratioWidth ) * 10 ) );
-          } else {
-            this._wheelLevel = Math.abs( Math.floor( ( 1 - ratioWidth ) * 10 / 2 ) );
+            this._wheelLevel = - this._wheelLevel;
           }
 
-          var pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, this._wheelZoomFactor );
-
+          var pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, false );
           this._$elem.find( ".geo-shapes-container" ).geographics("clear");
 
           for ( i = 0; i < this._currentServices.length; i++ ) {
@@ -1631,7 +1637,7 @@
         e.preventDefault( );
         this._isMultiTouch = false;
 
-        var pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, this._wheelZoomFactor );
+        var pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, false );
 
         this._setCenterAndSize(pinchCenterAndSize.center, pinchCenterAndSize.pixelSize, true, true);
 
@@ -1771,7 +1777,7 @@
 
         this._wheelLevel += delta;
 
-        var wheelCenterAndSize = this._getZoomCenterAndSize(this._anchor, this._wheelLevel, this._wheelZoomFactor),
+        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, this._options[ "tilingScheme" ] != null ),
             service,
             i = 0;
 
