@@ -203,9 +203,10 @@
           serviceContainer.children( ).each( function ( i ) {
             var $scaleContainer = $(this),
                 scaleRatio = $scaleContainer.attr("data-pixelSize") / pixelSize,
-                transitionCss = "width .25s ease-in, height .25s ease-in, left .25s ease-in, top .25s ease-in";
+                transitionCss = ""; //"width .25s ease-in, height .25s ease-in, left .25s ease-in, top .25s ease-in";
 
             scaleRatio = Math.round(scaleRatio * 1000) / 1000;
+
 
             var scaleOriginParts = $scaleContainer.data("scaleOrigin").split(","),
                 oldMapCoord = map._toMap([scaleOriginParts[0], scaleOriginParts[1]]),

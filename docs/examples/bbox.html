@@ -67,8 +67,16 @@
             <th><label for="bbox-prop">.geomap(&quot;option&quot;, &quot;bbox&quot;,</label> </th>
             <td><input id="bbox-prop" name="bbox-prop" type="text" /> <b>)</b> <button type="submit">set</button></td>
           </tr>
+          <tr class="bbox-bbox">
+            <th>.geomap( &quot;option&quot;, &quot;bbox&quot; )</th>
+            <td></td>
+          </tr>
           <tr class="bbox-proj">
             <th>$.geo.proj.fromGeodetic( bbox )</th>
+            <td></td>
+          </tr>
+          <tr class="bbox-projto">
+            <th>$.geo.proj.toGeodetic( bbox )</th>
             <td></td>
           </tr>
           <tr class="bbox-center">
@@ -118,21 +126,31 @@
   </div>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
-  <script src="../jquery.geo-test.min.js"></script>
+  <script src="../../js/jquery.geo.head.js"></script>
+  <script src="../../js/excanvas.js"></script>
+  <script src="../../js/jquery.mousewheel.min.js"></script>
+  <script src="../../js/jquery.ui.widget.js"></script>
+  <script src="../../js/jsrender.js"></script>
+  <script src="../../js/jquery.geo.core.js"></script>
+  <script src="../../js/jquery.geo.geographics.js"></script>
+  <script src="../../js/jquery.geo.geomap.js"></script>
+  <script src="../../js/jquery.geo.tiled.js"></script>
+  <script src="../../js/jquery.geo.shingled.js"></script>
+  <!--<script src="../jquery.geo-test.min.js"></script>-->
   <script>
     $(function () {
       var $bboxInput = $(".bbox-prop input"); //< bbox input reference
 
       // create a map
       var map = $("#map").geomap({
-        center: [-71.0595678, 42.3604823],
-        zoom: 8,
-        bboxchange: function (e, geo) {
-          // inside the bboxchange event, update the input with the current bbox
-          // the geo object has a bbox property which is the new bbox
-          updateBboxDisplay(geo.bbox);
-        }
-      });
+            center: [-71.0595678, 42.3604823],
+            zoom: 8,
+            bboxchange: function (e, geo) {
+              // inside the bboxchange event, update the input with the current bbox
+              // the geo object has a bbox property which is the new bbox
+              updateBboxDisplay(geo.bbox);
+            }
+          });
 
       $("form.bbox").submit(function () {
         // a new bbox is submitted, update the bbox option
@@ -210,13 +228,19 @@
         // the bbox argument is a GeoJSON bounding box, which is a JavaScript array
         // we can call join on the array to add spaces after the bbox values
         // the values are: min longitude/x, min latitude/y, max longitude/x, max latitude/y
-        $bboxInput.val("[" + bbox + "]");
+        $bboxInput.val( "[" + bbox + "]" );
+
+        // the bbox as the map widget sees it
+        $(".bbox-bbox td").text( "[" + map.geomap( "option", "bbox" ).join( ", " ) + "]" );
 
         // projected coordinates of the bbox
-        $(".bbox-proj td").text("[" + $.geo.proj.fromGeodetic(bbox) + "]");
+        $(".bbox-proj td").text("[" + $.geo.proj.fromGeodetic(bbox).join( ", " ) + "]");
+
+        // geodetic coordinates of the bbox
+        $(".bbox-projto td").text("[" + $.geo.proj.toGeodetic(bbox).join( ", " ) + "]");
 
         // center of the bbox, a GeoJSON position
-        $(".bbox-center td").text("[" + $.geo.center(bbox) + "]");
+        $(".bbox-center td").text("[" + $.geo.center(bbox).join( ", " ) + "]");
 
         // width & height of the bbox, in meters because the default service is web mercator meters
         // the units will match whatever coordinate system you set via geomap's tilingScheme or bboxMax properties

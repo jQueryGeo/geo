@@ -41,16 +41,27 @@
 };
 
 var projectedCoords = $.geo.proj.fromGeodetic( geodeticPoint.coordinates );</code></pre>
+
       <p>However, a LineString's coordinates property is an array of positions which you can also pass to the fromGeodetic method to get an array converted positions</p>
-      <pre><code>var projectedCoords = $.geo.proj.fromGeodetic( geodeticLineString.coordinates );</code></pre>
+
+      <pre><code>var projectedLineStringCoords = $.geo.proj.fromGeodetic( geodeticLineString.coordinates );</code></pre>
+
       <p>To convert a set of projected GeoJSON positions back to web mercator, call toGeodetic.</p>
-      <pre><code>var geodeticCoords = $.geo.proj.toGeodetic( projectedPolygon.coordinates );</code></pre>
+
+      <pre><code>var geodeticLineString = {
+  type: &quot;LineString&quot;,
+  coordinates: $.geo.proj.toGeodetic( projectedLineStringCoords  )
+};</code></pre>
 
       <h3 id="otherprojections">Other projections</h3>
+
       <p>The $.geo.proj object allows you to use geodetic coordinates with whichever coordinate system or projection you want in any plugin function. If you pass a geodetic Polygon to $.geo.bbox, the returned bounding box will be in geodetic coordinates.</p>
-      <p>If you are working in a projection other than the default web mercator meters but still wish to use geodetic coordinates, you will have to create a new $.geo.proj object that can convert between geodetic and projected coordinates.</p>
-      <p>However, if you don't need to work in geodetic coordinates, you have the option to set $.geo.proj to null. By doing so, you are limited to projected coordinates throughout your project. If you are working in Massachusetts Mainland State Plane meters for example, you will have to pass a Polygon of that projection and you will get results in that projection. This includes all $.geo functions and geomap options &amp; methods.</p>
-      <pre><code>$.geo.proj = null;
+
+      <p>If you are working in a projection other than the default web mercator meters but still wish to use geodetic coordinates, you will have to update the $.geo.proj object so that it can convert between geodetic coordinates and ones in your projection.</p>
+
+      <p>However, if you don't need to work in longitude, latitude at all, you can ignore $.geo.proj and use projected coordinates throughout your project. You also still have the option to set $.geo.proj to null for completeness and remind yourself that you are limited to projected coordinates. If you are working in Massachusetts Mainland State Plane meters for example, you can pass a Polygon of that projection to any plugin function and you will get results in that projection. This includes all $.geo functions and geomap options &amp; methods.</p>
+
+      <pre><code>$.geo.proj = null; <span class="comment">// not required but reminds us that jQuery Geo can't use lon, lat in this project</span>
 
 $('map').geomap( {
   tilingScheme: null,
@@ -58,7 +69,11 @@ $('map').geomap( {
   bbox: [ 235644, 894775, 237775, 898523 ],
   services: [ /* service object that supports MA State Plane */ ]
 } );</code></pre>
+
       <p>jQuery Geo uses the four $.geo.proj functions throughout to convert between geodetic and projected coordinates. However, fromGeodeticPos and toGeodeticPos handle the conversion of individual GeoJSON positions and are used by fromGeodetic and toGeodetic. You can extend $.geo.proj with your own implementations of fromGeodeticPos and toGeodeticPos to change the internal projection used by all plugin functions and still use geodetic (lon, lat) coordinates as arguments and return values.</p>
+
+      <p><b>Please note</b> that you must extend $.geo.proj with new functionality instead of replacing it wholesale with a new object. You need to keep the original fromGeodetic and toGeodetic functions intact.</p>
+
       <pre><code>$.extend($.geo.proj, {
   fromGeodeticPos: function( coordinate ) {
     var converted = [];
