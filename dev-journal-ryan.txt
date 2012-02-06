@@ -1,9 +1,8 @@
 ﻿== to do ==
-* geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
 * geomap - service object visibility and opacity options should be moved to a style property
+* geomap - show attr text
 * geomap - [bug] first use of mouse/touch in any mode moves map by one pixel on mousedown/touch
 ** possibly only when axisLayout is image
-* geomap - show attr text
 * geomap - [bug] pan lags on first drag (related?)
 * geomap - [bug] zoom in more than once with zoom method moves tiles to the wrong spot
 * geomap - [bug] map panning is jumpy, appears to be related to shapes and/or drawing context
@@ -13,6 +12,9 @@
 * geomap - [bug] zoom option doesn't return proper values for shingled services?
 * geomap - [bug] double tap to end shapes adds two points before ending the shape, in different places
 * geomap - [bug] lifting figers after pinch zoom in drawLineString or drawPolygon modes sometimes adds fake visual coordinate on touch point last lifted
+* examples - jQuery Mobile
+* examples - drag shapes
+* examples - multi-service-level shapes
 * geomap - don't request tiles that are -y index or > max possible y for scale
 * geomap - repeat horizontal tiles
 * geomap - cache label coordinates (the labelPixel cannot be cached, it will change each refresh)
@@ -151,6 +153,14 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-02-04==
+===options===
+Right, this._options does equal this.options but only because the latter must be called so and we can minify the former for internal use.
+
+==2012-02-03==
+===proj===
+I seem to be able to detect geodetic coordinates ok. I'm switching all of the $.geo functions to use it. So far, so good.
 
 ==2012-02-02==
 ===transition===

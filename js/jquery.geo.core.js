@@ -42,6 +42,20 @@
       return result;
     },
 
+    _isGeodetic: function( coords ) {
+      // returns true if the first coordinate it can find is geodetic
+
+      while ( $.isArray( coords ) ) {
+        if ( coords.length > 1 && ! $.isArray( coords[ 0 ] ) ) {
+          return ( coords[ 0 ] >= -180 && coords[ 0 ] <= 180 && coords[ 1 ] >= -85 && coords[ 1 ] <= 85 );
+        } else {
+          coords = coords[ 0 ];
+        }
+      }
+
+      return false;
+    },
+
     //
     // bbox functions
     //
@@ -49,25 +63,32 @@
     center: function (bbox, _ignoreGeo /* Internal Use Only */) {
       // Envelope.centre in JTS
       // bbox only, use centroid for geom
-      if (!_ignoreGeo && $.geo.proj) {
+      var wasGeodetic = false;
+      if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( bbox ) ) {
+        wasGeodetic = true;
         bbox = $.geo.proj.fromGeodetic(bbox);
       }
+
       var center = [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2];
-      return !_ignoreGeo && $.geo.proj ? $.geo.proj.toGeodetic(center) : center;
+      return wasGeodetic ? $.geo.proj.toGeodetic(center) : center;
     },
 
-    expandBy: function (bbox, dx, dy) {
-      if ($.geo.proj) {
+    expandBy: function (bbox, dx, dy, _ignoreGeo /* Internal Use Only */) {
+      var wasGeodetic = false;
+      if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( bbox ) ) {
+        wasGeodetic = true;
         bbox = $.geo.proj.fromGeodetic(bbox);
       }
+
       bbox = [bbox[0] - dx, bbox[1] - dy, bbox[2] + dx, bbox[3] + dy];
-      return $.geo.proj ? $.geo.proj.toGeodetic(bbox) : bbox;
+      return wasGeodetic ? $.geo.proj.toGeodetic(bbox) : bbox;
     },
 
     height: function (bbox, _ignoreGeo /* Internal Use Only */ ) {
-      if (!_ignoreGeo && $.geo.proj) {
+      if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( bbox ) ) {
         bbox = $.geo.proj.fromGeodetic(bbox);
       }
+
       return bbox[3] - bbox[1];
     },
 
@@ -87,9 +108,12 @@
 
     reaspect: function (bbox, ratio, _ignoreGeo /* Internal Use Only */ ) {
       // not in JTS
-      if (!_ignoreGeo && $.geo.proj) {
+      var wasGeodetic = false;
+      if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( bbox ) ) {
+        wasGeodetic = true;
         bbox = $.geo.proj.fromGeodetic(bbox);
       }
+
       var width = this.width(bbox, true),
           height = this.height(bbox, true),
           center = this.center(bbox, true),
@@ -106,14 +130,22 @@
 
         bbox = [center[0] - dx, center[1] - dy, center[0] + dx, center[1] + dy];
       }
-      return (!_ignoreGeo && $.geo.proj) ? $.geo.proj.toGeodetic(bbox) : bbox;
+
+      return wasGeodetic ? $.geo.proj.toGeodetic(bbox) : bbox;
     },
 
     recenter: function( bbox, center, _ignoreGeo /* Internal Use Only */ ) {
       // not in JTS
-      if (!_ignoreGeo && $.geo.proj) {
-        bbox = $.geo.proj.fromGeodetic(bbox);
-        center = $.geo.proj.fromGeodetic(center);
+      var wasGeodetic = false;
+      if ( !_ignoreGeo && $.geo.proj ) {
+        if ( this._isGeodetic( bbox ) ) {
+          wasGeodetic = true;
+          bbox = $.geo.proj.fromGeodetic(bbox);
+        }
+
+        if ( this._isGeodetic( center ) ) {
+          center = $.geo.proj.fromGeodetic(center);
+        }
       }
 
       var halfWidth = ( bbox[ 2 ] - bbox[ 0 ] ) / 2,
@@ -126,25 +158,31 @@
         center[ 1 ] + halfHeight
       ];
 
-      return (!_ignoreGeo && $.geo.proj) ? $.geo.proj.toGeodetic(bbox) : bbox;
+      return wasGeodetic ? $.geo.proj.toGeodetic(bbox) : bbox;
     },
 
     scaleBy: function ( bbox, scale, _ignoreGeo /* Internal Use Only */ ) {
       // not in JTS
-      if (!_ignoreGeo && $.geo.proj) {
+      var wasGeodetic = false;
+      if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( bbox ) ) {
+        wasGeodetic = true;
         bbox = $.geo.proj.fromGeodetic(bbox);
       }
+
       var c = this.center(bbox, true),
           dx = (bbox[2] - bbox[0]) * scale / 2,
           dy = (bbox[3] - bbox[1]) * scale / 2;
+
       bbox = [c[0] - dx, c[1] - dy, c[0] + dx, c[1] + dy];
-      return !_ignoreGeo && $.geo.proj ? $.geo.proj.toGeodetic(bbox) : bbox;
+
+      return wasGeodetic ? $.geo.proj.toGeodetic(bbox) : bbox;
     },
 
     width: function (bbox, _ignoreGeo /* Internal Use Only */ ) {
-      if (!_ignoreGeo && $.geo.proj) {
+      if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( bbox ) ) {
         bbox = $.geo.proj.fromGeodetic(bbox);
       }
+
       return bbox[2] - bbox[0];
     },
 
@@ -158,7 +196,7 @@
       if ( !geom ) {
         return undefined;
       } else if ( geom.bbox ) {
-        result = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic( geom.bbox ) : geom.bbox;
+        result = ( !_ignoreGeo && $.geo.proj && this._isGeodetic( geom.bbox ) ) ? $.geo.proj.fromGeodetic( geom.bbox ) : geom.bbox;
       } else {
         result = [ pos_oo, pos_oo, neg_oo, neg_oo ];
 
@@ -169,7 +207,9 @@
           return undefined;
         }
 
-        if ( $.geo.proj ) {
+        var wasGeodetic = false;
+        if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( coordinates ) ) {
+          wasGeodetic = true;
           coordinates = $.geo.proj.fromGeodetic( coordinates );
         }
 
@@ -181,7 +221,7 @@
         }
       }
 
-      return $.geo.proj ? $.geo.proj.toGeodetic(result) : result;
+      return wasGeodetic ? $.geo.proj.toGeodetic(result) : result;
     },
 
     // centroid
@@ -198,7 +238,9 @@
               coords = $.merge( [ ], geom.type == "Polygon" ? geom.coordinates[0] : geom.coordinates ),
               i = 1, j, n;
 
-          if ( !_ignoreGeo && $.geo.proj ) {
+          var wasGeodetic = false;
+          if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( coords ) ) {
+            wasGeodetic = true;
             coords = $.geo.proj.fromGeodetic(coords);
           }
 
@@ -218,7 +260,7 @@
             if (coords.length > 0) {
               c[0] = coords[0][0];
               c[1] = coords[0][1];
-              return { type: "Point", coordinates: !_ignoreGeo && $.geo.proj ? $.geo.proj.toGeodetic(c) : c };
+              return { type: "Point", coordinates: wasGeodetic ? $.geo.proj.toGeodetic(c) : c };
             } else {
               return undefined;
             }
@@ -228,7 +270,7 @@
           c[0] /= a;
           c[1] /= a;
 
-          return { type: "Point", coordinates: !_ignoreGeo && $.geo.proj ? $.geo.proj.toGeodetic(c) : c };
+          return { type: "Point", coordinates: wasGeodetic ? $.geo.proj.toGeodetic(c) : c };
       }
       return undefined;
     },
@@ -295,8 +337,8 @@
     // distance
 
     distance: function ( geom1, geom2, _ignoreGeo /* Internal Use Only */ ) {
-      var geom1CoordinatesProjected = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic(geom1.coordinates) : geom1.coordinates,
-          geom2CoordinatesProjected = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic(geom2.coordinates) : geom2.coordinates;
+      var geom1CoordinatesProjected = ( !_ignoreGeo && $.geo.proj && this._isGeodetic( geom1.coordinates ) ) ? $.geo.proj.fromGeodetic(geom1.coordinates) : geom1.coordinates,
+          geom2CoordinatesProjected = ( !_ignoreGeo && $.geo.proj && this._isGeodetic( geom2.coordinates ) ) ? $.geo.proj.fromGeodetic(geom2.coordinates) : geom2.coordinates;
 
       switch (geom1.type) {
         case "Point":
@@ -413,10 +455,17 @@
     // buffer
 
     _buffer: function( geom, distance, _ignoreGeo /* Internal Use Only */ ) {
+      var wasGeodetic = false,
+          coords;
+
+      if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( geom.coordinates ) ) {
+        wasGeodetic = true;
+        coords = $.geo.proj.fromGeodetic( geom.coordinates );
+      }
+
       switch ( geom.type ) {
         case "Point":
-          var coord = ( !_ignoreGeo && $.geo.proj ) ? $.geo.proj.fromGeodetic(geom.coordinates) : geom.coordinates,
-              resultCoords = [],
+          var resultCoords = [],
               slices = 180,
               i = 0,
               a;
@@ -424,14 +473,14 @@
           for ( ; i <= slices; i++ ) {
             a = ( i * 360 / slices ) * ( Math.PI / 180 );
             resultCoords.push( [
-              coord[ 0 ] + Math.cos( a ) * distance,
-              coord[ 1 ] + Math.sin( a ) * distance
+              coords[ 0 ] + Math.cos( a ) * distance,
+              coords[ 1 ] + Math.sin( a ) * distance
             ] );
           }
 
           return {
             type: "Polygon",
-            coordinates: [ ( !_ignoreGeo && $.geo.proj ? $.geo.proj.toGeodetic( resultCoords ) : resultCoords ) ]
+            coordinates: [ ( wasGeodetic ? $.geo.proj.toGeodetic( resultCoords ) : resultCoords ) ]
           };
 
           break;
@@ -485,22 +534,29 @@
           return 0;
 
         case "LineString":
-          lineStringCoordinates = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic(geom.coordinates) : geom.coordinates;
+          lineStringCoordinates = geom.coordinates;
           break;
 
         case "Polygon":
-          lineStringCoordinates = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic(geom.coordinates[ 0 ]) : geom.coordinates[ 0 ];
+          lineStringCoordinates = geom.coordinates[ 0 ];
           break;
       }
 
       if ( lineStringCoordinates ) {
+        if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( lineStringCoordinates ) ) {
+          lineStringCoordinates = $.geo.proj.fromGeodetic( lineStringCoordinates );
+        }
+
         for ( ; i < lineStringCoordinates.length; i++ ) {
           dx = lineStringCoordinates[ i ][0] - lineStringCoordinates[ i - 1 ][0];
           dy = lineStringCoordinates[ i ][1] - lineStringCoordinates[ i - 1 ][1];
           sum += Math.sqrt((dx * dx) + (dy * dy));
         }
+
         return sum;
       }
+
+      // return undefined;
     },
 
     area: function( geom, _ignoreGeo /* Internal Use Only */ ) {
@@ -514,12 +570,15 @@
           return 0;
 
         case "Polygon":
-          polygonCoordinates = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic( geom.coordinates[ 0 ] ) : geom.coordinates[ 0 ];
+          polygonCoordinates = geom.coordinates[ 0 ];
           break;
       }
 
-
       if ( polygonCoordinates ) {
+        if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( polygonCoordinates ) ) {
+          polygonCoordinates = $.geo.proj.fromGeodetic( polygonCoordinates );
+        }
+
         for ( ; i <= polygonCoordinates.length; i++) {
           j = i %  polygonCoordinates.length;
           sum += ( polygonCoordinates[ i - 1 ][ 0 ] - polygonCoordinates[ j ][ 0 ] ) * ( polygonCoordinates[ i - 1 ][ 1 ] + polygonCoordinates[ j ][ 1 ] ) / 2;
@@ -538,7 +597,8 @@
           lineStringCoordinates,
           segmentLengths = [],
           i = 1, dx, dy,
-          c, c0, c1;
+          c, c0, c1,
+          wasGeodetic = false;
 
       switch ( geom.type ) {
         case "Point":
@@ -566,7 +626,10 @@
             coordinates: [ lineStringCoordinates[ i ][ 0 ], lineStringCoordinates[ i ][ 1 ] ]
           };
         } else {
-          lineStringCoordinates = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic( lineStringCoordinates ) : lineStringCoordinates;
+          if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( lineStringCoordinates ) ) {
+            wasGeodetic = true;
+            lineStringCoordinates = $.geo.proj.fromGeodetic( lineStringCoordinates );
+          }
 
           for ( ; i < lineStringCoordinates.length; i++ ) {
             dx = lineStringCoordinates[ i ][ 0 ] - lineStringCoordinates[ i - 1 ][ 0 ];
@@ -593,7 +656,7 @@
 
           return {
             type: "Point",
-            coordinates: !_ignoreGeo && $.geo.proj ? $.geo.proj.toGeodetic(c) : c
+            coordinates: wasGeodetic ? $.geo.proj.toGeodetic(c) : c
           };
         }
       }
@@ -833,7 +896,11 @@
           ];
         },
 
-        fromGeodetic: function (coordinates) {
+        fromGeodetic: function ( coordinates ) {
+          if ( ! $.geo._isGeodetic( coordinates ) ) {
+            return coordinates;
+          }
+
           var isMultiPointOrLineString = $.isArray(coordinates[ 0 ]),
               fromGeodeticPos = this.fromGeodeticPos;
 
@@ -881,6 +948,10 @@
         },
 
         toGeodetic: function (coordinates) {
+          if ( $.geo._isGeodetic( coordinates ) ) {
+            return coordinates;
+          }
+
           var isMultiPointOrLineString = $.isArray(coordinates[ 0 ]),
               toGeodeticPos = this.toGeodeticPos;
 
