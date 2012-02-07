@@ -12,6 +12,7 @@
 * geomap - [bug] zoom option doesn't return proper values for shingled services?
 * geomap - [bug] double tap to end shapes adds two points before ending the shape, in different places
 * geomap - [bug] lifting figers after pinch zoom in drawLineString or drawPolygon modes sometimes adds fake visual coordinate on touch point last lifted
+* geomap - [bug] pointAlong doesn't take last point into account in all browsers (iOS, Firefox Nightly)
 * examples - jQuery Mobile
 * examples - drag shapes
 * examples - multi-service-level shapes
@@ -153,6 +154,10 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-02-06==
+===mousewheel===
+This needs to be updated, it doesn't work with jQuery 1.7.
 
 ==2012-02-04==
 ===options===
