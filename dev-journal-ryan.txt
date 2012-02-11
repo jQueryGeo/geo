@@ -1,7 +1,6 @@
 ﻿== to do ==
 
 === a4 ===
-* geomap - don't change user's service objects in opacity/toggle
 * geomap - show attr text
 * geomap - pan mode should use a hand cursor by default
 * docs - geomap - loadstart event

@@ -417,7 +417,6 @@
             var service = this._currentServices[ i ];
             if ( !_serviceContainer || service.serviceContainer[ 0 ] == _serviceContainer[ 0 ] ) {
               service.style.opacity = value;
-              this._options[ "services" ][ i ].style = $.extend( this._options[ "services" ][ i ].style, { opacity: value } );
               $.geo[ "_serviceTypes" ][ service.type ].opacity( this, service );
             }
           }
@@ -429,11 +428,9 @@
       if ( this._$elem.is( ".geo-service" ) ) {
         this._$elem.closest( ".geo-map" ).geomap( "toggle", value, this._$elem );
       } else {
-        var service,
-            propertyValue;
 
         for ( var i = 0; i < this._currentServices.length; i++ ) {
-          service = this._currentServices[ i ];
+          var service = this._currentServices[ i ];
 
           if ( !_serviceContainer || service.serviceContainer[ 0 ] == _serviceContainer[ 0 ] ) {
             if ( value === undefined ) {
@@ -441,10 +438,7 @@
               value = ( service.style.visibility !== "visible" );
             }
 
-            propertyValue = ( value ? "visible" : "hidden" );
-
-            service.style.visibility = propertyValue;
-            this._options[ "services" ][ i ].style = $.extend( this._options[ "services" ][ i ].style, { visibility: propertyValue } );
+            service.style.visibility = ( value ? "visible" : "hidden" );
 
             service.serviceContainer.toggle( value );
 
