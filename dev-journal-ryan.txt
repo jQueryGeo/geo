@@ -1,7 +1,6 @@
 ﻿== to do ==
 
 === a4 ===
-* geomap - show attr text
 * geomap - pan mode should use a hand cursor by default
 * docs - geomap - loadstart event
 * geomap - loadstart event
@@ -12,12 +11,14 @@
 * geomap - [bug] pan lags on first drag (related?)
 * geomap - [bug] zoom in more than once with zoom method moves tiles to the wrong spot
 * geomap - [bug] map panning is jumpy, appears to be related to shapes and/or drawing context
+* geomap - [bug] only services that have finished refreshing move when the user pans
+** check by zooming in then panning shingled demo with forest layer on
 * geomap - [bug] chaining doesn't work, e.g., .geomap(option,center).geomap(option,zoom)
 * geomap - [bug] measure modes do not show text for shingled services?
 * geomap - [bug] mouse zoom doesn't work for shingled services?
 * geomap - [bug] zoom option doesn't return proper values for shingled services?
 * geomap - [bug] double tap to end shapes adds two points before ending the shape, in different places
-* geomap - [bug] lifting figers after pinch zoom in drawLineString or drawPolygon modes sometimes adds fake visual coordinate on touch point last lifted
+* geomap - [bug] lifting fingers after pinch zoom in drawLineString or drawPolygon modes sometimes adds fake visual coordinate on touch point last lifted
 * geomap - [bug] pointAlong doesn't take last point into account in all browsers (iOS, Firefox Nightly)
 * examples - jQuery Mobile
 * examples - drag shapes
@@ -179,6 +180,9 @@ $.extend({
   }, style)
 
 That returns what you would expect if style is undfined.
+
+===str src===
+I can't mod index in the template. I feel that there is a way, but it's not there yet.
 
 ==2012-02-06==
 ===mousewheel===

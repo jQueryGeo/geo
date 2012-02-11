@@ -66,6 +66,7 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * geomap - service object visibility and opacity options should be moved to a style property
 * geomap - use _currentServices in all functions unless we actually need to update the public options services object
 * geomap - don't change user's service objects in opacity/toggle
+* geomap - show attr text
 
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon

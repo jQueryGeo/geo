@@ -63,6 +63,7 @@
     _$eventTarget: undefined,
     _$contentFrame: undefined,
     _$existingChildren: undefined,
+    _$attrList: undefined,
     _$servicesContainer: undefined,
 
     _$panContainer: undefined, //< all non-service elements that move while panning
@@ -704,6 +705,9 @@
       this._$contentFrame.append('<div class="geo-shapes-container" style="' + contentPosCss + contentSizeCss + '"></div>');
       this._$shapesContainer = this._$contentFrame.children(':last');
 
+      this._$contentFrame.append( '<ul style="position: absolute; bottom: 8px; left: 8px; list-style-type: none; max-width: 50%; padding: 0; margin: 0;"></ul>' );
+      this._$attrList = this._$contentFrame.children( ":last" );
+
       this._$contentFrame.append('<div class="geo-draw-container" style="' + contentPosCss + contentSizeCss + '"></div>');
       this._$drawContainer = this._$contentFrame.children(':last');
 
@@ -732,6 +736,7 @@
 
       this._currentServices = [ ];
       this._$servicesContainer.html( "" );
+      this._$attrList.html( "" );
 
       for ( i = 0; i < this._options[ "services" ].length; i++ ) {
         service = this._currentServices[ i ] = $.extend( { }, this._options[ "services" ][ i ] );
@@ -754,7 +759,16 @@
         $.geo[ "_serviceTypes" ][ service.type ].create( this, serviceContainer, service, i );
 
         serviceContainer.data( "geoMap", this ).geomap();
+
+        if ( service.attr ) {
+          this._$attrList.append( '<li>' + service.attr + '</li>' );
+        }
       }
+
+      this._$attrList.find( "a" ).css( {
+        position: "relative",
+        zIndex: 100
+      } );
     },
 
     _refreshDrawing: function ( ) {
