@@ -96,7 +96,7 @@
 
         this._cancelUnloaded(map, service);
 
-        if (serviceState && service && (service.visibility === undefined || service.visibility === "visible") && !( serviceState.serviceContainer.is( ":hidden" ) ) ) {
+        if ( serviceState && service && service.style.visibility === "visible" && !( serviceState.serviceContainer.is( ":hidden" ) ) ) {
 
           var bbox = map._getBbox(),
               pixelSize = map._pixelSize,
@@ -113,7 +113,7 @@
 
               scaleContainer = serviceContainer.children('[data-pixelSize="' + pixelSize + '"]'),
 
-              opacity = (service.opacity === undefined ? 1 : service.opacity),
+              opacity = service.style.opacity,
 
               $img;
 
@@ -180,7 +180,7 @@
       resize: function (map, service) {
         var serviceState = $.data(service, "geoServiceState");
 
-        if ( serviceState && service && (service.visibility === undefined || service.visibility === "visible")) {
+        if ( serviceState && service && service.style.visibility === "visible" ) {
           this._cancelUnloaded(map, service);
 
           var serviceContainer = serviceState.serviceContainer,
@@ -202,14 +202,14 @@
         }
       },
 
-      opacity: function (map, service) {
-        var serviceState = $.data(service, "geoServiceState");
-        serviceState.serviceContainer.find("img").stop(true).fadeTo("fast", service.opacity);
+      opacity: function ( map, service ) {
+        var serviceState = $.data( service, "geoServiceState" );
+        serviceState.serviceContainer.find( "img" ).stop( true ).fadeTo( "fast", service.style.opacity );
       },
 
       toggle: function (map, service) {
         var serviceState = $.data(service, "geoServiceState");
-        serviceState.serviceContainer.css("display", service.visibility === "visible" ? "block" : "none");
+        serviceState.serviceContainer.css("display", service.style.visibility === "visible" ? "block" : "none");
       },
 
       _cancelUnloaded: function (map, service) {

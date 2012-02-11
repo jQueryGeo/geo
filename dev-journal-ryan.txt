@@ -1,6 +1,13 @@
 ﻿== to do ==
-* geomap - service object visibility and opacity options should be moved to a style property
+
+=== a4 ===
+* geomap - don't change user's service objects in opacity/toggle
 * geomap - show attr text
+* geomap - pan mode should use a hand cursor by default
+* docs - geomap - loadstart event
+* geomap - loadstart event
+* docs - geomap - loadend event
+* geomap - loadend event
 * geomap - [bug] first use of mouse/touch in any mode moves map by one pixel on mousedown/touch
 ** possibly only when axisLayout is image
 * geomap - [bug] pan lags on first drag (related?)
@@ -16,8 +23,14 @@
 * examples - jQuery Mobile
 * examples - drag shapes
 * examples - multi-service-level shapes
+* examples - remove tmpl from examples as it conflicts with jsrender
 * geomap - don't request tiles that are -y index or > max possible y for scale
 * geomap - repeat horizontal tiles
+
+=== b1 ===
+
+* docs - geomap - pass the service id (if there is one) to the src callback as a view property
+* geomap - pass the service id (if there is one) to the src callback as a view property
 * geomap - cache label coordinates (the labelPixel cannot be cached, it will change each refresh)
 * geomap - rotate label based on segment
 * geomap - use pointer-events: none where appropriate
@@ -38,7 +51,6 @@
 * geomap - [bug] multiple maps do not work on the same page
 * docs - geomap - add argument to refresh to force reload of images (in case of dynamic data)
 * geomap - add argument to refresh to force reload of images (in case of dynamic data)
-* geomap - use _currentServices in all functions unless we actually need to update the public  options services object
 * geomap - create _defaultState object, use for widget-local _widgetState property, reinit _widgetState on _createWidget
 * geomap - don't redraw shapes after interactiveScale, they've already been drawn at new scale
 * geomap - [bug] exception when calling destroy on uninitialized div
@@ -48,10 +60,8 @@
 ** delay image loading more during movement
 * geomap - use CSS transition or transform for smoother tiling
 * geomap - implement service-level shape redrawing during interactive movement
-* upgrade jquery.mousewheel
 * make a package for new jQuery plugin directory
 ** https://github.com/jquery/plugins.jquery.com/blob/master/docs/package.md
-* examples - remove tmpl from examples as it conflicts with jsrender
 * examples - redo the jVectorMap demo page using jQuery Geo
 ** http://jvectormap.owl-hollow.net/ ( found via http://www.moretechtips.net/2011/12/22-most-popular-jquery-plugins-of-2011.html )
 * expose jQuery Geo as an AMD module so asynchronous loaders like RequireJS and curl.js can use it
@@ -60,6 +70,7 @@
 * examples - merge all mode examples into one, called mode
 * examples - Codecademy course
 * geomap - [bug] when a singled image hasn't loaded after pan and you double click on empty space, the zoomed bbox seems wrong
+* build releases using grunt
 * remove BOM from release files
 * add 3rd party license headers
 * docs - geomap - pan events (pattern after HTML5 drag)
@@ -149,11 +160,26 @@
 ** in the drawing modes, this function starts drawing or adds a point into the already-started shape at the given coordinate
 ** immediately triggers the shape event if mode is drawPoint
 * geomap - drawPush function
+* docs - geomap - drawPop function
+** in the drawing modes, this function ends drawing or removes a point into the already-started shape at the given coordinate
+* geomap - drawPop function
 * docs - geomap - drawStop function
 ** in the drawing modes, this function ends drawing and triggers the shape event with whatever coordinates have already been added to the shape
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-02-11==
+===current services===
+I need to make sure their style property is always full, that's the point of having an internal copy. This means I have to fill in visibility & opacity when I create the services based on defaults.
+
+=== service style===
+$.extend({
+    visibility: "visible",
+    opacity: 1
+  }, style)
+
+That returns what you would expect if style is undfined.
 
 ==2012-02-06==
 ===mousewheel===

@@ -5,7 +5,7 @@
   <meta charset="utf-8">
 
   <title>services | geomap</title>
-  <meta name="description" content="geomap services property">
+  <meta name="description" content="geomap services option">
   <meta name="author" content="Ryan Westphal">
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,11 +37,7 @@
   src: function( view ) {
     return &quot;http://tile.openstreetmap.org/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png&quot;;
   },
-  attr: &quot;&amp;copy; OpenStreetMap &amp;amp; contributors, CC-BY-SA&quot;,
-  style: {
-    visibility: &quot;visible&quot;,
-    opacity: 1.0
-  }
+  attr: &quot;&amp;copy; OpenStreetMap &amp;amp; contributors, CC-BY-SA&quot;
 } ]</pre></code></td>
         </tr>
         <tr>
@@ -80,9 +76,29 @@
 } ] );</code></pre></td>
         </tr>
       </table>
-      <p>The services property is an array of service objects. The service objects are JavaScript objects that control how the geomap widget displays map images.</p>
-      <p>By default, geomap will display OpenStreetMap tiles. You can change all services at once by setting this property with an entirely new array of service objects. You can set a specific part of of a specific service by getting the current array, modifying, adding or deleting one of the service objects and then re-setting the services property with the modified array.</p>
+
+      <p>The services option is an array of service objects. The service objects are JavaScript objects that control how the geomap widget displays map images.</p>
+
+      <p>By default, geomap will display OpenStreetMap tiles. You can change all services at once by setting this option with an entirely new array of service objects. You can set a specific part of of a specific service by getting the current array, modifying, adding, or deleting one of the service objects and then re-setting the services option with the modified array.</p>
+
+      <pre><code><span class="comment">// get the current services array</span>
+var services = map.geomap( &quot;option&quot;, &quot;services&quot; );
+
+<span class="comment">// add a service</span>
+services.push( {
+  id: &quot;Ortho_MapQuest&quot;,
+  type: &quot;tiled&quot;,
+  src: function (view) {
+    return &quot;http://oatile&quot; + ((view.index % 4) + 1) + &quot;.mqcdn.com/naip/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png&quot;;
+  },
+  attr: &quot;&lt;p&gt;Tiles Courtesy of &lt;a href='http://www.mapquest.com/' target='_blank'&gt;MapQuest&lt;a&gt; &lt;img src='http://developer.mapquest.com/content/osm/mq_logo.png'&gt;&lt;p&gt;&quot;
+} );
+
+<span class="comment">// re-set the services option</span>
+map.geomap( &quot;option&quot;, &quot;services&quot;, services );</code></pre>
+
       <h2>service object</h2>
+
       <p>A service object has six properties, two of which are required. The id and class properties are optional but at least one is recommended so you can target specific services with the toggle and opacity methods.</p>
       <h3>id</h3>
       <p>Each service can have an id that distinguishes it from other service objects in the array. The id is a string and must be follow the HTML element id naming conditions. If present, the id must be unique across all services in all maps as well as unique from any other HTML element on the page. The default service object of a geomap widget does not have an id.</p>
@@ -92,7 +108,7 @@
       <p>Unfortunately, class is a reserved word in JavaScript. When you specify class in your service object, you must quote the word class. This is exactly how it's done in jQuery itself when applying attributes to an element based on an object. To quote the jQuery API:</p>
       <blockquote>The name &quot;class&quot; must be quoted since it is a JavaScript reserved word, and &quot;className&quot; cannot be used since it is not the correct attribute name.</blockquote>
       <h3>type</h3>
-      <p>A service has a type property which is either &quot;tiled&quot; or &quot;shingled&quot;. Tiled servies will get one image request per tile needed to fill a given view when the map refreshes. The tile request's bbox will only be the size of the given tile. Shingled services will get only one image request each time the map refreshes and the bbox will be the extent of the whole map view.</p>
+      <p>A service object has a type property which is either &quot;tiled&quot; or &quot;shingled&quot;. Tiled servies will get one image request per tile needed to fill a given view when the map refreshes. The tile request's bbox will only be the size of the given tile. Shingled services will get only one image request each time the map refreshes and the bbox will be the extent of the whole map view.</p>
       <h3>src</h3>
       <p>The src property of a service object can be one of the following three options:</p>
       <ul>
@@ -136,9 +152,9 @@
       <h3>style</h3>
       <p>The style property is optional. It contains presentation options for the service.</p>
 
-      <p>The visibility property defaults to &quot;visible&quot;. It determines whether or not the map will show images from this service while refreshing. You can change the visibility of a service either by changing the visibility property of the service object to &quot;visible&quot; or &quot;hidden&quot; and then setting geomap's services property or by using the toggle method of the geomap widget. The latter is recommended because it is a lot faster and does not cause services to be recreated.</p>
+      <p>The visibility property defaults to &quot;visible&quot;. It determines whether or not the map will show images from this service while refreshing. You can change the visibility of a service either by changing the visibility property of the service object to &quot;visible&quot; or &quot;hidden&quot; and then setting geomap's services option or by using the toggle method of the geomap widget. The latter is recommended because it is a lot faster and does not cause services to be recreated.</p>
 
-      <p>The opacity defaults to 1.0. It determines how transparent a service is when it is visible. Valid values are floating point numbers between 0 and 1 inclusive. Services with an opacity of 0 will not show on the map even if visible is true. You can change the opacity of a service either by changing the opacity property of the service object and then setting geomap's services property or by using the opacity method of the geomap widget. The latter is recommended because it is a lot faster and does not cause services to be recreated.</p>
+      <p>The opacity defaults to 1.0. It determines how transparent a service is when it is visible. Valid values are floating point numbers between 0 and 1 inclusive. Services with an opacity of 0 will not show on the map even if visible is true. You can change the opacity of a service either by changing the opacity property of the service object and then setting geomap's services option or by using the opacity method of the geomap widget. The latter is recommended because it is a lot faster and does not cause services to be recreated.</p>
     </div>
   </div> <!-- end of #container -->
 
