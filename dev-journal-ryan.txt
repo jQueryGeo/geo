@@ -1,36 +1,28 @@
 ﻿== to do ==
 
 === a4 ===
-* geomap - pan mode should use a hand cursor by default
-* docs - geomap - loadstart event
-* geomap - loadstart event
-* docs - geomap - loadend event
-* geomap - loadend event
-* geomap - [bug] first use of mouse/touch in any mode moves map by one pixel on mousedown/touch
-** possibly only when axisLayout is image
-* geomap - [bug] pan lags on first drag (related?)
-* geomap - [bug] zoom in more than once with zoom method moves tiles to the wrong spot
-* geomap - [bug] map panning is jumpy, appears to be related to shapes and/or drawing context
-* geomap - [bug] only services that have finished refreshing move when the user pans
-** check by zooming in then panning shingled demo with forest layer on
-* geomap - [bug] chaining doesn't work, e.g., .geomap(option,center).geomap(option,zoom)
-* geomap - [bug] measure modes do not show text for shingled services?
-* geomap - [bug] mouse zoom doesn't work for shingled services?
-* geomap - [bug] zoom option doesn't return proper values for shingled services?
+* examples - all demo (shingled)
+* examples - all demo (tiled)
 * geomap - [bug] double tap to end shapes adds two points before ending the shape, in different places
 * geomap - [bug] lifting fingers after pinch zoom in drawLineString or drawPolygon modes sometimes adds fake visual coordinate on touch point last lifted
 * geomap - [bug] pointAlong doesn't take last point into account in all browsers (iOS, Firefox Nightly)
 * examples - jQuery Mobile
 * examples - drag shapes
-* examples - multi-service-level shapes
 * examples - remove tmpl from examples as it conflicts with jsrender
-* geomap - don't request tiles that are -y index or > max possible y for scale
-* geomap - repeat horizontal tiles
 
 === b1 ===
-
+* docs - geomap - loadstart event
+* geomap - loadstart event
+* docs - geomap - loadend event
+* geomap - loadend event
 * docs - geomap - pass the service id (if there is one) to the src callback as a view property
 * geomap - pass the service id (if there is one) to the src callback as a view property
+* docs - geomap - support dynamic map services that only work in geodetic coordinates (sr=4326)
+* geomap - support dynamic map services that only work in geodetic coordinates (sr=4326)
+* docs - geomap - allow append to take an array of shapes
+* geomap - allow append to take an array of shapes
+* docs - geomap - allow remove to take an array of shapes
+* geomap - allow remove to take an array of shapes
 * geomap - cache label coordinates (the labelPixel cannot be cached, it will change each refresh)
 * geomap - rotate label based on segment
 * geomap - use pointer-events: none where appropriate
@@ -42,6 +34,8 @@
 * geomap - [bug] iPad 2 measureLength puts current length on second to last coord instead of last coord
 * geomap - [bug] pinch zoom on iPad 2 (iOS 5) doesn't refresh tiles when zooming out
 ** oddly, iPod Touch 4 (iOS 4) is fine
+* geomap - [bug] first use of mouse/touch in any mode moves map by one pixel on mousedown/touch
+** possibly only when axisLayout is image
 * geomap - [bug] multiples of the same event trigger after creating more than one map on the same div, even after destroy
 ** destroy should unbind all geomap events
 * geomap - remove this-style state properties
@@ -55,13 +49,27 @@
 * geomap - don't redraw shapes after interactiveScale, they've already been drawn at new scale
 * geomap - [bug] exception when calling destroy on uninitialized div
 * geomap - maybe throw an error when setting center to an invalid object, such as the first number in a coordinate array: coordinates[ 0 ] <== wrong!
-* geomap - merge interactive pan and zoom into one, faster system
+* geomap - merge interactive pan and zoom into one, faster system (pan/zoom rewrite)
 ** pan and zoom in same interactive session (_interactiveCenter & _interactivePixelSize)
 ** delay image loading more during movement
+* geomap - request new image in shingled service during interactive pan (after pan/zoom rewrite)
+* geomap - repeat horizontal tiles
+* geomap - don't request tiles that > max possible y for scale
+* geomap - do not interactiveScale non-tiled maps out past pixelSizeMax
+* geomap - [bug] zoom in more than once with zoom method moves tiles to the wrong spot
+** postponed until after pan/zoom rewrite
+* geomap - [bug] only services that have finished refreshing move when the user pans
+** check by zooming in then panning shingled demo with forest layer on
+** for a4: hide unfinished services; for b1: properly move the already zoomed service after pan/zoom rewrite
+* geomap - [bug] map panning is jumpy, appears to be related to shapes and/or drawing context
+** postponed until after pan/zoom rewrite
+* geomap - [bug] pan sometimes lags on first drag
+** cannot reproduce effectively, test again after pan/zoom rewrite
 * geomap - use CSS transition or transform for smoother tiling
 * geomap - implement service-level shape redrawing during interactive movement
 * make a package for new jQuery plugin directory
 ** https://github.com/jquery/plugins.jquery.com/blob/master/docs/package.md
+* examples - ie7 - floating info div doesn't show up, inputs are alone and on the left
 * examples - redo the jVectorMap demo page using jQuery Geo
 ** http://jvectormap.owl-hollow.net/ ( found via http://www.moretechtips.net/2011/12/22-most-popular-jquery-plugins-of-2011.html )
 * expose jQuery Geo as an AMD module so asynchronous loaders like RequireJS and curl.js can use it
@@ -73,6 +81,9 @@
 * build releases using grunt
 * remove BOM from release files
 * add 3rd party license headers
+
+=== future ===
+
 * docs - geomap - pan events (pattern after HTML5 drag)
 * docs - geomap - zoom events (pattern after HTML5 drag)
 * docs - geomap - support two-finger vertical slide as zoom on mobile devices
@@ -86,6 +97,8 @@
 * geomap - unbind keydown handler on destroy, it's on the document
 * docs - $.geo.WKT object
 * geo - $.geo.WKT object
+* geomap - panning cursor (for when user is actually panning)
+* geomap - completely original cursor set for pan, zoom, draw, etc.
 * docs - geomap - replace method
 * geomap - replace method
 * docs - geomap - allow service-level refresh
@@ -170,6 +183,15 @@
 ==2012-02-12==
 ===find===
 Need to implement the * selector. That was easy. $.isPlainObject thankfully returns false on strings.
+
+===unloaded image===
+It appears that when you pan starting on an area that has an unloaded image, i.e., empty space, this._center gets set to string values. Checking on this now.
+
+===shingled 0===
+To prohibit shingled maps from zooming out past 0, I had to change quite a bit of code. I now have getZoom & getPixelSize methods that will work regardless of tilingScheme. I'm also calculating pixelSizeMax when bboxMax changes and making sure the non-tiled zoom doesn't go less than 0 in two spots. That seems to do the trick.
+
+===service-level shape refresh===
+Shapes on services draw twice, heh. That was a tough one. Turns out, when I create the service-level geomap widgets, I wasn't setting _graphicShapes to a new array before passing the (this) object to the widget factory. All services were sharing the same _graphicShapes reference.
 
 ==2012-02-11==
 ===current services===
