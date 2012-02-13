@@ -11,7 +11,7 @@
         center: [0, 0],
         cursors: {
           "static": "default",
-          pan: "move",
+          pan: "url(data:image/vnd.microsoft.icon;base64,AAACAAEAICACAAgACAAwAQAAFgAAACgAAAAgAAAAQAAAAAEAAQAAAAAAAAEAAAAAAAAAAAAAAgAAAAAAAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD8AAAA/AAAAfwAAAP+AAAH/gAAB/8AAA//AAAd/wAAGf+AAAH9gAADbYAAA2yAAAZsAAAGbAAAAGAAAAAAAAA//////////////////////////////////////////////////////////////////////////////////////gH///4B///8Af//+AD///AA///wAH//4AB//8AAf//AAD//5AA///gAP//4AD//8AF///AB///5A////5///8=), move",
           zoom: "crosshair",
           drawPoint: "crosshair",
           drawLineString: "crosshair",
@@ -139,6 +139,7 @@
         var $contentFrame = this._$elem.closest( ".geo-content-frame" );
         this._$elem.append('<div class="geo-shapes-container" style="position:absolute; left:0; top:0; width:' + $contentFrame.css( "width" ) + '; height:' + $contentFrame.css( "height" ) + '; margin:0; padding:0;"></div>');
         this._$shapesContainer = this._$elem.children(':last');
+        this._graphicShapes = [];
         $.Widget.prototype._createWidget.apply(this, arguments);
         return;
       }
@@ -348,11 +349,21 @@
 
         case "tilingScheme":
           if ( value != null ) {
-            this._pixelSizeMax = this._getTiledPixelSize(0);
+            this._pixelSizeMax = this._getPixelSize( 0 );
             this._centerMax = [
               value.origin[ 0 ] + this._pixelSizeMax * value.tileWidth / 2,
               value.origin[ 1 ] + this._pixelSizeMax * value.tileHeight / 2
             ];
+          }
+          break;
+
+        case "bboxMax":
+          this._pixelSizeMax = this._getPixelSize( 0 );
+
+          if ( $.geo.proj && $.geo._isGeodetic( value ) ) {
+            this._centerMax = $.geo.center( $.geo.proj.fromGeodetic( value ) );
+          } else {
+            this._centerMax = $.geo.center( value );
           }
           break;
 
@@ -406,7 +417,7 @@
     },
 
     toPixel: function ( p, _center /* Internal Use Only */, _pixelSize /* Internal Use Only */ ) {
-      return this._toPixel( $.geo.proj.fromGeodetic( p ), _center, _pixelSize );
+      return this._toPixel( $.geo.proj ? $.geo.proj.fromGeodetic( p ) : p, _center, _pixelSize );
     },
 
     opacity: function ( value, _serviceContainer ) {
@@ -630,10 +641,11 @@
     _getBbox: function (center, pixelSize) {
       center = center || this._center;
       pixelSize = pixelSize || this._pixelSize;
+
       // calculate the internal bbox
-      var halfWidth = this._contentBounds["width"] / 2 * pixelSize,
-          halfHeight = this._contentBounds["height"] / 2 * pixelSize;
-      return [center[0] - halfWidth, center[1] - halfHeight, center[0] + halfWidth, center[1] + halfHeight];
+      var halfWidth = this._contentBounds[ "width" ] / 2 * pixelSize,
+          halfHeight = this._contentBounds[ "height" ] / 2 * pixelSize;
+      return [ center[ 0 ] - halfWidth, center[ 1 ] - halfHeight, center[ 0 ] + halfWidth, center[ 1 ] + halfHeight ];
     },
 
     _setBbox: function (value, trigger, refresh) {
@@ -641,9 +653,14 @@
           pixelSize = Math.max($.geo.width(value, true) / this._contentBounds.width, $.geo.height(value, true) / this._contentBounds.height);
 
       if (this._options["tilingScheme"]) {
-        var zoom = this._getTiledZoom(pixelSize);
-        pixelSize = this._getTiledPixelSize(zoom);
+        var zoom = this._getZoom(pixelSize);
+        pixelSize = this._getPixelSize(zoom);
+      } else {
+        if ( this._getZoom( center, pixelSize ) < 0 ) {
+          pixelSize = this._pixelSizeMax;
+        }
       }
+
       this._setCenterAndSize(center, pixelSize, trigger, refresh);
     },
 
@@ -666,29 +683,41 @@
       return this._$servicesContainer;
     },
 
-    _getZoom: function () {
+    _getZoom: function ( center, pixelSize ) {
+      center = center || this._center;
+      pixelSize = pixelSize || this._pixelSize;
+
       // calculate the internal zoom level, vs. public zoom property
-      if (this._options["tilingScheme"]) {
-        return this._getTiledZoom(this._pixelSize);
+      var tilingScheme = this._options["tilingScheme"];
+      if ( tilingScheme ) {
+        if ( tilingScheme.pixelSizes != null ) {
+          var roundedPixelSize = Math.floor(pixelSize * 1000),
+              levels = tilingScheme.pixelSizes.length,
+              i = levels - 1;
+
+          for ( ; i >= 0; i-- ) {
+            if ( Math.floor( tilingScheme.pixelSizes[ i ] * 1000 ) >= roundedPixelSize ) {
+              return i;
+            }
+          }
+
+          return 0;
+        } else {
+          return Math.max( Math.round( Math.log( tilingScheme.basePixelSize / pixelSize) / Math.log( 2 ) ), 0 );
+        }
       } else {
         var ratio = this._contentBounds["width"] / this._contentBounds["height"],
-            bbox = $.geo.reaspect(this._getBbox(), ratio, true),
+            bbox = $.geo.reaspect( this._getBbox( center, pixelSize ), ratio, true ),
             bboxMax = $.geo.reaspect(this._getBboxMax(), ratio, true);
 
-        return Math.log($.geo.width(bboxMax, true) / $.geo.width(bbox, true)) / Math.log(this._zoomFactor);
+        return Math.max( Math.round( Math.log($.geo.width(bboxMax, true) / $.geo.width(bbox, true)) / Math.log(this._zoomFactor) ), 0 );
       }
     },
 
-    _setZoom: function (value, trigger, refresh) {
-      value = Math.max(value, 0);
+    _setZoom: function ( value, trigger, refresh ) {
+      value = Math.max( value, 0 );
 
-      if (this._options["tilingScheme"]) {
-        this._setCenterAndSize(this._center, this._getTiledPixelSize(value), trigger, refresh);
-      } else {
-        var bbox = $.geo.scaleBy(this._getBboxMax(), 1 / Math.pow(this._zoomFactor, value), true),
-            pixelSize = Math.max($.geo.width(bbox, true) / this._contentBounds.width, $.geo.height(bbox, true) / this._contentBounds.height);
-        this._setCenterAndSize(this._center, pixelSize, trigger, refresh);
-      }
+      this._setCenterAndSize( this._center, this._getPixelSize( value ), trigger, refresh );
     },
 
     _createChildren: function () {
@@ -950,7 +979,7 @@
       }
     },
 
-    _getTiledPixelSize: function (zoom) {
+    _getPixelSize: function ( zoom ) {
       var tilingScheme = this._options["tilingScheme"];
       if (tilingScheme != null) {
         if (zoom === 0) {
@@ -968,23 +997,8 @@
           return tilingScheme.basePixelSize / Math.pow(2, zoom);
         }
       } else {
-        return NaN;
-      }
-    },
-
-    _getTiledZoom: function (pixelSize) {
-      var tilingScheme = this._options["tilingScheme"];
-      if (tilingScheme.pixelSizes != null) {
-        var roundedPixelSize = Math.floor(pixelSize * 1000),
-          levels = tilingScheme.pixelSizes.length;
-        for (var i = levels - 1; i >= 0; i--) {
-          if (Math.floor(tilingScheme.pixelSizes[i] * 1000) >= roundedPixelSize) {
-            return i;
-          }
-        }
-        return 0;
-      } else {
-        return Math.max(Math.round(Math.log(tilingScheme.basePixelSize / pixelSize) / Math.log(2)), 0);
+        var bbox = $.geo.scaleBy( this._getBboxMax(), 1 / Math.pow( this._zoomFactor, zoom ), true );
+        return Math.max( $.geo.width( bbox, true ) / this._contentBounds.width, $.geo.height( bbox, true ) / this._contentBounds.height );
       }
     },
 
@@ -994,11 +1008,15 @@
           pixelSize,
           zoomLevel;
 
-      if (this._options["tilingScheme"]) {
-        zoomLevel = this._getTiledZoom(this._pixelSize * scale);
-        pixelSize = this._getTiledPixelSize(zoomLevel);
+      if ( this._options[ "tilingScheme" ] ) {
+        zoomLevel = this._getZoom(this._center, this._pixelSize * scale);
+        pixelSize = this._getPixelSize(zoomLevel);
       } else {
         pixelSize = this._pixelSize * scale;
+
+        if ( this._getZoom( this._center, pixelSize ) < 0 ) {
+          pixelSize = this._pixelSizeMax;
+        }
       }
 
       var ratio = pixelSize / this._pixelSize,
@@ -1118,7 +1136,7 @@
       var service,
           i = 0;
 
-      if ( this._$elem.not( ".geo-service" ).length > 0 ) {
+      if ( this._$elem.is( ".geo-map" ) ) {
         for ( ; i < this._currentServices.length; i++ ) {
           service = this._currentServices[ i ];
 
@@ -1138,6 +1156,10 @@
     },
 
     _setCenterAndSize: function (center, pixelSize, trigger, refresh) {
+      if ( ! $.isArray( center ) || center.length != 2 || typeof center[ 0 ] !== "number" || typeof center[ 1 ] !== "number" ) {
+        return;
+      }
+
       // the final call during any extent change
       if (this._pixelSize != pixelSize) {
         this._$elem.find( ".geo-shapes-container" ).geographics("clear");
@@ -1147,7 +1169,7 @@
         }
       }
 
-      this._center = center;
+      this._center = $.merge( [ ], center );
       this._options["pixelSize"] = this._pixelSize = pixelSize;
 
       if ( this._userGeodetic ) {
@@ -1155,7 +1177,7 @@
         this._options["center"] = $.geo.proj.toGeodetic( this._center );
       } else {
         this._options["bbox"] = this._getBbox();
-        this._options["center"] = this._center;
+        this._options["center"] = $.merge( [ ], center );
       }
 
       this._options["zoom"] = this._getZoom();
@@ -1165,7 +1187,7 @@
       }
 
       if (trigger) {
-        this._trigger("bboxchange", window.event, { bbox: this._options["bbox"] });
+        this._trigger("bboxchange", window.event, { bbox: $.merge( [ ], this._options["bbox"] ) });
       }
 
       if (refresh) {
@@ -1273,16 +1295,9 @@
     _zoomTo: function (coord, zoom, trigger, refresh) {
       zoom = zoom < 0 ? 0 : zoom;
 
-      var tiledPixelSize = this._getTiledPixelSize(zoom);
+      var pixelSize = this._getPixelSize( zoom );
 
-      if (!isNaN(tiledPixelSize)) {
-        this._setCenterAndSize(coord, tiledPixelSize, trigger, refresh);
-      } else {
-        var bboxMax = $.geo._scaleBy(this._getBboxMax(), 1 / Math.pow(this._zoomFactor, zoom), true),
-            pixelSize = Math.max($.geo.width(bboxMax, true) / this._contentBounds["width"], $.geo.height(bboxMax, true) / this._contentBounds["height"]);
-
-        this._setCenterAndSize(coord, pixelSize, trigger, refresh);
-      }
+      this._setCenterAndSize( coord, pixelSize, trigger, refresh );
     },
 
     _document_keydown: function (e) {
