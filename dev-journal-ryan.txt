@@ -84,8 +84,6 @@
 * docs - geomap - document the correct way to add a service after init
 * geomap - remember last map unit type set with bbox and center, return all coords and arguments in that type
 * geomap - unbind keydown handler on destroy, it's on the document
-* docs - selector argument to find method
-* selector argument to find method
 * docs - $.geo.WKT object
 * geo - $.geo.WKT object
 * docs - geomap - replace method
@@ -168,6 +166,10 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-02-12==
+===find===
+Need to implement the * selector. That was easy. $.isPlainObject thankfully returns false on strings.
 
 ==2012-02-11==
 ===current services===

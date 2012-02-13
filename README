@@ -67,6 +67,8 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * geomap - use _currentServices in all functions unless we actually need to update the public options services object
 * geomap - don't change user's service objects in opacity/toggle
 * geomap - show attr text
+* docs - geomap - selector argument to find method
+* geomap - selector argument to find method
 
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon

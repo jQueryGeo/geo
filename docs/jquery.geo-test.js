@@ -4191,8 +4191,9 @@ function try$( selector ) {
       }
     },
 
-    find: function (point, pixelTolerance) {
-      var searchPixel = this._map.toPixel( point.coordinates ),
+    find: function ( selector, pixelTolerance ) {
+      var isPoint = $.isPlainObject( selector ),
+          searchPixel = isPoint ? this._map.toPixel( selector.coordinates ) : undefined,
           mapTol = this._map._pixelSize * pixelTolerance,
           result = [],
           graphicShape,
@@ -4203,42 +4204,46 @@ function try$( selector ) {
       for ( ; i < this._graphicShapes.length; i++ ) {
         graphicShape = this._graphicShapes[ i ];
 
-        if ( graphicShape.shape.type == "Point" ) {
-          if ( $.geo.distance( graphicShape.shape, point ) <= mapTol ) {
-            result.push( graphicShape.shape );
-          }
-        } else {
-          var bbox = $.data( graphicShape.shape, "geoBbox" ),
-              bboxPolygon = {
-                type: "Polygon",
-                coordinates: [ [
-                  [bbox[0], bbox[1]],
-                  [bbox[0], bbox[3]],
-                  [bbox[2], bbox[3]],
-                  [bbox[2], bbox[1]],
-                  [bbox[0], bbox[1]]
-                ] ]
-              },
-              projectedPoint = {
-                type: "Point",
-                coordinates: $.geo.proj && $.geo._isGeodetic( point.coordinates ) ? $.geo.proj.fromGeodetic( point.coordinates ) : point.coordinates
-              };
+        if ( isPoint ) {
+          if ( graphicShape.shape.type == "Point" ) {
+            if ( $.geo.distance( graphicShape.shape, selector ) <= mapTol ) {
+              result.push( graphicShape.shape );
+            }
+          } else {
+            var bbox = $.data( graphicShape.shape, "geoBbox" ),
+                bboxPolygon = {
+                  type: "Polygon",
+                  coordinates: [ [
+                    [bbox[0], bbox[1]],
+                    [bbox[0], bbox[3]],
+                    [bbox[2], bbox[3]],
+                    [bbox[2], bbox[1]],
+                    [bbox[0], bbox[1]]
+                  ] ]
+                },
+                projectedPoint = {
+                  type: "Point",
+                  coordinates: $.geo.proj && $.geo._isGeodetic( selector.coordinates ) ? $.geo.proj.fromGeodetic( selector.coordinates ) : selector.coordinates
+                };
 
-          if ( $.geo.distance( bboxPolygon, projectedPoint, true ) <= mapTol ) {
-            geometries = $.geo._flatten( graphicShape.shape );
-            for ( curGeom = 0; curGeom < geometries.length; curGeom++ ) {
-              if ( $.geo.distance( geometries[ curGeom ], point ) <= mapTol ) {
-                result.push( graphicShape.shape );
-                break;
+            if ( $.geo.distance( bboxPolygon, projectedPoint, true ) <= mapTol ) {
+              geometries = $.geo._flatten( graphicShape.shape );
+              for ( curGeom = 0; curGeom < geometries.length; curGeom++ ) {
+                if ( $.geo.distance( geometries[ curGeom ], selector ) <= mapTol ) {
+                  result.push( graphicShape.shape );
+                  break;
+                }
               }
             }
           }
+        } else {
+          result.push( graphicShape.shape );
         }
       }
 
       if ( this._$elem.is( ".geo-map" ) ) {
         this._$elem.find( ".geo-service" ).each( function( ) {
-          result = $.merge( result, $( this ).geomap( "find", point, pixelTolerance ) );
+          result = $.merge( result, $( this ).geomap( "find", selector, pixelTolerance ) );
         } );
       }
 
