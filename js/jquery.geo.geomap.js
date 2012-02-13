@@ -1138,6 +1138,10 @@
     },
 
     _setCenterAndSize: function (center, pixelSize, trigger, refresh) {
+      if ( ! $.isArray( center ) || center.length != 2 || typeof center[ 0 ] !== "number" || typeof center[ 1 ] !== "number" ) {
+        return;
+      }
+
       // the final call during any extent change
       if (this._pixelSize != pixelSize) {
         this._$elem.find( ".geo-shapes-container" ).geographics("clear");
@@ -1147,7 +1151,7 @@
         }
       }
 
-      this._center = center;
+      this._center = $.merge( [ ], center );
       this._options["pixelSize"] = this._pixelSize = pixelSize;
 
       if ( this._userGeodetic ) {
@@ -1155,7 +1159,7 @@
         this._options["center"] = $.geo.proj.toGeodetic( this._center );
       } else {
         this._options["bbox"] = this._getBbox();
-        this._options["center"] = this._center;
+        this._options["center"] = $.merge( [ ], center );
       }
 
       this._options["zoom"] = this._getZoom();
@@ -1165,7 +1169,7 @@
       }
 
       if (trigger) {
-        this._trigger("bboxchange", window.event, { bbox: this._options["bbox"] });
+        this._trigger("bboxchange", window.event, { bbox: $.merge( [ ], this._options["bbox"] ) });
       }
 
       if (refresh) {

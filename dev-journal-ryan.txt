@@ -1,10 +1,10 @@
 ﻿== to do ==
 
 === a4 ===
-* geomap - [bug] chaining doesn't work, e.g., .geomap(option,center).geomap(option,zoom)
-* examples - all demo
-* geomap - [bug] measure modes do not show text for shingled services?
-* geomap - [bug] zoom option doesn't return proper values for shingled services?
+* examples - all demo (shingled)
+* examples - all demo (tiled)
+* geomap - [bug] non-tiled maps can zoom out past zoom 0
+* geomap - [bug] zoom option doesn't return proper values for shingled services
 * geomap - [bug] double tap to end shapes adds two points before ending the shape, in different places
 * geomap - [bug] lifting fingers after pinch zoom in drawLineString or drawPolygon modes sometimes adds fake visual coordinate on touch point last lifted
 * geomap - [bug] pointAlong doesn't take last point into account in all browsers (iOS, Firefox Nightly)
@@ -51,6 +51,7 @@
 * geomap - merge interactive pan and zoom into one, faster system (pan/zoom rewrite)
 ** pan and zoom in same interactive session (_interactiveCenter & _interactivePixelSize)
 ** delay image loading more during movement
+** geomap - request new image in shingled service during interactive pan (after pan/zoom rewrite)
 * geomap - [bug] zoom in more than once with zoom method moves tiles to the wrong spot
 ** postponed until after pan/zoom rewrite
 * geomap - [bug] only services that have finished refreshing move when the user pans
@@ -178,6 +179,9 @@
 ==2012-02-12==
 ===find===
 Need to implement the * selector. That was easy. $.isPlainObject thankfully returns false on strings.
+
+===unloaded image===
+It appears that when you pan starting on an area that has an unloaded image, i.e., empty space, this._center gets set to string values. Checking on this now.
 
 ==2012-02-11==
 ===current services===
