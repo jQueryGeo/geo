@@ -88,7 +88,7 @@
                 tileY2 = Math.ceil(( image ? (mapCenter[1] + halfHeight) - tilingScheme.origin[1] : tilingScheme.origin[1] - (mapCenter[1] - halfHeight)) / (pixelSize * tileHeight)),
 
                 bboxMax = map._getBboxMax(),
-                pixelSizeAtZero = map._getTiledPixelSize(0),
+                pixelSizeAtZero = map._getPixelSize(0),
                 ratio = pixelSizeAtZero / pixelSize,
                 fullXAtScale = Math.floor((bboxMax[0] - tilingScheme.origin[0]) / (pixelSizeAtZero * tileWidth)) * ratio,
                 fullYAtScale = Math.floor((tilingScheme.origin[1] + ySign * bboxMax[3]) / (pixelSizeAtZero * tileHeight)) * ratio,
@@ -260,7 +260,7 @@
               tileY2 = Math.ceil( ( image ? bbox[3] - tilingScheme.origin[1] : tilingScheme.origin[1] - bbox[ 1 ] ) / (pixelSize * tileHeight) ),
 
               bboxMax = map._getBboxMax(),
-              pixelSizeAtZero = map._getTiledPixelSize(0),
+              pixelSizeAtZero = map._getPixelSize(0),
               ratio = pixelSizeAtZero / pixelSize,
               fullXAtScale = Math.floor((bboxMax[0] - tilingScheme.origin[0]) / (pixelSizeAtZero * tileWidth)) * ratio,
               fullYAtScale = Math.floor((tilingScheme.origin[1] + ySign * bboxMax[3]) / (pixelSizeAtZero * tileHeight)) * ratio,

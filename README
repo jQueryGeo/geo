@@ -73,6 +73,7 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * geomap - [bug] only services that have finished refreshing move when the user pans
 ** for a4: hide unfinished services
 * geomap - [bug] a user can mess with the center option, e.g., convert numbers to strings, and it can wreck havoc with map state
+* geomap - [bug] non-tiled maps can zoom out past zoom 0
 
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon

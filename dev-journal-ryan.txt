@@ -3,7 +3,6 @@
 === a4 ===
 * examples - all demo (shingled)
 * examples - all demo (tiled)
-* geomap - [bug] non-tiled maps can zoom out past zoom 0
 * geomap - [bug] zoom option doesn't return proper values for shingled services
 * geomap - [bug] double tap to end shapes adds two points before ending the shape, in different places
 * geomap - [bug] lifting fingers after pinch zoom in drawLineString or drawPolygon modes sometimes adds fake visual coordinate on touch point last lifted
@@ -24,6 +23,8 @@
 * geomap - loadend event
 * docs - geomap - pass the service id (if there is one) to the src callback as a view property
 * geomap - pass the service id (if there is one) to the src callback as a view property
+* docs - geomap - support dynamic map services that only work in geodetic coordinates (sr=4326)
+* geomap - support dynamic map services that only work in geodetic coordinates (sr=4326)
 * geomap - cache label coordinates (the labelPixel cannot be cached, it will change each refresh)
 * geomap - rotate label based on segment
 * geomap - use pointer-events: none where appropriate
@@ -51,7 +52,8 @@
 * geomap - merge interactive pan and zoom into one, faster system (pan/zoom rewrite)
 ** pan and zoom in same interactive session (_interactiveCenter & _interactivePixelSize)
 ** delay image loading more during movement
-** geomap - request new image in shingled service during interactive pan (after pan/zoom rewrite)
+* geomap - request new image in shingled service during interactive pan (after pan/zoom rewrite)
+* geomap - do not interactiveScale non-tiled maps out past pixelSizeMax
 * geomap - [bug] zoom in more than once with zoom method moves tiles to the wrong spot
 ** postponed until after pan/zoom rewrite
 * geomap - [bug] only services that have finished refreshing move when the user pans
@@ -182,6 +184,9 @@ Need to implement the * selector. That was easy. $.isPlainObject thankfully retu
 
 ===unloaded image===
 It appears that when you pan starting on an area that has an unloaded image, i.e., empty space, this._center gets set to string values. Checking on this now.
+
+===shingled 0===
+To prohibit shingled maps from zooming out past 0, I had to change quite a bit of code. I now have getZoom & getPixelSize methods that will work regardless of tilingScheme. I'm also calculating pixelSizeMax when bboxMax changes and making sure the non-tiled zoom doesn't go less than 0 in two spots. That seems to do the trick.
 
 ==2012-02-11==
 ===current services===
