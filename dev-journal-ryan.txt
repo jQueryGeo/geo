@@ -1,7 +1,6 @@
 ﻿== to do ==
 
 === a4 ===
-* geomap - pan mode should use a hand cursor by default
 * docs - geomap - loadstart event
 * geomap - loadstart event
 * docs - geomap - loadend event
@@ -73,6 +72,9 @@
 * build releases using grunt
 * remove BOM from release files
 * add 3rd party license headers
+
+=== future ===
+
 * docs - geomap - pan events (pattern after HTML5 drag)
 * docs - geomap - zoom events (pattern after HTML5 drag)
 * docs - geomap - support two-finger vertical slide as zoom on mobile devices
@@ -86,6 +88,8 @@
 * geomap - unbind keydown handler on destroy, it's on the document
 * docs - $.geo.WKT object
 * geo - $.geo.WKT object
+* geomap - panning cursor (for when user is actually panning)
+* geomap - completely original cursor set for pan, zoom, draw, etc.
 * docs - geomap - replace method
 * geomap - replace method
 * docs - geomap - allow service-level refresh

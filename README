@@ -69,6 +69,7 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * geomap - show attr text
 * docs - geomap - selector argument to find method
 * geomap - selector argument to find method
+* geomap - pan mode should use a hand cursor by default
 
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon
