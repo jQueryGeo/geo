@@ -139,6 +139,7 @@
         var $contentFrame = this._$elem.closest( ".geo-content-frame" );
         this._$elem.append('<div class="geo-shapes-container" style="position:absolute; left:0; top:0; width:' + $contentFrame.css( "width" ) + '; height:' + $contentFrame.css( "height" ) + '; margin:0; padding:0;"></div>');
         this._$shapesContainer = this._$elem.children(':last');
+        this._graphicShapes = [];
         $.Widget.prototype._createWidget.apply(this, arguments);
         return;
       }
@@ -416,7 +417,7 @@
     },
 
     toPixel: function ( p, _center /* Internal Use Only */, _pixelSize /* Internal Use Only */ ) {
-      return this._toPixel( $.geo.proj.fromGeodetic( p ), _center, _pixelSize );
+      return this._toPixel( $.geo.proj ? $.geo.proj.fromGeodetic( p ) : p, _center, _pixelSize );
     },
 
     opacity: function ( value, _serviceContainer ) {
@@ -1135,7 +1136,7 @@
       var service,
           i = 0;
 
-      if ( this._$elem.not( ".geo-service" ).length > 0 ) {
+      if ( this._$elem.is( ".geo-map" ) ) {
         for ( ; i < this._currentServices.length; i++ ) {
           service = this._currentServices[ i ];
 

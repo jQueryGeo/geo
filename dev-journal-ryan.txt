@@ -19,6 +19,10 @@
 * geomap - pass the service id (if there is one) to the src callback as a view property
 * docs - geomap - support dynamic map services that only work in geodetic coordinates (sr=4326)
 * geomap - support dynamic map services that only work in geodetic coordinates (sr=4326)
+* docs - geomap - allow append to take an array of shapes
+* geomap - allow append to take an array of shapes
+* docs - geomap - allow remove to take an array of shapes
+* geomap - allow remove to take an array of shapes
 * geomap - cache label coordinates (the labelPixel cannot be cached, it will change each refresh)
 * geomap - rotate label based on segment
 * geomap - use pointer-events: none where appropriate
@@ -185,6 +189,9 @@ It appears that when you pan starting on an area that has an unloaded image, i.e
 
 ===shingled 0===
 To prohibit shingled maps from zooming out past 0, I had to change quite a bit of code. I now have getZoom & getPixelSize methods that will work regardless of tilingScheme. I'm also calculating pixelSizeMax when bboxMax changes and making sure the non-tiled zoom doesn't go less than 0 in two spots. That seems to do the trick.
+
+===service-level shape refresh===
+Shapes on services draw twice, heh. That was a tough one. Turns out, when I create the service-level geomap widgets, I wasn't setting _graphicShapes to a new array before passing the (this) object to the widget factory. All services were sharing the same _graphicShapes reference.
 
 ==2012-02-11==
 ===current services===
