@@ -52,6 +52,9 @@
               return parseInt(value) + dy;
             }
           } );
+
+          // until pan/zoom rewrite, remove all containers not in this scale
+          serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
         }
       },
 

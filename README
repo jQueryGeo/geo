@@ -70,6 +70,8 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * docs - geomap - selector argument to find method
 * geomap - selector argument to find method
 * geomap - pan mode should use a hand cursor by default
+* geomap - [bug] only services that have finished refreshing move when the user pans
+** for a4: hide unfinished services
 
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon
