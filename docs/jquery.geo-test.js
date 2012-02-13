@@ -1438,18 +1438,6 @@ if (!document.createElement('canvas').getContext) {
   })();
 
 } // if
-/* Copyright (c) 2009 Brandon Aaron (http://brandonaaron.net)
- * Dual licensed under the MIT (http://www.opensource.org/licenses/mit-license.php)
- * and GPL (http://www.opensource.org/licenses/gpl-license.php) licenses.
- * Thanks to: http://adomas.org/javascript-mouse-wheel/ for some pointers.
- * Thanks to: Mathias Bank(http://www.mathias-bank.de) for a scope bug fix.
- *
- * Version: 3.0.2
- * 
- * Requires: 1.2.2+
- */
-(function(c){var a=["DOMMouseScroll","mousewheel"];c.event.special.mousewheel={setup:function(){if(this.addEventListener){for(var d=a.length;d;){this.addEventListener(a[--d],b,false)}}else{this.onmousewheel=b}},teardown:function(){if(this.removeEventListener){for(var d=a.length;d;){this.removeEventListener(a[--d],b,false)}}else{this.onmousewheel=null}}};c.fn.extend({mousewheel:function(d){return d?this.bind("mousewheel",d):this.trigger("mousewheel")},unmousewheel:function(d){return this.unbind("mousewheel",d)}});function b(f){var d=[].slice.call(arguments,1),g=0,e=true;f=c.event.fix(f||window.event);f.type="mousewheel";if(f.wheelDelta){g=f.wheelDelta/120}if(f.detail){g=-f.detail/3}d.unshift(f,g);return c.event.handle.apply(this,d)}})(jQuery);
-
 /*!
  * jQuery UI Widget @VERSION
  *
@@ -2430,25 +2418,32 @@ function try$( selector ) {
     center: function (bbox, _ignoreGeo /* Internal Use Only */) {
       // Envelope.centre in JTS
       // bbox only, use centroid for geom
-      if (!_ignoreGeo && $.geo.proj) {
+      var wasGeodetic = false;
+      if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( bbox ) ) {
+        wasGeodetic = true;
         bbox = $.geo.proj.fromGeodetic(bbox);
       }
+
       var center = [(bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2];
-      return !_ignoreGeo && $.geo.proj ? $.geo.proj.toGeodetic(center) : center;
+      return wasGeodetic ? $.geo.proj.toGeodetic(center) : center;
     },
 
-    expandBy: function (bbox, dx, dy) {
-      if ($.geo.proj) {
+    expandBy: function (bbox, dx, dy, _ignoreGeo /* Internal Use Only */) {
+      var wasGeodetic = false;
+      if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( bbox ) ) {
+        wasGeodetic = true;
         bbox = $.geo.proj.fromGeodetic(bbox);
       }
+
       bbox = [bbox[0] - dx, bbox[1] - dy, bbox[2] + dx, bbox[3] + dy];
-      return $.geo.proj ? $.geo.proj.toGeodetic(bbox) : bbox;
+      return wasGeodetic ? $.geo.proj.toGeodetic(bbox) : bbox;
     },
 
     height: function (bbox, _ignoreGeo /* Internal Use Only */ ) {
-      if (!_ignoreGeo && $.geo.proj) {
+      if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( bbox ) ) {
         bbox = $.geo.proj.fromGeodetic(bbox);
       }
+
       return bbox[3] - bbox[1];
     },
 
@@ -2468,9 +2463,12 @@ function try$( selector ) {
 
     reaspect: function (bbox, ratio, _ignoreGeo /* Internal Use Only */ ) {
       // not in JTS
-      if (!_ignoreGeo && $.geo.proj) {
+      var wasGeodetic = false;
+      if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( bbox ) ) {
+        wasGeodetic = true;
         bbox = $.geo.proj.fromGeodetic(bbox);
       }
+
       var width = this.width(bbox, true),
           height = this.height(bbox, true),
           center = this.center(bbox, true),
@@ -2487,14 +2485,22 @@ function try$( selector ) {
 
         bbox = [center[0] - dx, center[1] - dy, center[0] + dx, center[1] + dy];
       }
-      return (!_ignoreGeo && $.geo.proj) ? $.geo.proj.toGeodetic(bbox) : bbox;
+
+      return wasGeodetic ? $.geo.proj.toGeodetic(bbox) : bbox;
     },
 
     recenter: function( bbox, center, _ignoreGeo /* Internal Use Only */ ) {
       // not in JTS
-      if (!_ignoreGeo && $.geo.proj) {
-        bbox = $.geo.proj.fromGeodetic(bbox);
-        center = $.geo.proj.fromGeodetic(center);
+      var wasGeodetic = false;
+      if ( !_ignoreGeo && $.geo.proj ) {
+        if ( this._isGeodetic( bbox ) ) {
+          wasGeodetic = true;
+          bbox = $.geo.proj.fromGeodetic(bbox);
+        }
+
+        if ( this._isGeodetic( center ) ) {
+          center = $.geo.proj.fromGeodetic(center);
+        }
       }
 
       var halfWidth = ( bbox[ 2 ] - bbox[ 0 ] ) / 2,
@@ -2507,25 +2513,31 @@ function try$( selector ) {
         center[ 1 ] + halfHeight
       ];
 
-      return (!_ignoreGeo && $.geo.proj) ? $.geo.proj.toGeodetic(bbox) : bbox;
+      return wasGeodetic ? $.geo.proj.toGeodetic(bbox) : bbox;
     },
 
     scaleBy: function ( bbox, scale, _ignoreGeo /* Internal Use Only */ ) {
       // not in JTS
-      if (!_ignoreGeo && $.geo.proj) {
+      var wasGeodetic = false;
+      if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( bbox ) ) {
+        wasGeodetic = true;
         bbox = $.geo.proj.fromGeodetic(bbox);
       }
+
       var c = this.center(bbox, true),
           dx = (bbox[2] - bbox[0]) * scale / 2,
           dy = (bbox[3] - bbox[1]) * scale / 2;
+
       bbox = [c[0] - dx, c[1] - dy, c[0] + dx, c[1] + dy];
-      return !_ignoreGeo && $.geo.proj ? $.geo.proj.toGeodetic(bbox) : bbox;
+
+      return wasGeodetic ? $.geo.proj.toGeodetic(bbox) : bbox;
     },
 
     width: function (bbox, _ignoreGeo /* Internal Use Only */ ) {
-      if (!_ignoreGeo && $.geo.proj) {
+      if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( bbox ) ) {
         bbox = $.geo.proj.fromGeodetic(bbox);
       }
+
       return bbox[2] - bbox[0];
     },
 
@@ -2539,7 +2551,7 @@ function try$( selector ) {
       if ( !geom ) {
         return undefined;
       } else if ( geom.bbox ) {
-        result = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic( geom.bbox ) : geom.bbox;
+        result = ( !_ignoreGeo && $.geo.proj && this._isGeodetic( geom.bbox ) ) ? $.geo.proj.fromGeodetic( geom.bbox ) : geom.bbox;
       } else {
         result = [ pos_oo, pos_oo, neg_oo, neg_oo ];
 
@@ -2550,7 +2562,9 @@ function try$( selector ) {
           return undefined;
         }
 
-        if ( $.geo.proj ) {
+        var wasGeodetic = false;
+        if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( coordinates ) ) {
+          wasGeodetic = true;
           coordinates = $.geo.proj.fromGeodetic( coordinates );
         }
 
@@ -2562,7 +2576,7 @@ function try$( selector ) {
         }
       }
 
-      return $.geo.proj ? $.geo.proj.toGeodetic(result) : result;
+      return wasGeodetic ? $.geo.proj.toGeodetic(result) : result;
     },
 
     // centroid
@@ -2579,7 +2593,9 @@ function try$( selector ) {
               coords = $.merge( [ ], geom.type == "Polygon" ? geom.coordinates[0] : geom.coordinates ),
               i = 1, j, n;
 
-          if ( !_ignoreGeo && $.geo.proj ) {
+          var wasGeodetic = false;
+          if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( coords ) ) {
+            wasGeodetic = true;
             coords = $.geo.proj.fromGeodetic(coords);
           }
 
@@ -2599,7 +2615,7 @@ function try$( selector ) {
             if (coords.length > 0) {
               c[0] = coords[0][0];
               c[1] = coords[0][1];
-              return { type: "Point", coordinates: !_ignoreGeo && $.geo.proj ? $.geo.proj.toGeodetic(c) : c };
+              return { type: "Point", coordinates: wasGeodetic ? $.geo.proj.toGeodetic(c) : c };
             } else {
               return undefined;
             }
@@ -2609,7 +2625,7 @@ function try$( selector ) {
           c[0] /= a;
           c[1] /= a;
 
-          return { type: "Point", coordinates: !_ignoreGeo && $.geo.proj ? $.geo.proj.toGeodetic(c) : c };
+          return { type: "Point", coordinates: wasGeodetic ? $.geo.proj.toGeodetic(c) : c };
       }
       return undefined;
     },
@@ -2676,8 +2692,8 @@ function try$( selector ) {
     // distance
 
     distance: function ( geom1, geom2, _ignoreGeo /* Internal Use Only */ ) {
-      var geom1CoordinatesProjected = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic(geom1.coordinates) : geom1.coordinates,
-          geom2CoordinatesProjected = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic(geom2.coordinates) : geom2.coordinates;
+      var geom1CoordinatesProjected = ( !_ignoreGeo && $.geo.proj && this._isGeodetic( geom1.coordinates ) ) ? $.geo.proj.fromGeodetic(geom1.coordinates) : geom1.coordinates,
+          geom2CoordinatesProjected = ( !_ignoreGeo && $.geo.proj && this._isGeodetic( geom2.coordinates ) ) ? $.geo.proj.fromGeodetic(geom2.coordinates) : geom2.coordinates;
 
       switch (geom1.type) {
         case "Point":
@@ -2794,10 +2810,17 @@ function try$( selector ) {
     // buffer
 
     _buffer: function( geom, distance, _ignoreGeo /* Internal Use Only */ ) {
+      var wasGeodetic = false,
+          coords;
+
+      if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( geom.coordinates ) ) {
+        wasGeodetic = true;
+        coords = $.geo.proj.fromGeodetic( geom.coordinates );
+      }
+
       switch ( geom.type ) {
         case "Point":
-          var coord = ( !_ignoreGeo && $.geo.proj ) ? $.geo.proj.fromGeodetic(geom.coordinates) : geom.coordinates,
-              resultCoords = [],
+          var resultCoords = [],
               slices = 180,
               i = 0,
               a;
@@ -2805,14 +2828,14 @@ function try$( selector ) {
           for ( ; i <= slices; i++ ) {
             a = ( i * 360 / slices ) * ( Math.PI / 180 );
             resultCoords.push( [
-              coord[ 0 ] + Math.cos( a ) * distance,
-              coord[ 1 ] + Math.sin( a ) * distance
+              coords[ 0 ] + Math.cos( a ) * distance,
+              coords[ 1 ] + Math.sin( a ) * distance
             ] );
           }
 
           return {
             type: "Polygon",
-            coordinates: [ ( !_ignoreGeo && $.geo.proj ? $.geo.proj.toGeodetic( resultCoords ) : resultCoords ) ]
+            coordinates: [ ( wasGeodetic ? $.geo.proj.toGeodetic( resultCoords ) : resultCoords ) ]
           };
 
           break;
@@ -2866,22 +2889,29 @@ function try$( selector ) {
           return 0;
 
         case "LineString":
-          lineStringCoordinates = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic(geom.coordinates) : geom.coordinates;
+          lineStringCoordinates = geom.coordinates;
           break;
 
         case "Polygon":
-          lineStringCoordinates = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic(geom.coordinates[ 0 ]) : geom.coordinates[ 0 ];
+          lineStringCoordinates = geom.coordinates[ 0 ];
           break;
       }
 
       if ( lineStringCoordinates ) {
+        if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( lineStringCoordinates ) ) {
+          lineStringCoordinates = $.geo.proj.fromGeodetic( lineStringCoordinates );
+        }
+
         for ( ; i < lineStringCoordinates.length; i++ ) {
           dx = lineStringCoordinates[ i ][0] - lineStringCoordinates[ i - 1 ][0];
           dy = lineStringCoordinates[ i ][1] - lineStringCoordinates[ i - 1 ][1];
           sum += Math.sqrt((dx * dx) + (dy * dy));
         }
+
         return sum;
       }
+
+      // return undefined;
     },
 
     area: function( geom, _ignoreGeo /* Internal Use Only */ ) {
@@ -2895,12 +2925,15 @@ function try$( selector ) {
           return 0;
 
         case "Polygon":
-          polygonCoordinates = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic( geom.coordinates[ 0 ] ) : geom.coordinates[ 0 ];
+          polygonCoordinates = geom.coordinates[ 0 ];
           break;
       }
 
-
       if ( polygonCoordinates ) {
+        if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( polygonCoordinates ) ) {
+          polygonCoordinates = $.geo.proj.fromGeodetic( polygonCoordinates );
+        }
+
         for ( ; i <= polygonCoordinates.length; i++) {
           j = i %  polygonCoordinates.length;
           sum += ( polygonCoordinates[ i - 1 ][ 0 ] - polygonCoordinates[ j ][ 0 ] ) * ( polygonCoordinates[ i - 1 ][ 1 ] + polygonCoordinates[ j ][ 1 ] ) / 2;
@@ -2919,7 +2952,8 @@ function try$( selector ) {
           lineStringCoordinates,
           segmentLengths = [],
           i = 1, dx, dy,
-          c, c0, c1;
+          c, c0, c1,
+          wasGeodetic = false;
 
       switch ( geom.type ) {
         case "Point":
@@ -2947,7 +2981,10 @@ function try$( selector ) {
             coordinates: [ lineStringCoordinates[ i ][ 0 ], lineStringCoordinates[ i ][ 1 ] ]
           };
         } else {
-          lineStringCoordinates = !_ignoreGeo && $.geo.proj ? $.geo.proj.fromGeodetic( lineStringCoordinates ) : lineStringCoordinates;
+          if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( lineStringCoordinates ) ) {
+            wasGeodetic = true;
+            lineStringCoordinates = $.geo.proj.fromGeodetic( lineStringCoordinates );
+          }
 
           for ( ; i < lineStringCoordinates.length; i++ ) {
             dx = lineStringCoordinates[ i ][ 0 ] - lineStringCoordinates[ i - 1 ][ 0 ];
@@ -2974,7 +3011,7 @@ function try$( selector ) {
 
           return {
             type: "Point",
-            coordinates: !_ignoreGeo && $.geo.proj ? $.geo.proj.toGeodetic(c) : c
+            coordinates: wasGeodetic ? $.geo.proj.toGeodetic(c) : c
           };
         }
       }
@@ -3214,7 +3251,11 @@ function try$( selector ) {
           ];
         },
 
-        fromGeodetic: function (coordinates) {
+        fromGeodetic: function ( coordinates ) {
+          if ( ! $.geo._isGeodetic( coordinates ) ) {
+            return coordinates;
+          }
+
           var isMultiPointOrLineString = $.isArray(coordinates[ 0 ]),
               fromGeodeticPos = this.fromGeodeticPos;
 
@@ -3262,6 +3303,10 @@ function try$( selector ) {
         },
 
         toGeodetic: function (coordinates) {
+          if ( $.geo._isGeodetic( coordinates ) ) {
+            return coordinates;
+          }
+
           var isMultiPointOrLineString = $.isArray(coordinates[ 0 ]),
               toGeodeticPos = this.toGeodeticPos;
 
@@ -3657,6 +3702,7 @@ function try$( selector ) {
     _$eventTarget: undefined,
     _$contentFrame: undefined,
     _$existingChildren: undefined,
+    _$attrList: undefined,
     _$servicesContainer: undefined,
 
     _$panContainer: undefined, //< all non-service elements that move while panning
@@ -3673,6 +3719,8 @@ function try$( selector ) {
     _pixelSize: undefined,
     _centerMax: undefined,
     _pixelSizeMax: undefined,
+
+    _userGeodetic: true,
 
     _wheelTimeout: null,
     _wheelLevel: 0,
@@ -3785,6 +3833,8 @@ function try$( selector ) {
     },
 
     _create: function () {
+      this._options = this.options;
+
       if (this._$elem.is(".geo-service")) {
         this._map = this._$elem.data( "geoMap" );
         this._$shapesContainer.geographics( );
@@ -3793,8 +3843,6 @@ function try$( selector ) {
       }
 
       this._map = this;
-
-      this._options = this.options;
 
       this._supportTouch = "ontouchend" in document;
       this._softDblClick = this._supportTouch || _ieVersion == 7;
@@ -3878,22 +3926,22 @@ function try$( selector ) {
 
       switch (key) {
         case "bbox":
-          if ($.geo.proj) {
-            value = $.geo.proj.fromGeodetic([[value[0], value[1]], [value[2], value[3]]]);
-            value = [value[0][0], value[0][1], value[1][0], value[1][1]];
+          this._userGeodetic = $.geo.proj && $.geo._isGeodetic( value );
+          if ( this._userGeodetic ) {
+            value = $.geo.proj.fromGeodetic( value );
           }
 
           this._setBbox(value, false, refresh);
           value = this._getBbox();
-
-          if ($.geo.proj) {
-            value = $.geo.proj.toGeodetic([[value[0], value[1]], [value[2], value[3]]]);
-            value = [value[0][0], value[0][1], value[1][0], value[1][1]];
-          }
           break;
 
         case "center":
-          this._setCenterAndSize($.geo.proj ? $.geo.proj.fromGeodetic([[value[0], value[1]]])[0] : value, this._pixelSize, false, refresh);
+          this._userGeodetic = $.geo.proj && $.geo._isGeodetic( value );
+          if ( this._userGeodetic ) {
+            value = $.geo.proj.fromGeodetic( value );
+          }
+
+          this._setCenterAndSize( value, this._pixelSize, false, refresh );
           break;
 
         case "measureLabels":
@@ -3928,7 +3976,15 @@ function try$( selector ) {
 
       $.Widget.prototype._setOption.apply(this, arguments);
 
-      switch (key) {
+      switch ( key ) {
+        case "bbox":
+        case "center":
+          if ( this._userGeodetic ) {
+            this._options[ "bbox" ] = $.geo.proj.toGeodetic( this._options[ "bbox" ] );
+            this._options[ "center" ] = $.geo.proj.toGeodetic( this._center );
+          }
+          break;
+
         case "tilingScheme":
           if ( value != null ) {
             this._pixelSizeMax = this._getTiledPixelSize(0);
@@ -3985,46 +4041,49 @@ function try$( selector ) {
 
     toMap: function (p) {
       p = this._toMap(p);
-      return $.geo.proj ? $.geo.proj.toGeodetic(p) : p;
+      return this._userGeodetic ? $.geo.proj.toGeodetic(p) : p;
     },
 
     toPixel: function ( p, _center /* Internal Use Only */, _pixelSize /* Internal Use Only */ ) {
-      p = $.geo.proj ? $.geo.proj.fromGeodetic(p) : p;
-      return this._toPixel(p, _center, _pixelSize);
+      return this._toPixel( $.geo.proj.fromGeodetic( p ), _center, _pixelSize );
     },
 
-    opacity: function (value, _serviceContainer) {
-      if (this._$elem.is(".geo-service")) {
-        this._$elem.closest(".geo-map").geomap("opacity", value, this._$elem);
+    opacity: function ( value, _serviceContainer ) {
+      if ( this._$elem.is( ".geo-service" ) ) {
+        this._$elem.closest( ".geo-map" ).geomap( "opacity", value, this._$elem );
       } else {
-        if (value >= 0 || value <= 1) {
+        if ( value >= 0 || value <= 1 ) {
           for ( var i = 0; i < this._currentServices.length; i++ ) {
-            var service = this._currentServices[i];
-            if ( !_serviceContainer || service.serviceContainer[0] == _serviceContainer[0] ) {
-              this._options["services"][i].opacity = service.opacity = value;
-              $.geo["_serviceTypes"][service.type].opacity(this, service);
+            var service = this._currentServices[ i ];
+            if ( !_serviceContainer || service.serviceContainer[ 0 ] == _serviceContainer[ 0 ] ) {
+              service.style.opacity = value;
+              $.geo[ "_serviceTypes" ][ service.type ].opacity( this, service );
             }
           }
         }
       }
     },
 
-    toggle: function (value, _serviceContainer) {
-      if (this._$elem.is(".geo-service")) {
-        this._$elem.closest(".geo-map").geomap("toggle", value, this._$elem);
+    toggle: function ( value, _serviceContainer ) {
+      if ( this._$elem.is( ".geo-service" ) ) {
+        this._$elem.closest( ".geo-map" ).geomap( "toggle", value, this._$elem );
       } else {
-        for (var i = 0; i < this._currentServices.length; i++) {
-          var service = this._currentServices[i];
-          if (!_serviceContainer || service.serviceContainer[0] == _serviceContainer[0]) {
-            if (value === undefined) {
-              value = (service.visibility === undefined || service.visibility === "visible" ? false : true);
+
+        for ( var i = 0; i < this._currentServices.length; i++ ) {
+          var service = this._currentServices[ i ];
+
+          if ( !_serviceContainer || service.serviceContainer[ 0 ] == _serviceContainer[ 0 ] ) {
+            if ( value === undefined ) {
+              // toggle visibility
+              value = ( service.style.visibility !== "visible" );
             }
 
-            this._options["services"][i].visibility = service.visibility = ( value ? "visible" : "hidden" );
-            service.serviceContainer.toggle(value);
+            service.style.visibility = ( value ? "visible" : "hidden" );
 
-            if (value) {
-              $.geo["_serviceTypes"][service.type].refresh(this, service);
+            service.serviceContainer.toggle( value );
+
+            if ( value ) {
+              $.geo[ "_serviceTypes" ][ service.type ].refresh( this, service );
             }
           }
         }
@@ -4101,7 +4160,7 @@ function try$( selector ) {
         for ( i = 0; i < shapes.length; i++ ) {
           if ( shapes[ i ].type != "Point" ) {
             var bbox = $.geo.bbox( shapes[ i ] );
-            if ( $.geo.proj ) {
+            if ( $.geo.proj && $.geo._isGeodetic( bbox ) ) {
               bbox = $.geo.proj.fromGeodetic( bbox );
             }
             $.data( shapes[ i ], "geoBbox", bbox );
@@ -4132,8 +4191,9 @@ function try$( selector ) {
       }
     },
 
-    find: function (point, pixelTolerance) {
-      var searchPixel = this._map.toPixel( point.coordinates ),
+    find: function ( selector, pixelTolerance ) {
+      var isPoint = $.isPlainObject( selector ),
+          searchPixel = isPoint ? this._map.toPixel( selector.coordinates ) : undefined,
           mapTol = this._map._pixelSize * pixelTolerance,
           result = [],
           graphicShape,
@@ -4144,42 +4204,46 @@ function try$( selector ) {
       for ( ; i < this._graphicShapes.length; i++ ) {
         graphicShape = this._graphicShapes[ i ];
 
-        if ( graphicShape.shape.type == "Point" ) {
-          if ( $.geo.distance( graphicShape.shape, point ) <= mapTol ) {
-            result.push( graphicShape.shape );
-          }
-        } else {
-          var bbox = $.data( graphicShape.shape, "geoBbox" ),
-              bboxPolygon = {
-                type: "Polygon",
-                coordinates: [ [
-                  [bbox[0], bbox[1]],
-                  [bbox[0], bbox[3]],
-                  [bbox[2], bbox[3]],
-                  [bbox[2], bbox[1]],
-                  [bbox[0], bbox[1]]
-                ] ]
-              },
-              projectedPoint = {
-                type: "Point",
-                coordinates: $.geo.proj ? $.geo.proj.fromGeodetic( point.coordinates ) : point.coordinates
-              };
+        if ( isPoint ) {
+          if ( graphicShape.shape.type == "Point" ) {
+            if ( $.geo.distance( graphicShape.shape, selector ) <= mapTol ) {
+              result.push( graphicShape.shape );
+            }
+          } else {
+            var bbox = $.data( graphicShape.shape, "geoBbox" ),
+                bboxPolygon = {
+                  type: "Polygon",
+                  coordinates: [ [
+                    [bbox[0], bbox[1]],
+                    [bbox[0], bbox[3]],
+                    [bbox[2], bbox[3]],
+                    [bbox[2], bbox[1]],
+                    [bbox[0], bbox[1]]
+                  ] ]
+                },
+                projectedPoint = {
+                  type: "Point",
+                  coordinates: $.geo.proj && $.geo._isGeodetic( selector.coordinates ) ? $.geo.proj.fromGeodetic( selector.coordinates ) : selector.coordinates
+                };
 
-          if ( $.geo.distance( bboxPolygon, projectedPoint, true ) <= mapTol ) {
-            geometries = $.geo._flatten( graphicShape.shape );
-            for ( curGeom = 0; curGeom < geometries.length; curGeom++ ) {
-              if ( $.geo.distance( geometries[ curGeom ], point ) <= mapTol ) {
-                result.push( graphicShape.shape );
-                break;
+            if ( $.geo.distance( bboxPolygon, projectedPoint, true ) <= mapTol ) {
+              geometries = $.geo._flatten( graphicShape.shape );
+              for ( curGeom = 0; curGeom < geometries.length; curGeom++ ) {
+                if ( $.geo.distance( geometries[ curGeom ], selector ) <= mapTol ) {
+                  result.push( graphicShape.shape );
+                  break;
+                }
               }
             }
           }
+        } else {
+          result.push( graphicShape.shape );
         }
       }
 
       if ( this._$elem.is( ".geo-map" ) ) {
         this._$elem.find( ".geo-service" ).each( function( ) {
-          result = $.merge( result, $( this ).geomap( "find", point, pixelTolerance ) );
+          result = $.merge( result, $( this ).geomap( "find", selector, pixelTolerance ) );
         } );
       }
 
@@ -4285,6 +4349,9 @@ function try$( selector ) {
       this._$contentFrame.append('<div class="geo-shapes-container" style="' + contentPosCss + contentSizeCss + '"></div>');
       this._$shapesContainer = this._$contentFrame.children(':last');
 
+      this._$contentFrame.append( '<ul style="position: absolute; bottom: 8px; left: 8px; list-style-type: none; max-width: 50%; padding: 0; margin: 0;"></ul>' );
+      this._$attrList = this._$contentFrame.children( ":last" );
+
       this._$contentFrame.append('<div class="geo-draw-container" style="' + contentPosCss + contentSizeCss + '"></div>');
       this._$drawContainer = this._$contentFrame.children(':last');
 
@@ -4304,32 +4371,48 @@ function try$( selector ) {
     },
 
     _createServices: function () {
-      var i, serviceContainer, service;
+      var service, i;
 
-      for (i = 0; i < this._currentServices.length; i++) {
-        this._currentServices[i].serviceContainer.geomap("destroy");
-        $.geo["_serviceTypes"][this._currentServices[i].type].destroy(this, this._$servicesContainer, this._currentServices[i]);
+      for ( i = 0; i < this._currentServices.length; i++ ) {
+        this._currentServices[ i ].serviceContainer.geomap( "destroy" );
+        $.geo[ "_serviceTypes" ][ this._currentServices[ i ].type ].destroy( this, this._$servicesContainer, this._currentServices[ i ] );
       }
 
-      this._currentServices = [];
+      this._currentServices = [ ];
       this._$servicesContainer.html( "" );
+      this._$attrList.html( "" );
 
-      for (i = 0; i < this._options["services"].length; i++) {
-        service = this._options["services"][i];
-        this._currentServices[i] = service;
+      for ( i = 0; i < this._options[ "services" ].length; i++ ) {
+        service = this._currentServices[ i ] = $.extend( { }, this._options[ "services" ][ i ] );
+
+        // default the service style property on our copy
+        service.style = $.extend( {
+                          visibility: "visible",
+                          opacity: 1
+                        }, service.style );
 
         var idString = service.id ? ' id="' + service.id + '"' : "",
             classString = 'class="geo-service ' + ( service["class"] ? service["class"] : '' ) + '"',
-            scHtml = '<div ' + idString + classString + ' style="position:absolute; left:0; top:0; width:32px; height:32px; margin:0; padding:0; display:' + (service.visibility === undefined || service.visibility === "visible" ? "block" : "none") + ';"></div>';
+            scHtml = '<div ' + idString + classString + ' style="position:absolute; left:0; top:0; width:32px; height:32px; margin:0; padding:0; display:' + ( service.style.visibility === "visible" ? "block" : "none" ) + ';"></div>',
+            servicesContainer;
 
         this._$servicesContainer.append( scHtml );
         serviceContainer = this._$servicesContainer.children( ":last" );
-        this._currentServices[i].serviceContainer = serviceContainer;
+        this._currentServices[ i ].serviceContainer = serviceContainer;
         
-        $.geo["_serviceTypes"][this._currentServices[i].type].create(this, serviceContainer, this._currentServices[i], i);
+        $.geo[ "_serviceTypes" ][ service.type ].create( this, serviceContainer, service, i );
 
         serviceContainer.data( "geoMap", this ).geomap();
+
+        if ( service.attr ) {
+          this._$attrList.append( '<li>' + service.attr + '</li>' );
+        }
       }
+
+      this._$attrList.find( "a" ).css( {
+        position: "relative",
+        zIndex: 100
+      } );
     },
 
     _refreshDrawing: function ( ) {
@@ -4697,25 +4780,20 @@ function try$( selector ) {
       // the final call during any extent change
       if (this._pixelSize != pixelSize) {
         this._$elem.find( ".geo-shapes-container" ).geographics("clear");
-        for (var i = 0; i < this._options["services"].length; i++) {
-          var service = this._options["services"][i];
+        for (var i = 0; i < this._currentServices.length; i++) {
+          var service = this._currentServices[i];
           $.geo["_serviceTypes"][service.type].interactiveScale(this, service, center, pixelSize);
         }
       }
 
       this._center = center;
-      this.options["pixelSize"] = this._pixelSize = pixelSize;
+      this._options["pixelSize"] = this._pixelSize = pixelSize;
 
-      if ($.geo.proj) {
-        var bbox = this._getBbox();
-        bbox = $.geo.proj.toGeodetic([[bbox[0], bbox[1]], [bbox[2], bbox[3]]]);
-        bbox = [bbox[0][0], bbox[0][1], bbox[1][0], bbox[1][1]];
-        this._options["bbox"] = bbox;
-
-        this._options["center"] = $.geo.proj.toGeodetic([[this._center[0], this._center[1]]])[0];
+      if ( this._userGeodetic ) {
+        this._options["bbox"] = $.geo.proj.toGeodetic( this._getBbox() );
+        this._options["center"] = $.geo.proj.toGeodetic( this._center );
       } else {
         this._options["bbox"] = this._getBbox();
-
         this._options["center"] = this._center;
       }
 
@@ -4893,7 +4971,7 @@ function try$( selector ) {
               this._drawCoords.length--;
               this._trigger( "shape", e, {
                 type: "LineString",
-                coordinates: $.geo.proj ? $.geo.proj.toGeodetic(this._drawCoords) : this._drawCoords
+                coordinates: this._userGeodetic ? $.geo.proj.toGeodetic(this._drawCoords) : this._drawCoords
               } );
           } else {
             this._eventTarget_dblclick_zoom(e);
@@ -4909,7 +4987,7 @@ function try$( selector ) {
               this._drawCoords[endIndex] = $.merge( [], this._drawCoords[0] );
               this._trigger( "shape", e, {
                 type: "Polygon",
-                coordinates: [ $.geo.proj ? $.geo.proj.toGeodetic(this._drawCoords) : this._drawCoords ]
+                coordinates: [ this._userGeodetic ? $.geo.proj.toGeodetic(this._drawCoords) : this._drawCoords ]
               } );
             }
           } else {
@@ -5088,10 +5166,9 @@ function try$( selector ) {
               anchorWidth = this._multiTouchAnchorBbox[ 2 ] - this._multiTouchAnchorBbox[ 0 ],
               ratioWidth = currentWidth / anchorWidth;
 
+          this._wheelLevel = Math.abs( Math.floor( ( 1 - ratioWidth ) * 10 ) );
           if ( Math.abs( currentWidth ) < Math.abs( anchorWidth ) ) {
-            this._wheelLevel = - Math.abs( Math.ceil( ( 1 - ratioWidth ) * 10 ) );
-          } else {
-            this._wheelLevel = Math.abs( Math.floor( ( 1 - ratioWidth ) * 10 / 2 ) );
+            this._wheelLevel = - this._wheelLevel;
           }
 
           var pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, false );
@@ -5449,7 +5526,7 @@ function try$( selector ) {
             }
           });
 
-          if ( service && ( service.visibility === undefined || service.visibility === "visible" ) ) {
+          if ( service && service.style.visibility === "visible" ) {
             var pixelSize = map._pixelSize,
 
                 serviceObj = this,
@@ -5502,7 +5579,7 @@ function try$( selector ) {
                 serviceLeft = Math.round((fullXMinX - (mapCenterOriginal[0] - halfWidth)) / pixelSize),
                 serviceTop = Math.round(( image ? fullYMinOrMaxY - (mapCenterOriginal[1] - halfHeight) : (mapCenterOriginal[1] + halfHeight) - fullYMinOrMaxY  ) / pixelSize),
 
-                opacity = (service.opacity === undefined ? 1 : service.opacity),
+                opacity = service.style.opacity,
 
                 x, y;
 
@@ -5592,7 +5669,7 @@ function try$( selector ) {
       interactiveScale: function (map, service, center, pixelSize) {
         var serviceState = $.data( service, "geoServiceState" );
 
-        if ( serviceState && service && ( service.visibility === undefined || service.visibility === "visible" ) ) {
+        if ( serviceState && service && service.style.visibility === "visible" ) {
           this._cancelUnloaded(map, service);
 
           var serviceContainer = serviceState.serviceContainer,
@@ -5637,7 +5714,7 @@ function try$( selector ) {
 
         this._cancelUnloaded(map, service);
 
-        if ( serviceState && service && ( service.visibility === undefined || service.visibility === "visible" ) && !( serviceState.serviceContainer.is( ":hidden" ) ) ) {
+        if ( serviceState && service && service.style.visibility === "visible" && !( serviceState.serviceContainer.is( ":hidden" ) ) ) {
 
           var bbox = map._getBbox(),
               pixelSize = map._pixelSize,
@@ -5676,7 +5753,7 @@ function try$( selector ) {
               scaleContainers = $serviceContainer.children().show(),
               scaleContainer = scaleContainers.filter("[data-pixelSize='" + pixelSize + "']").appendTo($serviceContainer),
 
-              opacity = (service.opacity === undefined ? 1 : service.opacity),
+              opacity = service.style.opacity,
 
               x, y;
 
@@ -5792,14 +5869,14 @@ function try$( selector ) {
       resize: function (map, service) {
       },
 
-      opacity: function (map, service) {
+      opacity: function ( map, service ) {
         var serviceState = $.data( service, "geoServiceState" );
-        serviceState.serviceContainer.find("img").stop(true).fadeTo("fast", service.opacity);
+        serviceState.serviceContainer.find( "img" ).stop( true ).fadeTo( "fast", service.style.opacity );
       },
 
-      toggle: function (map, service) {
+      toggle: function ( map, service ) {
         var serviceState = $.data( service, "geoServiceState" );
-        serviceState.serviceContainer.css("display", service.visibility === "visible" ? "block" : "none");
+        serviceState.serviceContainer.css( "display", service.style.visibility === "visible" ? "block" : "none" );
       },
 
       _cancelUnloaded: function (map, service) {
@@ -5938,7 +6015,7 @@ function try$( selector ) {
 
         this._cancelUnloaded(map, service);
 
-        if (serviceState && service && (service.visibility === undefined || service.visibility === "visible") && !( serviceState.serviceContainer.is( ":hidden" ) ) ) {
+        if ( serviceState && service && service.style.visibility === "visible" && !( serviceState.serviceContainer.is( ":hidden" ) ) ) {
 
           var bbox = map._getBbox(),
               pixelSize = map._pixelSize,
@@ -5955,7 +6032,7 @@ function try$( selector ) {
 
               scaleContainer = serviceContainer.children('[data-pixelSize="' + pixelSize + '"]'),
 
-              opacity = (service.opacity === undefined ? 1 : service.opacity),
+              opacity = service.style.opacity,
 
               $img;
 
@@ -6022,7 +6099,7 @@ function try$( selector ) {
       resize: function (map, service) {
         var serviceState = $.data(service, "geoServiceState");
 
-        if ( serviceState && service && (service.visibility === undefined || service.visibility === "visible")) {
+        if ( serviceState && service && service.style.visibility === "visible" ) {
           this._cancelUnloaded(map, service);
 
           var serviceContainer = serviceState.serviceContainer,
@@ -6044,14 +6121,14 @@ function try$( selector ) {
         }
       },
 
-      opacity: function (map, service) {
-        var serviceState = $.data(service, "geoServiceState");
-        serviceState.serviceContainer.find("img").stop(true).fadeTo("fast", service.opacity);
+      opacity: function ( map, service ) {
+        var serviceState = $.data( service, "geoServiceState" );
+        serviceState.serviceContainer.find( "img" ).stop( true ).fadeTo( "fast", service.style.opacity );
       },
 
       toggle: function (map, service) {
         var serviceState = $.data(service, "geoServiceState");
-        serviceState.serviceContainer.css("display", service.visibility === "visible" ? "block" : "none");
+        serviceState.serviceContainer.css("display", service.style.visibility === "visible" ? "block" : "none");
       },
 
       _cancelUnloaded: function (map, service) {

@@ -20,10 +20,10 @@
 <body>
   <div>
     <a href="../" class="docLink">&lt; docs</a>
-    <h1>
-      tiled services test</h1>
-    <p>
-      This page tests initializing geomap with different services that support the same tilingScheme.</p>
+    <h1>tiled services test</h1>
+
+    <p>This page tests initializing geomap with different services that support the same tilingScheme.</p>
+
     <p>
       So long as all services support the current tiling scheme, they are interchangeabe without worrying about the tilingScheme property.</p>
     <p>
@@ -67,7 +67,7 @@
        + view.tile.row
        + &quot;.png&quot;;
     },
-    attr: &quot;&lt;p&gt;Tiles Courtesy of &lt;a href='http://www.mapquest.com/' target='_blank'&gt;MapQuest&lt;/a&gt; &lt;img src='http://developer.mapquest.com/content/osm/mq_logo.png'&gt;&lt;/p&gt;&quot;
+    attr: &quot;Tiles Courtesy of &lt;a href='http://www.mapquest.com/' target='_blank'&gt;MapQuest&lt;/a&gt; &lt;img src='http://developer.mapquest.com/content/osm/mq_logo.png'&gt;&quot;
   }
 ]</code></pre>
       <label>
@@ -85,7 +85,7 @@
        + view.tile.row
        + &quot;.png&quot;;
     },
-    attr: &quot;&lt;p&gt;Tiles Courtesy of &lt;a href='http://www.mapquest.com/' target='_blank'&gt;MapQuest&lt;/a&gt; &lt;img src='http://developer.mapquest.com/content/osm/mq_logo.png'&gt;&lt;/p&gt;&quot;
+    attr: &quot;Tiles Courtesy of &lt;a href='http://www.mapquest.com/' target='_blank'&gt;MapQuest&lt;/a&gt; &lt;img src='http://developer.mapquest.com/content/osm/mq_logo.png'&gt;&quot;
   }
 ]</code></pre>
       <label>
@@ -102,7 +102,8 @@
        + view.tile.column + &quot;/&quot;
        + view.tile.row
        + &quot;.png&quot;;
-    }
+    },
+    attr: &quot;Tiles Courtesy of &lt;a href='http://www.mapquest.com/' target='_blank'&gt;MapQuest&lt;/a&gt; &lt;img src='http://developer.mapquest.com/content/osm/mq_logo.png'&gt;&quot;
   },
   {
     id: &quot;OSM_MapQuest&quot;,
@@ -114,8 +115,7 @@
        + view.tile.row
        + &quot;.png&quot;;
     },
-    attr: &quot;&lt;p&gt;Tiles Courtesy of &lt;a href='http://www.mapquest.com/' target='_blank'&gt;MapQuest&lt;/a&gt; &lt;img src='http://developer.mapquest.com/content/osm/mq_logo.png'&gt;&lt;/p&gt;&quot;,
-    opacity: .3
+    style: { opacity: .3 }
   }
 ]</code></pre>
     </fieldset>
@@ -128,7 +128,17 @@
     </div>
   </div>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
-  <script src="../jquery.geo-test.min.js"></script>
+  <script src="../../js/jquery.geo.head.js"></script>
+  <script src="../../js/excanvas.js"></script>
+  <script src="../../js/jquery.ui.widget.js"></script>
+  <script src="../../js/jsrender.js"></script>
+  <script src="../../js/jquery.geo.core.js"></script>
+  <script src="../../js/jquery.geo.geographics.js"></script>
+  <script src="../../js/jquery.geo.geomap.js"></script>
+  <script src="../../js/jquery.geo.tiled.js"></script>
+  <script src="../../js/jquery.geo.shingled.js"></script>
+  <script src="../../js/jquery.mousewheel.js"></script>
+  <!--<script src="../jquery.geo-test.min.js"></script>-->
   <script>
     $(function () {
 
@@ -156,7 +166,7 @@
               src: function (view) {
                 return "http://otile" + ((view.index % 4) + 1) + ".mqcdn.com/tiles/1.0.0/osm/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
               },
-              attr: "<p>Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='http://developer.mapquest.com/content/osm/mq_logo.png'></p>"
+              attr: "Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='http://developer.mapquest.com/content/osm/mq_logo.png'>"
             }
           ],
           center: [-71, 42],
@@ -171,7 +181,7 @@
               src: function (view) {
                 return "http://oatile" + ((view.index % 4) + 1) + ".mqcdn.com/naip/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
               },
-              attr: "<p>Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='http://developer.mapquest.com/content/osm/mq_logo.png'></p>"
+              attr: "Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='http://developer.mapquest.com/content/osm/mq_logo.png'>"
             }
           ],
           center: [-71, 42],
@@ -185,7 +195,8 @@
               type: "tiled",
               src: function (view) {
                 return "http://oatile" + ((view.index % 4) + 1) + ".mqcdn.com/naip/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
-              }
+              },
+              attr: "Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='http://developer.mapquest.com/content/osm/mq_logo.png'>"
             },
             {
               id: "OSM_MapQuest",
@@ -193,8 +204,7 @@
               src: function (view) {
                 return "http://otile" + ((view.index % 4) + 1) + ".mqcdn.com/tiles/1.0.0/osm/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
               },
-              attr: "<p>Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='http://developer.mapquest.com/content/osm/mq_logo.png'></p>",
-              opacity: .3
+              style: { opacity: .3 }
             }
           ],
           center: [-71, 42],

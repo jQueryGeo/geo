@@ -43,51 +43,73 @@
   </div>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
-  <script src="../jquery.geo-test.min.js"></script>
+  <script src="../../js/jquery.geo.head.js"></script>
+  <script src="../../js/excanvas.js"></script>
+  <script src="../../js/jquery.mousewheel.min.js"></script>
+  <script src="../../js/jquery.ui.widget.js"></script>
+  <script src="../../js/jsrender.js"></script>
+  <script src="../../js/jquery.geo.core.js"></script>
+  <script src="../../js/jquery.geo.geographics.js"></script>
+  <script src="../../js/jquery.geo.geomap.js"></script>
+  <script src="../../js/jquery.geo.tiled.js"></script>
+  <script src="../../js/jquery.geo.shingled.js"></script>
+  <!--<script src="../jquery.geo-test.min.js"></script>-->
   <script>
     $(function () {
-      // Set proj to null because we are working in map units
-      // (note: this will still be valid but not required in alpha 4)
+      // Set proj to null because we are working a different projection &
+      // entirely in map units
+      //
+      // Note: this is still valid in a4
+      // Though not required because we're working entirely in map units,
+      // i.e., jQuery Geo will not need to project anything,
+      // it makes sense because we are not working in the default projection of web mercator
+
       $.geo.proj = null;
+
+      // some strings used in all services
+      // base URL for image request
+      var massGisHost = "http://giswebservices.massgis.state.ma.us/geoserver/wms";
+      // view template used to get the map image
+      // notice that we can put the view arguments right into the template
+      var imageTemplate = "&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX={{=bbox}}&WIDTH={{=width}}&HEIGHT={{=height}}";
 
       // create a map with three services from MassGIS
       // the service types are "shingled"
       // they must all be in the same coordinate system to work together
       // to keep jQuery Geo's API simple, it will only work in one coordinate system at a time and will not reproject images on the fly
+
       var map = $("#map").geomap({
         services: [
           // this is a basemap and will always be shown
           {
             id: "massgis_basemap",
             type: "shingled",
-            src: function (view) {
-              return "http://giswebservices.massgis.state.ma.us/geoserver/wms?LAYERS=massgis_basemap&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX=" + view.bbox + "&WIDTH=" + view.width + "&HEIGHT=" + view.height;
-            },
+            src: massGisHost + "?LAYERS=massgis_basemap" + imageTemplate,
             attr: "&copy; 2011 Commonwealth of Massachusetts"
           },
 
           // this is a forest layer
-          // it has visibility set to "hidden"
+          // it has style.visibility set to "hidden"
           {
             id: "massgis_interiorforest",
             type: "shingled",
-            src: function (view) {
-              return "http://giswebservices.massgis.state.ma.us/geoserver/wms?LAYERS=massgis%3AGISDATA.INTERIORFOREST_POLY&STYLES=GISDATA.INTERIORFOREST_POLY%3A%3ADefault&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX=" + view.bbox + "&WIDTH=" + view.width + "&HEIGHT=" + view.height;
-            },
+            src: massGisHost + "?LAYERS=massgis%3AGISDATA.INTERIORFOREST_POLY&STYLES=GISDATA.INTERIORFOREST_POLY%3A%3ADefault&TRANSPARENT=true" + imageTemplate,
             attr: "&copy; 2011 Commonwealth of Massachusetts",
-            visibility: "hidden"
+            style: {
+              visibility: "hidden"
+            }
           },
 
           // this is a water layer
-          //it has visibility set to "hidden"
+          // it has style.visibility set to "hidden"
           {
             id: "massgis_hydrography",
             type: "shingled",
-            src: function (view) {
-              return "http://giswebservices.massgis.state.ma.us/geoserver/wms?LAYERS=massgis%3AGISDATA.MAJPOND_POLY,massgis%3AGISDATA.MAJSTRM_ARC&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX=" + view.bbox + "&WIDTH=" + view.width + "&HEIGHT=" + view.height;
-            },
+            src: massGisHost + "?LAYERS=massgis%3AGISDATA.MAJPOND_POLY,massgis%3AGISDATA.MAJSTRM_ARC&TRANSPARENT=true" + imageTemplate,
             attr: "&copy; 2011 Commonwealth of Massachusetts",
-            visibility: "hidden"
+            style: {
+              visibility: "hidden"
+            }
           }
         ],
 
@@ -96,8 +118,8 @@
         // shingled services do not have a tilingScheme
         tilingScheme: null,
 
-        center: [184670.21967, 870771.290247],
-        zoom: 9
+        center: [ 184670.21967, 890771.290247 ],
+        zoom: 11
       });
 
       // jQuery UI for pretty buttons

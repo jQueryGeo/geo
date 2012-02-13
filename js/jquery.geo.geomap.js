@@ -63,6 +63,7 @@
     _$eventTarget: undefined,
     _$contentFrame: undefined,
     _$existingChildren: undefined,
+    _$attrList: undefined,
     _$servicesContainer: undefined,
 
     _$panContainer: undefined, //< all non-service elements that move while panning
@@ -408,38 +409,42 @@
       return this._toPixel( $.geo.proj.fromGeodetic( p ), _center, _pixelSize );
     },
 
-    opacity: function (value, _serviceContainer) {
-      if (this._$elem.is(".geo-service")) {
-        this._$elem.closest(".geo-map").geomap("opacity", value, this._$elem);
+    opacity: function ( value, _serviceContainer ) {
+      if ( this._$elem.is( ".geo-service" ) ) {
+        this._$elem.closest( ".geo-map" ).geomap( "opacity", value, this._$elem );
       } else {
-        if (value >= 0 || value <= 1) {
+        if ( value >= 0 || value <= 1 ) {
           for ( var i = 0; i < this._currentServices.length; i++ ) {
-            var service = this._currentServices[i];
-            if ( !_serviceContainer || service.serviceContainer[0] == _serviceContainer[0] ) {
-              this._options["services"][i].opacity = service.opacity = value;
-              $.geo["_serviceTypes"][service.type].opacity(this, service);
+            var service = this._currentServices[ i ];
+            if ( !_serviceContainer || service.serviceContainer[ 0 ] == _serviceContainer[ 0 ] ) {
+              service.style.opacity = value;
+              $.geo[ "_serviceTypes" ][ service.type ].opacity( this, service );
             }
           }
         }
       }
     },
 
-    toggle: function (value, _serviceContainer) {
-      if (this._$elem.is(".geo-service")) {
-        this._$elem.closest(".geo-map").geomap("toggle", value, this._$elem);
+    toggle: function ( value, _serviceContainer ) {
+      if ( this._$elem.is( ".geo-service" ) ) {
+        this._$elem.closest( ".geo-map" ).geomap( "toggle", value, this._$elem );
       } else {
-        for (var i = 0; i < this._currentServices.length; i++) {
-          var service = this._currentServices[i];
-          if (!_serviceContainer || service.serviceContainer[0] == _serviceContainer[0]) {
-            if (value === undefined) {
-              value = (service.visibility === undefined || service.visibility === "visible" ? false : true);
+
+        for ( var i = 0; i < this._currentServices.length; i++ ) {
+          var service = this._currentServices[ i ];
+
+          if ( !_serviceContainer || service.serviceContainer[ 0 ] == _serviceContainer[ 0 ] ) {
+            if ( value === undefined ) {
+              // toggle visibility
+              value = ( service.style.visibility !== "visible" );
             }
 
-            this._options["services"][i].visibility = service.visibility = ( value ? "visible" : "hidden" );
-            service.serviceContainer.toggle(value);
+            service.style.visibility = ( value ? "visible" : "hidden" );
 
-            if (value) {
-              $.geo["_serviceTypes"][service.type].refresh(this, service);
+            service.serviceContainer.toggle( value );
+
+            if ( value ) {
+              $.geo[ "_serviceTypes" ][ service.type ].refresh( this, service );
             }
           }
         }
@@ -547,8 +552,9 @@
       }
     },
 
-    find: function (point, pixelTolerance) {
-      var searchPixel = this._map.toPixel( point.coordinates ),
+    find: function ( selector, pixelTolerance ) {
+      var isPoint = $.isPlainObject( selector ),
+          searchPixel = isPoint ? this._map.toPixel( selector.coordinates ) : undefined,
           mapTol = this._map._pixelSize * pixelTolerance,
           result = [],
           graphicShape,
@@ -559,42 +565,46 @@
       for ( ; i < this._graphicShapes.length; i++ ) {
         graphicShape = this._graphicShapes[ i ];
 
-        if ( graphicShape.shape.type == "Point" ) {
-          if ( $.geo.distance( graphicShape.shape, point ) <= mapTol ) {
-            result.push( graphicShape.shape );
-          }
-        } else {
-          var bbox = $.data( graphicShape.shape, "geoBbox" ),
-              bboxPolygon = {
-                type: "Polygon",
-                coordinates: [ [
-                  [bbox[0], bbox[1]],
-                  [bbox[0], bbox[3]],
-                  [bbox[2], bbox[3]],
-                  [bbox[2], bbox[1]],
-                  [bbox[0], bbox[1]]
-                ] ]
-              },
-              projectedPoint = {
-                type: "Point",
-                coordinates: $.geo.proj && $.geo._isGeodetic( point.coordinates ) ? $.geo.proj.fromGeodetic( point.coordinates ) : point.coordinates
-              };
+        if ( isPoint ) {
+          if ( graphicShape.shape.type == "Point" ) {
+            if ( $.geo.distance( graphicShape.shape, selector ) <= mapTol ) {
+              result.push( graphicShape.shape );
+            }
+          } else {
+            var bbox = $.data( graphicShape.shape, "geoBbox" ),
+                bboxPolygon = {
+                  type: "Polygon",
+                  coordinates: [ [
+                    [bbox[0], bbox[1]],
+                    [bbox[0], bbox[3]],
+                    [bbox[2], bbox[3]],
+                    [bbox[2], bbox[1]],
+                    [bbox[0], bbox[1]]
+                  ] ]
+                },
+                projectedPoint = {
+                  type: "Point",
+                  coordinates: $.geo.proj && $.geo._isGeodetic( selector.coordinates ) ? $.geo.proj.fromGeodetic( selector.coordinates ) : selector.coordinates
+                };
 
-          if ( $.geo.distance( bboxPolygon, projectedPoint, true ) <= mapTol ) {
-            geometries = $.geo._flatten( graphicShape.shape );
-            for ( curGeom = 0; curGeom < geometries.length; curGeom++ ) {
-              if ( $.geo.distance( geometries[ curGeom ], point ) <= mapTol ) {
-                result.push( graphicShape.shape );
-                break;
+            if ( $.geo.distance( bboxPolygon, projectedPoint, true ) <= mapTol ) {
+              geometries = $.geo._flatten( graphicShape.shape );
+              for ( curGeom = 0; curGeom < geometries.length; curGeom++ ) {
+                if ( $.geo.distance( geometries[ curGeom ], selector ) <= mapTol ) {
+                  result.push( graphicShape.shape );
+                  break;
+                }
               }
             }
           }
+        } else {
+          result.push( graphicShape.shape );
         }
       }
 
       if ( this._$elem.is( ".geo-map" ) ) {
         this._$elem.find( ".geo-service" ).each( function( ) {
-          result = $.merge( result, $( this ).geomap( "find", point, pixelTolerance ) );
+          result = $.merge( result, $( this ).geomap( "find", selector, pixelTolerance ) );
         } );
       }
 
@@ -700,6 +710,9 @@
       this._$contentFrame.append('<div class="geo-shapes-container" style="' + contentPosCss + contentSizeCss + '"></div>');
       this._$shapesContainer = this._$contentFrame.children(':last');
 
+      this._$contentFrame.append( '<ul style="position: absolute; bottom: 8px; left: 8px; list-style-type: none; max-width: 50%; padding: 0; margin: 0;"></ul>' );
+      this._$attrList = this._$contentFrame.children( ":last" );
+
       this._$contentFrame.append('<div class="geo-draw-container" style="' + contentPosCss + contentSizeCss + '"></div>');
       this._$drawContainer = this._$contentFrame.children(':last');
 
@@ -719,32 +732,48 @@
     },
 
     _createServices: function () {
-      var i, serviceContainer, service;
+      var service, i;
 
-      for (i = 0; i < this._currentServices.length; i++) {
-        this._currentServices[i].serviceContainer.geomap("destroy");
-        $.geo["_serviceTypes"][this._currentServices[i].type].destroy(this, this._$servicesContainer, this._currentServices[i]);
+      for ( i = 0; i < this._currentServices.length; i++ ) {
+        this._currentServices[ i ].serviceContainer.geomap( "destroy" );
+        $.geo[ "_serviceTypes" ][ this._currentServices[ i ].type ].destroy( this, this._$servicesContainer, this._currentServices[ i ] );
       }
 
-      this._currentServices = [];
+      this._currentServices = [ ];
       this._$servicesContainer.html( "" );
+      this._$attrList.html( "" );
 
-      for (i = 0; i < this._options["services"].length; i++) {
-        service = this._options["services"][i];
-        this._currentServices[i] = service;
+      for ( i = 0; i < this._options[ "services" ].length; i++ ) {
+        service = this._currentServices[ i ] = $.extend( { }, this._options[ "services" ][ i ] );
+
+        // default the service style property on our copy
+        service.style = $.extend( {
+                          visibility: "visible",
+                          opacity: 1
+                        }, service.style );
 
         var idString = service.id ? ' id="' + service.id + '"' : "",
             classString = 'class="geo-service ' + ( service["class"] ? service["class"] : '' ) + '"',
-            scHtml = '<div ' + idString + classString + ' style="position:absolute; left:0; top:0; width:32px; height:32px; margin:0; padding:0; display:' + (service.visibility === undefined || service.visibility === "visible" ? "block" : "none") + ';"></div>';
+            scHtml = '<div ' + idString + classString + ' style="position:absolute; left:0; top:0; width:32px; height:32px; margin:0; padding:0; display:' + ( service.style.visibility === "visible" ? "block" : "none" ) + ';"></div>',
+            servicesContainer;
 
         this._$servicesContainer.append( scHtml );
         serviceContainer = this._$servicesContainer.children( ":last" );
-        this._currentServices[i].serviceContainer = serviceContainer;
+        this._currentServices[ i ].serviceContainer = serviceContainer;
         
-        $.geo["_serviceTypes"][this._currentServices[i].type].create(this, serviceContainer, this._currentServices[i], i);
+        $.geo[ "_serviceTypes" ][ service.type ].create( this, serviceContainer, service, i );
 
         serviceContainer.data( "geoMap", this ).geomap();
+
+        if ( service.attr ) {
+          this._$attrList.append( '<li>' + service.attr + '</li>' );
+        }
       }
+
+      this._$attrList.find( "a" ).css( {
+        position: "relative",
+        zIndex: 100
+      } );
     },
 
     _refreshDrawing: function ( ) {
@@ -1112,8 +1141,8 @@
       // the final call during any extent change
       if (this._pixelSize != pixelSize) {
         this._$elem.find( ".geo-shapes-container" ).geographics("clear");
-        for (var i = 0; i < this._options["services"].length; i++) {
-          var service = this._options["services"][i];
+        for (var i = 0; i < this._currentServices.length; i++) {
+          var service = this._currentServices[i];
           $.geo["_serviceTypes"][service.type].interactiveScale(this, service, center, pixelSize);
         }
       }
