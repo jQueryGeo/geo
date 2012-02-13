@@ -11,6 +11,7 @@
   <div class="output">
     <h2>Click the geometry!</h2>
     <ul></ul>
+    <button id="findAll" type="button">find( &quot;*&quot; )</button>
   </div>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
 
@@ -32,9 +33,16 @@
             zoom: 13,
             click: function (e, geo) {
               var outputHtml = "",
-                  result = geomap.find( ".osm" ).geomap("find", geo, 8);
+                  mapShapes = geomap.geomap("find", geo, 8),
+                  serviceShapes = geomap.find( ".osm" ).geomap("find", geo, 8);
 
-              $.each(result, function () {
+              outputHtml += '<li><b>map shapes</b></li>';
+              $.each(mapShapes, function () {
+                outputHtml += ("<li>Found a " + this.type + " at " + this.coordinates + "</li>");
+              });
+
+              outputHtml += '<li><b>service shapes</b></li>';
+              $.each(serviceShapes, function () {
                 outputHtml += ("<li>Found a " + this.type + " at " + this.coordinates + "</li>");
               });
 
@@ -53,9 +61,26 @@
         seven: { type: "Polygon", coordinates: [[[-71.06, 42.3425], [-71.06, 42.3475], [-71.04, 42.3475], [-71.04, 42.3425], [-71.06, 42.3425]]] }
       };
 
+      var i = 0;
       for (var geomKey in geoms) {
-        service.geomap("append", geoms[geomKey]);
+        if ( i % 2 ) {
+          geomap.geomap("append", geoms[geomKey]);
+        } else {
+          service.geomap("append", geoms[geomKey]);
+        }
+        i++;
       }
+
+      $( "#findAll" ).click( function() {
+        var outputHtml = "",
+            result = geomap.geomap( "find", "*" );
+
+        $.each(result, function () {
+          outputHtml += ("<li>Found a " + this.type + " at " + this.coordinates + "</li>");
+        });
+
+        $(".output ul").html(outputHtml);
+      } );
     });
   </script>
 </body>
