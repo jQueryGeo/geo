@@ -76,6 +76,7 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * geomap - [bug] zoom option doesn't return proper values for shingled services
 * geomap - [bug] non-tiled maps can zoom out past zoom 0
 * geomap - don't request tiles that are -y index
+* geomap - [bug] initializing tiled map by non-geodetic bbox always causes zoom level 0
 
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon
