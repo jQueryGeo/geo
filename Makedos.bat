@@ -18,6 +18,9 @@ type js\jquery.geo.shingled.js >> docs\jquery.geo-%1.js
 
 echo Minifying build
 java -jar build\google-compiler-20100917.jar --js docs\jquery.geo-%1.js --js_output_file docs\jquery.geo-%1.min.js
+
+echo Adding dependencies
+type js\jquery.mousewheel.js >> docs\jquery.geo-%1.js
 type js\jquery.mousewheel.min.js >> docs\jquery.geo-%1.min.js
 
 goto end
