@@ -327,7 +327,7 @@
           break;
 
         case "mode":
-          this._$drawContainer.geographics("clear");
+          this._resetDrawing( );
           this._$eventTarget.css("cursor", this._options["cursors"][value]);
           break;
 

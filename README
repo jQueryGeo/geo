@@ -82,6 +82,7 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * geomap - [bug] lifting fingers after pinch zoom in drawLineString or drawPolygon modes sometimes adds fake visual coordinate on touch point last lifted
 * docs - upgrade to jQuery 1.7.1
 * geomap - [bug] scroll=off doesn't zoom map but also doesn't allow document scroll
+* geomap - [bug] changing mode does not reset measure drawing
 
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon

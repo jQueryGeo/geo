@@ -4,11 +4,11 @@
 * docs - geomap - custom modes
 * examples - all demo (shingled)
 * examples - all demo (tiled)
-* geomap - [bug] pointAlong doesn't take last point into account in all browsers (iOS, Firefox Nightly)
 * examples - jQuery Mobile
 * examples - remove tmpl from examples as it conflicts with jsrender
 
 === b1 ===
+* cdn - max age header should be infinite...always cache as long as possible, release code won't change
 * docs - geomap - loadstart event
 * geomap - loadstart event
 * docs - geomap - loadend event
@@ -26,7 +26,12 @@
 * geomap - use pointer-events: none where appropriate
 * geomap - test changing shingled service URL to get updated images (in case of dynamic data)
 * geomap - replace data-geo attributes with classes
-* geomap - [bug] ie highlights entire map div during shift-zoom
+* docs - warn users about potential CSS/JavaScript issues relating to generated elements:
+** ul, li, div, span, img
+* geomap - Firefox - [bug] inertial pan is choppy post touchstop
+* geomap - iPad 2 - [bug] pointAlong doesn't take last point into account in all browsers
+** cannot reproduce; possibly axisLayout image only
+* geomap - ie - [bug] ie highlights entire map div during shift-zoom
 * geomap - [bug] iPad 2 panning is visually jumpy but settles on the correct bbox in the end
 ** possibly only when axisLayout is image
 * geomap - [bug] iPad 2 measureLength puts current length on second to last coord instead of last coord
@@ -51,6 +56,8 @@
 ** pan and zoom in same interactive session (_interactiveCenter & _interactivePixelSize)
 ** delay image loading more during movement
 * geomap - request new image in shingled service during interactive pan (after pan/zoom rewrite)
+* docs - geomap - view.service.row & view.service.column to string multiple services together or repeat horizontal tiles
+* geomap - view.service.row & view.service.column to string multiple services together or repeat horizontal tiles
 * geomap - repeat horizontal tiles
 * geomap - don't request tiles that > max possible y for scale
 * geomap - do not interactiveScale non-tiled maps out past pixelSizeMax
