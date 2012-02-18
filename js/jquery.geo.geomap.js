@@ -1394,10 +1394,6 @@
         return;
       }
 
-      if ( this._options[ "mode" ] === "static" ) {
-        return;
-      }
-
       this._panFinalize();
       this._mouseWheelFinish();
 
