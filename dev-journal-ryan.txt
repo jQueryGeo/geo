@@ -4,10 +4,8 @@
 * docs - geomap - custom modes
 * examples - all demo (shingled)
 * examples - all demo (tiled)
-* geomap - [bug] lifting fingers after pinch zoom in drawLineString or drawPolygon modes sometimes adds fake visual coordinate on touch point last lifted
 * geomap - [bug] pointAlong doesn't take last point into account in all browsers (iOS, Firefox Nightly)
 * examples - jQuery Mobile
-* examples - drag shapes
 * examples - remove tmpl from examples as it conflicts with jsrender
 
 === b1 ===
@@ -69,7 +67,8 @@
 * geomap - implement service-level shape redrawing during interactive movement
 * make a package for new jQuery plugin directory
 ** https://github.com/jquery/plugins.jquery.com/blob/master/docs/package.md
-* examples - ie7 - floating info div doesn't show up, inputs are alone and on the left
+* examples - drag shapes
+* examples - ie7 - [bug] floating info div doesn't show up, inputs are alone and on the left
 * examples - redo the jVectorMap demo page using jQuery Geo
 ** http://jvectormap.owl-hollow.net/ ( found via http://www.moretechtips.net/2011/12/22-most-popular-jquery-plugins-of-2011.html )
 * expose jQuery Geo as an AMD module so asynchronous loaders like RequireJS and curl.js can use it

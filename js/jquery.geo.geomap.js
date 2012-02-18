@@ -1587,6 +1587,7 @@
 
       if ( this._isMultiTouch ) {
         e.preventDefault( );
+        this._isDbltap = this._isTap = false;
         return false;
       }
 
