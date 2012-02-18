@@ -1437,10 +1437,10 @@
             var dx = this._current[0] - this._anchor[0],
                 dy = this._current[1] - this._anchor[1],
                 distance = Math.sqrt((dx * dx) + (dy * dy));
-            if (distance > 10) {
+            if (distance > 8) {
               this._isTap = false;
             } else {
-              this._current = this._anchor;
+              this._current = $.merge( [ ], this._anchor );
             }
           }
 
@@ -1457,7 +1457,7 @@
       }
 
       this._mouseDown = true;
-      this._anchor = this._current;
+      this._anchor = $.merge( [ ], this._current );
 
       if (!this._inOp && e.shiftKey) {
         this._shiftZoom = true;
@@ -1576,7 +1576,7 @@
         }
       }
 
-      if (this._softDblClick) {
+      if ( _ieVersion == 7 ) {
         this._isDbltap = this._isTap = false;
       }
 
@@ -1664,6 +1664,17 @@
         current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
       } else {
         current = [e.pageX - offset.left, e.pageY - offset.top];
+      }
+
+      if (this._softDblClick) {
+        if (this._isTap) {
+          var dx = current[0] - this._anchor[0],
+              dy = current[1] - this._anchor[1],
+              distance = Math.sqrt((dx * dx) + (dy * dy));
+          if (distance <= 8) {
+            current = $.merge( [ ], this._anchor );
+          }
+        }
       }
 
       dx = current[0] - this._anchor[0];

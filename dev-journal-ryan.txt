@@ -1,9 +1,9 @@
 ﻿== to do ==
 
 === a4 ===
+* docs - geomap - custom modes
 * examples - all demo (shingled)
 * examples - all demo (tiled)
-* geomap - [bug] double tap to end shapes adds two points before ending the shape, in different places
 * geomap - [bug] lifting fingers after pinch zoom in drawLineString or drawPolygon modes sometimes adds fake visual coordinate on touch point last lifted
 * geomap - [bug] pointAlong doesn't take last point into account in all browsers (iOS, Firefox Nightly)
 * examples - jQuery Mobile
@@ -75,7 +75,6 @@
 * expose jQuery Geo as an AMD module so asynchronous loaders like RequireJS and curl.js can use it
 * examples - geomap resize method
 * examples - multiple maps example
-* examples - merge all mode examples into one, called mode
 * examples - Codecademy course
 * geomap - [bug] when a singled image hasn't loaded after pan and you double click on empty space, the zoomed bbox seems wrong
 * build releases using grunt
@@ -179,6 +178,10 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-02-15==
+===labels===
+The code already worked the way I wanted! No .geo-label div is created if you don't at least provide an empty string label.
 
 ==2012-02-12==
 ===find===

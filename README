@@ -77,6 +77,8 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * geomap - [bug] non-tiled maps can zoom out past zoom 0
 * geomap - don't request tiles that are -y index
 * geomap - [bug] initializing tiled map by non-geodetic bbox always causes zoom level 0
+* docs - geomap - empty string needed for label element
+* geomap - [bug] double tap to end shapes adds two points before ending the shape, in different places
 
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon
