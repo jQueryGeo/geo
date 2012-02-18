@@ -1806,7 +1806,7 @@
     },
 
     _eventTarget_mousewheel: function (e, delta) {
-      if ( this._options[ "mode" ] === "static" ) {
+      if ( this._options[ "mode" ] === "static" || this._options[ "scroll" ] === "off" ) {
         return;
       }
 
@@ -1814,7 +1814,7 @@
 
       this._panFinalize();
 
-      if ( this._mouseDown || this._options[ "scroll" ] === "off" ) {
+      if ( this._mouseDown ) {
         return false;
       }
 
