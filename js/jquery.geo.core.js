@@ -456,7 +456,7 @@
 
     _buffer: function( geom, distance, _ignoreGeo /* Internal Use Only */ ) {
       var wasGeodetic = false,
-          coords;
+          coords = geom.coordinates;
 
       if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( geom.coordinates ) ) {
         wasGeodetic = true;
