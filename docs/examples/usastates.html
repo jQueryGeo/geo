@@ -21,24 +21,28 @@
         <a href="http://jsfiddle.net/ryanttb/sh8uH/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
       </div>
       <h1>USA States</h1>
-      <p>This map reads USA state boundary data as a GeoJSON FeatureCollection and draws it on top of OpenStreetMap.</p>
+      <p class="not-mobile">This map reads USA state boundary data as a GeoJSON FeatureCollection and draws it on top of OpenStreetMap.</p>
       <p>Click a state to change its color!</p>
     </div>
   </div>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.js"></script>
   <script src="js/iecors.js"></script>
-  <script src="../jquery.geo-test.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a4.min.js"></script>
   <script>
     $(function () {
       var map = $("#map").geomap({
         center: [-71.0595678, 42.3604823],
         zoom: 6,
-        click: function (e, geo) {
+        mode: "drawPoint",
+        shape: function (e, geo) {
           var state = map.geomap("find", geo, 0);
           if (state && state.length > 0) {
             map.geomap("remove", state[0]);
+
+            var color = Math.round(0xffffff * Math.random()).toString(16);
+
             map.geomap("append", state[0], {
-              color: "#" + Math.round(0xffffff * Math.random()).toString(16)
+              color: "#" + ( color.length == 5 ? "0" : "" ) + color
             });
           }
         }

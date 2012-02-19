@@ -32,11 +32,10 @@
       <p></p>
     </div>
   </div>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
   <script src="../../js/jquery.geo.head.js"></script>
   <script src="../../js/excanvas.js"></script>
-  <script src="../../js/jquery.mousewheel.min.js"></script>
   <script src="../../js/jquery.ui.widget.js"></script>
   <script src="../../js/jsrender.js"></script>
   <script src="../../js/jquery.geo.core.js"></script>
@@ -44,15 +43,16 @@
   <script src="../../js/jquery.geo.geomap.js"></script>
   <script src="../../js/jquery.geo.tiled.js"></script>
   <script src="../../js/jquery.geo.shingled.js"></script>
+  <script src="../../js/jquery.mousewheel.js"></script>
   <!--<script src="../jquery.geo-test.min.js"></script>-->
   <script>
-    $(function () {
+    $( function ( ) {
       // create a map
-      var map = $("#map").geomap({
-        center: [-71.0595678, 42.3604823],
+      var map = $( "#map" ).geomap( {
+        center: [ -71.0595678, 42.3604823 ],
         zoom: 8
-      });
-    });  
+      } );
+    } );  
   </script>
 
   <script>
