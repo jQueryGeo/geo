@@ -46,7 +46,7 @@
       </table>
       <p>The mode option determines how the map responds to user interaction and which events the developer receives.</p>
       
-      <p>The current list of modes is:</p>
+      <p>The current list of built-in modes is:</p>
       <ul>
         <li>static</li>
         <li>pan</li>
@@ -57,6 +57,8 @@
         <li>measureLength</li>
         <li>measureArea</li>
       </ul>
+
+      <p>You are free to set mode to any other string, this is called <a href="javascript:document.getElementById('custom-modes').scrollIntoView();" rel="external">custom modes</a> in jQuery Geo and described at the end of this page.</p>
 
       <h2>options</h2>
       <p>Each mode has a matching property on the <a href="cursors.html">cursors</a> option. For example, to change the cursor for drawPoint mode to an I-beam, you can initialize the geomap widget like this:</p>
@@ -226,6 +228,63 @@
         <li>dblclick &ndash; when the user double-clicks or double-taps a point on the map but is not actively measuring</li>
         <li>bboxchange &ndash; when the user changes the bbox by panning or zooming</li>
       </ul>
+
+      <h2 id="custom-modes">custom modes</h2>
+
+      <p>As mentioned above, you can also set mode to any other string. It will behave exactly like pan mode. However, you can set a different cursor:</p>
+
+      <pre><code>var map = $( &quot;#map&quot; ).geomap( {
+  mode: &quot;click&quot;,
+  cursors: { click: &quot;crosshair&quot; }
+} );</code></pre>
+
+      <p>The above example creates a new custom mode, click, and sets the geomap widget to that mode during initialization. When the widget is in this mode, it will behave exactly like pan, but have a crosshair. This means you will get all the same events as pan: move, click, dblclick &amp; bboxchange. A mode like this is useful if you want to give users more accuracy when clicking the map.</p>
+
+      <p>Custom modes will still allow panning. While panning, the cursor will temporarily switch to the pan cursor. You can disable panning for your mode by setting the widget's panning option to false whenever you change the mode option.</p>
+
+      <pre><code>function setMode( mode ) {
+  map.geomap( &quot;option&quot;, {
+    mode: mode,
+    panning: mode !== &quot;click&quot;
+  } );
+}</code></pre>
+
+      <p>In this last example, we create a new map with two modes, find and remove. They both trigger the click event so we can check our current mode and behave differently depending on which one is set, or do nothing if we're not in find or remove mode.</p>
+
+      <pre><code>var map = $( &quot;#map&quot; ).geomap( {
+  mode: &quot;drawPoint&quot;,
+  cursors: {
+    find: &quot;crosshair&quot;,
+    remove: &quot;crosshair&quot;
+  },
+  shape: function( e, geo ) {
+    <span class="comment">// only the draw modes trigger this event</span>
+    map.geomap( &quot;append&quot;, geo );
+  },
+  click: function( e, geo ) {
+    switch( map.geomap( &quot;option&quot;, &quot;mode&quot; ) ) {
+      case &quot;find&quot;:
+        <span class="comment">// search for shapes but just alert the user</span>
+        var shapes = map.geomap( &quot;find&quot;, geo, 3 );
+        if ( shapes.length &gt; 0 ) {
+          alert( &quot;Found &quot; + shapes.length + &quot; shape(s) !&quot; );
+        }
+        break;
+
+      case &quot;remove&quot;:
+        <span class="comment">// search for shapes and remove one of them</span>
+        var shapes = map.geomap( &quot;find&quot;, geo, 3 );
+        if ( shapes.length &gt; 0 ) {
+          map.geomap( &quot;remove&quot;, shapes[ 0 ] );
+        }
+        break;
+
+      default:
+        <span class="comment">// ignore the click event for all other modes: pan, zoom, etc.</span>
+        break;
+    }
+  }
+} );</code></pre>
 
     </div>
   </div> <!-- end of #container -->

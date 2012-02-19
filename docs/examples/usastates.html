@@ -36,7 +36,7 @@
         mode: "drawPoint",
         shape: function (e, geo) {
           var state = map.geomap("find", geo, 0);
-          if (state && state.length > 0) {
+          if (state.length > 0) {
             map.geomap("remove", state[0]);
 
             var color = Math.round(0xffffff * Math.random()).toString(16);

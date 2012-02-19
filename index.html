@@ -8,13 +8,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/blitzer/jquery-ui.css" />
   <style type="text/css">
-    html { font:13px/1.231 sans-serif; *font-size:small; }
+    html { font:13px/1.231 sans-serif; }
     
     body, h1 { margin: 0; padding: 0; }
     
     body, select, input, textarea
     {
       color: #444;
+    }
+
+    pre
+    {
+      white-space: pre-wrap;
+      white-space: pre-line;
     }
     
     .geomap
@@ -34,7 +40,7 @@
       width: 80%;
     }
     
-    .nav
+    .project-links
     {
       float: right;
     }
@@ -71,7 +77,11 @@
       margin-left: 48px;
     }
     
-    h2 { margin-bottom: 8px; }
+    h2
+    {
+      clear: both;
+      margin-bottom: 8px;
+    }
 
     time
     {
@@ -88,6 +98,25 @@
       margin-top: 128px;
       padding: 32px;
     }
+
+    .thanks
+    {
+      list-style-type: none;
+    }
+
+    .thanks li
+    {
+      display: inline-block;
+      margin: 1em;
+    }
+
+    #jQueryLogo
+    {
+      background: #39414A;
+      border-radius: 8px;
+      padding: .5em;
+    }
+
   </style>
 </head>
 <body>
@@ -99,31 +128,162 @@
   </div>
   <div class="container">
     <div class="main" role="main">
-      <div class="nav">
-        <a href="http://jquerygeo.com/1.0a3/" title="Documentation and demos">Documentation &amp; Demos</a>
-        <a href="https://github.com/AppGeo/geo/" title="Source code on GitHub">GitHub Project</a>
-      </div>
-
-      <h2>Follow us on Twitter</h2>
-      <div class="nav">
-        <a href="https://twitter.com/#!/jQueryGeo" title="@jQueryGeo on Twitter">@jQueryGeo for announcements</a>
-        <a href="https://twitter.com/#!/ryanttb" title="ryanttb on Twitter">@ryanttb for questions</a>
+      <div class="nav project-links">
+        <a href="http://jquerygeo.com/1.0a4/" title="Documentation and demos">Docs &amp; Demos</a>
+        <a href="https://github.com/AppGeo/geo/" title="Source code on GitHub">GitHub</a>
       </div>
 
       <h2>jQuery Geo - an interactive mapping plugin</h2>
+
       <p>jQuery Geo, an open-source geospatial mapping project from Applied Geographics, provides a streamlined JavaScript API for a large percentage of your online mapping needs. Whether you just want to display a map on a wep page as quickly as possible or you are a more advanced GIS user, jQuery Geo can help!</p>
+      
       <p>This project is considered alpha only because it does not yet fully implement the feature set of our scheduled beta release. Alpha releases are stable and should not change much as we port technology from our internal library to the open source one.</p>
 
-      <h2>Alpha 4 docs!</h2>
-      <time>2012-01-05</time>
-      <p>We've finished the documentation for jQuery Geo 1.0 alpha 4. Exciting new features include: measure modes, CSS-based shape labeling, more geometry functions and service-level shapes. Some of the new features already have functioning examples. You can read the alpha 4 documentation on the test branch by clicking this button:</p>
+      <p>You can check back here, follow <a href="https://twitter.com/jQueryGeo">@jQueryGeo</a> on Twitter for release announcements. Also, head over to the lead developer's Twitter account, <a href="https://twitter.com/ryanttb">@ryanttb</a>, for development info, links, or to ask questions.</p>
 
-      <a data-role="button" href="http://jquerygeo.com/test/">jQuery Geo 1.0a4 docs</a>
+      <h2>Download</h2>
+      <p>Using jQuery Geo requires adding one element, including one script (apart from jQuery itself) and calling one function. The following copy-and-paste snippet will help you get started.</p>
+      <pre>&lt;div id=&quot;map&quot; style=&quot;height: 320px;&quot;&gt;&lt;/div&gt;
+&lt;script src=&quot;http://code.jquery.com/jquery-1.7.1.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;http://code.jquerygeo.com/jquery.geo-1.0a4.min.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;$(function() { $( &quot;#map&quot; ).geomap( ); });&lt;/script&gt;</pre>
 
-      <p>Alpha 4 will be the last alpha release.</p>
+      <p>code.jquerygeo.com is on the CloudFlare Content Delivery Network (CDN) so our minified, gzipped library will get to your client as fast as possible!</p>
+
+      <h2>Alpha 4 released!</h2>
+      <time>2012-02-19</time>
+
+      <p>It's been a long three months but we're very happy to announce the release of jQuery Geo 1.0a4! Here are some highlights and details:</p>
+
+      <h3>At the service level</h3>
+
+      <p>In alpha 3, you could append and interact with shapes on the map. In alpha 4, this is extended to services! Service-level shapes have their own shapeStyle apart from the map's and hide when their service is hidden.</p>
+
+      <h3>More modes!</h3>
+
+      <p>There are new modes to let you measure distance &amp; area, and a static mode for when you want to display a map but not let users interact with it. Apart from the three new built-in modes, you can also create custom modes to help organize your app.</p>
+
+      <h3>What's that? CSS labels!</h3>
+
+      <p>You can now give any shape a label when you append it. You can style the label from your regular style sheet using the .geo-label class which opens labeling up to all the design power of CSS3. There's even more potential if you put a class or id on your map service because you can target labels on different services using CSS rules. Also, labels can be any HTML which opens them up to new features in HTML5!</p>
+
+      <h3>More service src options</h3>
+
+      <p>The old getUrl property has been renamed to src (see Breaking below) and you can now set it to a string template. jQuery Geo will stick your tile row, column, zoom, or image bbox in for you. Services defined as a string are a little easier on the eyes than a function and can be stored as JSON data.</p> 
+
+      <p>You can still use a function and the function can now return a <a href="http://api.jquery.com/category/deferred-object/">jQuery Promise</a> to delay loading of the map image or tile. Want to calculate a Mandlebrot image in a JavaScript web worker without blocking user interaction? Return a new jQuery.Deferred() and call resolve when you're done!</p>
+
+      <h3>Mobile</h3>
+
+      <p>This version has better mobile support including pinch zoom on iOS and Android 3+ as well as other bug fixes for mobile devices.</p>
+
+      <h3>Don't worry about $.geo.proj so much</h3>
+
+      <p>You can now send either geodetic (lon, lat) or projected (x, y) coordinates to any library function and it will return accordingly if you stay on the default web mercator projection. You should still set it to null or implement the (to|from)GeodeticPos functions if you need to change projections.</p>
+
+      <h3>Breaking</h3>
+
+      <p>There is one deprecation (a service object property will be renamed in beta) and one minor breaking change.</p>
+
+      <p>To align this API with HTML itself, the getUrl property on service objects will be renamed to src. Using either src or getUrl will work for this alpha release but getUrl will be removed for beta. Please update any map services to use the new src property when you're defining them.</p>
+
+      <p>Also on service objects, the initial opacity and visibility are in a property of the service object itself named style. Your old services will still function but ones you may expect to be hidden initially will be visible until you update the service object.</p>
+
+      <p>To exemplify both of these changes, instead of: <pre><code>{
+  type: &quot;tiled&quot;,
+  getUrl: function( view ) { return &quot;&quot;; },
+  visibility: &quot;hidden&quot;
+}</code></pre> you should write: <pre><code>{
+  type: &quot;tiled&quot;,
+  src: function( view ) { return &quot;&quot;; },
+  style: { visibility: &quot;hidden&quot; }
+}</code></pre></p>
+
+      <h3>Everything else</h3>
+
+      <p>With over 60 commits, there are more features and bug fixes to write about. If you dare to click the link below (or read the README file on the project's GitHub page) you can get a better idea of what went into this build. This is the last alpha release (!) and the path to beta will add unit testing, a better build process, and smaller, more refined source code. Thanks for all your support!</p>
+
+      <a href="javascript:jQuery('#a4changelog').show();">Show changelog</a>
+
+<pre id="a4changelog" style="display: none;">* geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax
+* geomap - [bug] shingled services throw exception during resize
+* docs - geomap - axisLayout option
+* geomap - axisLayout option
+* docs - upgrade to jQuery Mobile rc3
+* docs - allow page refreshing
+* docs - geomap - more modes: measureDistance, measureArea, static
+* docs - geomap - append label argument
+* docs - geomap - toPixel/toMap should take all coordinate dimensions like the proj functions
+* geomap - toPixel/toMap should take all coordinate dimensions like the proj functions
+* geomap - move the drawing container instead of individual points during pan
+* geomap - [bug] drawStyle resets after window resize
+* geomap - append label argument
+* docs - geomap - measureLabels option
+* geomap - measureLabels option
+* geomap - measureDistance mode
+* geomap - measureArea mode
+* docs - geomap - service-level shapeStyle
+* docs - geomap - getUrl string option
+* geomap - [bug] create doesn't clear drawing shapes
+* docs - geomap - service-level shapes
+* docs - geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
+* docs - geomap - add projection section explaining how bbox &amp; center affect map unit type
+* docs - geomap - rename getUrl to src
+* docs - geomap - scroll option
+* docs - geomap - pannable option
+* geomap - src string option
+* examples - string service src
+* geomap - [bug] map tracks mouse when not panning if click on other elements
+* geomap - pannable option
+* geomap - scroll option
+* geomap - [bug] shapesContainer is being cleared twice during mouse wheel zoom
+* geomap - support pinch zoom on iOS
+* docs - geo - add recenter function for bbox
+* geomap - static mode
+* docs - geomap - allow Deferred or Promise as return value from src function
+* geomap - [bug] widget factory merges first service with default sometimes causing exceptions with shingled services
+* geomap - allow Deferred or Promise as return value from src function
+* geomap - [bug] resize event triggered too many times during resize
+* geomap - service-level shapes
+* geomap - service-level find
+* geographics - add a resize method, call from geomap.resize
+* geo - add recenter function for bbox
+* geomap - [bug] errors creating second un-tiled map after destroying a first on same element
+* geomap - refresh shouldn't request new images if the map element is hidden
+* geomap - [bug] delayed multitouch isn't nearly as smooth as true multitouch
+* geomap - [bug] tiled pinch zoom isn't smooth
+* geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
+* geomap - [bug] mouse wheel doesn't work with jQuery 1.7
+** upgrade to latest jquery.mousewheel plugin
+* geomap - service object visibility and opacity options should be moved to a style property
+* geomap - use _currentServices in all functions unless we actually need to update the public options services object
+* geomap - don't change user's service objects in opacity/toggle
+* geomap - show attr text
+* docs - geomap - selector argument to find method
+* geomap - selector argument to find method
+* geomap - pan mode should use a hand cursor by default
+* geomap - [bug] only services that have finished refreshing move when the user pans
+** for a4: hide unfinished services
+* geomap - [bug] a user can mess with the center option, e.g., convert numbers to strings, and it can wreck havoc with map state
+* geomap - [bug] zoom option doesn't return proper values for shingled services
+* geomap - [bug] non-tiled maps can zoom out past zoom 0
+* geomap - don't request tiles that are -y index
+* geomap - [bug] initializing tiled map by non-geodetic bbox always causes zoom level 0
+* docs - geomap - empty string needed for label element
+* geomap - [bug] double tap to end shapes adds two points before ending the shape, in different places
+* geomap - [bug] lifting fingers after pinch zoom in drawLineString or drawPolygon modes sometimes adds fake visual coordinate on touch point last lifted
+* docs - upgrade to jQuery 1.7.1
+* geomap - [bug] scroll=off doesn't zoom map but also doesn't allow document scroll
+* geomap - [bug] changing mode does not reset measure drawing
+* geomap - [bug] jQuery UI Widget Factory no longer passes pageX &amp; pageY event properties during _trigger when using jQuery 1.7
+** upgrade to Widget Factory 1.8.17
+* examples - all demo (shingled)
+* docs - geomap - custom modes
+* examples - all demo (tiled)</pre>
 
       <h2>Alpha 3 released!</h2>
       <time>2011-11-01</time>
+
       <h3>jQuery Geo 1.0 Alpha 3 is mostly about sketching!</h3>
       <ul>
         <li>new modes: drawPoint, drawLineString, and drawPolygon allow users to draw on your map</li>
@@ -149,22 +309,49 @@
         </li>
       </ul>
 
-      <h2>Download</h2>
-      <p>Using jQuery Geo requires adding one element, including one script (apart from jQuery itself) and calling one function. The following copy-and-paste snippet will help you get started.</p>
-      <pre>&lt;div id=&quot;map&quot; style=&quot;height: 320px;&quot;&gt;&lt;/div&gt;
-&lt;script src="http://code.jquery.com/jquery-1.6.4.min.js"&gt;&lt;/script&gt;
-&lt;script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"&gt;&lt;/script&gt;
-&lt;script&gt;$(function() { $( &quot;#map&quot; ).geomap( ); });&lt;/script&gt;</pre>
       <h2>Edge</h2>
       <p>The links above will always point to the latest stable release. However, you can test the most recently committed docs, code &amp; demos by heading over to the test release.</p>
       <a data-role="button" href="http://jquerygeo.com/test/" title="jQuery Geo test build">Test docs &amp; demos</a>
+
+      <h2>Thanks!</h2>
+
+      <ul class="thanks">
+        <li>
+          <!-- AppGeo -->
+          <a href="http://www.appgeo.com"><img width="180" height="48" title="Applied Geographics" alt="" src="data:image/png;base64,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" /></a>
+        </li>
+
+        <li>
+          <!-- jQuery -->
+          <a href="http://jquery.com"><img id="jQueryLogo" title="jQuery" alt="" src="http://static.jquery.com/files/rocker/images/logo_jquery_215x53.gif" /></a>
+        </li>
+
+        <li>
+          <!-- html5 -->
+          <img title="HTML5" alt="" src="http://www.w3.org/html/logo/downloads/HTML5_Badge_64.png" />
+        </li>
+
+        <li>
+          <!-- (mt) -->
+          <a href="http://mediatemple.net"><img title="Media Temple" alt="" src="http://mediatemple.net/_images/partnerlogos/mt-120x60-dk.png" /></a>
+        </li>
+
+        <li>
+          <!-- CloudFlare -->
+          <a href="http://www.cloudflare.com"><img title="CloudFlare" alt="" src="https://www.cloudflare.com/media/images/web-badges/cf-web-badges-a-gray-on.png" /></a>
+        </li>
+      </ul>
+
+      
     </div>
   </div>
-  <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
-  <script type="text/javascript" src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
+  <script type="text/javascript" src="http://code.jquerygeo.com/jquery.geo-1.0a4.min.js"></script>
   <script type="text/javascript">
     $(function () {
+      var map;
+
       $(".nav").buttonset();
       $("a").filter("[data-role='button']").button();
 

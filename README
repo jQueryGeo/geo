@@ -56,10 +56,8 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * geo - add recenter function for bbox
 * geomap - [bug] errors creating second un-tiled map after destroying a first on same element
 * geomap - refresh shouldn't request new images if the map element is hidden
-* geomap - use transitions during interactiveScale of tiled maps
 * geomap - [bug] delayed multitouch isn't nearly as smooth as true multitouch
 * geomap - [bug] tiled pinch zoom isn't smooth
-* geomap - disable transitions for now, they are causing visual side effects
 * geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
 * geomap - [bug] mouse wheel doesn't work with jQuery 1.7
 ** upgrade to latest jquery.mousewheel plugin
@@ -86,6 +84,8 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * geomap - [bug] jQuery UI Widget Factory no longer passes pageX & pageY event properties during _trigger when using jQuery 1.7
 ** upgrade to Widget Factory 1.8.17
 * examples - all demo (shingled)
+* docs - geomap - custom modes
+* examples - all demo (tiled)
 
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon
