@@ -41,19 +41,9 @@
 
     </div>
   </div>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
-  <script src="../../js/jquery.geo.head.js"></script>
-  <script src="../../js/excanvas.js"></script>
-  <script src="../../js/jquery.mousewheel.min.js"></script>
-  <script src="../../js/jquery.ui.widget.js"></script>
-  <script src="../../js/jsrender.js"></script>
-  <script src="../../js/jquery.geo.core.js"></script>
-  <script src="../../js/jquery.geo.geographics.js"></script>
-  <script src="../../js/jquery.geo.geomap.js"></script>
-  <script src="../../js/jquery.geo.tiled.js"></script>
-  <script src="../../js/jquery.geo.shingled.js"></script>
-  <!--<script src="../jquery.geo-test.min.js"></script>-->
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a4.min.js"></script>
   <script>
     $(function () {
       // Set proj to null because we are working a different projection &
@@ -81,6 +71,8 @@
       var map = $("#map").geomap({
         services: [
           // this is a basemap and will always be shown
+          // it's the only one we need to put the attr on
+          // since all services come from the same source
           {
             id: "massgis_basemap",
             type: "shingled",
@@ -94,7 +86,6 @@
             id: "massgis_interiorforest",
             type: "shingled",
             src: massGisHost + "?LAYERS=massgis%3AGISDATA.INTERIORFOREST_POLY&STYLES=GISDATA.INTERIORFOREST_POLY%3A%3ADefault&TRANSPARENT=true" + imageTemplate,
-            attr: "&copy; 2011 Commonwealth of Massachusetts",
             style: {
               visibility: "hidden"
             }
@@ -106,7 +97,6 @@
             id: "massgis_hydrography",
             type: "shingled",
             src: massGisHost + "?LAYERS=massgis%3AGISDATA.MAJPOND_POLY,massgis%3AGISDATA.MAJSTRM_ARC&TRANSPARENT=true" + imageTemplate,
-            attr: "&copy; 2011 Commonwealth of Massachusetts",
             style: {
               visibility: "hidden"
             }

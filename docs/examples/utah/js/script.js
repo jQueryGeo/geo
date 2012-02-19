@@ -4,12 +4,11 @@
 
 $(function () {
   $("#basemapButtons").buttonset().find("label").click(function () {
-    var 
-    inputId = $(this).attr("for"),
-    $basemapInput = $("#" + inputId),
-    basemapValue = $basemapInput.val(),
-    tileSize = parseInt($basemapInput.data("tileSize")),
-    serviceOptions = makeService(basemapValue, tileSize);
+    var inputId = $(this).attr("for"),
+        $basemapInput = $("#" + inputId),
+        basemapValue = $basemapInput.val(),
+        tileSize = parseInt($basemapInput.data("tileSize")),
+        serviceOptions = makeService(basemapValue, tileSize);
 
     $("#map").geomap("option", {
       tilingScheme: serviceOptions.tilingScheme,
@@ -18,23 +17,21 @@ $(function () {
     });
   });
 
-  var options = {
-    center: [453709, 4333922],
-    zoom: 2,
-    move: function (e, geo) {
-      $("#lblCoords>span").text("" + geo.coordinates);
-    }
-  };
-
-  $.extend(options, makeService("UtahBaseMap-Lite"));
+  var options = $.extend( { }, makeService("UtahBaseMap-Lite", 256), {
+          center: [453709, 4333922],
+          zoom: 2,
+          move: function (e, geo) {
+            $("#lblCoords>span").text("" + geo.coordinates);
+          }
+        } );
 
   $("input[value='UtahBaseMap-Lite']").prop("checked", true);
 
   $("#pnlSearch form").submit(function (e) {
     e.preventDefault();
-    var 
-    address = $(this).find("input").val().replace(/,\s*UT/i, ""),
-    addressParts = address.split(",");
+
+    var address = $(this).find("input").val().replace(/,\s*UT/i, ""),
+        addressParts = address.split(",");
 
     if (addressParts.length >= 2) {
       address = address.replace(addressParts[addressParts.length - 1], "").replace(",", "");
@@ -71,11 +68,8 @@ $(function () {
     return {
       services: [
         {
-          id: name,
           type: "tiled",
-          src: function (view) {
-            return "http://mapserv.utah.gov/ArcGIS/rest/services/" + name + "/MapServer/tile/" + view.zoom + "/" + view.tile.row + "/" + view.tile.column;
-          }
+          src: "http://mapserv.utah.gov/ArcGIS/rest/services/" + name + "/MapServer/tile/{{=zoom}}/{{=tile.row}}/{{=tile.column}}"
         }
       ],
       tilingScheme: {

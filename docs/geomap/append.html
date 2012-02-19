@@ -55,13 +55,27 @@ $(<i>map or service selector</i>).geomap( &quot;append&quot;, { type: &quot;Poin
       <p>The jQuery UI widget factory returns the original jQuery collection to maintain call chaining.</p>
       <!--<p>geomap draws shapes ordered by geometry type and then by order of addition. It draws Polygon shapes first followed by LineString and finally Point shapes. </p>-->
       <h2>styling</h2>
+
       <p>The optional style argument modifies how geomap draws the specific geometry or feature you are adding. Properties supplied in this style will override ones of the same name in geomap&#39;s base shapeStyle. Properties not referenced are inheritied from the base style and can change with future changes to the shapeStyle option. Please see the shapeStyle method documentation for information about what properties are valid for this object.</p>
+
       <h2>labeling</h2>
+
       <p>The optional label argument will display a label near the shape. Labels are a powerful way to add text, pixel-based graphics, or other HTML and CSS effects to the map. The label string can be any text or HTML. For example, consider the following:</p>
+
       <ul>
-        <li>you append a Point shape setting its style to have zero for width and height: <pre><code>{ width: &quot;0px&quot;, height: &quot;0px&quot; }</code></pre></li>
-        <li>you also supply a label of nothing more than a div element with a class: <pre><code>'&lt;div class=&quot;markers&quot;&gt;&lt;/div&gt;'</code></pre></li>
-        <li>in a CSS style sheet, you give the markers class a width, height, background image and negative relative position: <pre><code>.markers
+        <li>
+          <span>you append a Point shape setting its style to have zero for width and height:</span>
+          <pre><code>{ width: &quot;0px&quot;, height: &quot;0px&quot; }</code></pre>
+        </li>
+
+        <li>
+          <span>you also supply a label of nothing more than a div element with a class:</span>
+          <pre><code>'&lt;div class=&quot;marker&quot;&gt;&lt;/div&gt;'</code></pre>
+        </li>
+
+        <li>
+          <span>in a CSS style sheet, you give the marker class a width, height, background image and negative relative position:</span>
+          <pre><code>.marker
 {
   width: 8px;
   height: 8px;
@@ -69,25 +83,39 @@ $(<i>map or service selector</i>).geomap( &quot;append&quot;, { type: &quot;Poin
   position: relative;
   left: -4px;
   top: -4px;
-}</pre></code></li>
+}</pre></code>
+        </li>
       </ul>
+
       <p>In the above example, marker.png will be centered on every point added with a similar label. The regular shape style will not show because the point style has no size.</p>
+
       <p>For Point shapes, the top-left of the label is positioned at the Point's only coordinate. For LineString shapes, the label is usually positioned 50% along the shape but will be forced into view if its usual position is out of the map's current bbox. For Polygon shapes, the label is usually positioned at the centroid but will be forced into view if its usual position is out of the map's current bbox. All other non-basic shape types use the shape's centroid.</p>
-      <p>The geomap widget uses a div to position the labels. The div exists inside a container for the service. The div has the CSS class: geo-label. You can use this design to apply regular CSS style to all labels or all labels within a service. The following CSS snippets shows a couple examples of using this, assuming the main map div has the id &quot;map&quot; and the default map service (which has the CSS class &quot;osm&quot;) has not been changed.</p>
+
+      <p>The geomap widget uses a div to position the labels. The div exists inside a container for the service. The div has the CSS class: geo-label. You can use this design to apply regular CSS style to all labels or all labels within a service. The following snippets show examples of using this, assuming the main map div has the id &quot;map&quot; and the default map service (which has the CSS class &quot;osm&quot;) has not been changed.</p>
+
       <h3>JavaScript</h3>
+
       <pre><code><span class="comment">/* add a point to the map itself */</span>
 $( &quot;#map&quot; ).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, &quot;map point&quot; );
 
 <span class="comment">/* add a point to the default map service */</span>
 $( &quot;#map .osm&quot; ).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -70, 40 ] }, &quot;service point&quot; );
 </code></pre>
+
       <h3>CSS</h3>
+
       <pre><code><span class="comment">/* turn the color of all labels blue */</span>
 #map .geo-label { color: blue; }
 
 <span class="comment">/* make labels on the default basemap service bold */</span>
 #map .osm .geo-label { font-weight: bold; }</code></pre>
+
+      <p>One caveat is that, to keep performance high, jQuery Geo will not create the .geo-label container if you do not at least pass an empty string as the label. So, if you want to do something similar to the marker example above, but using the already provided .geo-label div, you will need to pass an empty string as the label.</p>
+      
+      <p>Each .geo-label div is absolutely positioned to the correct location in the map view. Please keep that in mind because changing the position, left or top CSS properties on the .geo-label class may affect your labels drastically.</p>
+
       <h2>delaying refresh</h2>
+
       <p>The optional refresh argument determines if geomap refreshes the map graphics after this call to append. It defaults to true. If you pass false, geomap will add the shape internally but not immediately redraw the graphics. The changes will display if the user moves the map or you call geomap's refresh method.</p>
       <h2>service-level shapes</h2>
       <p>The geomap widget allows you to append a shape to a specific service. You do this by targeting a service inside a map instead of the map itself for your call to geomap's append method. For example, the default map service has the CSS class: osm. We can append a shape to that service specifically by using jQuery to target the service:</p>
@@ -140,8 +168,8 @@ $( &quot;#map&quot; ).append( shape, { color: &quot;blue&quot; } );</code></pre>
     </div>
   </div> <!-- end of #container -->
 
-  <script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
-  <script src="http://code.jquerygeo.com/jquery.geo-1.0a3.min.js"></script>
+  <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a4.min.js"></script>
   <script src="../js/script.js"></script>
   <script src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
 </body>

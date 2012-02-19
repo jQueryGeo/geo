@@ -76,6 +76,16 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * geomap - [bug] zoom option doesn't return proper values for shingled services
 * geomap - [bug] non-tiled maps can zoom out past zoom 0
 * geomap - don't request tiles that are -y index
+* geomap - [bug] initializing tiled map by non-geodetic bbox always causes zoom level 0
+* docs - geomap - empty string needed for label element
+* geomap - [bug] double tap to end shapes adds two points before ending the shape, in different places
+* geomap - [bug] lifting fingers after pinch zoom in drawLineString or drawPolygon modes sometimes adds fake visual coordinate on touch point last lifted
+* docs - upgrade to jQuery 1.7.1
+* geomap - [bug] scroll=off doesn't zoom map but also doesn't allow document scroll
+* geomap - [bug] changing mode does not reset measure drawing
+* geomap - [bug] jQuery UI Widget Factory no longer passes pageX & pageY event properties during _trigger when using jQuery 1.7
+** upgrade to Widget Factory 1.8.17
+* examples - all demo (shingled)
 
 === 1.0a3 ===
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon
