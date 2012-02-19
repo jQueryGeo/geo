@@ -2,10 +2,8 @@
 
 === a4 ===
 * docs - geomap - custom modes
-* examples - all demo (shingled)
 * examples - all demo (tiled)
 * examples - jQuery Mobile
-* examples - remove tmpl from examples as it conflicts with jsrender
 
 === b1 ===
 * cdn - max age header should be infinite...always cache as long as possible, release code won't change
