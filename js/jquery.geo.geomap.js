@@ -327,7 +327,7 @@
           break;
 
         case "mode":
-          this._$drawContainer.geographics("clear");
+          this._resetDrawing( );
           this._$eventTarget.css("cursor", this._options["cursors"][value]);
           break;
 
@@ -653,8 +653,8 @@
           pixelSize = Math.max($.geo.width(value, true) / this._contentBounds.width, $.geo.height(value, true) / this._contentBounds.height);
 
       if (this._options["tilingScheme"]) {
-        var zoom = this._getZoom(pixelSize);
-        pixelSize = this._getPixelSize(zoom);
+        var zoom = this._getZoom( center, pixelSize );
+        pixelSize = this._getPixelSize( zoom );
       } else {
         if ( this._getZoom( center, pixelSize ) < 0 ) {
           pixelSize = this._pixelSizeMax;
@@ -1394,10 +1394,6 @@
         return;
       }
 
-      if ( this._options[ "mode" ] === "static" ) {
-        return;
-      }
-
       this._panFinalize();
       this._mouseWheelFinish();
 
@@ -1441,10 +1437,10 @@
             var dx = this._current[0] - this._anchor[0],
                 dy = this._current[1] - this._anchor[1],
                 distance = Math.sqrt((dx * dx) + (dy * dy));
-            if (distance > 10) {
+            if (distance > 8) {
               this._isTap = false;
             } else {
-              this._current = this._anchor;
+              this._current = $.merge( [ ], this._anchor );
             }
           }
 
@@ -1461,7 +1457,7 @@
       }
 
       this._mouseDown = true;
-      this._anchor = this._current;
+      this._anchor = $.merge( [ ], this._current );
 
       if (!this._inOp && e.shiftKey) {
         this._shiftZoom = true;
@@ -1580,7 +1576,7 @@
         }
       }
 
-      if (this._softDblClick) {
+      if ( _ieVersion == 7 ) {
         this._isDbltap = this._isTap = false;
       }
 
@@ -1591,6 +1587,7 @@
 
       if ( this._isMultiTouch ) {
         e.preventDefault( );
+        this._isDbltap = this._isTap = false;
         return false;
       }
 
@@ -1668,6 +1665,17 @@
         current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
       } else {
         current = [e.pageX - offset.left, e.pageY - offset.top];
+      }
+
+      if (this._softDblClick) {
+        if (this._isTap) {
+          var dx = current[0] - this._anchor[0],
+              dy = current[1] - this._anchor[1],
+              distance = Math.sqrt((dx * dx) + (dy * dy));
+          if (distance <= 8) {
+            current = $.merge( [ ], this._anchor );
+          }
+        }
       }
 
       dx = current[0] - this._anchor[0];
@@ -1798,7 +1806,7 @@
     },
 
     _eventTarget_mousewheel: function (e, delta) {
-      if ( this._options[ "mode" ] === "static" ) {
+      if ( this._options[ "mode" ] === "static" || this._options[ "scroll" ] === "off" ) {
         return;
       }
 
@@ -1806,7 +1814,7 @@
 
       this._panFinalize();
 
-      if ( this._mouseDown || this._options[ "scroll" ] === "off" ) {
+      if ( this._mouseDown ) {
         return false;
       }
 

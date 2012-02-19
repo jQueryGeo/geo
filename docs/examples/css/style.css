@@ -30,6 +30,11 @@
   vertical-align: middle;
 }
   
+.mobile-shrink
+{
+  font-size: .6em;
+}
+
 .not-mobile
 {
   display: none;
@@ -43,6 +48,11 @@
     position: absolute !important;
     right: 16px;
     top: 16px;
+  }
+
+  .mobile-shrink
+  {
+    font-size: 1em;
   }
   
   .not-mobile

@@ -32,8 +32,8 @@
         <a href="http://roycesimpson.wordpress.com/2011/07/19/air-android-arcgis-server-flex-api-gps-activated-mapping-apps/" target="_blank">Inspired by Royce Simpson</a></p>
     </div>
   </div>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
-  <script src="../jquery.geo-test.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a4.min.js"></script>
   <script>
     $(function () {
       var map = null;
@@ -45,9 +45,7 @@
           services: [
             {
               type: "tiled",
-              src: function (view) {
-                return "http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/" + view.zoom + "/" + view.tile.row + "/" + view.tile.column
-              },
+              src: "http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{{=zoom}}/{{=tile.row}}/{{=tile.column}}",
               attr: "&copy; Esri"
             }
           ]

@@ -20,14 +20,15 @@
     <div class="geomap" style="width: 640px; height: 480px;">
     </div>
   </div>
-  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
-  <script src="../jquery.geo-test.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a4.min.js"></script>
   <script>
     $(function () {
       var geomap = $(".geomap").geomap({
         center: [-71.05, 42.35],
         zoom: 13,
-        click: function (e, geo) {
+        mode: "drawPoint",
+        shape: function (e, geo) {
           geomap.geomap("append", geo);
         }
       });
