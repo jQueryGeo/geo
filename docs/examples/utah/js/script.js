@@ -69,7 +69,8 @@ $(function () {
       services: [
         {
           type: "tiled",
-          src: "http://mapserv.utah.gov/ArcGIS/rest/services/" + name + "/MapServer/tile/{{=zoom}}/{{=tile.row}}/{{=tile.column}}"
+          src: "http://mapserv.utah.gov/ArcGIS/rest/services/" + name + "/MapServer/tile/{{=zoom}}/{{=tile.row}}/{{=tile.column}}",
+          attr: "&copy; AGRC"
         }
       ],
       tilingScheme: {

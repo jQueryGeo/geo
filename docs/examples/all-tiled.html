@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>everything shingled</title>
+  <title>everything tiled</title>
   <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
-  <meta name="description" content="A demo of everything using a shingled service">
+  <meta name="description" content="A demo of everything using a tiled service">
   <meta name="author" content="Ryan Westphal">
   <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/blitzer/jquery-ui.css" />
   <link rel="stylesheet" type="text/css" href="css/style.css" />
@@ -27,10 +27,11 @@
       bottom: 0;
     }
 
-    /* a label CSS example: all text for labels on the hydro service will be blue! */
-    #massgis_hydrography
+    /* a label CSS example: all text for labels on the speedtest service will be purple and bold! */
+    #broadband-speedtest
     {
-      color: blue;
+      color: purple;
+      font-weight: bold;
     }
 
     .modes { margin: .5em 0; }
@@ -49,12 +50,12 @@
     <div class="info mobile-shrink">
       <div class="links not-mobile">
         <a href="../" class="docLink">&lt; docs</a>
-        <a href="http://jsfiddle.net/ryanttb/69mFE/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
+        <a href="http://jsfiddle.net/ryanttb/uSMjS/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
       </div>
 
-      <h1 class="not-mobile">shingled</h1>
+      <h1 class="not-mobile">tiled</h1>
 
-      <p class="not-mobile">The everything demo, shingled edition!</p>
+      <p class="not-mobile">The everything demo, tiled edition!</p>
 
       <section class="not-mobile">
         <h2>info</h2> <button id="toggle-info" type="button" title="click to view some map info">show / hide</button>
@@ -154,8 +155,8 @@
           <h2>target</h2>
           <div class="clickTargets">
             <input type="radio" id="clickTargetWidget" name="clickTarget" value="widget" checked="checked" /><label for="clickTargetWidget">widget</label>
-            <input type="radio" id="clickTargetBasemapService" name="clickTarget" value="massgis_basemap" /><label for="clickTargetBasemapService">basemap</label>
-            <input type="radio" id="clickTargetHydroService" name="clickTarget" value="massgis_hydrography" /><label for="clickTargetHydroService">hydro</label>
+            <input type="radio" id="clickTargetBasemapService" name="clickTarget" value="mapquest-open" /><label for="clickTargetBasemapService">basemap</label>
+            <input type="radio" id="clickTargetSpeedtestService" name="clickTarget" value="broadband-speedtest" /><label for="clickTargetSpeedtestService">speedtest</label>
           </div>
         </section>
 
@@ -163,8 +164,8 @@
           <h2>toggle</h2>
 
           <div class="toggleTargets">
-            <input type="checkbox" id="toggleTargetBasemapService" name="toggleTarget" value="massgis_basemap" checked="checked" /><label for="toggleTargetBasemapService">basemap</label>
-            <input type="checkbox" id="toggleTargetHydroService" name="toggleTarget" value="massgis_hydrography" checked="checked" /><label for="toggleTargetHydroService">hydro</label>
+            <input type="checkbox" id="toggleTargetBasemapService" name="toggleTarget" value="mapquest-open" checked="checked" /><label for="toggleTargetBasemapService">basemap</label>
+            <input type="checkbox" id="toggleTargetSpeedtestService" name="toggleTarget" value="broadband-speedtest" checked="checked" /><label for="toggleTargetSpeedtestService">speedtest</label>
           </div>
         <section>
 
@@ -181,7 +182,7 @@
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
   <script src="http://code.jquerygeo.com/jquery.geo-1.0a4.min.js"></script>
-  <script src="js/all-shingled.js"></script>
+  <script src="js/all-tiled.js"></script>
 
   <script>
     var _gaq = [['_setAccount', 'UA-26084853-1'], ['_trackPageview']];

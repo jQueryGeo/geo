@@ -7,32 +7,29 @@ $(function () {
     return false;
   } );
 
-  // set proj to null because we don't have the code for this projection 
-  // and are working entirely in map units
-
-  $.geo.proj = null;
-
-  // define two shingled services
+  // define two tiled services
   var services = [
-    // define a basemap service
+    // a free basemap tile set from MapQuest
     {
-      id: "massgis_basemap",
-      type: "shingled",
-      src: "http://giswebservices.massgis.state.ma.us/geoserver/wms?LAYERS=massgis_basemap&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX={{=bbox}}&WIDTH={{=width}}&HEIGHT={{=height}}",
-      attr: "&copy; 2011 Commonwealth of Massachusetts"
+      id: "mapquest-open",
+      type: "tiled",
+      src: function( view ) {
+        return "http://otile" + ((view.index % 4) + 1) + ".mqcdn.com/tiles/1.0.0/osm/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
+      },
+      attr: 'Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png">'
     },
 
     // define a second service as a layer on top of the basemap
     // we use this service as the target when "target" is set to service in this demo
     {
-      id: "massgis_hydrography",
-      type: "shingled",
-      src: "http://giswebservices.massgis.state.ma.us/geoserver/wms?LAYERS=massgis%3AGISDATA.MAJPOND_POLY,massgis%3AGISDATA.MAJSTRM_ARC&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX={{=bbox}}&WIDTH={{=width}}&HEIGHT={{=height}}"
+      id: "broadband-speedtest",
+      type: "tiled",
+      src: "http://www.broadbandmap.gov/StamenTiles/speedtest/speedtest/download/{{=zoom}}/{{=tile.column}}/{{=tile.row}}.png",
+      attr: "Speed Test data maintained by the NTIA, in collaboration with the FCC"
     }
   ];
 
-
-  // create a map without a tilingScheme & with the two shingled services
+  // create a map with a tilingScheme & with the two tiled services
   var map = $( "#map" ).geomap( {
     // add a cursor for our custom mode: remove
     cursors: { remove: "crosshair" },
@@ -40,15 +37,22 @@ $(function () {
     // use the services array defined above
     services: services,
 
-    // you must set bboxMax for shingled services for the zoom property to mean anything
-    bboxMax: [ 31789.1658, 790194.4183, 337250.8970, 961865.1338 ],
+    // these tiled services are in jQuery Geo's default tilingScheme, web mercator
+    // we don't need to change it but will write it here in comments, for this demo
+    /*
+    tilingScheme: {
+      tileWidth: 256,
+      tileHeight: 256,
+      levels: 18,
+      basePixelSize: 156543.03392799936,
+      pixelSizes: null,
+      origin: [ -20037508.342787, 20037508.342787 ]
+    },
+    */
 
-    // shingled services do not have a tilingScheme
-    tilingScheme: null,
-
-    // center & zoom values that fit MassGIS's projection
-    center: [ 235670.21967, 900771.290247 ],
-    zoom: 13,
+    // center & zoom values that default to showing the contenental United States of America
+    center: [ -89.34, 38.84 ],
+    zoom: 5,
 
     bboxchange: function( e, geo ) {
       // when the bbox changes, update the info section with new option values
@@ -87,9 +91,9 @@ $(function () {
         // also note, that the label is controlled seperately from the shape, by CSS, rather than by jQuery Geo shapeStyle objects
         // if you look at the CSS, you will notice:
         //
-        // #massgis_hydrography { color: blue; }
+        // #broadband-speedtest { color: purple; font-weight: bold; }
         //
-        // which makes all labels on the hydro service blue text
+        // which makes all labels on the speedtest service blue text
       }
     },
 
