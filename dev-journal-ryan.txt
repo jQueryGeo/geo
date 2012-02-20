@@ -1,11 +1,7 @@
 ﻿== to do ==
 
-=== a4 ===
-* docs - geomap - custom modes
-* examples - all demo (tiled)
-* examples - jQuery Mobile
-
 === b1 ===
+* examples - jQuery Mobile
 * cdn - max age header should be infinite...always cache as long as possible, release code won't change
 * docs - geomap - loadstart event
 * geomap - loadstart event
@@ -26,6 +22,8 @@
 * geomap - replace data-geo attributes with classes
 * docs - warn users about potential CSS/JavaScript issues relating to generated elements:
 ** ul, li, div, span, img
+* geomap - [bug] if panning is false, mode is draw*, and user attempts to pan, the drawing begins (or another point is added) on the touchstop point
+** a failed pan shouldn't add a point to drawCoords
 * geomap - Firefox - [bug] inertial pan is choppy post touchstop
 * geomap - iPad 2 - [bug] pointAlong doesn't take last point into account in all browsers
 ** cannot reproduce; possibly axisLayout image only

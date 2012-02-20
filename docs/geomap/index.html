@@ -23,20 +23,37 @@
     
     <div data-role="content">
       <p>Once you have an HTML element to target, you can call the geographic map widget's function.</p>
+
       <pre><code>.geomap( options )</code></pre>
+
       <h2>overview</h2>
+
       <p>The widget creates an interactive map. Users can pan and zoom on desktop and mobile browsers against many different cached tile sets or dynamic map servers. Developers can handle events triggered by user action.</p>
+
       <div class="geomap-indoc"></div>
+
       <h2>options</h2>
+
       <p>The options argument is a JavaScript object that configures the map widget during the first instantiation on a div. No options are required. By default the map will show the whole world using the OpenStreetMap tile set.</p>
+
       <p>After initializing a map with your first geomap call, you can get or set most of these options using the following syntax:</p>
-      <pre><code><span class="comment">// get the current values</span>
+
+      <pre><code><span class="comment">// get the current value of a single option</span>
 var optionValue = $( <i>map selector</i> ).geomap( &quot;option&quot;, <i>optionName</i> );
 
-<span class="comment">// set a new value</span>
-$( <i>map selector</i> ).geomap( &quot;option&quot;, <i>optionName</i>, <i>newValue</i> );</code></pre>
+<span class="comment">// set a new value for a single option</span>
+$( <i>map selector</i> ).geomap( &quot;option&quot;, <i>optionName</i>, <i>newValue</i> );
+
+<span class="comment">// set new values for multiple options at the same time</span>
+$( <i>map selector</i> ).geomap( &quot;option&quot;, {
+  <i>optionName</i>: <i>newValue</i>,
+  <i>optionName</i>: <i>newValue</i>
+} );</code></pre>
+
       <p>One exception is pixelSize, which is read-only.</p>
+
       <p>The map view refreshes when you change these options: bbox, center, services, tilingScheme &amp; zoom.</p>
+
       <ul data-role="listview" data-inset="true">
         <li><a href="bbox.html"><h3>bbox</h3><p>bounds of the currently visible viewport</p></a></li>
         <li><a href="bboxMax.html"><h3>bboxMax</h3><p>bounds of maximum viewport for non-tiled maps</p></a></li>
