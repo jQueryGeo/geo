@@ -39,11 +39,12 @@
 } );</pre></code></td>
         </tr>
       </table>
-      <p>The shape event triggers when the user draws a point, line or polygon. He or she does this by tapping the map in specific ways while the geomap mode property is set to: drawPoint, drawLineString or drawPolygon.</p>
+      <p>The shape event triggers when the user measures a length, or area, or draws a point, line or polygon. He or she does this by tapping the map in specific ways while the geomap mode property is set to: measureLength, measureArea, drawPoint, drawLineString or drawPolygon.</p>
       <p>When mode is drawPoint, a single tap of the map triggers this event passing a <a href="http://geojson.org/geojson-spec.html#point" rel="external">GeoJSON Point</a> object of the tapped location in map coordinates.</p>
-      <p>When mode is drawLineString, the first single tap begins a line. Subsequent single taps add points to the line. A double-tap on the map adds a final point and triggers this event passing a <a href="http://geojson.org/geojson-spec.html#linestring" rel="external">GeoJSON LineString</a> object of the sketched line in map coordinates.</p>
-      <p>When mode is drawPolygon, the first single tap begins a polygon. Subsequent single taps add points to the polygon. A double-tap on the map adds a final point and triggers this event passing a <a href="http://geojson.org/geojson-spec.html#polygon" rel="external">GeoJSON Polygon</a> object of the sketched polygon in map coordinates.</p>
-      <p>While drawing a shape, the user can pan the map by dragging or zoom the map with the mouse wheel. This will not interrupt their drawing of the current shape.</p>
+      <p>When mode is measureLength or drawLineString, the first single tap begins a line. Subsequent single taps add points to the line. A double-tap on the map adds a final point and triggers this event passing a <a href="http://geojson.org/geojson-spec.html#linestring" rel="external">GeoJSON LineString</a> object of the measured length or sketched line in map coordinates.</p>
+      <p>When mode is measureArea or drawPolygon, the first single tap begins a polygon. Subsequent single taps add points to the polygon. A double-tap on the map adds a final point and triggers this event passing a <a href="http://geojson.org/geojson-spec.html#polygon" rel="external">GeoJSON Polygon</a> object of the measured area or sketched polygon in map coordinates.</p>
+      <p>While measuring or drawing a shape, the user can pan the map by dragging or zoom the map with the mouse wheel. This will not interrupt their current measuring or drawing.</p>
+      <p>If you allow users to both measure and draw in your app, be sure to check the <a href="mode.html">mode</a> option in your event handler to determine if this event was triggered by measuring or by drawing. For example, you may want to append the shape to the map during drawPolygon but not during measureArea.</p>
     </div>
   </div> <!-- end of #container -->
 

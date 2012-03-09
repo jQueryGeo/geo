@@ -56,66 +56,72 @@ $(function () {
     },
 
     shape: function( e, geo ) {
-      // when the user draws a shape, show it on the map
-      // the shape event triggers when the user finishes drawing a shape
-      // the geo argument is a GeoJSON object representing the shape
+      // both the measure and draw modes trigger the shape event
+      // but we only want to append for the draw
+      if ( map.geomap( "option", "mode" ).substr( 0, 4 ) == "draw" ) {
+        // when the user draws a shape, show it on the map
+        // the shape event triggers when the user finishes drawing a shape
+        // the geo argument is a GeoJSON object representing the shape
 
-      // for this example, we'll append it to the map forcing an
-      // individual style that matches the current drawStyle
+        // for this example, we'll append it to the map forcing an
+        // individual style that matches the current drawStyle
 
-      // make a copy of the current drawStyle
-      var drawStyle = $.extend( { }, map.geomap( "option", "drawStyle" ) );
+        // make a copy of the current drawStyle
+        var drawStyle = $.extend( { }, map.geomap( "option", "drawStyle" ) );
 
-      // grab the label (if any) from the input
-      var label = $( "#shapeLabels input" ).val( );
+        // grab the label (if any) from the input
+        var label = $( "#shapeLabels input" ).val( );
 
-      // append the shape using that style
-      // however, depending on which target is checked, we will append the shape to either the map widget itself or a specific map service
-      if ( $( "#clickTargetWidget" ).is( ":checked" ) ) {
-        // if the map is our target, just append the shape to the map
-        // if there's a label entered, used it
-        map.geomap( "append", geo, drawStyle, label );
-      } else {
-        // otherwise, grab a reference to a service
-        // ( by id in this case ) and append the shape to that
-        // the value of the remaining radio buttons matches the id of a service
-        // if there's a label entered, used it
-        var serviceToAppend = $( "#" + $( "input[name='clickTarget']:checked" ).val( ) );
+        // append the shape using that style
+        // however, depending on which target is checked, we will append the shape to either the map widget itself or a specific map service
+        if ( $( "#clickTargetWidget" ).is( ":checked" ) ) {
+          // if the map is our target, just append the shape to the map
+          // if there's a label entered, used it
+          map.geomap( "append", geo, drawStyle, label );
+        } else {
+          // otherwise, grab a reference to a service
+          // ( by id in this case ) and append the shape to that
+          // the value of the remaining radio buttons matches the id of a service
+          // if there's a label entered, used it
+          var serviceToAppend = $( "#" + $( "input[name='clickTarget']:checked" ).val( ) );
 
-        $( serviceToAppend ).geomap( "append", geo, drawStyle, label );
+          $( serviceToAppend ).geomap( "append", geo, drawStyle, label );
 
-        // also note, that the label is controlled seperately from the shape, by CSS, rather than by jQuery Geo shapeStyle objects
-        // if you look at the CSS, you will notice:
-        //
-        // #massgis_hydrography { color: blue; }
-        //
-        // which makes all labels on the hydro service blue text
+          // also note, that the label is controlled seperately from the shape, by CSS, rather than by jQuery Geo shapeStyle objects
+          // if you look at the CSS, you will notice:
+          //
+          // #massgis_hydrography { color: blue; }
+          //
+          // which makes all labels on the hydro service blue text
+        }
       }
     },
 
     click: function( e, geo ) {
-      // when the user clicks the map while in our custom mode, remove,
-      // we will search for shapes on either the map widget itself
-      // ( and, by design, all map services) or a single, specific map service
+      if ( map.geomap( "option", "mode" ) == "remove" ) {
+        // when the user clicks the map while in our custom mode, remove,
+        // we will search for shapes on either the map widget itself
+        // ( and, by design, all map services) or a single, specific map service
 
-      // we'll use a nice, fat 5px radius for the searches here, that's what the (, 5) is below
+        // we'll use a nice, fat 5px radius for the searches here, that's what the (, 5) is below
 
-      // however, in this demo, we remove any shapes found from either the map or service
+        // however, in this demo, we remove any shapes found from either the map or service
 
-      // if the map is our target, grab the map reference
-      // otherwise, grab a reference to a service, in this case, by id
-      var target = $( "#clickTargetWidget" ).is( ":checked" ) ? map : $( "#" + $( "input[name='clickTarget']:checked" ).val( ) );
+        // if the map is our target, grab the map reference
+        // otherwise, grab a reference to a service, in this case, by id
+        var target = $( "#clickTargetWidget" ).is( ":checked" ) ? map : $( "#" + $( "input[name='clickTarget']:checked" ).val( ) );
 
-      // by design, calling find on the map itself returns all shapes at that location
-      // even if they have been appended to a service
-      // when target is the service, find is limited to shapes that have been appended there
-      var shapes = target.geomap( "find", geo, 3 );
+        // by design, calling find on the map itself returns all shapes at that location
+        // even if they have been appended to a service
+        // when target is the service, find is limited to shapes that have been appended there
+        var shapes = target.geomap( "find", geo, 3 );
 
-      // even though we potentially found service-level shapes with the find method,
-      // calling remove on the map does not remove from all services
-      $.each( shapes, function( ) {
-        target.geomap( "remove", this );
-      } );
+        // even though we potentially found service-level shapes with the find method,
+        // calling remove on the map does not remove from all services
+        $.each( shapes, function( ) {
+          target.geomap( "remove", this );
+        } );
+      }
     }
   } );
 
