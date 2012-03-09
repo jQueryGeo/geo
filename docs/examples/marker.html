@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>i &lt;3 u, laura!</title>
+  <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+  <meta name="description" content="i &lt;3 u, laura!">
+  <meta name="author" content="Ryan Westphal">
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+  <style type="text/css">
+    #map
+    {
+      position: fixed;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+
+    .heart
+{
+width: 64px;
+height: 64px;
+position: absolute;
+left: -28px;
+top: -28px;
+background-repeat: no-repeat;
+background-image: url(img/heart.png);
+}
+
+  </style>
+</head>
+<body>
+  <div>
+    <div id="map">
+      <div class="info">
+        <h1>i &lt;3 u, laura!</h1>
+      </div>
+    </div>
+  </div>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script src="../jquery.geo-test.min.js"></script>
+  <script>
+    $(function () {
+      var map = null;
+
+      function setPosition( center ) {
+        var geo = {
+              type: "Point",
+              coordinates: center || [ -71.0595678, 42.3604823 ]
+            };
+
+        if ( ! map ) {
+          // create a map
+          map = $( "#map" ).geomap( {
+            center: geo.coordinates,
+            zoom: 15,
+            shapeStyle: {
+              width: 0,
+              height: 0
+            }
+          } ).geomap( "append", geo, null, '<div class="heart"></div>' );
+        } else {
+          map.geomap( "empty", false );
+          map.geomap( "append", geo, null, '<div class="heart"></div>', false );
+          map.geomap( "center", center );
+        }
+      }
+
+      if ( navigator.geolocation ) {
+        navigator.geolocation.watchPosition( function ( p ) {
+          setPosition( [ p.coords.longitude, p.coords.latitude ] );
+        }, function (error) {
+          setPosition( );
+        });
+      } else {
+        setPosition( );
+      }
+      
+    });  
+  </script>
+
+  <script>
+    var _gaq = [['_setAccount', 'UA-26084853-1'], ['_trackPageview']];
+    (function (d, t) {
+      var g = d.createElement(t), s = d.getElementsByTagName(t)[0]; g.async = 1;
+      g.src = ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+      s.parentNode.insertBefore(g, s);
+    } (document, 'script'));
+  </script>
+</body>
+</html>
