@@ -1,5 +1,4 @@
 ﻿(function ($, undefined) {
-
   var _ieVersion = (function () {
     var v = 5, div = document.createElement("div"), a = div.all || [];
     while (div.innerHTML = "<!--[if gt IE " + (++v) + "]><br><![endif]-->", a[0]) { }
@@ -16,6 +15,10 @@
 
     _$canvas: undefined,
     _context: undefined,
+
+    _$blitcanvas: undefined,
+    _blitcontext: undefined,
+
     _$labelsContainer: undefined,
 
     options: {
@@ -62,6 +65,10 @@
         this._$elem.append('<canvas ' + sizeAttr + ' style="' + posCss + '"></canvas>');
         this._$canvas = this._$elem.children(':last');
         this._context = this._$canvas[0].getContext("2d");
+
+        this._$elem.append('<canvas ' + sizeAttr + ' style="' + posCss + ' visibility: hidden;"></canvas>');
+        this._$blitcanvas = this._$elem.children(':last');
+        this._blitcontext = this._$blitcanvas[0].getContext("2d");
       } else if (_ieVersion <= 8) {
         this._trueCanvas = false;
         this._$elem.append( '<div ' + sizeAttr + ' style="' + posCss + sizeCss + '"></div>');
@@ -182,7 +189,100 @@
     },
 
     drawPolygon: function (coordinates, style) {
-      this._drawLines(coordinates, true, style);
+      if ( !this._trueCanvas || coordinates.length == 1 ) {
+        // either we don't have fancy rendering or there's no need for it (no holes)
+        this._drawLines( coordinates, true, style );
+      } else {
+        if ( !coordinates || !coordinates.length || coordinates[ 0 ].length < 3 ) {
+          // this is not a Polygon or it doesn't have a proper outer ring
+          return;
+        }
+
+        style = this._getGraphicStyle(style);
+
+        var pixelBbox, i, j;
+
+        if ( style.visibility != "hidden" && style.opacity > 0 ) {
+          this._blitcontext.clearRect(0, 0, this._width, this._height);
+
+          if ( style.doFill ) {
+            if ( coordinates.length > 1 ) {
+              // stencil inner rings
+              this._blitcontext.globalCompositeOperation = "source-out";
+              this._blitcontext.globalAlpha = 1;
+
+              for ( i = 1; i < coordinates.length; i++ ) {
+                this._blitcontext.beginPath();
+                this._blitcontext.moveTo( coordinates[ i ][ 0 ][ 0 ], coordinates[ i ][ 0 ][ 1 ] );
+                for ( j = 1; j < coordinates[ i ].length; j++ ) {
+                  this._blitcontext.lineTo( coordinates[ i ][ j ][ 0 ], coordinates[ i ][ j ][ 1 ] );
+                }
+                this._blitcontext.closePath();
+
+                this._blitcontext.fill( );
+              }
+            }
+          }
+
+          // path outer ring
+          this._blitcontext.beginPath();
+          this._blitcontext.moveTo( coordinates[ 0 ][ 0 ][ 0 ], coordinates[ 0 ][ 0 ][ 1 ] );
+
+          pixelBbox = [ coordinates[ 0 ][ 0 ][ 0 ] - style.strokeWidthValue, coordinates[ 0 ][ 0 ][ 1 ] - style.strokeWidthValue, coordinates[ 0 ][ 0 ][ 0 ] + style.strokeWidthValue, coordinates[ 0 ][ 0 ][ 1 ] + style.strokeWidthValue ];
+
+          for ( i = 1; i < coordinates[ 0 ].length - 1; i++ ) {
+            this._blitcontext.lineTo( coordinates[ 0 ][ i ][ 0 ], coordinates[ 0 ][ i ][ 1 ] );
+
+            pixelBbox[ 0 ] = Math.min( coordinates[ 0 ][ i ][ 0 ] - style.strokeWidthValue, pixelBbox[ 0 ] );
+            pixelBbox[ 1 ] = Math.min( coordinates[ 0 ][ i ][ 1 ] - style.strokeWidthValue, pixelBbox[ 1 ] );
+            pixelBbox[ 2 ] = Math.max( coordinates[ 0 ][ i ][ 0 ] + style.strokeWidthValue, pixelBbox[ 2 ] );
+            pixelBbox[ 3 ] = Math.max( coordinates[ 0 ][ i ][ 1 ] + style.strokeWidthValue, pixelBbox[ 3 ] );
+          }
+
+          this._blitcontext.closePath();
+
+          this._blitcontext.globalCompositeOperation = "source-out";
+          if ( style.doFill ) {
+            // fill outer ring
+            this._blitcontext.fillStyle = style.fill;
+            this._blitcontext.globalAlpha = style.opacity * style.fillOpacity;
+            this._blitcontext.fill( );
+          }
+
+          this._blitcontext.globalCompositeOperation = "source-over";
+          if ( style.doStroke ) {
+            // stroke outer ring
+            this._blitcontext.lineCap = this._blitcontext.lineJoin = "round";
+            this._blitcontext.lineWidth = style.strokeWidthValue;
+            this._blitcontext.strokeStyle = style.stroke;
+
+            this._blitcontext.globalAlpha = style.opacity * style.strokeOpacity;
+            this._blitcontext.stroke( );
+
+            if ( coordinates.length > 1 ) {
+              // stroke inner rings
+              for ( i = 1; i < coordinates.length; i++ ) {
+                this._blitcontext.beginPath();
+                this._blitcontext.moveTo( coordinates[ i ][ 0 ][ 0 ], coordinates[ i ][ 0 ][ 1 ] );
+                for ( j = 1; j < coordinates[ i ].length; j++ ) {
+                  this._blitcontext.lineTo( coordinates[ i ][ j ][ 0 ], coordinates[ i ][ j ][ 1 ] );
+                }
+                this._blitcontext.closePath();
+
+                this._blitcontext.stroke( );
+              }
+            }
+          }
+
+          // blit
+          pixelBbox[ 0 ] = Math.max( pixelBbox[ 0 ], 0 );
+          pixelBbox[ 1 ] = Math.max( pixelBbox[ 1 ], 0 );
+          pixelBbox[ 2 ] = Math.min( pixelBbox[ 2 ], this._width );
+          pixelBbox[ 3 ] = Math.min( pixelBbox[ 3 ], this._height );
+
+          this._context.drawImage(this._$blitcanvas[ 0 ], pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ], pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ] );
+        }
+      }
     },
 
     drawBbox: function (bbox, style) {
@@ -248,10 +348,10 @@
 
       if (style.visibility != "hidden" && style.opacity > 0) {
         this._context.beginPath();
-        this._context.moveTo(coordinates[0][0][0], coordinates[0][0][1]);
 
         for (i = 0; i < coordinates.length; i++) {
-          for (j = 0; j < coordinates[i].length; j++) {
+          this._context.moveTo(coordinates[i][0][0], coordinates[i][0][1]);
+          for (j = 1; j < coordinates[i].length; j++) {
             this._context.lineTo(coordinates[i][j][0], coordinates[i][j][1]);
           }
         }
