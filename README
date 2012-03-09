@@ -10,6 +10,10 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 
 == CHANGELOG ==
 
+=== 1.0b1 ===
+* geographics - use canvas compositing for Polygons with holes
+* geographics - [bug] on polygons with holes, stroke draws a line from exterior ring to interior one
+
 === 1.0a4 ===
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax
 * geomap - [bug] shingled services throw exception during resize

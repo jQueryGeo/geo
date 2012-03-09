@@ -1,7 +1,11 @@
 ﻿== to do ==
 
 === b1 ===
+* geomap - [bug] multiple map widgets share the same compiled measureLabels template names and overwrite each other
+* docs - geomap - trigger a shape event when a user finishes measuring
+* geomap - trigger a shape event when a user finishes measuring
 * examples - jQuery Mobile
+* examples - everything - [bug] pan's click event removes appended shapes
 * cdn - max age header should be infinite...always cache as long as possible, release code won't change
 * docs - geomap - loadstart event
 * geomap - loadstart event
@@ -15,13 +19,19 @@
 * geomap - allow append to take an array of shapes
 * docs - geomap - allow remove to take an array of shapes
 * geomap - allow remove to take an array of shapes
+* docs - geomap - add argument to refresh to force reload of images (in case of dynamic data)
+* geomap - add argument to refresh to force reload of images (in case of dynamic data)
 * geomap - cache label coordinates (the labelPixel cannot be cached, it will change each refresh)
 * geomap - rotate label based on segment
 * geomap - use pointer-events: none where appropriate
 * geomap - test changing shingled service URL to get updated images (in case of dynamic data)
 * geomap - replace data-geo attributes with classes
+* geomap - don't redraw graphics if the map doesn't move during pan
 * docs - warn users about potential CSS/JavaScript issues relating to generated elements:
 ** ul, li, div, span, img
+* geomap - [bug] errors when setting src to empty string
+** "When I added services for my graphics layers with src set to an empty string I got very weird results -- I was seeing the single image from my inset map repeated over and over.  I had to set it to a function that returns an empty string for it to work."
+** possibly an object reference error when multiple maps are created
 * geomap - [bug] if panning is false, mode is draw*, and user attempts to pan, the drawing begins (or another point is added) on the touchstop point
 ** a failed pan shouldn't add a point to drawCoords
 * geomap - Firefox - [bug] inertial pan is choppy post touchstop
@@ -42,8 +52,8 @@
 * geo - use Array.push instead of $.merge where needed
 * geomap - [bug] changing services array (without changing all services) after initialization fails
 * geomap - [bug] multiple maps do not work on the same page
-* docs - geomap - add argument to refresh to force reload of images (in case of dynamic data)
-* geomap - add argument to refresh to force reload of images (in case of dynamic data)
+* docs - upgrade to jQuery Mobile 1.0.1
+* docs - non-mobile version via adaptive check
 * geomap - create _defaultState object, use for widget-local _widgetState property, reinit _widgetState on _createWidget
 * geomap - don't redraw shapes after interactiveScale, they've already been drawn at new scale
 * geomap - [bug] exception when calling destroy on uninitialized div
