@@ -13,6 +13,8 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 === 1.0b1 ===
 * geographics - use canvas compositing for Polygons with holes
 * geographics - [bug] on polygons with holes, stroke draws a line from exterior ring to interior one
+* docs - geomap - trigger a shape event when a user finishes measuring
+* geomap - trigger a shape event when a user finishes measuring
 
 === 1.0a4 ===
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax

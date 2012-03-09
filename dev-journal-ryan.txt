@@ -2,8 +2,6 @@
 
 === b1 ===
 * geomap - [bug] multiple map widgets share the same compiled measureLabels template names and overwrite each other
-* docs - geomap - trigger a shape event when a user finishes measuring
-* geomap - trigger a shape event when a user finishes measuring
 * examples - jQuery Mobile
 * examples - everything - [bug] pan's click event removes appended shapes
 * cdn - max age header should be infinite...always cache as long as possible, release code won't change

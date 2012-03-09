@@ -5017,6 +5017,7 @@ function try$( selector ) {
 
       switch (this._options["mode"]) {
         case "drawLineString":
+        case "measureLength":
           if ( this._drawCoords.length > 1 && ! ( this._drawCoords[0][0] == this._drawCoords[1][0] &&
                                                   this._drawCoords[0][1] == this._drawCoords[1][1] ) ) {
               this._drawCoords.length--;
@@ -5031,6 +5032,7 @@ function try$( selector ) {
           break;
 
         case "drawPolygon":
+        case "measureArea":
           if ( this._drawCoords.length > 1 && ! ( this._drawCoords[0][0] == this._drawCoords[1][0] &&
                                                   this._drawCoords[0][1] == this._drawCoords[1][1] ) ) {
             var endIndex = this._drawCoords.length - 1;
@@ -5044,11 +5046,6 @@ function try$( selector ) {
           } else {
             this._eventTarget_dblclick_zoom(e);
           }
-          this._resetDrawing();
-          break;
-
-        case "measureLength":
-        case "measureArea":
           this._resetDrawing();
           break;
 
