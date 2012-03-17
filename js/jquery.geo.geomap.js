@@ -1709,7 +1709,7 @@
 
         switch (mode) {
           case "zoom":
-            if ( dx > 0 || dy > 0 ) {
+            if ( dx != 0 || dy != 0 ) {
               var minSize = this._pixelSize * 6,
                   bboxCoords = this._toMap( [ [
                       Math.min( this._anchor[ 0 ], current[ 0 ] ),

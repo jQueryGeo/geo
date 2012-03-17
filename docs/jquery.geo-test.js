@@ -4504,7 +4504,7 @@ function try$( selector ) {
               type: "LineString",
               coordinates: coords
             };
-            label = $.render( { length: $.geo.length( labelShape, true ) }, "geoMeasureLength" );
+            label = $.render( { length: $.geo.length( labelShape, true ) }, "geoMeasureLength" + this._widgetId );
             labelPixel = $.merge( [], pixels[ pixels.length - 1 ] );
             break;
 
@@ -4517,7 +4517,7 @@ function try$( selector ) {
             };
             labelShape.coordinates[ 0 ].push( coords[ 0 ] );
 
-            label = $.render( { area: $.geo.area( labelShape, true ) }, "geoMeasureArea" );
+            label = $.render( { area: $.geo.area( labelShape, true ) }, "geoMeasureArea" + this._widgetId );
             labelPixel = $.merge( [], pixels[ pixels.length - 1 ] );
             pixels = [ pixels ];
             break;
@@ -5384,7 +5384,7 @@ function try$( selector ) {
 
         switch (mode) {
           case "zoom":
-            if ( dx > 0 || dy > 0 ) {
+            if ( dx != 0 || dy != 0 ) {
               var minSize = this._pixelSize * 6,
                   bboxCoords = this._toMap( [ [
                       Math.min( this._anchor[ 0 ], current[ 0 ] ),
