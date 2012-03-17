@@ -232,7 +232,7 @@
         }
         geomap._resizeTimeout = setTimeout(function () {
           if (geomap._created) {
-            geomap._$elem.geomap("resize");
+            geomap._$elem.geomap( "resize", true );
           }
         }, 500);
       };
@@ -472,7 +472,7 @@
       this._refresh();
     },
 
-    resize: function () {
+    resize: function ( _trigger /* Internal Use Only */ ) {
       var size = this._findMapSize(),
           dx = size["width"]/2 - this._contentBounds.width/2,
           dy = size["height"]/2 - this._contentBounds.height/2,
@@ -504,7 +504,7 @@
         this._drawPixels[i][1] += dy;
       }
 
-      this._setCenterAndSize(this._center, this._pixelSize, false, true);
+      this._setCenterAndSize(this._center, this._pixelSize, _trigger, true);
     },
 
     append: function ( shape, style, label, refresh ) {
