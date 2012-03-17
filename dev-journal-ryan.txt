@@ -1,9 +1,16 @@
 ﻿== to do ==
 
 === b1 ===
-* geomap - [bug] multiple map widgets share the same compiled measureLabels template names and overwrite each other
+* geomap - [bug] in zoom mode, dragging from bottom-right to top-left draws box but doesn't zoom
+* geomap - [bug] any mouse down on shingled services triggers refresh, even without pan (e.g., GPV)
+* geographics - draw all labels to a string or document fragment and append to DOM once
+* geomap - upgrade to jsRender beta-ish
 * examples - jQuery Mobile
 * cdn - max age header should be infinite...always cache as long as possible, release code won't change
+* docs - geomap - drawBbox mode
+* geomap - drawBbox mode
+* docs - geomap - shift option (default, zoom, shape, off)
+* geomap - shift option (default, zoom, shape, off)
 * docs - geomap - loadstart event
 * geomap - loadstart event
 * docs - geomap - loadend event
@@ -26,6 +33,7 @@
 * geomap - don't redraw graphics if the map doesn't move during pan
 * docs - warn users about potential CSS/JavaScript issues relating to generated elements:
 ** ul, li, div, span, img
+* geomap - [bug] pinch-zoom doesn't follow user's fingers close enough when scaling
 * geomap - [bug] errors when setting src to empty string
 ** "When I added services for my graphics layers with src set to an empty string I got very weird results -- I was seeing the single image from my inset map repeated over and over.  I had to set it to a function that returns an empty string for it to work."
 ** possibly an object reference error when multiple maps are created
@@ -127,6 +135,8 @@
 * geomap - stop using $.data to store bbox since it's only used for drawing; store on _graphicShapes instead
 * geomap - show a drawPoint style while the mouse is down, hide if toolPan or dbltap scale
 * geomap - android - [bug] cannot always pan map after appending shapes
+* geomap - audit allocations and reduce garbage
+** see http://www.scirra.com/blog/76/how-to-write-low-garbage-real-time-javascript
 * geomap - re-use services that have the same id as existing services
 * geomap - deep extend existing service objects when services property is set
 * geomap - cache point bbox if $.geo.proj is not null?

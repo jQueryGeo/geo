@@ -3674,7 +3674,8 @@ function try$( selector ) {
 })(jQuery);
 
 ﻿(function ($, undefined) {
-  var _ieVersion = (function () {
+  var _widgetIdSeed = 0,
+      _ieVersion = (function () {
     var v = 5, div = document.createElement("div"), a = div.all || [];
     while (div.innerHTML = "<!--[if gt IE " + (++v) + "]><br><![endif]-->", a[0]) { }
     return v > 6 ? v : !v;
@@ -3730,6 +3731,7 @@ function try$( selector ) {
     _$elem: undefined, //< map div for maps, service div for services
     _map: undefined, //< only defined in services
     _created: false,
+    _widgetId: 0,
 
     _contentBounds: {},
 
@@ -3819,6 +3821,8 @@ function try$( selector ) {
         return;
       }
 
+      this._widgetId = _widgetIdSeed++;
+
       this._$elem.addClass("geo-map");
 
       this._initOptions = options || {};
@@ -3907,7 +3911,7 @@ function try$( selector ) {
         }
         geomap._resizeTimeout = setTimeout(function () {
           if (geomap._created) {
-            geomap._$elem.geomap("resize");
+            geomap._$elem.geomap( "resize", true );
           }
         }, 500);
       };
@@ -3939,8 +3943,8 @@ function try$( selector ) {
         }
       }
 
-      $.template( "geoMeasureLength", this._options[ "measureLabels" ].length );
-      $.template( "geoMeasureArea", this._options[ "measureLabels" ].area );
+      $.template( "geoMeasureLength" + this._widgetId, this._options[ "measureLabels" ].length );
+      $.template( "geoMeasureArea" + this._widgetId, this._options[ "measureLabels" ].area );
 
       this._$eventTarget.css("cursor", this._options["cursors"][this._options["mode"]]);
 
@@ -3983,8 +3987,8 @@ function try$( selector ) {
 
         case "measureLabels":
           value = $.extend( this._options[ "measureLabels" ], value );
-          $.template( "geoMeasureLength", value.length );
-          $.template( "geoMeasureArea", value.area );
+          $.template( "geoMeasureLength" + this._widgetId, value.length );
+          $.template( "geoMeasureArea" + this._widgetId, value.area );
           break;
 
         case "drawStyle":
@@ -4147,7 +4151,7 @@ function try$( selector ) {
       this._refresh();
     },
 
-    resize: function () {
+    resize: function ( _trigger /* Internal Use Only */ ) {
       var size = this._findMapSize(),
           dx = size["width"]/2 - this._contentBounds.width/2,
           dy = size["height"]/2 - this._contentBounds.height/2,
@@ -4179,7 +4183,7 @@ function try$( selector ) {
         this._drawPixels[i][1] += dy;
       }
 
-      this._setCenterAndSize(this._center, this._pixelSize, false, true);
+      this._setCenterAndSize(this._center, this._pixelSize, _trigger, true);
     },
 
     append: function ( shape, style, label, refresh ) {
@@ -4396,11 +4400,11 @@ function try$( selector ) {
     },
 
     _createChildren: function () {
-      this._$existingChildren = this._$elem.children().detach();
+      this._$existingChildren = this._$elem.children();
 
       this._forcePosition(this._$existingChildren);
 
-      this._$existingChildren.css("-moz-user-select", "none");
+      this._$existingChildren.detach().css("-moz-user-select", "none");
 
       var contentSizeCss = "width:" + this._contentBounds["width"] + "px; height:" + this._contentBounds["height"] + "px; margin:0; padding:0;",
           contentPosCss = "position:absolute; left:0; top:0;";

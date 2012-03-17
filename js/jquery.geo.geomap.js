@@ -1,5 +1,6 @@
 ﻿(function ($, undefined) {
-  var _ieVersion = (function () {
+  var _widgetIdSeed = 0,
+      _ieVersion = (function () {
     var v = 5, div = document.createElement("div"), a = div.all || [];
     while (div.innerHTML = "<!--[if gt IE " + (++v) + "]><br><![endif]-->", a[0]) { }
     return v > 6 ? v : !v;
@@ -55,6 +56,7 @@
     _$elem: undefined, //< map div for maps, service div for services
     _map: undefined, //< only defined in services
     _created: false,
+    _widgetId: 0,
 
     _contentBounds: {},
 
@@ -143,6 +145,8 @@
         $.Widget.prototype._createWidget.apply(this, arguments);
         return;
       }
+
+      this._widgetId = _widgetIdSeed++;
 
       this._$elem.addClass("geo-map");
 
@@ -264,8 +268,8 @@
         }
       }
 
-      $.template( "geoMeasureLength", this._options[ "measureLabels" ].length );
-      $.template( "geoMeasureArea", this._options[ "measureLabels" ].area );
+      $.template( "geoMeasureLength" + this._widgetId, this._options[ "measureLabels" ].length );
+      $.template( "geoMeasureArea" + this._widgetId, this._options[ "measureLabels" ].area );
 
       this._$eventTarget.css("cursor", this._options["cursors"][this._options["mode"]]);
 
@@ -308,8 +312,8 @@
 
         case "measureLabels":
           value = $.extend( this._options[ "measureLabels" ], value );
-          $.template( "geoMeasureLength", value.length );
-          $.template( "geoMeasureArea", value.area );
+          $.template( "geoMeasureLength" + this._widgetId, value.length );
+          $.template( "geoMeasureArea" + this._widgetId, value.area );
           break;
 
         case "drawStyle":
@@ -825,7 +829,7 @@
               type: "LineString",
               coordinates: coords
             };
-            label = $.render( { length: $.geo.length( labelShape, true ) }, "geoMeasureLength" );
+            label = $.render( { length: $.geo.length( labelShape, true ) }, "geoMeasureLength" + this._widgetId );
             labelPixel = $.merge( [], pixels[ pixels.length - 1 ] );
             break;
 
@@ -838,7 +842,7 @@
             };
             labelShape.coordinates[ 0 ].push( coords[ 0 ] );
 
-            label = $.render( { area: $.geo.area( labelShape, true ) }, "geoMeasureArea" );
+            label = $.render( { area: $.geo.area( labelShape, true ) }, "geoMeasureArea" + this._widgetId );
             labelPixel = $.merge( [], pixels[ pixels.length - 1 ] );
             pixels = [ pixels ];
             break;
