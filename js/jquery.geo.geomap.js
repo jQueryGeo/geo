@@ -1031,7 +1031,7 @@
       return { pixelSize: pixelSize, center: scaleCenter };
     },
 
-    _mouseWheelFinish: function () {
+    _mouseWheelFinish: function ( refresh ) {
       this._wheelTimeout = null;
 
       if (this._wheelLevel != 0) {
@@ -1040,7 +1040,7 @@
         this._setCenterAndSize(wheelCenterAndSize.center, wheelCenterAndSize.pixelSize, true, true);
 
         this._wheelLevel = 0;
-      } else {
+      } else if ( refresh ) {
         this._refresh();
       }
     },
@@ -1396,7 +1396,7 @@
       }
 
       this._panFinalize();
-      this._mouseWheelFinish();
+      this._mouseWheelFinish( false );
 
       var offset = $(e.currentTarget).offset(),
           touches = e.originalEvent.changedTouches;
@@ -1852,7 +1852,7 @@
 
         var geomap = this;
         this._wheelTimeout = window.setTimeout(function () {
-          geomap._mouseWheelFinish();
+          geomap._mouseWheelFinish( true );
         }, 1000);
       }
 

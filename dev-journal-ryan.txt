@@ -1,7 +1,6 @@
 ﻿== to do ==
 
 === b1 ===
-* geomap - [bug] any mouse down on shingled services triggers refresh, even without pan (e.g., GPV)
 * geographics - draw all labels to a string or document fragment and append to DOM once
 * geomap - upgrade to jsRender beta-ish
 * examples - jQuery Mobile

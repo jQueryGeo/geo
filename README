@@ -20,6 +20,7 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * geomap - [bug] multiple map widgets share the same compiled measureLabels template names and overwrite each other
 * examples - inset map/multiple maps example
 * geomap - [bug] in zoom mode, dragging from bottom-right to top-left draws box but doesn't zoom
+* geomap - [bug] any mouse down triggers refresh, even without pan
 
 === 1.0a4 ===
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax
