@@ -21,6 +21,9 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * examples - inset map/multiple maps example
 * geomap - [bug] in zoom mode, dragging from bottom-right to top-left draws box but doesn't zoom
 * geomap - [bug] any mouse down triggers refresh, even without pan
+* cdn - fix caching
+** Cache-Control header max-age set to 5 years
+** remove Expires header
 
 === 1.0a4 ===
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax

@@ -1,10 +1,8 @@
 ﻿== to do ==
 
 === b1 ===
-* geographics - draw all labels to a string or document fragment and append to DOM once
 * geomap - upgrade to jsRender beta-ish
 * examples - jQuery Mobile
-* cdn - max age header should be infinite...always cache as long as possible, release code won't change
 * docs - geomap - drawBbox mode
 * geomap - drawBbox mode
 * docs - geomap - shift option (default, zoom, shape, off)
@@ -29,11 +27,13 @@
 * geomap - test changing shingled service URL to get updated images (in case of dynamic data)
 * geomap - replace data-geo attributes with classes
 * geomap - don't redraw graphics if the map doesn't move during pan
+* geographics - draw all labels to a string or document fragment and append to DOM once
 * geomap - compile shingled & tiled string src templates for re-use
 ** be sure their template names are unique so they don't overwrite each other
 * docs - warn users about potential CSS/JavaScript issues relating to generated elements:
 ** ul, li, div, span, img
 * geomap - [bug] pinch-zoom doesn't follow user's fingers close enough when scaling
+* docs - geomap - describe "graphic service" as shingled with src set to empty string or null
 * geomap - [bug] errors when setting src to empty string
 ** "When I added services for my graphics layers with src set to an empty string I got very weird results -- I was seeing the single image from my inset map repeated over and over.  I had to set it to a function that returns an empty string for it to work."
 ** possibly an object reference error when multiple maps are created
@@ -96,6 +96,7 @@
 * build releases using grunt
 * remove BOM from release files
 * add 3rd party license headers
+* cdn - test cache headers with http://redbot.org/ before release
 
 === future ===
 
