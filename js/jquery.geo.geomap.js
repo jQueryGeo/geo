@@ -721,11 +721,11 @@
     },
 
     _createChildren: function () {
-      this._$existingChildren = this._$elem.children().detach();
+      this._$existingChildren = this._$elem.children();
 
       this._forcePosition(this._$existingChildren);
 
-      this._$existingChildren.css("-moz-user-select", "none");
+      this._$existingChildren.detach().css("-moz-user-select", "none");
 
       var contentSizeCss = "width:" + this._contentBounds["width"] + "px; height:" + this._contentBounds["height"] + "px; margin:0; padding:0;",
           contentPosCss = "position:absolute; left:0; top:0;";
