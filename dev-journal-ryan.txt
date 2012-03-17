@@ -91,7 +91,6 @@
 ** http://jvectormap.owl-hollow.net/ ( found via http://www.moretechtips.net/2011/12/22-most-popular-jquery-plugins-of-2011.html )
 * expose jQuery Geo as an AMD module so asynchronous loaders like RequireJS and curl.js can use it
 * examples - geomap resize method
-* examples - multiple maps example
 * examples - Codecademy course
 * geomap - [bug] when a singled image hasn't loaded after pan and you double click on empty space, the zoomed bbox seems wrong
 * build releases using grunt

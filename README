@@ -18,6 +18,7 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * geomap - [bug] elements inside the map div lose their position setting
 * geomap - trigger bboxchange when we update the map size after the window resizes
 * geomap - [bug] multiple map widgets share the same compiled measureLabels template names and overwrite each other
+* examples - inset map/multiple maps example
 
 === 1.0a4 ===
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax
