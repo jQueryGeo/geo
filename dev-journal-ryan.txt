@@ -1,7 +1,6 @@
 ﻿== to do ==
 
 === b1 ===
-* geomap - upgrade to jsRender beta-ish
 * examples - jQuery Mobile
 * docs - geomap - drawBbox mode
 * geomap - drawBbox mode

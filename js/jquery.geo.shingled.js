@@ -155,8 +155,8 @@
           if ( isFunc ) {
             imageUrl = service[ urlProp ]( urlArgs );
           } else {
-            $.template( "geoSrc", service[ urlProp ] );
-            imageUrl = $.render( urlArgs, "geoSrc" );
+            $.templates( "geoSrc", service[ urlProp ] );
+            imageUrl = $.render[ "geoSrc" ]( urlArgs );
           }
 
           serviceState.loadCount++;

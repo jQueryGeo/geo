@@ -24,7 +24,7 @@ $(function () {
     {
       id: "broadband-speedtest",
       type: "tiled",
-      src: "http://www.broadbandmap.gov/StamenTiles/speedtest/speedtest/download/{{=zoom}}/{{=tile.column}}/{{=tile.row}}.png",
+      src: "http://www.broadbandmap.gov/StamenTiles/speedtest/speedtest/download/{{:zoom}}/{{:tile.column}}/{{:tile.row}}.png",
       attr: "Speed Test data maintained by the NTIA, in collaboration with the FCC"
     }
   ];

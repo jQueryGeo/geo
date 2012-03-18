@@ -24,6 +24,7 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * cdn - fix caching
 ** Cache-Control header max-age set to 5 years
 ** remove Expires header
+* geomap - upgrade to jsrender 1.0pre
 
 === 1.0a4 ===
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax
