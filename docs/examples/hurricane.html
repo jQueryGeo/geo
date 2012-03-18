@@ -44,17 +44,17 @@
           <p>Displaying a snapshot of storm data extracted from <a href="http://stormpulse.com">stormpulse.com</a></p>
       </div>
     </div>
-    <script id="tmplHurricane" type="text/x-jquery-tmpl">
-      <h2>{{=category}}</h2>
+    <script id="tmplHurricane" type="text/x-jsrender">
+      <h2>{{:category}}</h2>
       <table>
-        <tr><th>date</th><td>{{=date}}</td></tr>
-        <tr><th>accuracy</th><td>{{=accuracy}}/40</td></tr>
-        <tr><th>eye diameter</th><td>{{=eyeDiameter}}</td></tr>
-        <tr><th>direction</th><td>{{#if direction}}{{=direction}}&deg{{/if}}</td></tr>
-        <tr><th>pressure</th><td>{{=pressure}}</td></tr>
-        <tr><th>wind radii</th><td>{{=windRadii}}</td></tr>
-        <tr><th>wind speed</th><td>{{=windSpeed}}</td></tr>
-        <tr><th>gusts</th><td>{{=gusts}}</td></tr>
+        <tr><th>date</th><td>{{:date}}</td></tr>
+        <tr><th>accuracy</th><td>{{:accuracy}}/40</td></tr>
+        <tr><th>eye diameter</th><td>{{:eyeDiameter}}</td></tr>
+        <tr><th>direction</th><td>{{if direction}}{{:direction}}&deg{{/if}}</td></tr>
+        <tr><th>pressure</th><td>{{:pressure}}</td></tr>
+        <tr><th>wind radii</th><td>{{:windRadii}}</td></tr>
+        <tr><th>wind speed</th><td>{{:windSpeed}}</td></tr>
+        <tr><th>gusts</th><td>{{:gusts}}</td></tr>
       </table>
     </script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
@@ -62,8 +62,6 @@
     <script src="../jquery.geo-test.min.js"></script>
     <script>
       $(function () {
-        $.template( "hurricane", $( "#tmplHurricane" ) );
-
         var map = $("#map").geomap({
             center: [-76.6, 30.4],
             zoom: 5,
@@ -75,7 +73,7 @@
 
               $.each(tracks, function() {
                 if (this.type == "Feature") {
-                  $( "#popup" ).append( $.render( this.properties, "hurricane" ) );
+                  $( "#popup" ).append( $( "#tmplHurricane" ).render( this.properties ) );
                   var popupLocation = map.geomap( "toPixel", geo.coordinates );
                   $("#popup").css({
                     left: popupLocation[ 0 ],

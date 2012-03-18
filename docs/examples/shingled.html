@@ -61,7 +61,7 @@
       var massGisHost = "http://giswebservices.massgis.state.ma.us/geoserver/wms";
       // view template used to get the map image
       // notice that we can put the view arguments right into the template
-      var imageTemplate = "&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX={{=bbox}}&WIDTH={{=width}}&HEIGHT={{=height}}";
+      var imageTemplate = "&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX={{:bbox}}&WIDTH={{:width}}&HEIGHT={{:height}}";
 
       // create a map with three services from MassGIS
       // the service types are "shingled"

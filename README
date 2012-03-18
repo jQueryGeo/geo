@@ -15,6 +15,16 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * geographics - [bug] on polygons with holes, stroke draws a line from exterior ring to interior one
 * docs - geomap - trigger a shape event when a user finishes measuring
 * geomap - trigger a shape event when a user finishes measuring
+* geomap - [bug] elements inside the map div lose their position setting
+* geomap - trigger bboxchange when we update the map size after the window resizes
+* geomap - [bug] multiple map widgets share the same compiled measureLabels template names and overwrite each other
+* examples - inset map/multiple maps example
+* geomap - [bug] in zoom mode, dragging from bottom-right to top-left draws box but doesn't zoom
+* geomap - [bug] any mouse down triggers refresh, even without pan
+* cdn - fix caching
+** Cache-Control header max-age set to 5 years
+** remove Expires header
+* geomap - upgrade to jsrender 1.0pre
 
 === 1.0a4 ===
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax

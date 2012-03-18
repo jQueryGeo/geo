@@ -30,13 +30,13 @@
         <tr>
           <th>default</th>
           <td><pre><code>{
-  length: &quot;{{=length}} m&quot;,
-  area: &quot;{{=area}} sq m&quot;
+  length: &quot;{{:length}} m&quot;,
+  area: &quot;{{:area}} sq m&quot;
 }</code></pre></td>
         </tr>
         <tr>
           <th>init</th>
-          <td><code><pre>$( <i>selector</i> ).geomap( { measureLabels: { length: &quot;{{=length}} meters&quot; } } );</pre></code></td>
+          <td><code><pre>$( <i>selector</i> ).geomap( { measureLabels: { length: &quot;{{:length}} meters&quot; } } );</pre></code></td>
         </tr>
         <tr>
           <th>get</th>
@@ -44,11 +44,11 @@
         </tr>
         <tr>
           <th>set</th>
-          <td><code><pre>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;measureLabels&quot;, { area: &quot;{{=area}} square meters&quot; } );</pre></code></td>
+          <td><code><pre>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;measureLabels&quot;, { area: &quot;{{:area}} square meters&quot; } );</pre></code></td>
         </tr>
       </table>
       <p>The measureLabels option controls how the length or area text is formatted when displayed on the map during measuring.</p>
-      <p>In the label strings, the {{= }} syntax is used as a placeholder for the current length or area. All other text is displayed verbatim.</p>
+      <p>In the label strings, the {{: }} syntax is used as a placeholder for the current length or area. All other text is displayed verbatim.</p>
       <p>The developer may change each measureLabels property separately during both initialization of the widget or any time after.</p>
     </div>
   </div> <!-- end of #container -->
