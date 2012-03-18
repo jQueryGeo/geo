@@ -24,7 +24,7 @@ $(function () {
     {
       id: "broadband-speedtest",
       type: "tiled",
-      src: "http://www.broadbandmap.gov/StamenTiles/speedtest/speedtest/download/{{=zoom}}/{{=tile.column}}/{{=tile.row}}.png",
+      src: "http://www.broadbandmap.gov/StamenTiles/speedtest/speedtest/download/{{:zoom}}/{{:tile.column}}/{{:tile.row}}.png",
       attr: "Speed Test data maintained by the NTIA, in collaboration with the FCC"
     }
   ];
@@ -102,28 +102,30 @@ $(function () {
     },
 
     click: function( e, geo ) {
-      // when the user clicks the map while in our custom mode, remove,
-      // we will search for shapes on either the map widget itself
-      // ( and, by design, all map services) or a single, specific map service
+      if ( map.geomap( "option", "mode" ) == "remove" ) {
+        // when the user clicks the map while in our custom mode, remove,
+        // we will search for shapes on either the map widget itself
+        // ( and, by design, all map services) or a single, specific map service
 
-      // we'll use a nice, fat 5px radius for the searches here, that's what the (, 5) is below
+        // we'll use a nice, fat 5px radius for the searches here, that's what the (, 5) is below
 
-      // however, in this demo, we remove any shapes found from either the map or service
+        // however, in this demo, we remove any shapes found from either the map or service
 
-      // if the map is our target, grab the map reference
-      // otherwise, grab a reference to a service, in this case, by id
-      var target = $( "#clickTargetWidget" ).is( ":checked" ) ? map : $( "#" + $( "input[name='clickTarget']:checked" ).val( ) );
+        // if the map is our target, grab the map reference
+        // otherwise, grab a reference to a service, in this case, by id
+        var target = $( "#clickTargetWidget" ).is( ":checked" ) ? map : $( "#" + $( "input[name='clickTarget']:checked" ).val( ) );
 
-      // by design, calling find on the map itself returns all shapes at that location
-      // even if they have been appended to a service
-      // when target is the service, find is limited to shapes that have been appended there
-      var shapes = target.geomap( "find", geo, 3 );
+        // by design, calling find on the map itself returns all shapes at that location
+        // even if they have been appended to a service
+        // when target is the service, find is limited to shapes that have been appended there
+        var shapes = target.geomap( "find", geo, 3 );
 
-      // even though we potentially found service-level shapes with the find method,
-      // calling remove on the map does not remove from all services
-      $.each( shapes, function( ) {
-        target.geomap( "remove", this );
-      } );
+        // even though we potentially found service-level shapes with the find method,
+        // calling remove on the map does not remove from all services
+        $.each( shapes, function( ) {
+          target.geomap( "remove", this );
+        } );
+      }
     }
   } );
 

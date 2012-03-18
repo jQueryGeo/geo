@@ -205,6 +205,7 @@
         <li>click &ndash; when the user clicks or taps a point on the map without initiating a pan, this event triggers even while measuring</li>
         <li>dblclick &ndash; when the user double-clicks or double-taps a point on the map but is not actively measuring</li>
         <li>bboxchange &ndash; when the user changes the bbox by panning or zooming</li>
+        <li>shape &ndash; when the user double-clicks or taps a point on the map after beginning a measure operation with a single click, this action will send a GeoJSON LineString object to the developer</li>
       </ul>
 
       <h2>measureArea</h2>
@@ -227,6 +228,7 @@
         <li>click &ndash; when the user clicks or taps a point on the map without initiating a pan, this event triggers even while measuring</li>
         <li>dblclick &ndash; when the user double-clicks or double-taps a point on the map but is not actively measuring</li>
         <li>bboxchange &ndash; when the user changes the bbox by panning or zooming</li>
+        <li>shape &ndash; when the user double-clicks or taps a point on the map after beginning a measure operation with a single click, this action will send a GeoJSON Polygon object to the developer</li>
       </ul>
 
       <h2 id="custom-modes">custom modes</h2>

@@ -1,5 +1,6 @@
 ﻿(function ($, undefined) {
-  var _ieVersion = (function () {
+  var _widgetIdSeed = 0,
+      _ieVersion = (function () {
     var v = 5, div = document.createElement("div"), a = div.all || [];
     while (div.innerHTML = "<!--[if gt IE " + (++v) + "]><br><![endif]-->", a[0]) { }
     return v > 6 ? v : !v;
@@ -20,8 +21,8 @@
           measureArea: "crosshair"
         },
         measureLabels: {
-          length: "{{=length.toFixed( 2 )}} m",
-          area: "{{=area.toFixed( 2 )}} sq m"
+          length: "{{:length.toFixed( 2 )}} m",
+          area: "{{:area.toFixed( 2 )}} sq m"
         },
         drawStyle: {},
         shapeStyle: {},
@@ -55,6 +56,9 @@
     _$elem: undefined, //< map div for maps, service div for services
     _map: undefined, //< only defined in services
     _created: false,
+    _widgetId: 0,
+    _tmplLengthId: "",
+    _tmplAreaId: "",
 
     _contentBounds: {},
 
@@ -144,6 +148,10 @@
         return;
       }
 
+      this._widgetId = _widgetIdSeed++;
+      this._tmplLengthId = "geoMeasureLength" + this._widgetId;
+      this._tmplAreaId = "geoMeasureArea" + this._widgetId;
+
       this._$elem.addClass("geo-map");
 
       this._initOptions = options || {};
@@ -232,7 +240,7 @@
         }
         geomap._resizeTimeout = setTimeout(function () {
           if (geomap._created) {
-            geomap._$elem.geomap("resize");
+            geomap._$elem.geomap( "resize", true );
           }
         }, 500);
       };
@@ -264,8 +272,8 @@
         }
       }
 
-      $.template( "geoMeasureLength", this._options[ "measureLabels" ].length );
-      $.template( "geoMeasureArea", this._options[ "measureLabels" ].area );
+      $.templates( this._tmplLengthId, this._options[ "measureLabels" ].length );
+      $.templates( this._tmplAreaId, this._options[ "measureLabels" ].area );
 
       this._$eventTarget.css("cursor", this._options["cursors"][this._options["mode"]]);
 
@@ -308,8 +316,11 @@
 
         case "measureLabels":
           value = $.extend( this._options[ "measureLabels" ], value );
-          $.template( "geoMeasureLength", value.length );
-          $.template( "geoMeasureArea", value.area );
+
+
+          $.templates( this._tmplLengthId, this._options[ "measureLabels" ].length );
+          $.templates( this._tmplAreaId, this._options[ "measureLabels" ].area );
+
           break;
 
         case "drawStyle":
@@ -472,7 +483,7 @@
       this._refresh();
     },
 
-    resize: function () {
+    resize: function ( _trigger /* Internal Use Only */ ) {
       var size = this._findMapSize(),
           dx = size["width"]/2 - this._contentBounds.width/2,
           dy = size["height"]/2 - this._contentBounds.height/2,
@@ -504,7 +515,7 @@
         this._drawPixels[i][1] += dy;
       }
 
-      this._setCenterAndSize(this._center, this._pixelSize, false, true);
+      this._setCenterAndSize(this._center, this._pixelSize, _trigger, true);
     },
 
     append: function ( shape, style, label, refresh ) {
@@ -721,11 +732,11 @@
     },
 
     _createChildren: function () {
-      this._$existingChildren = this._$elem.children().detach();
+      this._$existingChildren = this._$elem.children();
 
       this._forcePosition(this._$existingChildren);
 
-      this._$existingChildren.css("-moz-user-select", "none");
+      this._$existingChildren.detach().css("-moz-user-select", "none");
 
       var contentSizeCss = "width:" + this._contentBounds["width"] + "px; height:" + this._contentBounds["height"] + "px; margin:0; padding:0;",
           contentPosCss = "position:absolute; left:0; top:0;";
@@ -825,7 +836,7 @@
               type: "LineString",
               coordinates: coords
             };
-            label = $.render( { length: $.geo.length( labelShape, true ) }, "geoMeasureLength" );
+            label = $.render[ this._tmplLengthId ]( { length: $.geo.length( labelShape, true ) } );
             labelPixel = $.merge( [], pixels[ pixels.length - 1 ] );
             break;
 
@@ -838,7 +849,7 @@
             };
             labelShape.coordinates[ 0 ].push( coords[ 0 ] );
 
-            label = $.render( { area: $.geo.area( labelShape, true ) }, "geoMeasureArea" );
+            label = $.render[ this._tmplAreaId ]( { area: $.geo.area( labelShape, true ) } );
             labelPixel = $.merge( [], pixels[ pixels.length - 1 ] );
             pixels = [ pixels ];
             break;
@@ -1027,7 +1038,7 @@
       return { pixelSize: pixelSize, center: scaleCenter };
     },
 
-    _mouseWheelFinish: function () {
+    _mouseWheelFinish: function ( refresh ) {
       this._wheelTimeout = null;
 
       if (this._wheelLevel != 0) {
@@ -1036,7 +1047,7 @@
         this._setCenterAndSize(wheelCenterAndSize.center, wheelCenterAndSize.pixelSize, true, true);
 
         this._wheelLevel = 0;
-      } else {
+      } else if ( refresh ) {
         this._refresh();
       }
     },
@@ -1392,7 +1403,7 @@
       }
 
       this._panFinalize();
-      this._mouseWheelFinish();
+      this._mouseWheelFinish( false );
 
       var offset = $(e.currentTarget).offset(),
           touches = e.originalEvent.changedTouches;
@@ -1705,7 +1716,7 @@
 
         switch (mode) {
           case "zoom":
-            if ( dx > 0 || dy > 0 ) {
+            if ( dx != 0 || dy != 0 ) {
               var minSize = this._pixelSize * 6,
                   bboxCoords = this._toMap( [ [
                       Math.min( this._anchor[ 0 ], current[ 0 ] ),
@@ -1848,7 +1859,7 @@
 
         var geomap = this;
         this._wheelTimeout = window.setTimeout(function () {
-          geomap._mouseWheelFinish();
+          geomap._mouseWheelFinish( true );
         }, 1000);
       }
 

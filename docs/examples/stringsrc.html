@@ -31,7 +31,7 @@
       <h1>string service src</h1>
       <p>This example shows how you can set a service's src property to a jsRender template string.</p>
       <p>The src property of the service object for this map is set to:</p>
-      <p>&quot;http://tile.openstreetmap.org/{{=zoom}}/{{=tile.column}}/{{=tile.row}}.png&quot;</p>
+      <p>&quot;http://tile.openstreetmap.org/{{:zoom}}/{{:tile.column}}/{{:tile.row}}.png&quot;</p>
     </div>
   </div>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
@@ -47,7 +47,7 @@
         services: [ {
           id: "osm-string-src",
           type: "tiled",
-          src: "http://tile.openstreetmap.org/{{=zoom}}/{{=tile.column}}/{{=tile.row}}.png"
+          src: "http://tile.openstreetmap.org/{{:zoom}}/{{:tile.column}}/{{:tile.row}}.png"
         } ]
       });
     });  
