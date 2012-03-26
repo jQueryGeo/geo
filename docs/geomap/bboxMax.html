@@ -5,7 +5,7 @@
   <meta charset="utf-8">
 
   <title>bboxMax | geomap</title>
-  <meta name="description" content="geomap bboxMax property">
+  <meta name="description" content="geomap bboxMax option">
   <meta name="author" content="Ryan Westphal">
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -44,10 +44,10 @@
           <td><code><pre>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;bboxMax&quot;, [ -75.696, 38.804, -73.696, 41.287 ] );</pre></code></td>
         </tr>
       </table>
-      <p>The bboxMax property calculates or modifies a bounding box that surrounds all of the data you wish to show in the map. Users can pan the map once they reach bboxMax but cannot zoom out further.</p>
-      <p>This property is a JavaScript array consisting of four values which can be thought of as: minx, miny, maxx and maxy of the maximum map view you wish to allow in map units and in that order.</p>
+      <p>The bboxMax option calculates or modifies a bounding box that surrounds all of the data you wish to show in the map. Users can pan the map once they reach bboxMax but cannot zoom out further.</p>
+      <p>This option is a JavaScript array consisting of four values which can be thought of as: minx, miny, maxx and maxy of the maximum map view you wish to allow in map units and in that order.</p>
       <p>Setting a new bboxMax will not refresh the map services.</p>
-      <p>A bboxMax property must be set properly for shinged (dynamic) services if you wish to use the zoom property since the value of the map's zoom is based on a ratio between the current bbox and bboxMax. If you have a fully dynamic map by setting tilingScheme to null, you should explicitly set bboxMax.</p>
+      <p>A bboxMax option must be set properly for shinged (dynamic) services if you wish to use the zoom option since the value of the map's zoom is based on a ratio between the current bbox and bboxMax. If you have a fully dynamic map by setting tilingScheme to null, you should explicitly set bboxMax.</p>
     </div>
   </div> <!-- end of #container -->
 
