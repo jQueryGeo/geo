@@ -79,21 +79,18 @@
 ** cannot reproduce effectively, test again after pan/zoom rewrite
 * geomap - use CSS transition or transform for smoother tiling
 * geomap - implement service-level shape redrawing during interactive movement
-* make a package for new jQuery plugin directory
-** https://github.com/jquery/plugins.jquery.com/blob/master/docs/package.md
 * examples - jQuery Mobile
 * examples - MBCR: http://www.mbta.com/rider_tools/developers/default.asp?id=21899
 * examples - drag shapes
 * examples - ie7 - [bug] floating info div doesn't show up, inputs are alone and on the left
 * examples - redo the jVectorMap demo page using jQuery Geo
+* examples - make OSM editing simple
+** http://www.maploser.com/2012/03/29/all-i-want-for-openstreetmap-is-simple/
 ** http://jvectormap.owl-hollow.net/ ( found via http://www.moretechtips.net/2011/12/22-most-popular-jquery-plugins-of-2011.html )
 * expose jQuery Geo as an AMD module so asynchronous loaders like RequireJS and curl.js can use it
 * examples - geomap resize method
 * examples - Codecademy course
 * geomap - [bug] when a singled image hasn't loaded after pan and you double click on empty space, the zoomed bbox seems wrong
-* build releases using grunt
-* remove BOM from release files
-* add 3rd party license headers
 * cdn - test cache headers with http://redbot.org/ before release
 
 === future ===
@@ -202,6 +199,15 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-03-30==
+===grunt===
+I haven't written in a while. Checking out grunt now.
+
+Wow, that was cool. jQuery Geo now compiles with Grunt and I also have a jQuery plugin package file!
+
+===graphic holes===
+With canvas, I have better control of drawing polygons with holes. It's pretty nice. I can't wait to get into WebGL.
 
 ==2012-02-15==
 ===labels===

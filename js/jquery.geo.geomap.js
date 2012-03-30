@@ -1,10 +1,12 @@
-﻿(function ($, undefined) {
+(function ($, undefined) {
   var _widgetIdSeed = 0,
-      _ieVersion = (function () {
-    var v = 5, div = document.createElement("div"), a = div.all || [];
-    while (div.innerHTML = "<!--[if gt IE " + (++v) + "]><br><![endif]-->", a[0]) { }
-    return v > 6 ? v : !v;
-  } ()),
+      _ieVersion = ( function () {
+        var v = 5, div = document.createElement("div"), a = div.all || [];
+        do {
+          div.innerHTML = "<!--[if gt IE " + (++v) + "]><br><![endif]-->";
+        } while ( a[0] );
+        return v > 6 ? v : !v;
+      }() ),
 
       _defaultOptions = {
         bbox: [-180, -85, 180, 85],
@@ -162,8 +164,8 @@
 
       var size = this._findMapSize();
       this._contentBounds = {
-        x: parseInt(this._$elem.css("padding-left")),
-        y: parseInt(this._$elem.css("padding-top")),
+        x: parseInt(this._$elem.css("padding-left"), 10),
+        y: parseInt(this._$elem.css("padding-top"), 10),
         width: size["width"],
         height: size["height"]
       };
@@ -188,7 +190,7 @@
       this._lastDrag = [ 0, 0 ];
       this._velocity = [ 0, 0 ];
 
-      this._friction = [.8, .8];
+      this._friction = [0.8, 0.8];
 
       this._downDate =
           this._moveDate =
@@ -359,7 +361,7 @@
           break;
 
         case "tilingScheme":
-          if ( value != null ) {
+          if ( value !== null ) {
             this._pixelSizeMax = this._getPixelSize( 0 );
             this._centerMax = [
               value.origin[ 0 ] + this._pixelSizeMax * value.tileWidth / 2,
@@ -474,7 +476,7 @@
     },
 
     zoom: function (numberOfLevels) {
-      if (numberOfLevels != null) {
+      if (numberOfLevels !== null) {
         this._setZoom(this._options["zoom"] + numberOfLevels, false, true);
       }
     },
@@ -490,8 +492,8 @@
           i;
 
       this._contentBounds = {
-        x: parseInt(this._$elem.css("padding-left")),
-        y: parseInt(this._$elem.css("padding-top")),
+        x: parseInt(this._$elem.css("padding-left"), 10),
+        y: parseInt(this._$elem.css("padding-top"), 10),
         width: size["width"],
         height: size["height"]
       };
@@ -701,7 +703,7 @@
       // calculate the internal zoom level, vs. public zoom property
       var tilingScheme = this._options["tilingScheme"];
       if ( tilingScheme ) {
-        if ( tilingScheme.pixelSizes != null ) {
+        if ( tilingScheme.pixelSizes ) {
           var roundedPixelSize = Math.floor(pixelSize * 1000),
               levels = tilingScheme.pixelSizes.length,
               i = levels - 1;
@@ -922,7 +924,7 @@
           case "LineString":
             this._$shapesContainer.geographics("drawLineString", this._map.toPixel(shape.coordinates, center, pixelSize), style);
             if ( hasLabel ) {
-              labelPixel = this._map.toPixel( $.geo.pointAlong( shape, .5 ).coordinates, center, pixelSize );
+              labelPixel = this._map.toPixel( $.geo.pointAlong( shape, 0.5 ).coordinates, center, pixelSize );
             }
             break;
           case "Polygon":
@@ -976,7 +978,7 @@
       while (sizeContainer.size() && !(size["width"] > 0 && size["height"] > 0)) {
         size = { width: sizeContainer.width(), height: sizeContainer.height() };
         if (size["width"] <= 0 || size["height"] <= 0) {
-          size = { width: parseInt(sizeContainer.css("width")), height: parseInt(sizeContainer.css("height")) };
+          size = { width: parseInt(sizeContainer.css("width"), 10), height: parseInt(sizeContainer.css("height"), 10) };
         }
         sizeContainer = sizeContainer.parent();
       }
@@ -992,17 +994,17 @@
 
     _getPixelSize: function ( zoom ) {
       var tilingScheme = this._options["tilingScheme"];
-      if (tilingScheme != null) {
+      if (tilingScheme !== null) {
         if (zoom === 0) {
-          return tilingScheme.pixelSizes != null ? tilingScheme.pixelSizes[0] : tilingScheme.basePixelSize;
+          return tilingScheme.pixelSizes ? tilingScheme.pixelSizes[0] : tilingScheme.basePixelSize;
         }
 
         zoom = Math.round(zoom);
         zoom = Math.max(zoom, 0);
-        var levels = tilingScheme.pixelSizes != null ? tilingScheme.pixelSizes.length : tilingScheme.levels;
+        var levels = tilingScheme.pixelSizes ? tilingScheme.pixelSizes.length : tilingScheme.levels;
         zoom = Math.min(zoom, levels - 1);
 
-        if (tilingScheme.pixelSizes != null) {
+        if ( tilingScheme.pixelSizes ) {
           return tilingScheme.pixelSizes[zoom];
         } else {
           return tilingScheme.basePixelSize / Math.pow(2, zoom);
@@ -1041,8 +1043,8 @@
     _mouseWheelFinish: function ( refresh ) {
       this._wheelTimeout = null;
 
-      if (this._wheelLevel != 0) {
-        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, this._options[ "tilingScheme" ] != null );
+      if (this._wheelLevel !== 0) {
+        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, this._options[ "tilingScheme" ] !== null );
 
         this._setCenterAndSize(wheelCenterAndSize.center, wheelCenterAndSize.pixelSize, true, true);
 
@@ -1116,16 +1118,16 @@
           this._velocity = [dx, dy];
         }
 
-        if (dx != 0 || dy != 0) {
+        if (dx !== 0 || dy !== 0) {
           this._panning = true;
           this._lastDrag = this._current;
 
           translateObj = {
             left: function (index, value) {
-              return parseInt(value) + dx;
+              return parseInt(value, 10) + dx;
             },
             top: function (index, value) {
-              return parseInt(value) + dy;
+              return parseInt(value, 10) + dy;
             }
           };
 
@@ -1473,18 +1475,12 @@
       } else if ( !this._isMultiTouch && this._options[ "pannable" ] ) {
         this._inOp = true;
 
-        switch (this._options["mode"]) {
-          case "zoom":
-            break;
+        if (this._options["mode"] !== "zoom") {
+          this._lastDrag = this._current;
 
-          default:
-            this._lastDrag = this._current;
-
-            if (e.currentTarget.setCapture) {
-              e.currentTarget.setCapture();
-            }
-
-            break;
+          if (e.currentTarget.setCapture) {
+            e.currentTarget.setCapture();
+          }
         }
       }
 
@@ -1677,10 +1673,9 @@
 
       if (this._softDblClick) {
         if (this._isTap) {
-          var dx = current[0] - this._anchor[0],
-              dy = current[1] - this._anchor[1],
-              distance = Math.sqrt((dx * dx) + (dy * dy));
-          if (distance <= 8) {
+          dx = current[0] - this._anchor[0];
+          dy = current[1] - this._anchor[1];
+          if (Math.sqrt((dx * dx) + (dy * dy)) <= 8) {
             current = $.merge( [ ], this._anchor );
           }
         }
@@ -1716,7 +1711,7 @@
 
         switch (mode) {
           case "zoom":
-            if ( dx != 0 || dy != 0 ) {
+            if ( dx !== 0 || dy !== 0 ) {
               var minSize = this._pixelSize * 6,
                   bboxCoords = this._toMap( [ [
                       Math.min( this._anchor[ 0 ], current[ 0 ] ),
@@ -1734,7 +1729,7 @@
                   ];
 
               if ( ( bbox[2] - bbox[0] ) < minSize && ( bbox[3] - bbox[1] ) < minSize ) {
-                bbox = $.geo.scaleBy( this._getBbox( $.geo.center( bbox, true ) ), .5, true );
+                bbox = $.geo.scaleBy( this._getBbox( $.geo.center( bbox, true ) ), 0.5, true );
               }
 
               this._setBbox(bbox, true, true);
@@ -1772,7 +1767,7 @@
             if (wasToolPan) {
               this._panFinalize();
             } else {
-              i = (this._drawCoords.length == 0 ? 0 : this._drawCoords.length - 1);
+              i = (this._drawCoords.length === 0 ? 0 : this._drawCoords.length - 1);
 
               this._drawCoords[i] = this._toMap(current);
               this._drawPixels[i] = current;
@@ -1826,7 +1821,7 @@
         return false;
       }
 
-      if (delta != 0) {
+      if (delta !== 0) {
         if (this._wheelTimeout) {
           window.clearTimeout(this._wheelTimeout);
           this._wheelTimeout = null;
@@ -1837,7 +1832,7 @@
 
         this._wheelLevel += delta;
 
-        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, this._options[ "tilingScheme" ] != null ),
+        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, this._options[ "tilingScheme" ] !== null ),
             service,
             i = 0;
 
@@ -1867,5 +1862,5 @@
     }
   }
   );
-})(jQuery);
+}(jQuery));
 

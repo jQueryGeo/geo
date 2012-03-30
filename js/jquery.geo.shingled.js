@@ -1,4 +1,4 @@
-﻿(function ($, undefined) {
+(function ($, undefined) {
   $.geo._serviceTypes.shingled = (function () {
     return {
       create: function (map, serviceContainer, service, index) {
@@ -46,10 +46,10 @@
 
           panContainer.css( {
             left: function (index, value) {
-              return parseInt(value) + dx;
+              return parseInt(value, 10) + dx;
             },
             top: function (index, value) {
-              return parseInt(value) + dy;
+              return parseInt(value, 10) + dy;
             }
           } );
 
@@ -245,8 +245,8 @@
 
               panContainer.children("img").each(function (i) {
                 var $thisimg = $(this),
-                    x = panContainerPos.left + parseInt($thisimg.css("left")),
-                    y = panContainerPos.top + parseInt($thisimg.css("top"));
+                    x = panContainerPos.left + parseInt($thisimg.css("left"), 10),
+                    y = panContainerPos.top + parseInt($thisimg.css("top"), 10);
 
                 $thisimg.css({ left: x + "px", top: y + "px" });
               }).unwrap();
@@ -266,6 +266,6 @@
           }
         }).attr("src", url);
       }
-    }
-  })();
-})(jQuery);
+    };
+  }());
+}(jQuery));
