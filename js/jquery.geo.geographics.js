@@ -1,9 +1,11 @@
-﻿(function ($, undefined) {
-  var _ieVersion = (function () {
+(function ($, undefined) {
+  var _ieVersion = ( function () {
     var v = 5, div = document.createElement("div"), a = div.all || [];
-    while (div.innerHTML = "<!--[if gt IE " + (++v) + "]><br><![endif]-->", a[0]) { }
+    do {
+      div.innerHTML = "<!--[if gt IE " + (++v) + "]><br><![endif]-->";
+    } while ( a[0] );
     return v > 6 ? v : !v;
-  } ());
+  }() );
 
   $.widget("geo.geographics", {
     _$elem: undefined,
@@ -26,7 +28,7 @@
         borderRadius: "8px",
         color: "#7f0000",
         //fill: undefined,
-        fillOpacity: .2,
+        fillOpacity: 0.2,
         height: "8px",
         opacity: 1,
         //stroke: undefined,
@@ -53,8 +55,8 @@
       this._height = this._$elem.height();
 
       if (!(this._width && this._height)) {
-        this._width = parseInt(this._$elem.css("width"));
-        this._height = parseInt(this._$elem.css("height"));
+        this._width = parseInt(this._$elem.css("width"), 10);
+        this._height = parseInt(this._$elem.css("height"), 10);
       }
 
       var posCss = 'position:absolute;left:0;top:0;margin:0;padding:0;',
@@ -147,7 +149,7 @@
     },
 
     drawPoint: function (coordinates, style) {
-      var style = this._getGraphicStyle(style);
+      style = this._getGraphicStyle(style);
       if (style.widthValue == style.heightValue && style.heightValue == style.borderRadiusValue) {
         this.drawArc(coordinates, 0, 360, style);
       } else if (style.visibility != "hidden" && style.opacity > 0) {
@@ -304,8 +306,8 @@
       this._height = this._$elem.height();
 
       if (!(this._width && this._height)) {
-        this._width = parseInt(this._$elem.css("width"));
-        this._height = parseInt(this._$elem.css("height"));
+        this._width = parseInt(this._$elem.css("width"), 10);
+        this._height = parseInt(this._$elem.css("height"), 10);
       }
 
       if ( this._trueCanvas ) {
@@ -322,7 +324,7 @@
 
     _getGraphicStyle: function (style) {
       function safeParse(value) {
-        value = parseInt(value);
+        value = parseInt(value, 10);
         return (+value + '') === value ? +value : value;
       }
 
@@ -343,8 +345,8 @@
         return;
       }
 
-      var style = this._getGraphicStyle(style),
-          i, j;
+      var i, j;
+      style = this._getGraphicStyle(style);
 
       if (style.visibility != "hidden" && style.opacity > 0) {
         this._context.beginPath();
@@ -377,7 +379,5 @@
       }
     }
   });
-
-
-})(jQuery);
+}(jQuery));
 

@@ -1,25 +1,22 @@
 ﻿== to do ==
 
 === b1 ===
-* examples - jQuery Mobile
-* docs - geomap - drawBbox mode
-* geomap - drawBbox mode
+* docs - geomap - dragBbox mode
+* geomap - dragBbox mode
 * docs - geomap - shift option (default, zoom, shape, off)
 * geomap - shift option (default, zoom, shape, off)
 * docs - geomap - loadstart event
 * geomap - loadstart event
 * docs - geomap - loadend event
 * geomap - loadend event
-* docs - geomap - pass the service id (if there is one) to the src callback as a view property
-* geomap - pass the service id (if there is one) to the src callback as a view property
-* docs - geomap - support dynamic map services that only work in geodetic coordinates (sr=4326)
-* geomap - support dynamic map services that only work in geodetic coordinates (sr=4326)
 * docs - geomap - allow append to take an array of shapes
 * geomap - allow append to take an array of shapes
 * docs - geomap - allow remove to take an array of shapes
 * geomap - allow remove to take an array of shapes
 * docs - geomap - add argument to refresh to force reload of images (in case of dynamic data)
 * geomap - add argument to refresh to force reload of images (in case of dynamic data)
+* docs - geomap - zoomMax option (tiled & shingled)
+* geomap - zoomMax option
 * geomap - cache label coordinates (the labelPixel cannot be cached, it will change each refresh)
 * geomap - rotate label based on segment
 * geomap - use pointer-events: none where appropriate
@@ -82,25 +79,31 @@
 ** cannot reproduce effectively, test again after pan/zoom rewrite
 * geomap - use CSS transition or transform for smoother tiling
 * geomap - implement service-level shape redrawing during interactive movement
-* make a package for new jQuery plugin directory
-** https://github.com/jquery/plugins.jquery.com/blob/master/docs/package.md
+* examples - jQuery Mobile
+* examples - MBCR: http://www.mbta.com/rider_tools/developers/default.asp?id=21899
 * examples - drag shapes
 * examples - ie7 - [bug] floating info div doesn't show up, inputs are alone and on the left
 * examples - redo the jVectorMap demo page using jQuery Geo
+* examples - make OSM editing simple
+** http://www.maploser.com/2012/03/29/all-i-want-for-openstreetmap-is-simple/
 ** http://jvectormap.owl-hollow.net/ ( found via http://www.moretechtips.net/2011/12/22-most-popular-jquery-plugins-of-2011.html )
 * expose jQuery Geo as an AMD module so asynchronous loaders like RequireJS and curl.js can use it
 * examples - geomap resize method
 * examples - Codecademy course
 * geomap - [bug] when a singled image hasn't loaded after pan and you double click on empty space, the zoomed bbox seems wrong
-* build releases using grunt
-* remove BOM from release files
-* add 3rd party license headers
 * cdn - test cache headers with http://redbot.org/ before release
 
 === future ===
 
+* docs - geomap - pass the service id (if there is one) to the src callback as a view property
+* geomap - pass the service id (if there is one) to the src callback as a view property
+* docs - geomap - support dynamic map services that only work in geodetic coordinates (sr=4326)?
+** can be done with src function that uses $.geo.toGeodetic?
+* geomap - support dynamic map services that only work in geodetic coordinates (sr=4326)?
 * docs - geomap - pan events (pattern after HTML5 drag)
+** can cancel with preventDefault
 * docs - geomap - zoom events (pattern after HTML5 drag)
+** can cancel with preventDefault
 * docs - geomap - support two-finger vertical slide as zoom on mobile devices
 * geomap - pan events (pattern after HTML5 drag)
 * geomap - zoom events (pattern after HTML5 drag)
@@ -196,6 +199,15 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-03-30==
+===grunt===
+I haven't written in a while. Checking out grunt now.
+
+Wow, that was cool. jQuery Geo now compiles with Grunt and I also have a jQuery plugin package file!
+
+===graphic holes===
+With canvas, I have better control of drawing polygons with holes. It's pretty nice. I can't wait to get into WebGL.
 
 ==2012-02-15==
 ===labels===

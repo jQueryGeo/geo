@@ -1,0 +1,34 @@
+{
+  "name": "jquery.geo",
+  "title": "jQuery Geo",
+  "description": "An interactive mapping and spatial analysis plugin.",
+  "version": "1.0.0b1",
+  "homepage": "http://jquerygeo.com",
+  "author": {
+    "name": "Ryan Westphal",
+    "company": "Applied Geographics, Inc.",
+    "email": "ryan@trippingthebits.com",
+    "url": "http://trippingthebits.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/AppGeo/geo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AppGeo/geo/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://jquerygeo.com/blob/master/LICENSE-MIT"
+    },
+    {
+      "type": "GPL",
+      "url": "http://jquerygeo.com/blob/master/LICENSE-GPL"
+    }
+  ],
+  "dependencies": {
+    "jquery": "~1.5"
+  },
+  "keywords": []
+}

@@ -1,4 +1,4 @@
-﻿(function ($, undefined) {
+(function ($, undefined) {
   $.geo._serviceTypes.tiled = (function () {
     return {
       create: function (map, serviceContainer, service, index) {
@@ -40,10 +40,10 @@
             webkitTransition: "",
             transition: "",
             left: function ( index, value ) {
-              return parseInt( value ) + dx;
+              return parseInt( value, 10 ) + dx;
             },
             top: function ( index, value ) {
-              return parseInt( value ) + dy;
+              return parseInt( value, 10 ) + dy;
             }
           });
 
@@ -72,8 +72,8 @@
 
                 currentPosition = scaleContainer.position(),
                 scaleOriginParts = scaleContainer.data("scaleOrigin").split(","),
-                totalDx = parseInt(scaleOriginParts[0]) - currentPosition.left,
-                totalDy = parseInt(scaleOriginParts[1]) - currentPosition.top,
+                totalDx = parseInt(scaleOriginParts[0], 10) - currentPosition.left,
+                totalDy = parseInt(scaleOriginParts[1], 10) - currentPosition.top,
 
                 mapCenterOriginal = map._getCenter(),
                 mapCenter = [
@@ -297,8 +297,8 @@
               tile = $img.attr("data-tile").split(",");
 
               $img.css({
-                left: Math.round(((parseInt(tile[0]) - fullXAtScale) * 100) + (serviceLeft - (serviceLeft % tileWidth)) / tileWidth * 100) + "%",
-                top: Math.round(((parseInt(tile[1]) - fullYAtScale) * 100) + (serviceTop - (serviceTop % tileHeight)) / tileHeight * 100) + "%"
+                left: Math.round(((parseInt(tile[0], 10) - fullXAtScale) * 100) + (serviceLeft - (serviceLeft % tileWidth)) / tileWidth * 100) + "%",
+                top: Math.round(((parseInt(tile[1], 10) - fullYAtScale) * 100) + (serviceTop - (serviceTop % tileHeight)) / tileHeight * 100) + "%"
               });
 
               if (opacity < 1) {
@@ -436,5 +436,5 @@
         }).attr("src", url);
       }
     };
-  })();
-})(jQuery);
+  }());
+}(jQuery));

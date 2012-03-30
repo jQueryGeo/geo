@@ -25,6 +25,9 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 ** Cache-Control header max-age set to 5 years
 ** remove Expires header
 * geomap - upgrade to jsrender 1.0pre
+* deploy - build releases using grunt
+* deploy - make a package for new jQuery plugin directory
+** https://github.com/jquery/plugins.jquery.com/blob/master/docs/package.md
 
 === 1.0a4 ===
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax
