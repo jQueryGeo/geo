@@ -15,7 +15,7 @@
 * geomap - allow remove to take an array of shapes
 * docs - geomap - add argument to refresh to force reload of images (in case of dynamic data)
 * geomap - add argument to refresh to force reload of images (in case of dynamic data)
-* docs - geomap - zoomMax option
+* docs - geomap - zoomMax option (tiled & shingled)
 * geomap - zoomMax option
 * geomap - cache label coordinates (the labelPixel cannot be cached, it will change each refresh)
 * geomap - rotate label based on segment
@@ -82,6 +82,7 @@
 * make a package for new jQuery plugin directory
 ** https://github.com/jquery/plugins.jquery.com/blob/master/docs/package.md
 * examples - jQuery Mobile
+* examples - MBCR: http://www.mbta.com/rider_tools/developers/default.asp?id=21899
 * examples - drag shapes
 * examples - ie7 - [bug] floating info div doesn't show up, inputs are alone and on the left
 * examples - redo the jVectorMap demo page using jQuery Geo
