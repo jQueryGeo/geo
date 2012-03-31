@@ -1,16 +1,40 @@
-== ABOUT ==
+# jQuery Geo
 
-After years of internal development, we are pleased to bring our JavaScript map control to the open-source world in the form of a jQuery plugin.
+After years of internal development, we are pleased to bring our JavaScript map widget and spatial analysis tools to the open-source world in the form of a jQuery plugin.
 
-== DOCS ==
+## Getting Started
+Using jQuery Geo requires adding one element, including one script (apart from jQuery itself) and calling one function. The following copy-and-paste snippet will help you get started.
 
-Documentation is hosted at http://jquerygeo.com
+```html
+<div id="map" style="height: 320px;"></div>
+<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+<script src="http://code.jquerygeo.com/jquery.geo-1.0a4.min.js"></script>
+<script>
+  $(function() {
+    $( "#map" ).geomap( ); // you've got a map!
+  });
+</script>
+```
 
-News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
+You can also download the latest release as a [minified JavaScript file][min] or a [full, uncompressed one][max].
 
-== CHANGELOG ==
+[min]: http://code.jquerygeo.com/jquery.geo-1.0a4.min.js
+[max]: http://code.jquerygeo.com/jquery.geo-1.0a4.js
 
-=== 1.0b1 ===
+
+## Documentation
+The latest docs are hosted at: http://jquerygeo.com
+
+Release and other announcements via @jQueryGeo on Twitter: https://twitter.com/#!/jQueryGeo
+
+News and smaller updates via @ryanttb on Twitter: https://twitter.com/#!/ryanttb
+
+## Contributing
+In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [grunt](https://github.com/cowboy/grunt).
+
+## Release History
+
+### 1.0b1
 * geographics - use canvas compositing for Polygons with holes
 * geographics - [bug] on polygons with holes, stroke draws a line from exterior ring to interior one
 * docs - geomap - trigger a shape event when a user finishes measuring
@@ -29,7 +53,7 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * deploy - make a package for new jQuery plugin directory
 ** https://github.com/jquery/plugins.jquery.com/blob/master/docs/package.md
 
-=== 1.0a4 ===
+### 1.0a4 (2012-02-19)
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax
 * geomap - [bug] shingled services throw exception during resize
 * docs - geomap - axisLayout option
@@ -106,7 +130,7 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * docs - geomap - custom modes
 * examples - all demo (tiled)
 
-=== 1.0a3 ===
+### 1.0a3 (2011-11-01)
 * docs - geomap - more modes: zoom, drawPoint, drawLineString, drawPolygon
 * geomap - [bug] tiles do not show when pixel sizes are near or lower than 1.0
 * geo - cache bbox as geoBbox to match namespacing convention started by jQuery Mobile
@@ -171,7 +195,7 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * geomap - make shapeStyle an option
 * examples - rewrite shapeStyle example
 
-=== 1.0a2.5 (2011-08-03) ===
+### 1.0a2.5 (2011-08-03)
 * geomap - find - [bug] does not handle GeoJSON features
 * geomap - find - allow for 0 pixel tolerance
 * geomap - find - check for bbox on non-Point geometries before getting too specific
@@ -188,7 +212,7 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * geomap - shingled - [bug] map doesn't resize correctly
 * examples - geomap drawStyle option
 
-=== 1.0a2 (2011-06-29) ===
+### 1.0a2 (2011-06-29)
 * geomap - Support dynamic map services
 * geomap - [BUG] geomap causes a script error if jQuery UI is already included
 * docs - Document shape methods
@@ -210,7 +234,12 @@ News and updates via ryanttb on Twitter: https://twitter.com/ryanttb
 * geomap - [bug] GeometryCollection shapes do not draw with their parent shape's style
 * geomap - implement empty method
 
-=== 1.0a1 (2011-05-09) ===
+### 1.0a1 (2011-05-09)
 * docs - Document a new interface to our internal map control
 * geomap - Port interactive map widget base to jQuery UI widget factory
 * geomap - Support tiled map services
+
+## License
+Copyright (c) 2012 Applied Geographics, Inc.
+Lead developer: Ryan Westphal
+Licensed under the MIT, GPL licenses.
