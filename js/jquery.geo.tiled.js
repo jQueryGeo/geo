@@ -102,7 +102,18 @@
 
                 opacity = service.style.opacity,
 
-                x, y;
+                x, y,
+
+                loadImageDeferredDone = function( url ) {
+                  // when a Deferred call is done, add the image to the map
+                  // a reference to the correct img element is on the Deferred object itself
+                  serviceObj._loadImage( $.data( this, "img" ), url, pixelSize, serviceState, serviceContainer, opacity );
+                },
+
+                loadImageDeferredFail = function( ) {
+                  $.data( this, "img" ).remove( );
+                  serviceState.loadCount--;
+                };
 
             for ( x = tileX; x < tileX2; x++ ) {
               for ( y = tileY; y < tileY2; y++ ) {
@@ -169,14 +180,12 @@
 
                   if ( typeof imageUrl === "string" ) {
                     serviceObj._loadImage( $img, imageUrl, pixelSize, serviceState, serviceContainer, opacity );
-                  } else {
+                  } else if ( imageUrl ) {
                     // assume Deferred
-                    imageUrl.done( function( url ) {
-                      serviceObj._loadImage( $img, url, pixelSize, serviceState, serviceContainer, opacity );
-                    } ).fail( function( ) {
-                      $img.remove( );
-                      serviceState.loadCount--;
-                    } );
+                    $.data( imageUrl, "img", $img );
+                    imageUrl.done( loadImageDeferredDone ).fail( loadImageDeferredFail );
+                  } else {
+                    $img.remove( );
                   }
 
                   /* end same as refresh 4 */
@@ -276,7 +285,18 @@
 
               opacity = service.style.opacity,
 
-              x, y;
+              x, y,
+
+              loadImageDeferredDone = function( url ) {
+                // when a Deferred call is done, add the image to the map
+                // a reference to the correct img element is on the Deferred object itself
+                serviceObj._loadImage( $.data( this, "img" ), url, pixelSize, serviceState, $serviceContainer, opacity );
+              },
+
+              loadImageDeferredFail = function( ) {
+                $.data( this, "img" ).remove( );
+                serviceState.loadCount--;
+              };
 
           if (serviceState.reloadTiles) {
             scaleContainers.find("img").attr("data-dirty", "true");
@@ -369,14 +389,12 @@
 
                 if ( typeof imageUrl === "string" ) {
                   serviceObj._loadImage( $img, imageUrl, pixelSize, serviceState, $serviceContainer, opacity );
-                } else {
+                } else if ( imageUrl ) {
                   // assume Deferred
-                  imageUrl.done( function( url ) {
-                    serviceObj._loadImage( $img, url, pixelSize, serviceState, $serviceContainer, opacity );
-                  } ).fail( function( ) {
-                    $img.remove( );
-                    serviceState.loadCount--;
-                  } );
+                  $.data( imageUrl, "img", $img );
+                  imageUrl.done( loadImageDeferredDone ).fail( loadImageDeferredFail );
+                } else {
+                  $img.remove( );
                 }
               }
             }
