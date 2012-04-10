@@ -1,0 +1,143 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>defer example</title>
+  <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+  <meta name="description" content="An example of deferring an image load">
+  <meta name="author" content="Ryan Westphal">
+  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/blitzer/jquery-ui.css" />
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+  <style type="text/css">
+    #map
+    {
+      position: fixed;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <div id="map">
+    </div>
+    <div class="info">
+      <div class="links">
+        <a href="../" class="docLink">&lt; docs</a>
+        <a href="http://jsfiddle.net/ryanttb/==JSFIDDLE==/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
+      </div>
+      <h1>defer</h1>
+      <p>The src function in this demo returns a jQuery Defer object so it can download the tile ahead of time and draw the bbox on it before passing the final image to the map widget as a data URL.</p>
+      <p class="non-mobile">This demo does not work in IE8.</p>
+    </div>
+  </div>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+  <script src="../../js/excanvas.js"></script>
+  <script src="../../js/jsrender.js"></script>
+  <script src="../../js/jquery.mousewheel.js"></script>
+  <script src="../../js/jquery.ui.widget.js"></script>
+  <script src="../../js/jquery.geo.core.js"></script>
+  <script src="../../js/jquery.geo.geographics.js"></script>
+  <script src="../../js/jquery.geo.geomap.js"></script>
+  <script src="../../js/jquery.geo.tiled.js"></script>
+  <script src="../../js/jquery.geo.shingled.js"></script>
+  <!--<script src="../jquery.geo-test.min.js"></script>-->
+  <script>
+    $( function ( ) {
+      // create a map
+      var map = $( "#map" ).geomap( {
+        center: [ -71.0595678, 42.3604823 ],
+        zoom: 8,
+        services: [ {
+          type: "tiled",
+          src: function( view ) {
+            // create a new Defer object for this tile request
+            var defer = new jQuery.Deferred();
+
+            // for this example, every tile will also contain the jQuery Geo logo :)
+
+            // interesting tidbit:
+            // you might /want/ to build a URL to an OpenStreetMap tile here
+            // however, that is a cross domain security error when we call toDataURL below
+            // http://stackoverflow.com/questions/2390232/why-does-canvas-todataurl-throw-a-security-exception
+
+            // if you really want to get OSM map tiles and draw on them,
+            // you will have to proxy them from your own website/domain
+
+            // a link to the jQuery Geo logo
+            var logoUrl = "../../apple-touch-icon.png";
+
+            // create a new img element where we will download an image
+            var img = new Image( );
+            
+            // hook into the load event
+            img.onload = function( ) {
+              // this callback is triggered when the tile is done being downloaded to the img element
+
+              // at this point, we have already returned the Deferred object
+              // to jQuery Geo for the current tile so it can calculate other tiles; neat!
+
+              // once loaded, we create a canvas element to use as a drawing context
+
+              // interesting tidbit: it's inefficient to create a new canvas for each tile
+              // however, we don't want tile canvases to mess with each other
+              // the best way would be some sort of canvas pool but that's too advanced for this demo
+              var canvas = document.createElement( "canvas" );
+
+              // the size of the canvas element matches the size of the tile
+              canvas.width = 256;
+              canvas.height = 256;
+
+              // grab a 2d context to draw onto the canvas element
+              var context = canvas.getContext( "2d" );
+
+              // draw a small version of our logo on the top-right corner of the tile
+              context.drawImage( img, 208, 16, 32, 32 );
+
+              // draw a border for the tile
+              context.strokeRect( 0, 0, 255, 255 );
+
+              // use $.geo.proj to convert the bbox to lon, lat
+              var geodeticBbox = $.geo.proj.toGeodetic( view.bbox );
+
+              // however, make it look nicer by rounding the numbers
+              geodeticBbox[ 0 ] = geodeticBbox[ 0 ].toFixed( 2 );
+              geodeticBbox[ 1 ] = geodeticBbox[ 1 ].toFixed( 2 );
+              geodeticBbox[ 2 ] = geodeticBbox[ 2 ].toFixed( 2 );
+              geodeticBbox[ 3 ] = geodeticBbox[ 3 ].toFixed( 2 );
+
+              // draw the tile dimensions to the tile
+              context.font = "1.4em Arial";
+              context.strokeText( "[ " + geodeticBbox.join( ", " ) + " ]", 32, 96 );
+
+              // we are done, resolve the deferred object and complete this tile
+              // the image is returned to jQuery Geo as a data URL thanks to canvas
+              defer.resolve( canvas.toDataURL( "image/png" ) );
+            };
+
+            // now that we've hooked up our load handler,
+            // we have to set the image's src attribute to get things going
+            img.src = logoUrl;
+
+            // return the Deferred object so the map widget can wait for done to be triggered
+            return defer;
+          },
+          attr: "&copy; OpenStreetMap &amp; contributors, CC-BY-SA"
+        } ]
+      } );
+    } );  
+  </script>
+
+  <script>
+    var _gaq = [['_setAccount', 'UA-26084853-1'], ['_trackPageview']];
+    (function (d, t) {
+      var g = d.createElement(t), s = d.getElementsByTagName(t)[0]; g.async = 1;
+      g.src = ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+      s.parentNode.insertBefore(g, s);
+    } (document, 'script'));
+  </script>
+</body>
+</html>
