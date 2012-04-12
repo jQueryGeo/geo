@@ -52,6 +52,11 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * deploy - build releases using grunt
 * deploy - make a package for new jQuery plugin directory
 ** https://github.com/jquery/plugins.jquery.com/blob/master/docs/package.md
+* deploy - lint JavaScript files
+* docs - geomap - dragBbox mode
+* docs - geo - polygonize function for bbox
+* geo - polygonize function for bbox
+* geomap - dragBbox mode
 
 ### 1.0a4 (2012-02-19)
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax
@@ -241,5 +246,5 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## License
 Copyright (c) 2012 Applied Geographics, Inc.
-Lead developer: Ryan Westphal
+Project lead by Ryan Westphal
 Licensed under the MIT, GPL licenses.

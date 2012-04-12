@@ -1,8 +1,6 @@
 ﻿== to do ==
 
 === b1 ===
-* docs - geomap - dragBbox mode
-* geomap - dragBbox mode
 * docs - geomap - shift option (default, zoom, shape, off)
 * geomap - shift option (default, zoom, shape, off)
 * docs - geomap - loadstart event
@@ -199,6 +197,37 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-04-12==
+===polygonize===
+That's what the bbox->polygon function will be called. It's in GEOS. Their docs say: Polygonizes a set of Geometries which contain linework that represents the edges of a planar graph.
+
+While that's supposed to be only for linework, e.g., a LineString to Polygon, I think it's fine to extend that to bbox. It's not called polygonize in JTS, there's a Polygonizer class and a getPolygons method. I'll simplify that, too.
+
+==2012-04-11==
+===foss===
+I gave my talk, went ok. Gotta get back to docs.
+
+===dragBbox===
+This mode should operate even if pannable is set to false. There's a test in the code where I have to special case that out.
+
+==2012-04-10==
+===foss===
+I'm coding at foss4g!
+
+===Deferred===
+Deferred demo is done.
+
+==2012-03-30==
+
+### markdown
+The new markdown file looks nice!
+
+### docs
+Time to document the last feature that are going into b1. Actually, I want to lint the last file, tiled.js.
+
+### Deferred context
+The last lint issue is that I shouldn't create functions in a loop. That's done when the user returns a Deferred object as the tiled service's src property. The function calls _loadImage on the service object but needs more than the url, which is all the Deferred done call gives it. How do I get the rest, such as $img, pixelSize, etc. $.proxy? But isn't that creating a function anyway, just one that lint can't see? Yes, it does. Maybe I can put the data on the Deferred object itself. I don't see why not.
 
 ==2012-03-30==
 ===grunt===

@@ -16,6 +16,7 @@
           "static": "default",
           pan: "url(data:image/vnd.microsoft.icon;base64,AAACAAEAICACAAgACAAwAQAAFgAAACgAAAAgAAAAQAAAAAEAAQAAAAAAAAEAAAAAAAAAAAAAAgAAAAAAAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD8AAAA/AAAAfwAAAP+AAAH/gAAB/8AAA//AAAd/wAAGf+AAAH9gAADbYAAA2yAAAZsAAAGbAAAAGAAAAAAAAA//////////////////////////////////////////////////////////////////////////////////////gH///4B///8Af//+AD///AA///wAH//4AB//8AAf//AAD//5AA///gAP//4AD//8AF///AB///5A////5///8=), move",
           zoom: "crosshair",
+          dragBbox: "crosshair",
           drawPoint: "crosshair",
           drawLineString: "crosshair",
           drawPolygon: "crosshair",
@@ -1472,10 +1473,10 @@
       if (!this._inOp && e.shiftKey) {
         this._shiftZoom = true;
         this._$eventTarget.css("cursor", this._options["cursors"]["zoom"]);
-      } else if ( !this._isMultiTouch && this._options[ "pannable" ] ) {
+      } else if ( !this._isMultiTouch && ( this._options[ "pannable" ] || this._options[ "mode" ] === "dragBbox" ) ) {
         this._inOp = true;
 
-        if (this._options["mode"] !== "zoom") {
+        if (this._options["mode"] !== "zoom" && this._options["mode"] !== "dragBbox" ) {
           this._lastDrag = this._current;
 
           if (e.currentTarget.setCapture) {
@@ -1599,6 +1600,7 @@
 
       switch (mode) {
         case "zoom":
+        case "dragBbox":
           if ( this._mouseDown ) {
             this._$drawContainer.geographics( "clear" );
             this._$drawContainer.geographics( "drawBbox", [
@@ -1711,6 +1713,7 @@
 
         switch (mode) {
           case "zoom":
+          case "dragBbox":
             if ( dx !== 0 || dy !== 0 ) {
               var minSize = this._pixelSize * 6,
                   bboxCoords = this._toMap( [ [
@@ -1726,13 +1729,23 @@
                     bboxCoords[0][1],
                     bboxCoords[1][0],
                     bboxCoords[1][1]
-                  ];
+                  ],
+                  polygon;
 
-              if ( ( bbox[2] - bbox[0] ) < minSize && ( bbox[3] - bbox[1] ) < minSize ) {
-                bbox = $.geo.scaleBy( this._getBbox( $.geo.center( bbox, true ) ), 0.5, true );
+              if ( mode === "zoom" ) {
+                if ( ( bbox[2] - bbox[0] ) < minSize && ( bbox[3] - bbox[1] ) < minSize ) {
+                  bbox = $.geo.scaleBy( this._getBbox( $.geo.center( bbox, true ) ), 0.5, true );
+                }
+
+                this._setBbox(bbox, true, true);
+              } else {
+
+                polygon = $.geo.polygonize( bbox, true );
+                this._trigger( "shape", e, this._userGeodetic ? {
+                  type: "Polygon",
+                  coordinates: $.geo.proj.toGeodetic( polygon.coordinates )
+                } : polygon );
               }
-
-              this._setBbox(bbox, true, true);
             }
 
             this._resetDrawing();

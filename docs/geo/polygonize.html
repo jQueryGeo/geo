@@ -1,0 +1,52 @@
+<!doctype html>  
+
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+
+  <title>polygonize | $.geo</title>
+  <meta name="description" content="jQuery Geo polygonize method">
+  <meta name="author" content="Ryan Westphal">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="../css/style.css?v=2">
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
+</head>
+
+<body>
+
+  <div id="polygonize" data-role="page">
+    <div data-role="header" data-theme="b">
+      <h1>polygonize</h1>
+    </div>
+    
+    <div data-role="content">
+      <table>
+        <tr>
+          <th>return type</th>
+          <td>Array ( <a href="http://geojson.org/geojson-spec.html#polygon" rel="external">GeoJSON Polygon</a> ) </td>
+        </tr>
+        <tr>
+          <th>syntax</th>
+          <td>$.geo.polygonize( Array bbox ( <a href="http://geojson.org/geojson-spec.html#bounding-boxes" rel="external">GeoJSON bounding box</a> ) )</td>
+        </tr>
+        <tr>
+          <th>usage</th>
+          <td><pre><code>var polygon = $.geo.polygonize( bbox )</code></pre></td>
+        </tr>
+      </table>
+
+      <p>The polygonize method creates a new Polygon with an outer ring that matches the rectangle covered by the bbox. The Polygon is closed and will have five coordinates.</p>
+
+      <p>This function is a simplification/adaptation of the Polygonizer class in JTS. While the JTS object operates on the line work of geometry objects, this function operates on bounding boxes.</p>
+    </div>
+  </div> <!-- end of #container -->
+
+  <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a4.min.js"></script>
+  <script src="../js/script.js"></script>
+  <script src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
+</body>
+</html>
+
