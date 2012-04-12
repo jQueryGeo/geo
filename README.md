@@ -57,6 +57,8 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * docs - geo - polygonize function for bbox
 * geo - polygonize function for bbox
 * geomap - dragBbox mode
+* docs - geomap - shift option (default, zoom, dragBbox, off)
+* geomap - shift option (default, zoom, dragBbox, off)
 
 ### 1.0a4 (2012-02-19)
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax

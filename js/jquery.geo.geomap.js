@@ -32,6 +32,7 @@
         mode: "pan",
         pannable: true,
         scroll: "default",
+        shift: "default",
         services: [
             {
               "class": "osm",
@@ -101,7 +102,7 @@
     _mouseDown: undefined,
     _inOp: undefined,
     _toolPan: undefined,
-    _shiftZoom: undefined,
+    _shiftDown: undefined,
     _anchor: undefined,
     _current: undefined,
     _downDate: undefined,
@@ -180,7 +181,7 @@
       this._mouseDown =
           this._inOp =
           this._toolPan =
-          this._shiftZoom =
+          this._shiftDown =
           this._panning =
           this._isTap =
           this._isDbltap = false;
@@ -1397,7 +1398,10 @@
     },
 
     _eventTarget_touchstart: function (e) {
-      if ( this._options[ "mode" ] === "static" ) {
+      var mode = this._options[ "mode" ],
+          shift = this._options[ "shift" ];
+
+      if ( mode === "static" ) {
         return;
       }
 
@@ -1470,13 +1474,13 @@
       this._mouseDown = true;
       this._anchor = $.merge( [ ], this._current );
 
-      if (!this._inOp && e.shiftKey) {
-        this._shiftZoom = true;
-        this._$eventTarget.css("cursor", this._options["cursors"]["zoom"]);
-      } else if ( !this._isMultiTouch && ( this._options[ "pannable" ] || this._options[ "mode" ] === "dragBbox" ) ) {
+      if (!this._inOp && e.shiftKey && shift !== "off") {
+        this._shiftDown = true;
+        this._$eventTarget.css( "cursor", this._options[ "cursors" ][ shift === "default" ? "zoom" : shift ] );
+      } else if ( !this._isMultiTouch && ( this._options[ "pannable" ] || mode === "dragBbox" ) ) {
         this._inOp = true;
 
-        if (this._options["mode"] !== "zoom" && this._options["mode"] !== "dragBbox" ) {
+        if ( mode !== "zoom" && mode !== "dragBbox" ) {
           this._lastDrag = this._current;
 
           if (e.currentTarget.setCapture) {
@@ -1596,7 +1600,8 @@
         return false;
       }
 
-      var mode = this._shiftZoom ? "zoom" : this._options["mode"];
+      var shift = this._options[ "shift" ],
+          mode = this._shiftDown ? ( shift === "default" ? "zoom" : shift ) : this._options["mode"];
 
       switch (mode) {
         case "zoom":
@@ -1663,7 +1668,8 @@
       var mouseWasDown = this._mouseDown,
           wasToolPan = this._toolPan,
           offset = this._$eventTarget.offset(),
-          mode = this._shiftZoom ? "zoom" : this._options["mode"],
+          shift = this._options[ "shift" ],
+          mode = this._shiftDown ? ( shift === "default" ? "zoom" : shift ) : this._options["mode"],
           current, i, clickDate,
           dx, dy;
 
@@ -1688,7 +1694,7 @@
 
       this._$eventTarget.css("cursor", this._options["cursors"][this._options["mode"]]);
 
-      this._shiftZoom = this._mouseDown = this._toolPan = false;
+      this._shiftDown = this._mouseDown = this._toolPan = false;
 
       if ( this._isMultiTouch ) {
         e.preventDefault( );
@@ -1711,7 +1717,7 @@
         clickDate = $.now();
         this._current = current;
 
-        switch (mode) {
+        switch ( mode ) {
           case "zoom":
           case "dragBbox":
             if ( dx !== 0 || dy !== 0 ) {
@@ -1739,7 +1745,6 @@
 
                 this._setBbox(bbox, true, true);
               } else {
-
                 polygon = $.geo.polygonize( bbox, true );
                 this._trigger( "shape", e, this._userGeodetic ? {
                   type: "Polygon",

@@ -1,0 +1,77 @@
+<!doctype html>  
+
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+
+  <title>shift | geomap</title>
+  <meta name="description" content="geomap shift option">
+  <meta name="author" content="Ryan Westphal">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="../css/style.css?v=2">
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
+</head>
+
+<body>
+
+  <div id="shift" data-role="page">
+    <div data-role="header" data-theme="f">
+      <h1>shift</h1>
+    </div>
+    
+    <div data-role="content">
+      <table>
+        <tr>
+          <th>type</th>
+          <td>String</td>
+        </tr>
+        <tr>
+          <th>default</th>
+          <td>&quot;default&quot;</td>
+        </tr>
+        <tr>
+          <th>init</th>
+          <td><pre><code>$( <i>map selector</i> ).geomap( { shift: &quot;default&quot; } );</code></pre></td>
+        </tr>
+        <tr>
+          <th>get</th>
+          <td><pre><code>var shift = $( <i>map selector</i> ).geomap( &quot;option&quot;, &quot;shift&quot; );</code></pre></td>
+        </tr>
+        <tr>
+          <th>set</th>
+          <td><pre><code>$( <i>map selector</i> ).geomap( &quot;option&quot;, &quot;shift&quot;, &quot;off&quot; );</code></pre></td>
+        </tr>
+      </table>
+
+      <p>The shift option determines how the shift key affects the map during drag operations in different modes. There are currently four values: default, zoom, dragBbox, and off. However, default is currently the same as zoom.</p>
+      
+      <h2>default and zoom</h2>
+
+      <p>When shift is set to default or zoom and a user holds the shift key before holding the mouse button down, the map temporarilly switches to zoom mode. In this state the user can perform a marquee zoom by clicking and holding one point and dragging the mouse cursor. A box will form. When the user lets go of the mouse, the map will zoom to the closest approximation of the bbox of the drawn shape.</p>
+
+      <p>When mode is dragBbox, the shift key will still switch to zoom mode. Dragging will form a box either way but if the shift key was down when the user started, the map will zoom.</p>
+
+      <h2>dragBbox</h2>
+
+      <p>When shift is set to dragBbox and a user holds the shift key before holding the mouse button down, the map temporarilly switches to dragBbox mode. In this state the user can click and hold one point and then drag the mouse cursor. A box will form. When the user lets go of the mouse, jQuery Geo will trigger a shape event passing a GeoJSON Polygon representation of the dragged bbox as the geo argument. The Polygon object also has the GeoJSON the bbox property.</p>
+
+      <h2>off</h2>
+
+      <p>When shift is set to off, the shift key is ignored. For example, if mode is pan and the user holds the shift key and begins to drag, the map will pan as normal.</p>
+
+      <h2>static maps</h2>
+
+      <p>When the map's mode option is set to static, the map ignores all user interaction so the shift key is also ignored.</p>
+
+    </div>
+  </div> <!-- end of #container -->
+
+  <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a4.min.js"></script>
+  <script src="../js/script.js"></script>
+  <script src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
+</body>
+</html>
+
