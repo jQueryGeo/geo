@@ -61,6 +61,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * geomap - shift option (default, zoom, dragBbox, off)
 * docs - geomap - loadstart, loadend events
 * docs - geomap - allow append to take an array of shapes
+* docs - geomap - allow remove to take an array of shapes
 
 ### 1.0a4 (2012-02-19)
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax

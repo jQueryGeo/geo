@@ -3,7 +3,6 @@
 === b1 ===
 * geomap - loadstart, loadend events
 * geomap - allow append to take an array of shapes
-* docs - geomap - allow remove to take an array of shapes
 * geomap - allow remove to take an array of shapes
 * docs - geomap - add argument to refresh to force reload of images (in case of dynamic data)
 * geomap - add argument to refresh to force reload of images (in case of dynamic data)
