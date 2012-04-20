@@ -34,7 +34,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Release History
 
-### 1.0b1
+### 1.0.0b1
 * geographics - use canvas compositing for Polygons with holes
 * geographics - [bug] on polygons with holes, stroke draws a line from exterior ring to interior one
 * docs - geomap - trigger a shape event when a user finishes measuring
@@ -59,6 +59,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * geomap - dragBbox mode
 * docs - geomap - shift option (default, zoom, dragBbox, off)
 * geomap - shift option (default, zoom, dragBbox, off)
+* docs - geomap - loadstart, loadend events
 
 ### 1.0a4 (2012-02-19)
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax

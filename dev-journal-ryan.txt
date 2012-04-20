@@ -1,10 +1,7 @@
 ﻿== to do ==
 
 === b1 ===
-* docs - geomap - loadstart event
-* geomap - loadstart event
-* docs - geomap - loadend event
-* geomap - loadend event
+* geomap - loadstart, loadend events
 * docs - geomap - allow append to take an array of shapes
 * geomap - allow append to take an array of shapes
 * docs - geomap - allow remove to take an array of shapes
@@ -13,6 +10,15 @@
 * geomap - add argument to refresh to force reload of images (in case of dynamic data)
 * docs - geomap - zoomMax option (tiled & shingled)
 * geomap - zoomMax option
+* docs - geomap - allow template for label argument to append
+* geomap - allow template for label argument to append
+* docs - geomap - allow template for properties on style argument to append
+* geomap - allow template for properties on style argument to append
+* docs - geomap - shapeLabel property
+** template for labels for all shapes added via append
+* geomap - shapeLabel property
+* docs - geomap - allow template for properties on shapeStyle option
+* geomap - allow template for properties on shapeStyle option
 * geomap - cache label coordinates (the labelPixel cannot be cached, it will change each refresh)
 * geomap - rotate label based on segment
 * geomap - use pointer-events: none where appropriate
@@ -44,6 +50,7 @@
 ** possibly only when axisLayout is image
 * geomap - [bug] multiples of the same event trigger after creating more than one map on the same div, even after destroy
 ** destroy should unbind all geomap events
+* geomap - add delegate handler for image load instead of one load handler per image
 * geomap - remove this-style state properties
 * geomap - remove "px" from .css calls
 * geo - use Array.push instead of $.merge where needed
@@ -153,8 +160,6 @@
 * geo - Support WKT with $.geo.parseWKT & $.geo.textify
 * geo - All bbox operations should be done in non-geodetic coordinates for accuracy
 * geo - support bbox in distance ( fix geomap.find )
-* docs - geomap - shapeLabel property
-** template for labels for all shapes added via append
 * geomap - perf test putting all containers that need to move with panning in a single super-container
 * docs - geomap - multiple labels
 * geomap - multiple labels
