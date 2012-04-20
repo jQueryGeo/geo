@@ -33,27 +33,81 @@
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>$(<i>map or service selector</i>).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] } )
+          <td><pre><code><span class="comment">// a single point, no style, no label, refresh immediately</span>
+$(<i>map or service selector</i>).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] } )
 
-$(<i>map or service selector</i>).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, false )
+<span class="comment">// a single line, don't refresh yet</span>
+$(<i>map or service selector</i>).geomap( &quot;append&quot;, {
+  type: &quot;LineString&quot;,
+  coordinates: [ [ -71, 40 ], [ -71.5, 41 ] ]
+}, false )
 
-$(<i>map or service selector</i>).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, { stroke: &quot;#11117f&quot;, strokeWidth: &quot;3px&quot; } )
+<span class="comment">// a polygon with a style</span>
+$(<i>map or service selector</i>).geomap( &quot;append&quot;, {
+  type: &quot;Polygon&quot;,
+  coordinates: [ [ 
+    [-75, 39.7],
+    [-74.8, 39.3],
+    [-75.2, 39.3],
+    [-75, 39.7]
+  ] ]
+}, { stroke: &quot;#11117f&quot;, strokeWidth: &quot;3px&quot; } )
 
-$(<i>map or service selector</i>).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, { stroke: &quot;#11117f&quot;, strokeWidth: &quot;3px&quot; }, false )
+<span class="comment">// an array of geometry objects with a style, don't refresh yet</span>
+$(<i>map or service selector</i>).geomap( &quot;append&quot;, [ 
+  { type: &quot;Point&quot;, coordinates: [ -71, 40 ] },
+  { type: &quot;Point&quot;, coordinates: [ -70, 39.5 ] },
+], { color: &quot;green&quot;, strokeWidth: &quot;3px&quot; }, false )
 
-$(<i>map or service selector</i>).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, &quot;My Point&quot; )
+<span class="comment">// a point feature with a label</span>
+$(<i>map or service selector</i>).geomap( &quot;append&quot;, {
+  type: &quot;Feature&quot;,
+  geometry: {
+    type: &quot;Point&quot;,
+    coordinates: [ -71, 40 ]
+  }
+}, &quot;My Point&quot; )
 
-$(<i>map or service selector</i>).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, &quot;My Point&quot;, false )
+<span class="comment">// a point with a label, don't refresh yet</span>
+$(<i>map or service selector</i>).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, &quot;My Point (don't refresh yet)&quot;, false )
 
+<span class="comment">// a point with a style &amp; label</span>
 $(<i>map or service selector</i>).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, { color: &quot;#00f&quot; }, &quot;Blue Point&quot; )
 
-$(<i>map or service selector</i>).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, { color: &quot;#00f&quot; }, '&lt;span style=&quot;color: #44f;&quot;&gt;Blue Point&lt;/span&gt;', false )</code></pre></td>
+<span class="comment">// a collection of features with a style, each point will get a separate label, don't refresh yet</span>
+$(<i>map or service selector</i>).geomap( &quot;append&quot;, {
+    type: &quot;FeatureCollection&quot;
+    features: [ {
+      type: &quot;Feature&quot;,
+      geometry: {
+        type: &quot;Point&quot;,
+        coordinates: [ -71, 40 ]
+      }
+    }, {
+      type: &quot;Feature&quot;,
+      geometry: {
+        type: &quot;Point&quot;,
+        coordinates: [ -71.2, 40.3 ]
+      }
+    } ]
+  },
+  { color: &quot;#00f&quot; },
+  '&lt;span style=&quot;color: #44f;&quot;&gt;Blue Point&lt;/span&gt;',
+  false
+)</code></pre></td>
         </tr>
       </table>
-      <p>The append method adds a shape to the map. In this documentation the word shape means a GeoJSON geometry object, GeoJSON feature or GeoJSON feature collection. Each feature in a FeatureCollection's features property is added as a separate shape whereas the other collection geometry types, e.g., MultiPoint, are added as a single shape. This is important distinction when considering the find method in that find can potentially return only one shape of a FeatureCollection but will return all shapes in a MultiPoint (as a reference to the original MultiPoint object supplied to append) even if only one intersects the find position.</p>
-      <p>The geomap widget maintains a reference to your shape. It will not change the object in any way. You can use the same object in calls to remove in order to remove the shape from the map at any time.</p>
+
+      <p>The append method adds one shape or an array of shapes to the map. In this documentation, the word shape means a GeoJSON geometry object or a GeoJSON Feature. A FeatureCollection is treated as an array of shapes.</p>
+      
+      <p>When you append more than one shape by using an array or a FeatureCollection, each shape in the array or FeatureCollection's features property is added as a separate shape whereas the other collection geometry types, e.g., MultiPoint, are added as a single shape. This is an important distinction when considering the find method and labels. The find method can potentially return only one shape from an array or one feature of a FeatureCollection but will return all shapes in a MultiPoint (as a reference to the original MultiPoint object supplied to append) even if only one of the coordinates in the MultiPoint intersects the find position. For labeling, each shape in an array and each feature in a FeatureCollection get their own label, however all polygons in a MultiPolygon will share the same label.</p>
+
+      <p>The geomap widget maintains a reference to your shape. You can use the same object in calls to remove in order to remove the shape from the map at any time.</p>
+
       <p>The jQuery UI widget factory returns the original jQuery collection to maintain call chaining.</p>
+
       <!--<p>geomap draws shapes ordered by geometry type and then by order of addition. It draws Polygon shapes first followed by LineString and finally Point shapes. </p>-->
+
       <h2>styling</h2>
 
       <p>The optional style argument modifies how geomap draws the specific geometry or feature you are adding. Properties supplied in this style will override ones of the same name in geomap&#39;s base shapeStyle. Properties not referenced are inheritied from the base style and can change with future changes to the shapeStyle option. Please see the shapeStyle method documentation for information about what properties are valid for this object.</p>

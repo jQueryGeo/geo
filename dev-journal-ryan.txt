@@ -2,7 +2,6 @@
 
 === b1 ===
 * geomap - loadstart, loadend events
-* docs - geomap - allow append to take an array of shapes
 * geomap - allow append to take an array of shapes
 * docs - geomap - allow remove to take an array of shapes
 * geomap - allow remove to take an array of shapes
