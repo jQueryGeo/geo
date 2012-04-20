@@ -96,6 +96,7 @@ td { padding: .5em 0; }
 b { font-weight: bold; }
 i { font-style: italic; }
 h4 { font-style: italic; font-weight: normal; }
+ul { margin-bottom: .5em; }
 
 .geomap-indoc
 {

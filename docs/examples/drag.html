@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>string src example</title>
+  <title>drag example</title>
   <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
-  <meta name="description" content="An example of setting a service src to a string">
+  <meta name="description" content="An example of drag modes">
   <meta name="author" content="Ryan Westphal">
   <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/blitzer/jquery-ui.css" />
   <link rel="stylesheet" type="text/css" href="css/style.css" />
@@ -26,31 +26,31 @@
     <div class="info">
       <div class="links">
         <a href="../" class="docLink">&lt; docs</a>
-        <a href="http://jsfiddle.net/ryanttb/YPkj4/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
+        <a href="http://jsfiddle.net/ryanttb/==JSFIDDLE==/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
       </div>
-      <h1>string service src</h1>
-      <p>This example shows how you can set a service's src property to a jsRender template string.</p>
-      <p>The src property of the service object for this map is set to:</p>
-      <p>&quot;http://tile.openstreetmap.org/{{:zoom}}/{{:tile.column}}/{{:tile.row}}.png&quot;</p>
+
+      <h1>drag</h1>
+
+      <p>There is currently only one drag mode, dragBbox. This demo tests it.</p>
     </div>
   </div>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
   <script src="../jquery.geo-test.min.js"></script>
   <script>
-    $(function () {
-      // create a map that replaces the default service with
-      // one using a string for the src property instead of a function
-      var map = $("#map").geomap({
-        center: [-71.0595678, 42.3604823],
+    $( function ( ) {
+      // create a map, setting the mode to dragBbox
+      var map = $( "#map" ).geomap( {
+        center: [ -71.0595678, 42.3604823 ],
         zoom: 8,
-        services: [ {
-          id: "osm-string-src",
-          type: "tiled",
-          src: "http://tile.openstreetmap.org/{{:zoom}}/{{:tile.column}}/{{:tile.row}}.png"
-        } ]
-      });
-    });  
+        mode: "dragBbox",
+        shape: function( e, geo ) {
+          // drag modes generate GeoJSON objects and send them as the geo argument
+          // you can append them to the map
+          map.geomap( "append", geo );
+        }
+      } );
+    } );  
   </script>
 
   <script>

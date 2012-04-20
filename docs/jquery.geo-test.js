@@ -1,6 +1,6 @@
-/*! jQuery Geo - v1.0.0b1 - 2012-03-30
+/*! jQuery Geo - v1.0.0b1 - 2012-04-12
  * http://jquerygeo.com
- * Copyright (c) 2012 Applied Geographics, Inc.; Licensed MIT, GPL */
+ * Copyright (c) 2012 Ryan Westphal/Applied Geographics, Inc.; Licensed MIT, GPL */
 
 // Copyright 2006 Google Inc.
 //
@@ -2740,6 +2740,28 @@ $.Widget.prototype = {
              bbox2[ 3 ] < bbox1[ 1 ];
     },
 
+    polygonize: function( bbox, _ignoreGeo /* Internal Use Only */ ) {
+      // adaptation of Polygonizer class in JTS for use with bboxes
+      var wasGeodetic = false;
+      if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( bbox ) ) {
+        wasGeodetic = true;
+        bbox = $.geo.proj.fromGeodetic(bbox);
+      }
+
+      var polygon = {
+        type: "Polygon",
+        coordinates: [ [
+          [ bbox[ 0 ], bbox[ 1 ] ],
+          [ bbox[ 0 ], bbox[ 3 ] ],
+          [ bbox[ 2 ], bbox[ 3 ] ],
+          [ bbox[ 2 ], bbox[ 1 ] ],
+          [ bbox[ 0 ], bbox[ 1 ] ]
+        ] ]
+      };
+
+      return wasGeodetic ? $.geo.proj.toGeodetic(polygon) : polygon;
+    },
+
     reaspect: function (bbox, ratio, _ignoreGeo /* Internal Use Only */ ) {
       // not in JTS
       var wasGeodetic = false;
@@ -4029,6 +4051,7 @@ $.Widget.prototype = {
           "static": "default",
           pan: "url(data:image/vnd.microsoft.icon;base64,AAACAAEAICACAAgACAAwAQAAFgAAACgAAAAgAAAAQAAAAAEAAQAAAAAAAAEAAAAAAAAAAAAAAgAAAAAAAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD8AAAA/AAAAfwAAAP+AAAH/gAAB/8AAA//AAAd/wAAGf+AAAH9gAADbYAAA2yAAAZsAAAGbAAAAGAAAAAAAAA//////////////////////////////////////////////////////////////////////////////////////gH///4B///8Af//+AD///AA///wAH//4AB//8AAf//AAD//5AA///gAP//4AD//8AF///AB///5A////5///8=), move",
           zoom: "crosshair",
+          dragBbox: "crosshair",
           drawPoint: "crosshair",
           drawLineString: "crosshair",
           drawPolygon: "crosshair",
@@ -4044,6 +4067,7 @@ $.Widget.prototype = {
         mode: "pan",
         pannable: true,
         scroll: "default",
+        shift: "default",
         services: [
             {
               "class": "osm",
@@ -4113,7 +4137,7 @@ $.Widget.prototype = {
     _mouseDown: undefined,
     _inOp: undefined,
     _toolPan: undefined,
-    _shiftZoom: undefined,
+    _shiftDown: undefined,
     _anchor: undefined,
     _current: undefined,
     _downDate: undefined,
@@ -4192,7 +4216,7 @@ $.Widget.prototype = {
       this._mouseDown =
           this._inOp =
           this._toolPan =
-          this._shiftZoom =
+          this._shiftDown =
           this._panning =
           this._isTap =
           this._isDbltap = false;
@@ -5409,7 +5433,10 @@ $.Widget.prototype = {
     },
 
     _eventTarget_touchstart: function (e) {
-      if ( this._options[ "mode" ] === "static" ) {
+      var mode = this._options[ "mode" ],
+          shift = this._options[ "shift" ];
+
+      if ( mode === "static" ) {
         return;
       }
 
@@ -5482,13 +5509,13 @@ $.Widget.prototype = {
       this._mouseDown = true;
       this._anchor = $.merge( [ ], this._current );
 
-      if (!this._inOp && e.shiftKey) {
-        this._shiftZoom = true;
-        this._$eventTarget.css("cursor", this._options["cursors"]["zoom"]);
-      } else if ( !this._isMultiTouch && this._options[ "pannable" ] ) {
+      if (!this._inOp && e.shiftKey && shift !== "off") {
+        this._shiftDown = true;
+        this._$eventTarget.css( "cursor", this._options[ "cursors" ][ shift === "default" ? "zoom" : shift ] );
+      } else if ( !this._isMultiTouch && ( this._options[ "pannable" ] || mode === "dragBbox" ) ) {
         this._inOp = true;
 
-        if (this._options["mode"] !== "zoom") {
+        if ( mode !== "zoom" && mode !== "dragBbox" ) {
           this._lastDrag = this._current;
 
           if (e.currentTarget.setCapture) {
@@ -5608,10 +5635,12 @@ $.Widget.prototype = {
         return false;
       }
 
-      var mode = this._shiftZoom ? "zoom" : this._options["mode"];
+      var shift = this._options[ "shift" ],
+          mode = this._shiftDown ? ( shift === "default" ? "zoom" : shift ) : this._options["mode"];
 
       switch (mode) {
         case "zoom":
+        case "dragBbox":
           if ( this._mouseDown ) {
             this._$drawContainer.geographics( "clear" );
             this._$drawContainer.geographics( "drawBbox", [
@@ -5674,7 +5703,8 @@ $.Widget.prototype = {
       var mouseWasDown = this._mouseDown,
           wasToolPan = this._toolPan,
           offset = this._$eventTarget.offset(),
-          mode = this._shiftZoom ? "zoom" : this._options["mode"],
+          shift = this._options[ "shift" ],
+          mode = this._shiftDown ? ( shift === "default" ? "zoom" : shift ) : this._options["mode"],
           current, i, clickDate,
           dx, dy;
 
@@ -5699,7 +5729,7 @@ $.Widget.prototype = {
 
       this._$eventTarget.css("cursor", this._options["cursors"][this._options["mode"]]);
 
-      this._shiftZoom = this._mouseDown = this._toolPan = false;
+      this._shiftDown = this._mouseDown = this._toolPan = false;
 
       if ( this._isMultiTouch ) {
         e.preventDefault( );
@@ -5722,8 +5752,9 @@ $.Widget.prototype = {
         clickDate = $.now();
         this._current = current;
 
-        switch (mode) {
+        switch ( mode ) {
           case "zoom":
+          case "dragBbox":
             if ( dx !== 0 || dy !== 0 ) {
               var minSize = this._pixelSize * 6,
                   bboxCoords = this._toMap( [ [
@@ -5739,13 +5770,22 @@ $.Widget.prototype = {
                     bboxCoords[0][1],
                     bboxCoords[1][0],
                     bboxCoords[1][1]
-                  ];
+                  ],
+                  polygon;
 
-              if ( ( bbox[2] - bbox[0] ) < minSize && ( bbox[3] - bbox[1] ) < minSize ) {
-                bbox = $.geo.scaleBy( this._getBbox( $.geo.center( bbox, true ) ), 0.5, true );
+              if ( mode === "zoom" ) {
+                if ( ( bbox[2] - bbox[0] ) < minSize && ( bbox[3] - bbox[1] ) < minSize ) {
+                  bbox = $.geo.scaleBy( this._getBbox( $.geo.center( bbox, true ) ), 0.5, true );
+                }
+
+                this._setBbox(bbox, true, true);
+              } else {
+                polygon = $.geo.polygonize( bbox, true );
+                this._trigger( "shape", e, this._userGeodetic ? {
+                  type: "Polygon",
+                  coordinates: $.geo.proj.toGeodetic( polygon.coordinates )
+                } : polygon );
               }
-
-              this._setBbox(bbox, true, true);
             }
 
             this._resetDrawing();
@@ -5982,7 +6022,18 @@ $.Widget.prototype = {
 
                 opacity = service.style.opacity,
 
-                x, y;
+                x, y,
+
+                loadImageDeferredDone = function( url ) {
+                  // when a Deferred call is done, add the image to the map
+                  // a reference to the correct img element is on the Deferred object itself
+                  serviceObj._loadImage( $.data( this, "img" ), url, pixelSize, serviceState, serviceContainer, opacity );
+                },
+
+                loadImageDeferredFail = function( ) {
+                  $.data( this, "img" ).remove( );
+                  serviceState.loadCount--;
+                };
 
             for ( x = tileX; x < tileX2; x++ ) {
               for ( y = tileY; y < tileY2; y++ ) {
@@ -6049,14 +6100,12 @@ $.Widget.prototype = {
 
                   if ( typeof imageUrl === "string" ) {
                     serviceObj._loadImage( $img, imageUrl, pixelSize, serviceState, serviceContainer, opacity );
-                  } else {
+                  } else if ( imageUrl ) {
                     // assume Deferred
-                    imageUrl.done( function( url ) {
-                      serviceObj._loadImage( $img, url, pixelSize, serviceState, serviceContainer, opacity );
-                    } ).fail( function( ) {
-                      $img.remove( );
-                      serviceState.loadCount--;
-                    } );
+                    $.data( imageUrl, "img", $img );
+                    imageUrl.done( loadImageDeferredDone ).fail( loadImageDeferredFail );
+                  } else {
+                    $img.remove( );
                   }
 
                   /* end same as refresh 4 */
@@ -6156,7 +6205,18 @@ $.Widget.prototype = {
 
               opacity = service.style.opacity,
 
-              x, y;
+              x, y,
+
+              loadImageDeferredDone = function( url ) {
+                // when a Deferred call is done, add the image to the map
+                // a reference to the correct img element is on the Deferred object itself
+                serviceObj._loadImage( $.data( this, "img" ), url, pixelSize, serviceState, $serviceContainer, opacity );
+              },
+
+              loadImageDeferredFail = function( ) {
+                $.data( this, "img" ).remove( );
+                serviceState.loadCount--;
+              };
 
           if (serviceState.reloadTiles) {
             scaleContainers.find("img").attr("data-dirty", "true");
@@ -6249,14 +6309,12 @@ $.Widget.prototype = {
 
                 if ( typeof imageUrl === "string" ) {
                   serviceObj._loadImage( $img, imageUrl, pixelSize, serviceState, $serviceContainer, opacity );
-                } else {
+                } else if ( imageUrl ) {
                   // assume Deferred
-                  imageUrl.done( function( url ) {
-                    serviceObj._loadImage( $img, url, pixelSize, serviceState, $serviceContainer, opacity );
-                  } ).fail( function( ) {
-                    $img.remove( );
-                    serviceState.loadCount--;
-                  } );
+                  $.data( imageUrl, "img", $img );
+                  imageUrl.done( loadImageDeferredDone ).fail( loadImageDeferredFail );
+                } else {
+                  $img.remove( );
                 }
               }
             }

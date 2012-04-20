@@ -44,27 +44,60 @@
           <td><pre><code>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;mode&quot;, &quot;drawPoint&quot; );</code></pre></td>
         </tr>
       </table>
-      <p>The mode option determines how the map responds to user interaction and which events the developer receives.</p>
+
+      <p>The mode option determines how the map responds to user interaction and which events jQuery Geo triggers for the developer.</p>
+
+      <p>jQuery Geo puts these modes into four small groups:</p>
       
-      <p>The current list of built-in modes is:</p>
+      <h2>modes</h2>
+
+
+      <h3>basic</h3>
+
+      <p>Basic modes are most common to what people expect to be able to do with a map: drag it around, zoom it in and out, or just have it sit there an look pretty.</p>
+
       <ul>
         <li>static</li>
         <li>pan</li>
         <li>zoom</li>
+      </ul>
+
+      <h3>drag</h3>
+
+      <p>Drag modes disable panning and turn single swipes into shape events.</p>
+
+      <ul>
+        <li>dragBbox</li>
+      </ul>
+
+      <h3>draw</h3>
+
+      <p>Draw modes turn user clicks into shape events, panning is allowed.</p>
+
+      <ul>
         <li>drawPoint</li>
         <li>drawLineString</li>
         <li>drawPolygon</li>
+      </ul>
+
+      <h3>measure</h3>
+
+      <p>Measure modes display length and area based on clicks and drags.</p>
+
+      <ul>
         <li>measureLength</li>
         <li>measureArea</li>
       </ul>
 
       <p>You are free to set mode to any other string, this is called <a href="javascript:document.getElementById('custom-modes').scrollIntoView();" rel="external">custom modes</a> in jQuery Geo and described at the end of this page.</p>
 
-      <h2>options</h2>
+      <h2>related options</h2>
+
       <p>Each mode has a matching property on the <a href="cursors.html">cursors</a> option. For example, to change the cursor for drawPoint mode to an I-beam, you can initialize the geomap widget like this:</p>
+
       <pre><code>$( <i>selector</i> ).geomap( { cursors: { drawPoint: &quot;text&quot; } } )</code></pre>
 
-      <p>The <a href="drawStyle.html">drawStyle</a> option determines how shapes look while being drawn in all of the draw modes and all of the measure modes.</p>
+      <p>The <a href="drawStyle.html">drawStyle</a> option determines how shapes look while being drawn in all of the draw, drag, and measure modes.</p>
 
       <p>The <a href="measureLabels.html">measureLabels</a> option determines how the text is formatted while using the measure modes.</p>
 
@@ -83,6 +116,7 @@
 
       <h3>user experience</h3>
       <p>The default cursor is the default arrow pointer.</p>
+
       <p>The map widget displays tiles and map images as normal but the user cannot interact with them, e.g., the user can't pan or zoom in any way, even if the <a href="pannable.html">pannable</a> option is set to true.</p>
 
       <p>As a developer, you can still call geomap methods and set options in order to change the static map's appearance. Events are not triggered when you change the map programmatically.</p>
@@ -95,6 +129,8 @@
       <p>The default cursor is an open hand in browsers that support data URIs and a four point arrow otherwise.</p>
 
       <p>The user can drag the map to pan. The map will continue panning a little after the user lets go. They can zoom in or out with the scroll wheel. They can also double-click or double-tap to zoom in one level. On some multitouch devices, users can use two fingers to &quot;pinch zoom&quot; (currently not available on Android).</p>
+
+      <p>The user can hold the shift key to temporarily switch to zoom mode.</p>
 
       <h3>events</h3>
       <p>In pan mode, the geomap widget triggers the following events on the original map div.</p>
@@ -124,6 +160,27 @@
         <li>bboxchange &ndash; when the user changes the bbox by zooming</li>
       </ul>
 
+      <h2>dragBbox</h2>
+
+      <h3>user experience</h3>
+      <p>The default cursor is a crosshair.</p>
+
+      <p>Similar to zoom, in this mode the user can click and hold one point and then drag the mouse cursor. A box will form. When the user lets go of the mouse, jQuery Geo will trigger a shape event passing a GeoJSON Polygon representation of the dragged bbox as the geo argument. The Polygon object also has the GeoJSON the bbox property.</p>
+
+      <p>The user cannot pan the map while in dragBbox mode. The user can zoom in or out with the scroll wheel as well as double-click or double-tap to zoom in one level. On some multitouch devices, users can use two fingers to &quot;pinch zoom&quot; (currently not available on Android).</p>
+
+      <p>The user can hold the shift key to temporarily switch to zoom mode.</p>
+
+      <h3>events</h3>
+      <p>In dragBbox mode the geomap widget triggers the following events on the original map div.</p>
+      <ul>
+        <li>move &ndash; when the user moves the mouse above the map but is not actively dragging a bbox</li>
+        <li>click &ndash; when the user clicks or taps a point on the map without initiating a marquee drag, i.e., they let go of the map at the same point and within a short time threshold</li>
+        <li>dblclick &ndash; when the user double-clicks or double-taps a point on the map</li>
+        <li>bboxchange &ndash; when the user changes the bbox by zooming</li>
+        <li>shape &ndash; when the user lets go of the mouse after dragging to make a bbox, jQuery Geo will send a GeoJSON Polygon object to the developer; this Polygon object has a bbox property which is set to the bbox of the rectangle drawn</li>
+      </ul>
+
       <h2>drawPoint</h2>
 
       <h3>user experience</h3>
@@ -134,6 +191,8 @@
       <p>A visual point will appear temporarily until they either let go to draw the point or begin panning.</p>
 
       <p>Similar to pan mode, the user can drag the map to pan. However, to allow a user more accuracy during digitization, the map will not continue panning a little after the user lets go. They can zoom in or out with the scroll wheel. They can also double-click or double-tap to zoom in one level. On some multitouch devices, users can use two fingers to &quot;pinch zoom&quot; (currently not available on Android).</p>
+
+      <p>The user can hold the shift key to temporarily switch to zoom mode.</p>
 
       <h3>events</h3>
       <p>In drawPoint mode, the geomap widget triggers the following events on the original map div. Note that the shape event replaces the click event.</p>
@@ -154,6 +213,8 @@
       <p>On a non-touch device a visual line will follow the mouse cursor from the last point to show the user the next segment of the line they will draw. On all devices, the next segment becomes visible when the user confirms the next point location by clicking or tapping. At any point, the user can hit the escape key to remove one point or, if there is only one point, stop drawing the shape alltogether.</p>
 
       <p>Similar to pan mode, the user can drag the map to pan, even while drawing a shape. However, to allow a user more accuracy during digitization, the map will not continue panning a little after the user lets go. They can zoom in or out with the scroll wheel. While not drawing, they can also double-click or double-tap to zoom in one level. On some multitouch devices, users can use two fingers to &quot;pinch zoom&quot; (currently not available on Android).</p>
+
+      <p>The user can hold the shift key to temporarily switch to zoom mode.</p>
 
       <h3>events</h3>
       <p>In drawLineString mode, the geomap widget triggers the following events on the original map div.</p>
@@ -176,6 +237,8 @@
 
       <p>Similar to pan mode, the user can drag the map to pan, even while drawing a shape. However, to allow a user more accuracy during digitization, the map will not continue panning a little after the user lets go. They can zoom in or out with the scroll wheel. While not drawing, they can also double-click or double-tap to zoom in one level. On some multitouch devices, users can use two fingers to &quot;pinch zoom&quot; (currently not available on Android).</p>
 
+      <p>The user can hold the shift key to temporarily switch to zoom mode.</p>
+
       <h3>events</h3>
       <p>In drawPolygon mode, the geomap widget triggers the following events on the original map div.</p>
       <ul>
@@ -196,6 +259,8 @@
       <p>On a non-touch device a visual line will follow the mouse cursor from the last point to show the user the next segment of the line they are measuring and update the measurement. On all devices, the next segment becomes visible when the user confirms the next point location by clicking or tapping. At any point, the user can hit the escape key to remove one point or, if there is only one point, stop measuring alltogether.</p>
 
       <p>Similar to pan mode, the user can drag the map to pan, even while measuring. The map will continue panning a little after the user lets go. They can zoom in or out with the scroll wheel. While not measuring, they can also double-click or double-tap to zoom in one level. On some multitouch devices, users can use two fingers to &quot;pinch zoom&quot; (currently not available on Android).</p>
+
+      <p>The user can hold the shift key to temporarily switch to zoom mode.</p>
 
       <p>By default the unit of measurment is meters because the default projection is web mercator meters. If you change the tilingScheme (on tiled services) or switch to a shingled service, the unit of measurment will be based on your new service's units.</p>
       <h3>events</h3>
@@ -219,9 +284,12 @@
 
       <p>Similar to pan mode, the user can drag the map to pan, even while measuring. The map will continue panning a little after the user lets go. They can zoom in or out with the scroll wheel. While not measuring, they can also double-click or double-tap to zoom in one level. On some multitouch devices, users can use two fingers to &quot;pinch zoom&quot; (currently not available on Android).</p>
 
+      <p>The user can hold the shift key to temporarily switch to zoom mode.</p>
+
       <p>By default the unit of measurment is meters because the default projection is web mercator meters. If you change the tilingScheme (on tiled services) or switch to a shingled service, the unit of measurment will be based on your new service's units.</p>
 
       <h3>events</h3>
+
       <p>In measureArea mode, the geomap widget triggers the following events on the original map div.</p>
       <ul>
         <li>move &ndash; when the user moves the mouse above the map but is not actively panning, this event triggers even while measuring</li>
