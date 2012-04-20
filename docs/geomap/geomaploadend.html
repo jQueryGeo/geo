@@ -1,0 +1,57 @@
+<!doctype html>  
+
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+
+  <title>loadend | geomap</title>
+  <meta name="description" content="geomap loadend event">
+  <meta name="author" content="Ryan Westphal">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="../css/style.css?v=2">
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
+</head>
+
+<body>
+
+  <div id="loadend" data-role="page">
+    <div data-role="header" data-theme="a">
+      <h1>loadend</h1>
+    </div>
+    
+    <div data-role="content">
+      <table>
+        <tr>
+          <th>type</th>
+          <td>load</td>
+        </tr>
+        <tr>
+          <th>init</th>
+          <td><pre><code>$( <i>map selector</i> ).geomap( {
+  loadend: function( e, geo ) { }
+} );</code></pre></td>
+        </tr>
+        <tr>
+          <th>bind</th>
+          <td><pre><code>$( <i>map selector</i> ).bind( &quot;geomaploadend&quot;, function( e, geo ) { } );
+} );</code></pre></td>
+        </tr>
+      </table>
+
+      <p>The loadend event triggers after a loadstart event when the geomap widget has finished loading all pending images. It only triggers once regardless of the number of images loaded. It will not be triggered again until after another loadstart event.</p>
+
+      <p>The geo argument is currently undefined for this event.</p>
+
+      <p>You can use this event to hide an indicator that your website is busy downloading images.</p> 
+    </div>
+  </div> <!-- end of #container -->
+
+  <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a4.min.js"></script>
+  <script src="../js/script.js"></script>
+  <script src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
+</body>
+</html>
+

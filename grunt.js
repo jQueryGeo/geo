@@ -50,7 +50,7 @@ module.exports = function(grunt) {
       files: ['test/**/*.html']
     },
     lint: {
-      files: ['js/jquery.geo.core.js', 'js/jquery.geo.geographics.js', 'js/jquery.geo.geomap.js', 'js/jquery.geo.shingled.js']
+      files: ['js/jquery.geo.core.js', 'js/jquery.geo.geographics.js', 'js/jquery.geo.geomap.js', 'js/jquery.geo.shingled.js', 'js/jquery.geo.tiled.js']
     },
     watch: {
       files: '<config:lint.files>',

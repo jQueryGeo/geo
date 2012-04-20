@@ -1,22 +1,22 @@
 ﻿== to do ==
 
 === b1 ===
-* docs - geomap - dragBbox mode
-* geomap - dragBbox mode
-* docs - geomap - shift option (default, zoom, shape, off)
-* geomap - shift option (default, zoom, shape, off)
-* docs - geomap - loadstart event
-* geomap - loadstart event
-* docs - geomap - loadend event
-* geomap - loadend event
-* docs - geomap - allow append to take an array of shapes
+* geomap - loadstart, loadend events
 * geomap - allow append to take an array of shapes
-* docs - geomap - allow remove to take an array of shapes
 * geomap - allow remove to take an array of shapes
 * docs - geomap - add argument to refresh to force reload of images (in case of dynamic data)
 * geomap - add argument to refresh to force reload of images (in case of dynamic data)
 * docs - geomap - zoomMax option (tiled & shingled)
 * geomap - zoomMax option
+* docs - geomap - allow template for label argument to append
+* geomap - allow template for label argument to append
+* docs - geomap - allow template for properties on style argument to append
+* geomap - allow template for properties on style argument to append
+* docs - geomap - shapeLabel property
+** template for labels for all shapes added via append
+* geomap - shapeLabel property
+* docs - geomap - allow template for properties on shapeStyle option
+* geomap - allow template for properties on shapeStyle option
 * geomap - cache label coordinates (the labelPixel cannot be cached, it will change each refresh)
 * geomap - rotate label based on segment
 * geomap - use pointer-events: none where appropriate
@@ -26,7 +26,7 @@
 * geographics - draw all labels to a string or document fragment and append to DOM once
 * geomap - compile shingled & tiled string src templates for re-use
 ** be sure their template names are unique so they don't overwrite each other
-* docs - warn users about potential CSS/JavaScript issues relating to generated elements:
+* docs - warn users about potential CSS/JavaScript issues relating to generated elements
 ** ul, li, div, span, img
 * geomap - [bug] pinch-zoom doesn't follow user's fingers close enough when scaling
 * docs - geomap - describe "graphic service" as shingled with src set to empty string or null
@@ -48,6 +48,7 @@
 ** possibly only when axisLayout is image
 * geomap - [bug] multiples of the same event trigger after creating more than one map on the same div, even after destroy
 ** destroy should unbind all geomap events
+* geomap - add delegate handler for image load instead of one load handler per image
 * geomap - remove this-style state properties
 * geomap - remove "px" from .css calls
 * geo - use Array.push instead of $.merge where needed
@@ -157,8 +158,6 @@
 * geo - Support WKT with $.geo.parseWKT & $.geo.textify
 * geo - All bbox operations should be done in non-geodetic coordinates for accuracy
 * geo - support bbox in distance ( fix geomap.find )
-* docs - geomap - shapeLabel property
-** template for labels for all shapes added via append
 * geomap - perf test putting all containers that need to move with panning in a single super-container
 * docs - geomap - multiple labels
 * geomap - multiple labels
@@ -199,6 +198,40 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-04-12==
+===polygonize===
+That's what the bbox->polygon function will be called. It's in GEOS. Their docs say: Polygonizes a set of Geometries which contain linework that represents the edges of a planar graph.
+
+While that's supposed to be only for linework, e.g., a LineString to Polygon, I think it's fine to extend that to bbox. It's not called polygonize in JTS, there's a Polygonizer class and a getPolygons method. I'll simplify that, too.
+
+===shift===
+I changed the shape value to dragBbox so I can use it in the code a little more smoothly (choosing cursors, actually switching the mode).
+
+==2012-04-11==
+===foss===
+I gave my talk, went ok. Gotta get back to docs.
+
+===dragBbox===
+This mode should operate even if pannable is set to false. There's a test in the code where I have to special case that out.
+
+==2012-04-10==
+===foss===
+I'm coding at foss4g!
+
+===Deferred===
+Deferred demo is done.
+
+==2012-03-30==
+
+### markdown
+The new markdown file looks nice!
+
+### docs
+Time to document the last feature that are going into b1. Actually, I want to lint the last file, tiled.js.
+
+### Deferred context
+The last lint issue is that I shouldn't create functions in a loop. That's done when the user returns a Deferred object as the tiled service's src property. The function calls _loadImage on the service object but needs more than the url, which is all the Deferred done call gives it. How do I get the rest, such as $img, pixelSize, etc. $.proxy? But isn't that creating a function anyway, just one that lint can't see? Yes, it does. Maybe I can put the data on the Deferred object itself. I don't see why not.
 
 ==2012-03-30==
 ===grunt===

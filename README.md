@@ -34,7 +34,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Release History
 
-### 1.0b1
+### 1.0.0b1
 * geographics - use canvas compositing for Polygons with holes
 * geographics - [bug] on polygons with holes, stroke draws a line from exterior ring to interior one
 * docs - geomap - trigger a shape event when a user finishes measuring
@@ -52,6 +52,17 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * deploy - build releases using grunt
 * deploy - make a package for new jQuery plugin directory
 ** https://github.com/jquery/plugins.jquery.com/blob/master/docs/package.md
+* deploy - lint JavaScript files
+* docs - geomap - dragBbox mode
+* docs - geo - polygonize function for bbox
+* geo - polygonize function for bbox
+* geomap - dragBbox mode
+* docs - geomap - shift option (default, zoom, dragBbox, off)
+* geomap - shift option (default, zoom, dragBbox, off)
+* docs - geomap - loadstart, loadend events
+* docs - geomap - allow append to take an array of shapes
+* docs - geomap - allow remove to take an array of shapes
+* docs - geomap - improve services option documentation
 
 ### 1.0a4 (2012-02-19)
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax
@@ -241,5 +252,5 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## License
 Copyright (c) 2012 Applied Geographics, Inc.
-Lead developer: Ryan Westphal
+Project lead by Ryan Westphal
 Licensed under the MIT, GPL licenses.

@@ -29,16 +29,20 @@
         </tr>
         <tr>
           <th>syntax</th>
-          <td>.geomap( &quot;remove&quot;, Object shape [ , Boolean refresh ] )</td>
+          <td>.geomap( &quot;remove&quot;, Object shape ( <a href="http://geojson.org/geojson-spec.html" rel="external">GeoJSON object</a> ) | Array&lt;Object&gt; shapes [ , Boolean refresh ] )</td>
         </tr>
         <tr>
           <th>usage</th>
           <td><pre><code>$( <i>map or service selector</i> ).geomap( &quot;remove&quot;, existingShape )
-$( <i>map or service selector</i> ).geomap( &quot;remove&quot;, existingShape, false )</code></pre></td>
+$( <i>map or service selector</i> ).geomap( &quot;remove&quot;, existingShape, false )
+$( <i>map or service selector</i> ).geomap( &quot;remove&quot;, [ existingShape1, existingShape2 ] )</code></pre></td>
         </tr>
       </table>
-      <p>The remove method removes a shape you have previously added with the append method. The existing shape can be an object reference used in a call to <a href="append.html">append</a> that you have held on to or one that you retrieved by using the <a href="find.html">find</a> method.</p>
+
+      <p>The remove method removes a shape (or array of shapes) that you have previously added with the append method. The existing shapes can be an object references used in a call to <a href="append.html">append</a> which you have held on to or ones that you retrieved by using the <a href="find.html">find</a> method.</p>
+
       <p>The jQuery UI widget factory returns the original jQuery collection to maintain call chaining.</p>
+
       <h2>delaying refresh</h2>
       <p>The optional refresh argument determines if geomap refreshes the map graphics after this call to remove. It defaults to true. If you pass false, geomap will remove the shape internally but not immediately redraw the graphics. The changes will display if the user moves the map or you call geomap's refresh method.</p>
       <p>If the shape is not found on the specified service, the map is not changed and will not be refreshed even if you pass true for the refresh argument.</p>
