@@ -91,6 +91,8 @@
 
     _userGeodetic: true,
 
+    _interactiveTimeout: null,
+
     _wheelTimeout: null,
     _wheelLevel: 0,
 
@@ -1048,7 +1050,8 @@
       if (this._wheelLevel !== 0) {
         var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, this._options[ "tilingScheme" ] !== null );
 
-        this._setCenterAndSize(wheelCenterAndSize.center, wheelCenterAndSize.pixelSize, true, true);
+        // #newpanzoom
+        //this._setCenterAndSize(wheelCenterAndSize.center, wheelCenterAndSize.pixelSize, true, true);
 
         this._wheelLevel = 0;
       } else if ( refresh ) {
@@ -1089,7 +1092,8 @@
 
         this._$servicesContainer.find( ".geo-shapes-container" ).css( { left: 0, top: 0 } );
 
-        this._setCenterAndSize([this._center[0] + dxMap, this._center[1] + dyMap], this._pixelSize, true, true);
+        // #newpanzoom
+        //this._setCenterAndSize([this._center[0] + dxMap, this._center[1] + dyMap], this._pixelSize, true, true);
 
         this._$eventTarget.css("cursor", this._options["cursors"][this._options["mode"]]);
 
@@ -1102,6 +1106,11 @@
     _panMove: function () {
       if ( ! this._options[ "pannable" ] ) {
         return;
+      }
+
+      if ( this._interactiveTimeout ) {
+        window.clearTimeout( this._interactiveTimeout );
+        this._interactiveTimeout = null;
       }
 
       var dx = this._current[0] - this._lastDrag[0],
@@ -1142,6 +1151,13 @@
 
           this._$panContainer.css( translateObj );
 
+          var geomap = this;
+          this._interactiveTimeout = setTimeout( function () {
+            if ( geomap._interactiveTimeout ) {
+              geomap._refresh( );
+              geomap._interactiveTimeout = null;
+            }
+          }, 500 );
           //this._refreshDrawing();
         }
       }
@@ -1308,6 +1324,7 @@
     },
 
     _zoomTo: function (coord, zoom, trigger, refresh) {
+      // #deprecated
       zoom = zoom < 0 ? 0 : zoom;
 
       var pixelSize = this._getPixelSize( zoom );
@@ -1337,7 +1354,8 @@
       this._trigger("dblclick", e, { type: "Point", coordinates: this.toMap(this._current) });
       if (!e.isDefaultPrevented()) {
         var centerAndSize = this._getZoomCenterAndSize(this._current, 1, true );
-        this._setCenterAndSize(centerAndSize.center, centerAndSize.pixelSize, true, true);
+        // #newpanzoom
+        //this._setCenterAndSize(centerAndSize.center, centerAndSize.pixelSize, true, true);
       }
     },
 
@@ -1702,7 +1720,8 @@
 
         var pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, false );
 
-        this._setCenterAndSize(pinchCenterAndSize.center, pinchCenterAndSize.pixelSize, true, true);
+        // #newpanzoom
+        //this._setCenterAndSize(pinchCenterAndSize.center, pinchCenterAndSize.pixelSize, true, true);
 
         this._wheelLevel = 0;
 
@@ -1743,7 +1762,8 @@
                   bbox = $.geo.scaleBy( this._getBbox( $.geo.center( bbox, true ) ), 0.5, true );
                 }
 
-                this._setBbox(bbox, true, true);
+                // #newpanzoom
+                //this._setBbox(bbox, true, true);
               } else {
                 polygon = $.geo.polygonize( bbox, true );
                 this._trigger( "shape", e, this._userGeodetic ? {
