@@ -762,7 +762,7 @@
       this._$contentFrame.append('<div class="geo-draw-container" style="' + contentPosCss + contentSizeCss + '"></div>');
       this._$drawContainer = this._$contentFrame.children(':last');
 
-      this._$contentFrame.append('<div class="geo-measure-container" style="' + contentPosCss + contentSizeCss + '"><div class="geo-measure-label" style="' + contentPosCss + '; display: none;"></div></div>');
+      this._$contentFrame.append('<div class="geo-measure-container" style="' + contentPosCss + contentSizeCss + '"><span class="geo-measure-label" style="' + contentPosCss + '; display: none;"></span></div>');
       this._$measureContainer = this._$contentFrame.children(':last');
       this._$measureLabel = this._$measureContainer.children();
 
@@ -856,7 +856,8 @@
             labelShape.coordinates[ 0 ].push( coords[ 0 ] );
 
             label = $.render[ this._tmplAreaId ]( { area: $.geo.area( labelShape, true ) } );
-            labelPixel = $.merge( [], pixels[ pixels.length - 1 ] );
+            //labelPixel = $.merge( [], pixels[ pixels.length - 1 ] );
+            labelPixel = this._toPixel( $.geo.centroid( labelShape ).coordinates );
             pixels = [ pixels ];
             break;
 
@@ -882,8 +883,8 @@
           }
 
           this._$measureLabel.css( {
-            left: labelPixel[ 0 ],
-            top: labelPixel[ 1 ]
+            left: Math.max( labelPixel[ 0 ], 0 ),
+            top: Math.max( labelPixel[ 1 ], 0 )
           } ).show();
         }
       }

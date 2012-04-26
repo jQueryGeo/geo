@@ -99,6 +99,7 @@
 
 === future ===
 
+* geomap - [bug] verify label clamping is correct in axisLayout=image maps
 * docs - geomap - pass the service id (if there is one) to the src callback as a view property
 * geomap - pass the service id (if there is one) to the src callback as a view property
 * docs - geomap - support dynamic map services that only work in geodetic coordinates (sr=4326)?
@@ -201,6 +202,20 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-04-26==
+===measure===
+In some instances, the measure tool doesn't position properly. Going to change it from a div to a span to calculate width better. The container can stay a div. Only the actual label needs to be inline.
+
+Fixed. I'm also clamping to [0, 0] so the measure label doesn't move past the left or top of the map.
+
+===pixel measure===
+I can tell I will have to add support for axisLayout=image into the measure code. The clamping is backwards.
+
+===centroid===
+On bad polygon geometry (hourglass is the common example), our centroid function returns weird results. I might clamp to the bbox for now as a stopgap until I fix it for real.
+
+That's better. Not great but not nearly as much weirdness.
 
 ==2012-04-24==
 ===pan/zoom===
