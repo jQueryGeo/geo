@@ -63,6 +63,9 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * docs - geomap - allow append to take an array of shapes
 * docs - geomap - allow remove to take an array of shapes
 * docs - geomap - improve services option documentation
+* geomap - clamp measure labels to [0, 0]
+* geo - clamp centroid to bbox
+* geomap - measure label for polygon should be in centroid
 
 ### 1.0a4 (2012-02-19)
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax
