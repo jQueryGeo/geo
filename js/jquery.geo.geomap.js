@@ -760,7 +760,7 @@
       this._$contentFrame.append('<div class="geo-draw-container" style="' + contentPosCss + contentSizeCss + '"></div>');
       this._$drawContainer = this._$contentFrame.children(':last');
 
-      this._$contentFrame.append('<div class="geo-measure-container" style="' + contentPosCss + contentSizeCss + '"><div class="geo-measure-label" style="' + contentPosCss + '; display: none;"></div></div>');
+      this._$contentFrame.append('<div class="geo-measure-container" style="' + contentPosCss + contentSizeCss + '"><span class="geo-measure-label" style="' + contentPosCss + '; display: none;"></span></div>');
       this._$measureContainer = this._$contentFrame.children(':last');
       this._$measureLabel = this._$measureContainer.children();
 

@@ -202,6 +202,10 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2012-04-26==
+===measure===
+In some instances, the measure tool doesn't position properly. Going to change it from a div to a span to calculate width better. The container can stay a div. Only the actual label needs to be inline.
+
 ==2012-04-24==
 ===pan/zoom===
 Where was I? :) Right, first disable all refreshing and attempt a the new interactive pan.
