@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0.0b1 - 2012-04-12
+/*! jQuery Geo - v1.0.0b1 - 2012-04-26
  * http://jquerygeo.com
  * Copyright (c) 2012 Ryan Westphal/Applied Geographics, Inc.; Licensed MIT, GPL */
 
@@ -2892,7 +2892,8 @@ $.Widget.prototype = {
           var a = 0,
               c = [0, 0],
               coords = $.merge( [ ], geom.type == "Polygon" ? geom.coordinates[0] : geom.coordinates ),
-              i = 1, j, n;
+              i = 1, j, n,
+              bbox = [ pos_oo, pos_oo, neg_oo, neg_oo ];
 
           var wasGeodetic = false;
           if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( coords ) ) {
@@ -2906,6 +2907,12 @@ $.Widget.prototype = {
 
           for (; i <= coords.length; i++) {
             j = i % coords.length;
+
+            bbox[0] = Math.min(coords[j][0], bbox[0]);
+            bbox[1] = Math.min(coords[j][1], bbox[1]);
+            bbox[2] = Math.max(coords[j][0], bbox[2]);
+            bbox[3] = Math.max(coords[j][1], bbox[3]);
+
             n = (coords[i - 1][0] * coords[j][1]) - (coords[j][0] * coords[i - 1][1]);
             a += n;
             c[0] += (coords[i - 1][0] + coords[j][0]) * n;
@@ -2914,8 +2921,8 @@ $.Widget.prototype = {
 
           if (a === 0) {
             if (coords.length > 0) {
-              c[0] = coords[0][0];
-              c[1] = coords[0][1];
+              c[0] = Math.min( Math.max( coords[0][0], bbox[ 0 ] ), bbox[ 2 ] );
+              c[1] = Math.min( Math.max( coords[0][1], bbox[ 1 ] ), bbox[ 3 ] );
               return { type: "Point", coordinates: wasGeodetic ? $.geo.proj.toGeodetic(c) : c };
             } else {
               return undefined;
@@ -2923,8 +2930,11 @@ $.Widget.prototype = {
           }
 
           a *= 3;
-          c[0] /= a;
-          c[1] /= a;
+          //c[0] /= a;
+          //c[1] /= a;
+
+          c[0] = Math.min( Math.max( c[0] / a, bbox[ 0 ] ), bbox[ 2 ] );
+          c[1] = Math.min( Math.max( c[1] / a, bbox[ 1 ] ), bbox[ 3 ] );
 
           return { type: "Point", coordinates: wasGeodetic ? $.geo.proj.toGeodetic(c) : c };
       }
@@ -4795,7 +4805,7 @@ $.Widget.prototype = {
       this._$contentFrame.append('<div class="geo-draw-container" style="' + contentPosCss + contentSizeCss + '"></div>');
       this._$drawContainer = this._$contentFrame.children(':last');
 
-      this._$contentFrame.append('<div class="geo-measure-container" style="' + contentPosCss + contentSizeCss + '"><div class="geo-measure-label" style="' + contentPosCss + '; display: none;"></div></div>');
+      this._$contentFrame.append('<div class="geo-measure-container" style="' + contentPosCss + contentSizeCss + '"><span class="geo-measure-label" style="' + contentPosCss + '; display: none;"></span></div>');
       this._$measureContainer = this._$contentFrame.children(':last');
       this._$measureLabel = this._$measureContainer.children();
 
@@ -4889,7 +4899,8 @@ $.Widget.prototype = {
             labelShape.coordinates[ 0 ].push( coords[ 0 ] );
 
             label = $.render[ this._tmplAreaId ]( { area: $.geo.area( labelShape, true ) } );
-            labelPixel = $.merge( [], pixels[ pixels.length - 1 ] );
+            //labelPixel = $.merge( [], pixels[ pixels.length - 1 ] );
+            labelPixel = this._toPixel( $.geo.centroid( labelShape ).coordinates );
             pixels = [ pixels ];
             break;
 
@@ -4915,8 +4926,8 @@ $.Widget.prototype = {
           }
 
           this._$measureLabel.css( {
-            left: labelPixel[ 0 ],
-            top: labelPixel[ 1 ]
+            left: Math.max( labelPixel[ 0 ], 0 ),
+            top: Math.max( labelPixel[ 1 ], 0 )
           } ).show();
         }
       }

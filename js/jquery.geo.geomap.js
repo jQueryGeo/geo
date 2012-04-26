@@ -854,7 +854,8 @@
             labelShape.coordinates[ 0 ].push( coords[ 0 ] );
 
             label = $.render[ this._tmplAreaId ]( { area: $.geo.area( labelShape, true ) } );
-            labelPixel = $.merge( [], pixels[ pixels.length - 1 ] );
+            //labelPixel = $.merge( [], pixels[ pixels.length - 1 ] );
+            labelPixel = this._toPixel( $.geo.centroid( labelShape ).coordinates );
             pixels = [ pixels ];
             break;
 
@@ -880,8 +881,8 @@
           }
 
           this._$measureLabel.css( {
-            left: labelPixel[ 0 ],
-            top: labelPixel[ 1 ]
+            left: Math.max( labelPixel[ 0 ], 0 ),
+            top: Math.max( labelPixel[ 1 ], 0 )
           } ).show();
         }
       }
