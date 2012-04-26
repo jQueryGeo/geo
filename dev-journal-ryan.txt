@@ -17,6 +17,9 @@
 * geomap - shapeLabel property
 * docs - geomap - allow template for properties on shapeStyle option
 * geomap - allow template for properties on shapeStyle option
+* docs - geo - include method for bbox
+** accept null first argument and coordinate or bbox second argument
+* geo - include method for bbox
 * geomap - cache label coordinates (the labelPixel cannot be cached, it will change each refresh)
 * geomap - rotate label based on segment
 * geomap - use pointer-events: none where appropriate
@@ -198,6 +201,28 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-04-24==
+===pan/zoom===
+Where was I? :) Right, first disable all refreshing and attempt a the new interactive pan.
+
+Not all refreshing will be disabled, the function/option calls from the developer should be honored.
+
+===zoomTo===
+Private but never called?
+
+===no refresh===
+With all _setCenterAndZoom calls commented out, the pan container still jumps back to starting position. That's expected with the current code but shouldn't happen when we're done. That jump needs to wait for the full refresh.
+
+==2012-04-20==
+===b1 docs===
+I got some more docs in. I need to take a small break and actually rework the pan/zoom engine.
+
+===pan/zoom===
+So it begins. I think the first thing to do is create the clearable refresh time during pan/zoom and remove the duplicate refresh code in interactivePan & interactiveScale.
+
+===google===
+Google Maps requests new tiles during pan when running in Chrome on the desktop, however, the mobile website waits until the user lets go of the map.
 
 ==2012-04-12==
 ===polygonize===
