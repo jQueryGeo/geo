@@ -258,7 +258,8 @@
           var a = 0,
               c = [0, 0],
               coords = $.merge( [ ], geom.type == "Polygon" ? geom.coordinates[0] : geom.coordinates ),
-              i = 1, j, n;
+              i = 1, j, n,
+              bbox = [ pos_oo, pos_oo, neg_oo, neg_oo ];
 
           var wasGeodetic = false;
           if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( coords ) ) {
@@ -272,6 +273,12 @@
 
           for (; i <= coords.length; i++) {
             j = i % coords.length;
+
+            bbox[0] = Math.min(coords[j][0], bbox[0]);
+            bbox[1] = Math.min(coords[j][1], bbox[1]);
+            bbox[2] = Math.max(coords[j][0], bbox[2]);
+            bbox[3] = Math.max(coords[j][1], bbox[3]);
+
             n = (coords[i - 1][0] * coords[j][1]) - (coords[j][0] * coords[i - 1][1]);
             a += n;
             c[0] += (coords[i - 1][0] + coords[j][0]) * n;
@@ -280,8 +287,8 @@
 
           if (a === 0) {
             if (coords.length > 0) {
-              c[0] = coords[0][0];
-              c[1] = coords[0][1];
+              c[0] = Math.min( Math.max( coords[0][0], bbox[ 0 ] ), bbox[ 2 ] );
+              c[1] = Math.min( Math.max( coords[0][1], bbox[ 1 ] ), bbox[ 3 ] );
               return { type: "Point", coordinates: wasGeodetic ? $.geo.proj.toGeodetic(c) : c };
             } else {
               return undefined;
@@ -289,8 +296,11 @@
           }
 
           a *= 3;
-          c[0] /= a;
-          c[1] /= a;
+          //c[0] /= a;
+          //c[1] /= a;
+
+          c[0] = Math.min( Math.max( c[0] / a, bbox[ 0 ] ), bbox[ 2 ] );
+          c[1] = Math.min( Math.max( c[1] / a, bbox[ 1 ] ), bbox[ 3 ] );
 
           return { type: "Point", coordinates: wasGeodetic ? $.geo.proj.toGeodetic(c) : c };
       }
