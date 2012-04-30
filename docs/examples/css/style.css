@@ -44,8 +44,8 @@
 {  
   .info
   {
-    max-width: 45% !important;
-    position: absolute !important;
+    width: 45% !important;
+    position: fixed;
     right: 16px;
     top: 16px;
   }
@@ -73,7 +73,7 @@ html
   box-shadow: -4px 4px #444;
   opacity: .8;
   padding: 8px;
-  width: 95%;
+  width: 90%;
 }
 
 fieldset { border: none; }
