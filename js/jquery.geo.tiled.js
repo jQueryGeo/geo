@@ -30,6 +30,47 @@
         $.removeData(service, "geoServiceState");
       },
 
+      interactiveTransform: function ( map, service, center, pixelSize ) {
+        var serviceState = $.data( service, "geoServiceState" ),
+            tilingScheme = map.options[ "tilingScheme" ];
+
+        if ( serviceState ) {
+          this._cancelUnloaded( map, service );
+
+          serviceState.serviceContainer.children( ).each( function ( i ) {
+            var $scaleContainer = $(this),
+                scaleRatio = $scaleContainer.data("pixelSize") / pixelSize;
+
+            scaleRatio = Math.round(scaleRatio * 1000) / 1000;
+
+
+            var scaleOriginParts = $scaleContainer.data("scaleOrigin").split(","),
+                oldMapCoord = map._toMap([scaleOriginParts[0], scaleOriginParts[1]]),
+                newPixelPoint = map._toPixel(oldMapCoord, center, pixelSize);
+
+            $scaleContainer.css( {
+              left: Math.round(newPixelPoint[0]) + "px",
+              top: Math.round(newPixelPoint[1]) + "px",
+              width: tilingScheme.tileWidth * scaleRatio,
+              height: tilingScheme.tileHeight * scaleRatio
+            } );
+
+            $scaleContainer.children().css( {
+              msTransformOrigin: "0px 0px",
+              msTransform: "scale(" + scaleRatio + ")"
+            } );
+
+            /*
+            if ( $("body")[0].filters !== undefined ) {
+              $scaleContainer.children().each( function ( i ) {
+                $( this ).css( "filter", "progid:DXImageTransform.Microsoft.Matrix(FilterType=bilinear,M11=" + scaleRatio + ",M22=" + scaleRatio + ",sizingmethod='auto expand')" );
+              } );
+            }
+            */
+          });
+        }
+      },
+
       interactivePan: function ( map, service, dx, dy ) {
         var serviceState = $.data( service, "geoServiceState" );
 
@@ -211,7 +252,7 @@
 
           serviceContainer.children( ).each( function ( i ) {
             var $scaleContainer = $(this),
-                scaleRatio = $scaleContainer.attr("data-pixelSize") / pixelSize,
+                scaleRatio = $scaleContainer.data("pixelSize") / pixelSize,
                 transitionCss = ""; //"width .25s ease-in, height .25s ease-in, left .25s ease-in, top .25s ease-in";
 
             scaleRatio = Math.round(scaleRatio * 1000) / 1000;
@@ -303,7 +344,7 @@
           }
 
           if (!scaleContainer.size()) {
-            $serviceContainer.append("<div style='position:absolute; left:" + serviceLeft % tileWidth + "px; top:" + serviceTop % tileHeight + "px; width:" + tileWidth + "px; height:" + tileHeight + "px; margin:0; padding:0;' data-pixelSize='" + pixelSize + "'></div>");
+            $serviceContainer.append("<div style='-webkit-transform:translateZ(0);position:absolute; left:" + serviceLeft % tileWidth + "px; top:" + serviceTop % tileHeight + "px; width:" + tileWidth + "px; height:" + tileHeight + "px; margin:0; padding:0;' data-pixel-size='" + pixelSize + "'></div>");
             scaleContainer = $serviceContainer.children(":last").data("scaleOrigin", (serviceLeft % tileWidth) + "," + (serviceTop % tileHeight));
           } else {
             scaleContainer.css({
@@ -373,7 +414,7 @@
                 if (serviceState.reloadTiles && $img.size() > 0) {
                   $img.attr("src", imageUrl);
                 } else {
-                  var imgMarkup = "<img style='position:absolute; " +
+                  var imgMarkup = "<img style='-webkit-transform:translateZ(0);position:absolute; " +
                     "left:" + (((x - fullXAtScale) * 100) + (serviceLeft - (serviceLeft % tileWidth)) / tileWidth * 100) + "%; " +
                     "top:" + (((y - fullYAtScale) * 100) + (serviceTop - (serviceTop % tileHeight)) / tileHeight * 100) + "%; ";
 
@@ -440,7 +481,7 @@
           serviceState.loadCount--;
 
           if (serviceState.loadCount <= 0) {
-            serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+            serviceContainer.children(":not([data-pixel-size='" + pixelSize + "'])").remove();
             serviceState.loadCount = 0;
           }
         }).error(function (e) {
@@ -448,7 +489,7 @@
           serviceState.loadCount--;
 
           if (serviceState.loadCount <= 0) {
-            serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+            serviceContainer.children(":not([data-pixel-size='" + pixelSize + "'])").remove();
             serviceState.loadCount = 0;
           }
         }).attr("src", url);

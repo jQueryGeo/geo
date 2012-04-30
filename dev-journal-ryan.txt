@@ -99,6 +99,9 @@
 
 === future ===
 
+* geomap - determine if moz-transform improves speed in Firefox
+* geomap - [bug] once we detect a pan, disable the ability to go to multitouch
+* geomap - [bug] after one finger is removed, stop processing as if multitouch is still on
 * geomap - [bug] verify label clamping is correct in axisLayout=image maps
 * docs - geomap - pass the service id (if there is one) to the src callback as a view property
 * geomap - pass the service id (if there is one) to the src callback as a view property
@@ -203,6 +206,37 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2012-04-27==
+===transform===
+Setting the transform on the images helped iOS. Settig it on the map div itself helped Android a lot and iOS a little.
+
+===iOS===
+If there's anything else over the map, iOS doesn't respond very well. It doesn't let me pan (scrolling the page instead) and pinch zoom is just weird.
+
+Out of a whim, I didn't include the jQuery UI style sheet. iOS now works like the others. I wonder what's in the style that it doesn't like. Latest version of jQuery UI (1.8.19) still has the issue. I wonder which widget does it.
+
+Weird, if I take out the .button() calls, the demo works on iPad.
+
+iOS works fine with fixed position. It's still the .button calls. I'm sniffing out the button calls for iOS 4-5 for now. I don't have time to figure out that issue.
+
+===ie9===
+I've been wanting to use better features in ie9 for a while. Let's see how this goes because with the new code, I have to drop the filter. I didn't like using filter anyway.
+
+I cannot belive how nicely the transform scale + transform-origin work in ie9! I might investigate using them instead of the % hook on the scale container for webkit & Firefox.
+
+==2012-04-27==
+===panzoom===
+_inOp gets set to true during pan.
+
+When to have the interactive center and pixelSize match the current values? Any function where timeoutInteractive is null, likely.
+
+I may have been moving the services' shapesContainers twice, once in _panMove and again in the service's serviceContainer.children().css call. No, the service container is the data-geo-service object. Its only children are scale containers.
+
+I'm not going to move the scaleContainers separately during pan...oh, I have to because they will move at different velocities.
+
+===transform===
+I'm attempting to add transform support for iOS. 3D CSS transforms make the images bounce around funny during scaling. At least, when I set the CSS on the scaleContainer.
+
 ==2012-04-26==
 ===measure===
 In some instances, the measure tool doesn't position properly. Going to change it from a div to a span to calculate width better. The container can stay a div. Only the actual label needs to be inline.
@@ -216,6 +250,15 @@ I can tell I will have to add support for axisLayout=image into the measure code
 On bad polygon geometry (hourglass is the common example), our centroid function returns weird results. I might clamp to the bbox for now as a stopgap until I fix it for real.
 
 That's better. Not great but not nearly as much weirdness.
+
+===pan/zoom===
+Back to this. I need to disable the pan pop as well as calls to refresh.
+
+When panning, we move the _$panContainer. It contains various top-level items (shapes/draw/measure containers). Each service moves their own content. Pan finalize resets the pan container as well as the shapes container for all services.
+
+I'm still doing too much in touchmove.
+
+Now caching the reference to services shapesContainers.
 
 ==2012-04-24==
 ===pan/zoom===
