@@ -1181,6 +1181,28 @@
       }
     },
 
+    _clearInteractiveTimeout: function() {
+      if ( this._timeoutInteractive ) {
+        clearTimeout( this._timeoutInteractive );
+        this._timeoutInteractive = null;
+      } else {
+        this._centerInteractive[ 0 ] = this._center[ 0 ];
+        this._centerInteractive[ 1 ] = this._center[ 1 ];
+        this._pixelSizeInteractive = this._pixelSize;
+      }
+    },
+
+    _setInteractiveTimeout: function() {
+      var geomap = this;
+      this._timeoutInteractive = setTimeout( function () {
+        if ( geomap._timeoutInteractive ) {
+          geomap._setCenterAndSize( geomap._centerInteractive, geomap._pixelSizeInteractive, true, true );
+          //geomap._refresh( );
+          geomap._timeoutInteractive = null;
+        }
+      }, 500 );
+    },
+
     _refresh: function () {
       var service,
           i = 0;
@@ -1189,7 +1211,7 @@
         for ( ; i < this._currentServices.length; i++ ) {
           service = this._currentServices[ i ];
 
-          if ( !this._mouseDown && $.geo[ "_serviceTypes" ][ service.type ] !== null ) {
+          if ( $.geo[ "_serviceTypes" ][ service.type ] !== null ) {
             $.geo[ "_serviceTypes" ][ service.type ].refresh( this, service );
             service.serviceContainer.geomap( "refresh" );
           }
@@ -1210,15 +1232,16 @@
       }
 
       // the final call during any extent change
+
       if (this._pixelSize != pixelSize) {
         if ( this._$servicesShapesContainers !== undefined ) {
           this._$servicesShapesContainers.geographics("clear");
         }
+      }
 
-        for (var i = 0; i < this._currentServices.length; i++) {
-          var service = this._currentServices[i];
-          $.geo["_serviceTypes"][service.type].interactiveTransform(this, service, center, pixelSize);
-        }
+      for (var i = 0; i < this._currentServices.length; i++) {
+        var service = this._currentServices[i];
+        $.geo["_serviceTypes"][service.type].interactiveTransform(this, service, center, pixelSize);
       }
 
       this._center = $.merge( [ ], center );
@@ -1372,14 +1395,7 @@
     },
 
     _eventTarget_dblclick_zoom: function(e) {
-      if ( this._timeoutInteractive ) {
-        window.clearTimeout( this._timeoutInteractive );
-        this._timeoutInteractive = null;
-      } else {
-        this._centerInteractive[ 0 ] = this._center[ 0 ];
-        this._centerInteractive[ 1 ] = this._center[ 1 ];
-        this._pixelSizeInteractive = this._pixelSize;
-      }
+      this._clearInteractiveTimeout( );
 
       this._trigger("dblclick", e, { type: "Point", coordinates: this._toMap(this._current, this._centerInteractive, this._pixelSizeInteractive ) });
 
@@ -1399,7 +1415,7 @@
         //this._setCenterAndSize(centerAndSize.center, centerAndSize.pixelSize, true, true);
       }
 
-      this._timeoutInteractive = 1;
+      this._setInteractiveTimeout( );
     },
 
     _eventTarget_dblclick: function (e) {
@@ -1478,15 +1494,7 @@
       //console.log("start centerI: " + this._centerInteractive.toString());
       //console.log("start pixelSizeI: " + this._pixelSizeInteractive);
 
-      if ( this._timeoutInteractive ) {
-        window.clearTimeout( this._timeoutInteractive );
-        this._timeoutInteractive = null;
-      } else {
-        this._centerInteractive[ 0 ] = this._center[ 0 ];
-        this._centerInteractive[ 1 ] = this._center[ 1 ];
-        this._pixelSizeInteractive = this._pixelSize;
-        //$("h1").text("start: " + this._pixelSizeInteractive);
-      }
+      this._clearInteractiveTimeout( );
 
       var offset = $(e.currentTarget).offset(),
           touches = e.originalEvent.changedTouches;
@@ -1567,7 +1575,7 @@
 
       e.preventDefault();
 
-      this._timeoutInteractive = 1;
+      this._setInteractiveTimeout( );
 
       return false;
     },
@@ -1580,15 +1588,7 @@
       //console.log("move centerI: " + this._centerInteractive.toString());
       //console.log("move pixelSizeI: " + this._pixelSizeInteractive);
 
-      if ( this._timeoutInteractive ) {
-        window.clearTimeout( this._timeoutInteractive );
-        this._timeoutInteractive = null;
-      } else {
-        this._centerInteractive[ 0 ] = this._center[ 0 ];
-        this._centerInteractive[ 1 ] = this._center[ 1 ];
-        this._pixelSizeInteractive = this._pixelSize;
-        //$("h1").text("move: " + this._pixelSizeInteractive);
-      }
+      this._clearInteractiveTimeout( );
 
       var offset = this._$eventTarget.offset(),
           drawCoordsLen = this._drawCoords.length,
@@ -1622,7 +1622,7 @@
           this._mouseDown = true;
           this._anchor = this._current = $.geo.center( this._multiTouchCurrentBbox, true );
 
-          this._timeoutInteractive = 1;
+          this._setInteractiveTimeout( );
           return false;
         }
 
@@ -1686,7 +1686,7 @@
         current = [e.pageX - offset.left, e.pageY - offset.top];
       }
 
-      this._timeoutInteractive = 1;
+      this._setInteractiveTimeout( );
 
       if (current[0] === this._lastMove[0] && current[1] === this._lastMove[1]) {
         if ( this._inOp ) {
@@ -1775,15 +1775,7 @@
         this._eventTarget_touchstart(e);
       }
 
-      if ( this._timeoutInteractive ) {
-        window.clearTimeout( this._timeoutInteractive );
-        this._timeoutInteractive = null;
-      } else {
-        this._centerInteractive[ 0 ] = this._center[ 0 ];
-        this._centerInteractive[ 1 ] = this._center[ 1 ];
-        this._pixelSizeInteractive = this._pixelSize;
-        //$("h1").text("stop: " + this._pixelSizeInteractive);
-      }
+      this._clearInteractiveTimeout( );
 
       //console.log("stop centerI: " + this._centerInteractive.toString());
       //console.log("stop pixelSizeI: " + this._pixelSizeInteractive);
@@ -1830,7 +1822,7 @@
 
         this._wheelLevel = 0;
 
-        this._timeoutInteractive = 1;
+        this._setInteractiveTimeout( );
         return false;
       }
 
@@ -1944,12 +1936,12 @@
 
         if (this._softDblClick && this._isDbltap) {
           this._isDbltap = this._isTap = false;
-          this._timeoutInteractive = 1;
+          this._setInteractiveTimeout( );
           this._$eventTarget.trigger("dblclick", e);
         }
       }
 
-      this._timeoutInteractive = 1;
+      this._setInteractiveTimeout( );
 
       if ( this._inOp ) {
         e.preventDefault();
@@ -1971,15 +1963,7 @@
       }
 
       if (delta !== 0) {
-        if ( this._timeoutInteractive ) {
-          window.clearTimeout( this._timeoutInteractive );
-          this._timeoutInteractive = null;
-        } else {
-          this._centerInteractive[ 0 ] = this._center[ 0 ];
-          this._centerInteractive[ 1 ] = this._center[ 1 ];
-          this._pixelSizeInteractive = this._pixelSize;
-          //$("h1").text("wheel start: " + this._pixelSizeInteractive);
-        }
+        this._clearInteractiveTimeout( );
 
         /*
         if (this._wheelTimeout) {
@@ -2022,7 +2006,7 @@
           this._refreshDrawing();
         }
 
-        this._timeoutInteractive = 1;
+        this._setInteractiveTimeout( );
 
         // #newpanzoom
         //var geomap = this;

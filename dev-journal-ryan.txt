@@ -31,6 +31,7 @@
 ** be sure their template names are unique so they don't overwrite each other
 * docs - warn users about potential CSS/JavaScript issues relating to generated elements
 ** ul, li, div, span, img
+* geomap - [bug] tiled services with pixelSizes set do not render zoom level 0?
 * geomap - [bug] pinch-zoom doesn't follow user's fingers close enough when scaling
 * docs - geomap - describe "graphic service" as shingled with src set to empty string or null
 * geomap - [bug] errors when setting src to empty string
@@ -121,6 +122,7 @@
 * docs - geomap - document the correct way to add a service after init
 * geomap - remember last map unit type set with bbox and center, return all coords and arguments in that type
 * geomap - unbind keydown handler on destroy, it's on the document
+* geomap - use requestAnimationFrame instead of setTimeout when waiting to move the map during intractiveTransform
 * docs - $.geo.WKT object
 * geo - $.geo.WKT object
 * geomap - panning cursor (for when user is actually panning)
@@ -205,6 +207,15 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-05-01==
+===shingled===
+Since tiled is pretty much ready for linking to the true refresh, I can either fix shinged now or actually implement the refresh. I suppose I should try to finish the rest of the geomap widget with tiled for now. It's not fun to be unable to refresh the map in this in-between state.
+
+===refresh===
+Tiled services are ready to be merged into refresh. I'm going to skip the _panEnd stuff now and just go to _panFinalize. I can add the inertial pan back later.
+
+Calling _setCenterAndSize at the end of my timer now. Pretty fast! I'm getting weird behavior with tiles that aren't in the current view, though. And some, look like they're repeating. It all settles down after the refresh but the quarter second leading up to it there is a visible jump.
 
 ==2012-04-27==
 ===transform===
