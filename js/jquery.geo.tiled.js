@@ -10,7 +10,7 @@
             reloadTiles: false
           };
 
-          var scHtml = '<div data-geo-service="tiled" style="position:absolute; left:0; top:0; width:8px; height:8px; margin:0; padding:0;"></div>';
+          var scHtml = '<div data-geo-service="tiled" style="-webkit-transform:translateZ(0); position:absolute; left:0; top:0; width:8px; height:8px; margin:0; padding:0;"></div>';
 
           serviceContainer.append(scHtml);
 
@@ -31,6 +31,7 @@
       },
 
       interactiveTransform: function ( map, service, center, pixelSize ) {
+        //console.log( "tiled.interactiveTransform( " + center.join( ", " ) + ", " + pixelSize + ")" );
         var serviceState = $.data( service, "geoServiceState" ),
             tilingScheme = map.options[ "tilingScheme" ];
 
@@ -281,6 +282,7 @@
       },
 
       refresh: function (map, service) {
+        //console.log( "tiled.refresh( " + map._center.join( ", " ) + ", " + map._pixelSize + ")" );
         var serviceState = $.data( service, "geoServiceState" );
 
         this._cancelUnloaded(map, service);
@@ -322,7 +324,7 @@
               serviceTop = Math.round( ( image ? fullYMinOrMaxY - bbox[1] : bbox[3] - fullYMinOrMaxY ) / pixelSize),
 
               scaleContainers = $serviceContainer.children().show(),
-              scaleContainer = scaleContainers.filter("[data-pixelSize='" + pixelSize + "']").appendTo($serviceContainer),
+              scaleContainer = scaleContainers.filter("[data-pixel-size='" + pixelSize + "']").appendTo($serviceContainer),
 
               opacity = service.style.opacity,
 

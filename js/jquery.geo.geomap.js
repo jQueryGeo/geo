@@ -759,10 +759,10 @@
       var contentSizeCss = "width:" + this._contentBounds["width"] + "px; height:" + this._contentBounds["height"] + "px; margin:0; padding:0;",
           contentPosCss = "position:absolute; left:0; top:0;";
 
-      this._$elem.prepend('<div class="geo-event-target geo-content-frame" style="position:absolute; left:' + this._contentBounds.x + 'px; top:' + this._contentBounds.y + 'px;' + contentSizeCss + 'overflow:hidden; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none;" unselectable="on"></div>');
+      this._$elem.prepend('<div class="geo-event-target geo-content-frame" style="-webkit-transform:translateZ(0); position:absolute; left:' + this._contentBounds.x + 'px; top:' + this._contentBounds.y + 'px;' + contentSizeCss + 'overflow:hidden; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none;" unselectable="on"></div>');
       this._$eventTarget = this._$contentFrame = this._$elem.children(':first');
 
-      this._$contentFrame.append('<div class="geo-services-container" style="' + contentPosCss + contentSizeCss + '"></div>');
+      this._$contentFrame.append('<div class="geo-services-container" style="-webkit-transform:translateZ(0); ' + contentPosCss + contentSizeCss + '"></div>');
       this._$servicesContainer = this._$contentFrame.children(':last');
 
       this._$contentFrame.append('<div class="geo-shapes-container" style="' + contentPosCss + contentSizeCss + '"></div>');
@@ -1186,6 +1186,8 @@
         clearTimeout( this._timeoutInteractive );
         this._timeoutInteractive = null;
       } else {
+        //console.log( "clearInteractiveTimeout( " + this._center.join( ", " ) + ", " + this._pixelSize + ")" );
+
         this._centerInteractive[ 0 ] = this._center[ 0 ];
         this._centerInteractive[ 1 ] = this._center[ 1 ];
         this._pixelSizeInteractive = this._pixelSize;
@@ -1227,6 +1229,8 @@
     },
 
     _setCenterAndSize: function (center, pixelSize, trigger, refresh) {
+      //console.log( "setCenterAndSize( " + center.join( ", " ) + ", " + pixelSize + ")" );
+
       if ( ! $.isArray( center ) || center.length != 2 || typeof center[ 0 ] !== "number" || typeof center[ 1 ] !== "number" ) {
         return;
       }
@@ -1588,7 +1592,9 @@
       //console.log("move centerI: " + this._centerInteractive.toString());
       //console.log("move pixelSizeI: " + this._pixelSizeInteractive);
 
-      this._clearInteractiveTimeout( );
+      if ( this._mouseDown ) {
+        this._clearInteractiveTimeout( );
+      }
 
       var offset = this._$eventTarget.offset(),
           drawCoordsLen = this._drawCoords.length,
@@ -1686,11 +1692,10 @@
         current = [e.pageX - offset.left, e.pageY - offset.top];
       }
 
-      this._setInteractiveTimeout( );
-
       if (current[0] === this._lastMove[0] && current[1] === this._lastMove[1]) {
         if ( this._inOp ) {
           e.preventDefault();
+          this._setInteractiveTimeout( );
           return false;
         }
       }
@@ -1702,6 +1707,7 @@
       if (this._mouseDown) {
         this._current = current;
         this._moveDate = $.now();
+        this._setInteractiveTimeout( );
       }
 
       if ( this._isMultiTouch ) {
@@ -1938,6 +1944,7 @@
           this._isDbltap = this._isTap = false;
           this._setInteractiveTimeout( );
           this._$eventTarget.trigger("dblclick", e);
+          return false;
         }
       }
 

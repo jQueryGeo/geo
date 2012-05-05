@@ -209,6 +209,17 @@
 * geo - potentially add address cracking
 
 ==2012-05-01==
+===rewrite===
+I turned refresh back on and there's still that image repeating. I'm going to log some stuff and see what I can discover.
+
+First step, interactiveTransform is being called on every mouse move even when the mouse isn't down, that has to stop.
+
+===pixel-size===
+Wow, I was making a new scale container every time because I had changed to using data-pixel-size but was still testing for data-pixelSize.
+
+The duplication is now gone. You can still mess up the view if you start panning right at the right moment, just as it's about to refresh but I can live with that for now.
+
+==2012-05-01==
 ===shingled===
 Since tiled is pretty much ready for linking to the true refresh, I can either fix shinged now or actually implement the refresh. I suppose I should try to finish the rest of the geomap widget with tiled for now. It's not fun to be unable to refresh the map in this in-between state.
 
