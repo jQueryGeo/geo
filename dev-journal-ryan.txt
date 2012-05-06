@@ -219,6 +219,9 @@ Wow, I was making a new scale container every time because I had changed to usin
 
 The duplication is now gone. You can still mess up the view if you start panning right at the right moment, just as it's about to refresh but I can live with that for now.
 
+===shingled===
+I suppose shingled is next.
+
 ==2012-05-01==
 ===shingled===
 Since tiled is pretty much ready for linking to the true refresh, I can either fix shinged now or actually implement the refresh. I suppose I should try to finish the rest of the geomap widget with tiled for now. It's not fun to be unable to refresh the map in this in-between state.
