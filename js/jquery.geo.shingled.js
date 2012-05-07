@@ -80,9 +80,6 @@
               mapWidth = contentBounds["width"],
               mapHeight = contentBounds["height"],
 
-              halfWidth = mapWidth / 2,
-              halfHeight = mapHeight / 2,
-
               scaleContainer = serviceContainer.children('[data-pixel-size="' + pixelSize + '"]'),
 
               opacity = service.style.opacity,
@@ -90,7 +87,7 @@
               $img;
 
           if ( !scaleContainer.size() ) {
-            serviceContainer.append('<div style="-webkit-transform:translateZ(0);position:absolute; left:' + halfWidth + 'px; top:' + halfHeight + 'px; width:' + mapWidth + 'px; height:' + mapHeight + 'px; margin:0; padding:0;" data-pixel-size="' + pixelSize + '"></div>');
+            serviceContainer.append('<div style="-webkit-transform:translateZ(0);position:absolute; left:0px; top: 0px; width:' + mapWidth + 'px; height:' + mapHeight + 'px; margin:0; padding:0;" data-pixel-size="' + pixelSize + '" data-center="[' + map._center.toString() + ']"></div>');
             scaleContainer = serviceContainer.children(":last");
           }
 
@@ -134,8 +131,8 @@
           serviceState.loadCount++;
           //this._map._requestQueued();
 
-          scaleContainer.append('<img style="-webkit-transform:translateZ(0);position:absolute; left:-' + halfWidth + 'px; top:-' + halfHeight + 'px; width:100%; height:100%; margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;" unselectable="on" />');
-          $img = scaleContainer.children(":last").data("center", map._getCenter());
+          scaleContainer.append('<img style="-webkit-transform:translateZ(0);position:absolute; left:0px; top:0px; width:100%; height:100%; margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;" unselectable="on" />');
+          $img = scaleContainer.children(":last").data("center", map._center);
 
           if ( typeof imageUrl === "string" ) {
             serviceObj._loadImage( $img, imageUrl, pixelSize, serviceState, serviceContainer, opacity );
@@ -209,7 +206,8 @@
           serviceState.loadCount--;
 
           if (serviceState.loadCount <= 0) {
-            serviceContainer.children(':not([data-pixel-size="' + pixelSize + '"])').remove();
+            // #newpanzoom
+            //serviceContainer.children(':not([data-pixel-size="' + pixelSize + '"])').remove();
 
             // #newpanzoom
             /*
