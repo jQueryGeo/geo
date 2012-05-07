@@ -64,7 +64,7 @@
           sizeAttr = 'width="' + this._width + '" height="' + this._height + '"';
 
       if (document.createElement('canvas').getContext) {
-        this._$elem.append('<canvas ' + sizeAttr + ' style="' + posCss + '"></canvas>');
+        this._$elem.append('<canvas ' + sizeAttr + ' style="-webkit-transform:translateZ(0);' + posCss + '"></canvas>');
         this._$canvas = this._$elem.children(':last');
         this._context = this._$canvas[0].getContext("2d");
 
@@ -81,7 +81,7 @@
         this._$canvas.children().css({ backgroundColor: "transparent", width: this._width, height: this._height });
       }
 
-      this._$elem.append('<div class="geo-labels-container" style="' + posCss + sizeCss + '"></div>');
+      this._$elem.append('<div class="geo-labels-container" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '"></div>');
       this._$labelsContainer = this._$elem.children(':last');
     },
 
@@ -298,7 +298,7 @@
     },
 
     drawLabel: function( coordinates, label ) {
-      this._$labelsContainer.append( '<div class="geo-label" style="position:absolute; left:' + coordinates[ 0 ] + 'px; top:' + coordinates[ 1 ] + 'px;">' + label + '</div>');
+      this._$labelsContainer.append( '<div class="geo-label" style="-webkit-transform:translateZ(0);position:absolute; left:' + coordinates[ 0 ] + 'px; top:' + coordinates[ 1 ] + 'px;">' + label + '</div>');
     },
 
     resize: function( ) {

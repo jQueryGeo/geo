@@ -63,6 +63,7 @@
 * geomap - create _defaultState object, use for widget-local _widgetState property, reinit _widgetState on _createWidget
 * geomap - don't redraw shapes after interactiveScale, they've already been drawn at new scale
 * geomap - [bug] exception when calling destroy on uninitialized div
+* geographics - try removing the blit canvas from the DOM, i.e., don't attach
 * geomap - maybe throw an error when setting center to an invalid object, such as the first number in a coordinate array: coordinates[ 0 ] <== wrong!
 * geomap - merge interactive pan and zoom into one, faster system (pan/zoom rewrite)
 ** pan and zoom in same interactive session (_interactiveCenter & _interactivePixelSize)
@@ -208,10 +209,26 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
-==2012-05-01==
+==2012-05-07==
+===shapes===
+I need to finish the rewrite by making sure graphic overlays move correctly.
+
+I might cheap out and hide the graphics for the b1 release. The geographics widget needs its own interactiveTransform method.
+
+===canvas===
+Do I need my blit canvas to be part of the document? I hope now, will remove it soon.
+
+===wow===
+I was originally moving all the servicesContainer for all services INSIDE the loop where I was moving all services.
+
+Also, _$servicesShapesContainer did not include the draw or primary shapes containers. I wonder if that was on purpose. It should not include the draw container because those shapes change during any change in the mouse or map.
+
+===shapesContainers===
+shapesContainers will eventually need the transform, but again, maybe not now. For now, I'm hiding the drawn shapes during interactiveTransform.
+
 ==2012-05-06==
 ===shinged===
-I have to get this started.
+I have to get this started. Appears to work pretty well. What's left for beta?
 
 ===non-moving divs===
 I don't think I need the transform on divs that don't move, such as the event target and content frame. I'm removing it for now.

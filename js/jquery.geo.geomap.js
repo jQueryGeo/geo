@@ -827,7 +827,7 @@
         }
       }
 
-      this._$servicesShapesContainers = this._$servicesContainer.find( ".geo-shapes-container" );
+      this._$servicesShapesContainers = this._$elem.find( ".geo-shapes-container" );
 
       this._$attrList.find( "a" ).css( {
         position: "relative",
@@ -1156,6 +1156,9 @@
           this._centerInteractive[ 0 ] -= ( dx * this._pixelSizeInteractive );
           this._centerInteractive[ 1 ] += ( ( this._options[ "axisLayout" ] === "image" ? -1 : 1 ) * dy * this._pixelSizeInteractive );
 
+          // #newpanzoom
+          this._$servicesShapesContainers.geographics("clear");
+
           for ( i = 0; i < this._currentServices.length; i++ ) {
             service = this._currentServices[ i ];
             $.geo[ "_serviceTypes" ][ service.type ].interactiveTransform( this, service, this._centerInteractive, this._pixelSizeInteractive );
@@ -1236,11 +1239,12 @@
 
       // the final call during any extent change
 
-      if (this._pixelSize != pixelSize) {
+      // #newpanzoom
+      //if (this._pixelSize != pixelSize) {
         if ( this._$servicesShapesContainers !== undefined ) {
           this._$servicesShapesContainers.geographics("clear");
         }
-      }
+      //}
 
       for (var i = 0; i < this._currentServices.length; i++) {
         var service = this._currentServices[i];
@@ -1996,16 +2000,20 @@
         this._pixelSizeInteractive = wheelCenterAndSize.pixelSize;
         //$("h1").text("wheel: " + this._pixelSizeInteractive);
 
-        this._$elem.find( ".geo-shapes-container" ).geographics("clear");
+        // #newpanzoom
+        //this._$elem.find( ".geo-shapes-container" ).geographics("clear");
+        this._$servicesShapesContainers.geographics("clear");
 
         for ( ; i < this._currentServices.length; i++ ) {
           service = this._currentServices[ i ];
           $.geo["_serviceTypes"][service.type].interactiveTransform(this, service, this._centerInteractive, this._pixelSizeInteractive);
         }
 
+        /*
         if (this._graphicShapes.length > 0 && this._graphicShapes.length < 256) {
           this._refreshShapes(this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes, wheelCenterAndSize.center, wheelCenterAndSize.pixelSize);
         }
+        */
 
         if (this._drawCoords.length > 0) {
           this._drawPixels = this._toPixel(this._drawCoords, wheelCenterAndSize.center, wheelCenterAndSize.pixelSize);
