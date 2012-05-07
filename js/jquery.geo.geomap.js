@@ -1246,12 +1246,22 @@
         }
       //}
 
+      if ( this._options[ "tilingScheme" ] ) {
+        var zoom = this._getZoom( center, pixelSize );
+        pixelSize = this._getPixelSize( zoom );
+      } else {
+        if ( this._getZoom( center, pixelSize ) < 0 ) {
+          pixelSize = this._pixelSizeMax;
+        }
+      }
+
       for (var i = 0; i < this._currentServices.length; i++) {
         var service = this._currentServices[i];
         $.geo["_serviceTypes"][service.type].interactiveTransform(this, service, center, pixelSize);
       }
 
-      this._center = $.merge( [ ], center );
+      this._center[ 0 ] = center[ 0 ];
+      this._center[ 1 ] = center[ 1 ];
       this._options["pixelSize"] = this._pixelSize = pixelSize;
 
       if ( this._userGeodetic ) {
@@ -1677,9 +1687,12 @@
             $.geo[ "_serviceTypes" ][ service.type ].interactiveTransform( this, service, this._centerInteractive, this._pixelSizeInteractive );
           }
 
+          // #newpanzoom
+          /*
           if (this._graphicShapes.length > 0 && this._graphicShapes.length < 256) {
             this._refreshShapes(this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes, pinchCenterAndSize.center, pinchCenterAndSize.pixelSize);
           }
+          */
 
 
           if (this._drawCoords.length > 0) {

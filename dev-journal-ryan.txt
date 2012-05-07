@@ -226,6 +226,20 @@ Also, _$servicesShapesContainer did not include the draw or primary shapes conta
 ===shapesContainers===
 shapesContainers will eventually need the transform, but again, maybe not now. For now, I'm hiding the drawn shapes during interactiveTransform.
 
+===jump===
+There's still a jumpiness issue when you catch it just before/during refresh. Old tiles that have already been scaled pop into weird locations. Should I fix it now or continue with shapes? Probably, I should finish with shapes and then work on bugs.
+
+===pinch zoom===
+Hmm, there are issues here once I turned refresh back on.
+
+It's with double click zoom as well, once you start panning.
+
+A single hardware pinch zoom appears to work perfectly if you don't pan any time after the zoom. I end up in Africa or the Virgin Island a lot from MA on the iPad.
+
+Definitely a problem with refresh. Disabling the refresh timer shows that interactiveTransform still works fine.
+
+I'm not doing any pixelSize clamping in _setCenterAndSize. That must have originally been somewhere else. With that change, there is still the jump issue of old transformed tiles but I don't seem to end up in Africa.
+
 ==2012-05-06==
 ===shinged===
 I have to get this started. Appears to work pretty well. What's left for beta?
