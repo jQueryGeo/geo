@@ -1248,10 +1248,10 @@
 
       if ( this._options[ "tilingScheme" ] ) {
         var zoom = this._getZoom( center, pixelSize );
-        pixelSize = this._getPixelSize( zoom );
+        this._pixelSizeInteractive = pixelSize = this._getPixelSize( zoom );
       } else {
         if ( this._getZoom( center, pixelSize ) < 0 ) {
-          pixelSize = this._pixelSizeMax;
+          this._pixelSizeInteractive = pixelSize = this._pixelSizeMax;
         }
       }
 
