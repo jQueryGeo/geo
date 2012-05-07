@@ -56,11 +56,6 @@
               height: tilingScheme.tileHeight * scaleRatio
             } );
 
-            $scaleContainer.children().css( {
-              msTransformOrigin: "0px 0px",
-              msTransform: "scale(" + scaleRatio + ")"
-            } );
-
             /*
             if ( $("body")[0].filters !== undefined ) {
               $scaleContainer.children().each( function ( i ) {
@@ -211,9 +206,14 @@
                     "left:" + (((x - fullXAtScale) * 100) + (serviceLeft - (serviceLeft % tileWidth)) / tileWidth * 100) + "%; " +
                     "top:" + (((y - fullYAtScale) * 100) + (serviceTop - (serviceTop % tileHeight)) / tileHeight * 100) + "%; ";
 
+                  imgMarkup += "width: 100%; height: 100%;";
+
+                  // #newpanzoom
+                  /*
                   if ($("body")[0].filters === undefined) {
                     imgMarkup += "width: 100%; height: 100%;";
                   }
+                  */
 
                   imgMarkup += "margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;' unselectable='on' data-tile='" + tileStr + "' />";
 
