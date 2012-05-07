@@ -94,6 +94,8 @@
             scaleContainer = serviceContainer.children(":last");
           }
 
+          // #newpanzoom
+          /*
           scaleContainer.children("img").each(function (i) {
             var $thisimg = $(this),
                 imgCenter = $thisimg.data("center"),
@@ -103,6 +105,7 @@
 
             $thisimg.css({ left: x + "px", top: y + "px" });
           });
+          */
 
           if (opacity < 1) {
             serviceContainer.find("img").attr("data-keepAlive", "0");
@@ -208,6 +211,8 @@
           if (serviceState.loadCount <= 0) {
             serviceContainer.children(':not([data-pixel-size="' + pixelSize + '"])').remove();
 
+            // #newpanzoom
+            /*
             var panContainer = serviceContainer.find('[data-pixel-size="' + pixelSize + '"]>div');
             if (panContainer.size() > 0) {
               var panContainerPos = panContainer.position();
@@ -222,6 +227,7 @@
 
               panContainer.remove();
             }
+            */
 
             serviceState.loadCount = 0;
           }
