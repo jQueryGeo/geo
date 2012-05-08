@@ -40,25 +40,38 @@
 
             bbox = [ center[ 0 ] - halfWidth, center[ 1 ] - halfHeight, center[ 0 ] + halfWidth, center[ 1 ] + halfHeight ];
 
-
         if ( serviceState ) {
           this._cancelUnloaded( map, service );
 
           serviceState.serviceContainer.children( ).each( function ( i ) {
             var $scaleContainer = $(this),
                 scalePixelSize = $scaleContainer.data( "pixelSize" ),
-                ratio = scalePixelSize / pixelSize;
+                scaleRatio = scalePixelSize / pixelSize;
                 
+            scaleRatio = Math.round(scaleRatio * 1000) / 1000;
+
+            var oldMapCoord = map._toMap( [ 0, 0 ] ),
+                newPixelPoint = map._toPixel( oldMapCoord, center, pixelSize );
+
             $scaleContainer.css( {
-              width: mapWidth * ratio,
-              height: mapHeight * ratio } ).children("img").each(function (i) {
+              left: Math.round( newPixelPoint[ 0 ] ),
+              top: Math.round( newPixelPoint[ 1 ] ),
+              width: mapWidth * scaleRatio,
+              height: mapHeight * scaleRatio
+            } );
+            
+            
+            // #newpanzoom
+            /*
+           .children("img").each(function (i) {
               var $img = $(this),
                   imgCenter = $img.data("center"),
-                  x = (Math.round((imgCenter[0] - center[0]) / scalePixelSize) - halfWidth) * ratio,
-                  y = (Math.round((center[1] - imgCenter[1]) / scalePixelSize) - halfHeight) * ratio;
+                  x = (Math.round((imgCenter[0] - center[0]) / scalePixelSize) - halfWidth) * scaleRatio,
+                  y = (Math.round((center[1] - imgCenter[1]) / scalePixelSize) - halfHeight) * scaleRatio;
 
               $img.css({ left: x + "px", top: y + "px" });
             });
+            */
           });
         }
       },
@@ -87,7 +100,7 @@
               $img;
 
           if ( !scaleContainer.size() ) {
-            serviceContainer.append('<div style="-webkit-transform:translateZ(0);position:absolute; left:0px; top: 0px; width:' + mapWidth + 'px; height:' + mapHeight + 'px; margin:0; padding:0;" data-pixel-size="' + pixelSize + '" data-center="[' + map._center.toString() + ']"></div>');
+            serviceContainer.append('<div style="-webkit-transform:translateZ(0);position:absolute; left:0px; top: 0px; width:' + mapWidth + 'px; height:' + mapHeight + 'px; margin:0; padding:0;" data-pixel-size="' + pixelSize + '"></div>');
             scaleContainer = serviceContainer.children(":last");
           }
 
@@ -131,7 +144,7 @@
           serviceState.loadCount++;
           //this._map._requestQueued();
 
-          scaleContainer.append('<img style="-webkit-transform:translateZ(0);position:absolute; left:0px; top:0px; width:100%; height:100%; margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;" unselectable="on" />');
+          scaleContainer.append('<img style="-webkit-transform:translateZ(0);position:absolute; left:' + ( - parseInt( scaleContainer.css( "left" ) ) ) + 'px; top:' + ( - parseInt( scaleContainer.css( "top" ) ) ) + 'px; width:100%; height:100%; margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;" unselectable="on" />');
           $img = scaleContainer.children(":last").data("center", map._center);
 
           if ( typeof imageUrl === "string" ) {

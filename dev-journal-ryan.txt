@@ -120,6 +120,7 @@
 * geomap - pan events (pattern after HTML5 drag)
 * geomap - zoom events (pattern after HTML5 drag)
 * geomap - test jQuery widget call chaining when setting option values
+* geomap - tiled data-scaleOrigin should be stored as an array
 * geomap - when scroll is zoom, attempt to not zoom while user is scrolling the page anyway
 * geomap - allow src to return a callback function or Promise to delay image requests for some reason (multiple requests, etc.)
 * docs - geomap - document the correct way to add a service after init
@@ -250,6 +251,8 @@ I'm creating a new shingle for each pan, which is right, but not positioning it 
 
 Actually, this is a much better representation of the jump issue I'm seeing in tiled. If I fix this, I may be able to fix tiled based on it.
 
+===data vs. parseInt===
+I'm going to guess that storing a number with $.data is much faster than trying to use parseInt on current CSS values. Although, the parseInt would only happen on refresh, while the .data call will happen with every pixel move.
 
 ==2012-05-06==
 ===shinged===

@@ -1204,7 +1204,7 @@
           //geomap._refresh( );
           geomap._timeoutInteractive = null;
         }
-      }, 500 );
+      }, 2000 );
     },
 
     _refresh: function () {

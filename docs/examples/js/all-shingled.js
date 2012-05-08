@@ -48,7 +48,7 @@ $(function () {
 
     // center & zoom values that fit MassGIS's projection
     center: [ 235670.21967, 900771.290247 ],
-    zoom: 13,
+    zoom: 14,
 
     bboxchange: function( e, geo ) {
       // when the bbox changes, update the info section with new option values
