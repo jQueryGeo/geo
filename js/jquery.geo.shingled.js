@@ -104,23 +104,6 @@
             scaleContainer = serviceContainer.children(":last");
           }
 
-          // #newpanzoom
-          /*
-          scaleContainer.children("img").each(function (i) {
-            var $thisimg = $(this),
-                imgCenter = $thisimg.data("center"),
-                center = map._getCenter(),
-                x = Math.round((imgCenter[0] - center[0]) / pixelSize) - halfWidth,
-                y = Math.round((center[1] - imgCenter[1]) / pixelSize) - halfHeight;
-
-            $thisimg.css({ left: x + "px", top: y + "px" });
-          });
-          */
-
-          if (opacity < 1) {
-            serviceContainer.find("img").attr("data-keepAlive", "0");
-          }
-
           var urlProp = ( service.hasOwnProperty("src") ? "src" : "getUrl" ),
               urlArgs = {
                 bbox: bbox,
