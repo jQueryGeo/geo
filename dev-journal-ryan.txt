@@ -212,6 +212,10 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2012-05-10==
+===shingled===
+Much better now! Two things I was missing: 1) I needed to base calculation on the original map origin of the scale container & 2) the position is now %-based, like tiled.
+
 ==2012-05-07==
 ===shapes===
 I need to finish the rewrite by making sure graphic overlays move correctly.

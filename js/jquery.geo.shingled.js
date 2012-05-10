@@ -50,8 +50,8 @@
                 
             scaleRatio = Math.round(scaleRatio * 1000) / 1000;
 
-            var oldMapCoord = map._toMap( [ 0, 0 ] ),
-                newPixelPoint = map._toPixel( oldMapCoord, center, pixelSize );
+            var oldMapOrigin = $scaleContainer.data( "origin" ),
+                newPixelPoint = map._toPixel( oldMapOrigin, center, pixelSize );
 
             $scaleContainer.css( {
               left: Math.round( newPixelPoint[ 0 ] ),
@@ -100,7 +100,7 @@
               $img;
 
           if ( !scaleContainer.size() ) {
-            serviceContainer.append('<div style="-webkit-transform:translateZ(0);position:absolute; left:0px; top: 0px; width:' + mapWidth + 'px; height:' + mapHeight + 'px; margin:0; padding:0;" data-pixel-size="' + pixelSize + '"></div>');
+            serviceContainer.append('<div style="-webkit-transform:translateZ(0);position:absolute; left:0px; top: 0px; width:' + mapWidth + 'px; height:' + mapHeight + 'px; margin:0; padding:0;" data-pixel-size="' + pixelSize + '" data-origin="[' + map._toMap( [ 0, 0 ] ) + ']"></div>');
             scaleContainer = serviceContainer.children(":last");
           }
 
@@ -131,8 +131,11 @@
                 index: 0
               },
               isFunc = $.isFunction( service[ urlProp ] ),
-              imageUrl;
+              imageUrl,
+              imagePos = scaleContainer.position( );
 
+          imagePos.left = - ( imagePos.left );
+          imagePos.top = - ( imagePos.top );
 
           if ( isFunc ) {
             imageUrl = service[ urlProp ]( urlArgs );
@@ -144,7 +147,7 @@
           serviceState.loadCount++;
           //this._map._requestQueued();
 
-          scaleContainer.append('<img style="-webkit-transform:translateZ(0);position:absolute; left:' + ( - parseInt( scaleContainer.css( "left" ) ) ) + 'px; top:' + ( - parseInt( scaleContainer.css( "top" ) ) ) + 'px; width:100%; height:100%; margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;" unselectable="on" />');
+          scaleContainer.append('<img style="-webkit-transform:translateZ(0);position:absolute; left:' + ( imagePos.left / scaleContainer.width( ) * 100 ) + '%; top:' + ( imagePos.top / scaleContainer.height( ) * 100 ) + '%; width:100%; height:100%; margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;" unselectable="on" />');
           $img = scaleContainer.children(":last").data("center", map._center);
 
           if ( typeof imageUrl === "string" ) {
@@ -220,25 +223,7 @@
 
           if (serviceState.loadCount <= 0) {
             // #newpanzoom
-            //serviceContainer.children(':not([data-pixel-size="' + pixelSize + '"])').remove();
-
-            // #newpanzoom
-            /*
-            var panContainer = serviceContainer.find('[data-pixel-size="' + pixelSize + '"]>div');
-            if (panContainer.size() > 0) {
-              var panContainerPos = panContainer.position();
-
-              panContainer.children("img").each(function (i) {
-                var $thisimg = $(this),
-                    x = panContainerPos.left + parseInt($thisimg.css("left"), 10),
-                    y = panContainerPos.top + parseInt($thisimg.css("top"), 10);
-
-                $thisimg.css({ left: x + "px", top: y + "px" });
-              }).unwrap();
-
-              panContainer.remove();
-            }
-            */
+            serviceContainer.children(':not([data-pixel-size="' + pixelSize + '"])').remove();
 
             serviceState.loadCount = 0;
           }
