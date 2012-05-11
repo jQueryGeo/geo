@@ -216,6 +216,20 @@
 ===shingled===
 Much better now! Two things I was missing: 1) I needed to base calculation on the original map origin of the scale container & 2) the position is now %-based, like tiled.
 
+===keepAlive===
+I don't think there's a need for this any more so I removed it. I had better make sure :) Oh, right. It was for opacity. We don't want to layer semi-transparent images.
+
+The code's not here. I see where I set keepAlive but can't find where I delete the images. This may be a regression from, like a2.
+
+I probably had it chained to a line I deleted. 
+
+Oooh, I didn't need it anymore when I added the concept of a pan container way back. Since I no longer have pan containers, I have to add keepAlive back.
+
+Yep, I had to add it back with the pan/zoom rewrite.
+
+===resize===
+For resize, I should be able to just resize each scale container. Everything else is %-based.
+
 ==2012-05-07==
 ===shapes===
 I need to finish the rewrite by making sure graphic overlays move correctly.

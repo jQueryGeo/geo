@@ -15,19 +15,24 @@ $(function () {
   // define two shingled services
   var services = [
     // define a basemap service
+  /*
     {
       id: "massgis_basemap",
       type: "shingled",
       src: "http://giswebservices.massgis.state.ma.us/geoserver/wms?LAYERS=massgis_basemap&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX={{:bbox}}&WIDTH={{:width}}&HEIGHT={{:height}}",
       attr: "&copy; 2011 Commonwealth of Massachusetts"
     },
+    */
 
     // define a second service as a layer on top of the basemap
     // we use this service as the target when "target" is set to service in this demo
     {
       id: "massgis_hydrography",
       type: "shingled",
-      src: "http://giswebservices.massgis.state.ma.us/geoserver/wms?LAYERS=massgis%3AGISDATA.MAJPOND_POLY,massgis%3AGISDATA.MAJSTRM_ARC&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX={{:bbox}}&WIDTH={{:width}}&HEIGHT={{:height}}"
+      src: "http://giswebservices.massgis.state.ma.us/geoserver/wms?LAYERS=massgis%3AGISDATA.MAJPOND_POLY,massgis%3AGISDATA.MAJSTRM_ARC&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX={{:bbox}}&WIDTH={{:width}}&HEIGHT={{:height}}",
+      style: {
+        opacity: .8
+      }
     }
   ];
 

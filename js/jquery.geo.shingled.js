@@ -99,6 +99,10 @@
 
               $img;
 
+          if (opacity < 1) {
+            serviceContainer.find("img").attr("data-keep-alive", "0");
+          }
+
           if ( !scaleContainer.size() ) {
             serviceContainer.append('<div style="-webkit-transform:translateZ(0);position:absolute; left:0px; top: 0px; width:' + mapWidth + 'px; height:' + mapHeight + 'px; margin:0; padding:0;" data-pixel-size="' + pixelSize + '" data-origin="[' + map._toMap( [ 0, 0 ] ) + ']"></div>');
             scaleContainer = serviceContainer.children(":last");
@@ -160,16 +164,31 @@
               mapWidth = contentBounds["width"],
               mapHeight = contentBounds["height"],
 
-              halfWidth = mapWidth / 2,
-              halfHeight = mapHeight / 2,
+              scaleContainers = serviceContainer.children();
 
-              scaleContainer = serviceContainer.children();
+          scaleContainers.attr("data-pixel-size", "0");
 
-          scaleContainer.attr("data-pixel-size", "0");
+          scaleContainers.each( function ( i ) {
+            var $scaleContainer = $(this),
+                position = $scaleContainer.position( );
+
+            var oldMapOrigin = $scaleContainer.data( "origin" ),
+                newPixelPoint = map._toPixel( oldMapOrigin );
+
+            $scaleContainer.css( {
+              left: position.left + ( mapWidth - $scaleContainer.width( ) ) / 2,
+              top: position.top + ( mapHeight - $scaleContainer.height( ) ) / 2
+            } );
+
+          } );
+            
+
+          /*
           scaleContainer.css({
             left: halfWidth + 'px',
             top: halfHeight + 'px'
           });
+          */
         }
       },
 
@@ -207,6 +226,8 @@
           if (serviceState.loadCount <= 0) {
             // #newpanzoom
             serviceContainer.children(':not([data-pixel-size="' + pixelSize + '"])').remove();
+
+            serviceContainer.find( "img[data-keep-alive]" ).remove( );
 
             serviceState.loadCount = 0;
           }
