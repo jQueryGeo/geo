@@ -686,7 +686,11 @@
         }
       }
 
-      this._setCenterAndSize(center, pixelSize, trigger, refresh);
+      this._centerInteractive = center;
+      this._pixelSizeInteractive = pixelSize;
+
+      // #newpanzoom
+      //this._setCenterAndSize(center, pixelSize, trigger, refresh);
     },
 
     _getBboxMax: function () {
@@ -1889,7 +1893,7 @@
                 }
 
                 // #newpanzoom
-                //this._setBbox(bbox, true, true);
+                this._setBbox(bbox, true, true);
               } else {
                 polygon = $.geo.polygonize( bbox, true );
                 this._trigger( "shape", e, this._userGeodetic ? {
