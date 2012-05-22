@@ -117,6 +117,8 @@
 * docs - geomap - zoom events (pattern after HTML5 drag)
 ** can cancel with preventDefault
 * docs - geomap - support two-finger vertical slide as zoom on mobile devices
+* geomap - create own .position function b/c $.position is doing too much
+** we don't have to worry about border or margin, all elements are within map div
 * geomap - pan events (pattern after HTML5 drag)
 * geomap - zoom events (pattern after HTML5 drag)
 * geomap - test jQuery widget call chaining when setting option values
@@ -211,6 +213,10 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-05-14==
+===mouseup===
+Chrome & Firefox trigger a rogue mouseup event when maximizing the window. I don't think that's right but I suppose I have to handle it. But, for some reason, geomap in Firefox doesn't trigger the refresh.
 
 ==2012-05-10==
 ===shingled===
