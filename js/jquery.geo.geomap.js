@@ -1170,6 +1170,12 @@
             //this._$servicesShapesContainers.css( translateObj );
           }
 
+          if (this._drawCoords.length > 0) {
+            this._drawPixels = this._toPixel( this._drawCoords, this._centerInteractive, this._pixelSizeInteractive );
+            this._refreshDrawing();
+          }
+
+
           //this._$panContainer.css( translateObj );
 
           /*
@@ -1430,6 +1436,12 @@
           service = this._currentServices[ i ];
           $.geo[ "_serviceTypes" ][ service.type ].interactiveTransform( this, service, this._centerInteractive, this._pixelSizeInteractive );
         }
+
+        if (this._drawCoords.length > 0) {
+          this._drawPixels = this._toPixel( this._drawCoords, this._centerInteractive, this._pixelSizeInteractive );
+          this._refreshDrawing();
+        }
+
 
 
         // #newpanzoom

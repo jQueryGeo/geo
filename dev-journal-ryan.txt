@@ -238,6 +238,13 @@ shapesContainer is no longer part of panContainer which is now only draw or meas
 
 Scratch that, I'm not going to move the original panContainer. I need to include the draw and measure coordinates in the new interactiveTransform stuff as well.
 
+That works ok, I think. I might change it later depending on how was shape drawing to img elements goes.
+
+I still need to test scale changes with drawing but I have a feeling it's fine. Took the code from pinch zoom.
+
+===tiled===
+I forgot, tiled still needs some of the origin fixes I put into shingled.
+
 ==2012-05-14==
 ===mouseup===
 Chrome & Firefox trigger a rogue mouseup event when maximizing the window. I don't think that's right but I suppose I have to handle it. But, for some reason, geomap in Firefox doesn't trigger the refresh.
