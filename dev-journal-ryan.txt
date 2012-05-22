@@ -103,6 +103,7 @@
 
 === future ===
 
+* geomap - integrate resize with interactiveTransform
 * geomap - determine if moz-transform improves speed in Firefox
 * geomap - [bug] once we detect a pan, disable the ability to go to multitouch
 * geomap - [bug] after one finger is removed, stop processing as if multitouch is still on
@@ -222,6 +223,10 @@ I'm ignoring rogue mouseup events now. Hopefully, that will clean resize up a bi
 Seems to work like it did before. I'm going to increase the frequency (decrease the timeout) of the resize check. In the future, I want the resize in two parts, one to move stuff around in real time/animationFrame time, another to perform the final refresh. Maybe move the latter back up to 500ms? Maybe not.
 
 67ms is too soon, Chrome flickers. I'm bumping it back up to 500ms for now.
+
+This should really be part of the new interactiveTransform code. At least, moving the images around and waiting for the final setCenterAndZoom. The issue I'm seeing with tiled now is that if I pan and the resize before the new tiles come in, the map jumps from the interactive to the final center. Same with shingled.
+
+For now, I think I may be done enough with this to merge back into the main project. That's a lie. I disabled a bunch of stuff before doing this, like marquee zoom. Any of the immediate mode changes.
 
 ==2012-05-14==
 ===mouseup===
