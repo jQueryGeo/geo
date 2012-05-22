@@ -214,6 +214,15 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2012-05-22==
+===mouseup===
+I'm ignoring rogue mouseup events now. Hopefully, that will clean resize up a bit on Chrome & Firefox.
+
+===resize===
+Seems to work like it did before. I'm going to increase the frequency (decrease the timeout) of the resize check. In the future, I want the resize in two parts, one to move stuff around in real time/animationFrame time, another to perform the final refresh. Maybe move the latter back up to 500ms? Maybe not.
+
+67ms is too soon, Chrome flickers. I'm bumping it back up to 500ms for now.
+
 ==2012-05-14==
 ===mouseup===
 Chrome & Firefox trigger a rogue mouseup event when maximizing the window. I don't think that's right but I suppose I have to handle it. But, for some reason, geomap in Firefox doesn't trigger the refresh.

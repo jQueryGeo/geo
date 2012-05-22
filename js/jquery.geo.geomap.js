@@ -529,7 +529,7 @@
         this._drawPixels[i][1] += dy;
       }
 
-      //this._setCenterAndSize(this._center, this._pixelSize, _trigger, true);
+      this._setCenterAndSize(this._center, this._pixelSize, _trigger, true);
     },
 
     append: function ( shape, style, label, refresh ) {
@@ -1791,10 +1791,16 @@
         return;
       }
 
-      if (!this._mouseDown && _ieVersion == 7) {
-        // ie7 doesn't appear to trigger dblclick on this._$eventTarget,
-        // we fake regular click here to cause soft dblclick
-        this._eventTarget_touchstart(e);
+      if ( !this._mouseDown ) {
+        if ( _ieVersion == 7 ) {
+          // ie7 doesn't appear to trigger dblclick on this._$eventTarget,
+          // we fake regular click here to cause soft dblclick
+          this._eventTarget_touchstart(e);
+        } else {
+          // Chrome & Firefox trigger an rogue mouseup event when doing a dblclick maximize in Windows(/Linux?)
+          // ignore it
+          return false;
+        }
       }
 
       this._clearInteractiveTimeout( );

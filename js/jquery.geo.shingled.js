@@ -48,30 +48,32 @@
                 scalePixelSize = $scaleContainer.data( "pixelSize" ),
                 scaleRatio = scalePixelSize / pixelSize;
                 
-            scaleRatio = Math.round(scaleRatio * 1000) / 1000;
+            if ( scalePixelSize > 0 ) {
+              scaleRatio = Math.round(scaleRatio * 1000) / 1000;
 
-            var oldMapOrigin = $scaleContainer.data( "origin" ),
-                newPixelPoint = map._toPixel( oldMapOrigin, center, pixelSize );
+              var oldMapOrigin = $scaleContainer.data( "origin" ),
+                  newPixelPoint = map._toPixel( oldMapOrigin, center, pixelSize );
 
-            $scaleContainer.css( {
-              left: Math.round( newPixelPoint[ 0 ] ),
-              top: Math.round( newPixelPoint[ 1 ] ),
-              width: mapWidth * scaleRatio,
-              height: mapHeight * scaleRatio
-            } );
-            
-            
-            // #newpanzoom
-            /*
-           .children("img").each(function (i) {
-              var $img = $(this),
-                  imgCenter = $img.data("center"),
-                  x = (Math.round((imgCenter[0] - center[0]) / scalePixelSize) - halfWidth) * scaleRatio,
-                  y = (Math.round((center[1] - imgCenter[1]) / scalePixelSize) - halfHeight) * scaleRatio;
+              $scaleContainer.css( {
+                left: Math.round( newPixelPoint[ 0 ] ),
+                top: Math.round( newPixelPoint[ 1 ] ),
+                width: mapWidth * scaleRatio,
+                height: mapHeight * scaleRatio
+              } );
+              
+              
+              // #newpanzoom
+              /*
+             .children("img").each(function (i) {
+                var $img = $(this),
+                    imgCenter = $img.data("center"),
+                    x = (Math.round((imgCenter[0] - center[0]) / scalePixelSize) - halfWidth) * scaleRatio,
+                    y = (Math.round((center[1] - imgCenter[1]) / scalePixelSize) - halfHeight) * scaleRatio;
 
-              $img.css({ left: x + "px", top: y + "px" });
-            });
-            */
+                $img.css({ left: x + "px", top: y + "px" });
+              });
+              */
+            }
           });
         }
       },
