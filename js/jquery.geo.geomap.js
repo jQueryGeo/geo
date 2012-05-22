@@ -1700,7 +1700,7 @@
 
 
           if (this._drawCoords.length > 0) {
-            this._drawPixels = this._toPixel(this._drawCoords, pinchCenterAndSize.center, pinchCenterAndSize.pixelSize);
+            this._drawPixels = this._toPixel( this._drawCoords, this._centerInteractive, this._pixelSizeInteractive );
             this._refreshDrawing();
           }
 
@@ -1763,7 +1763,7 @@
             this._panMove();
           } else {
             if (drawCoordsLen > 0) {
-              this._drawCoords[drawCoordsLen - 1] = this._toMap(current);
+              this._drawCoords[drawCoordsLen - 1] = this._toMap( current, this._centerInteractive, this._pixelSizeInteractive );
               this._drawPixels[drawCoordsLen - 1] = current;
 
               this._refreshDrawing();
@@ -1942,7 +1942,7 @@
 
               if (i < 2 || !(this._drawCoords[i][0] == this._drawCoords[i-1][0] &&
                              this._drawCoords[i][1] == this._drawCoords[i-1][1])) {
-                this._drawCoords[i + 1] = this._toMap(current);
+                this._drawCoords[i + 1] = this._toMap( current, this._centerInteractive, this._pixelSizeInteractive );
                 this._drawPixels[i + 1] = current;
               }
 
@@ -2039,7 +2039,7 @@
         */
 
         if (this._drawCoords.length > 0) {
-          this._drawPixels = this._toPixel(this._drawCoords, wheelCenterAndSize.center, wheelCenterAndSize.pixelSize);
+          this._drawPixels = this._toPixel( this._drawCoords, this._centerInteractive, this._pixelSizeInteractive );
           this._refreshDrawing();
         }
 

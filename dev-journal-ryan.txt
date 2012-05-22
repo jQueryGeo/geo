@@ -231,6 +231,13 @@ For now, I think I may be done enough with this to merge back into the main proj
 ===immediate===
 I'm going to try to tie these into the new interactiveTransform.
 
+===draw===
+The last obvious thing broken is moving the draw points during interactiveTransform.
+
+shapesContainer is no longer part of panContainer which is now only draw or measure layers.
+
+Scratch that, I'm not going to move the original panContainer. I need to include the draw and measure coordinates in the new interactiveTransform stuff as well.
+
 ==2012-05-14==
 ===mouseup===
 Chrome & Firefox trigger a rogue mouseup event when maximizing the window. I don't think that's right but I suppose I have to handle it. But, for some reason, geomap in Firefox doesn't trigger the refresh.
