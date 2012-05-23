@@ -40,29 +40,30 @@
 
           serviceState.serviceContainer.children( ).each( function ( i ) {
             var $scaleContainer = $(this),
-                scaleRatio = $scaleContainer.data("pixelSize") / pixelSize;
+                scalePixelSize = $scaleContainer.data("pixelSize"),
+                scaleRatio = scalePixelSize / pixelSize;
 
-            scaleRatio = Math.round(scaleRatio * 1000) / 1000;
+            if ( scalePixelSize > 0 ) {
+              scaleRatio = Math.round(scaleRatio * 1000) / 1000;
 
+              var oldMapCoord = $scaleContainer.data("scaleOrigin"),
+                  newPixelPoint = map._toPixel(oldMapCoord, center, pixelSize);
 
-            var scaleOriginParts = $scaleContainer.data("scaleOrigin").split(","),
-                oldMapCoord = map._toMap([scaleOriginParts[0], scaleOriginParts[1]]),
-                newPixelPoint = map._toPixel(oldMapCoord, center, pixelSize);
-
-            $scaleContainer.css( {
-              left: Math.round(newPixelPoint[0]) + "px",
-              top: Math.round(newPixelPoint[1]) + "px",
-              width: tilingScheme.tileWidth * scaleRatio,
-              height: tilingScheme.tileHeight * scaleRatio
-            } );
-
-            /*
-            if ( $("body")[0].filters !== undefined ) {
-              $scaleContainer.children().each( function ( i ) {
-                $( this ).css( "filter", "progid:DXImageTransform.Microsoft.Matrix(FilterType=bilinear,M11=" + scaleRatio + ",M22=" + scaleRatio + ",sizingmethod='auto expand')" );
+              $scaleContainer.css( {
+                left: Math.round(newPixelPoint[0]) + "px",
+                top: Math.round(newPixelPoint[1]) + "px",
+                width: tilingScheme.tileWidth * scaleRatio,
+                height: tilingScheme.tileHeight * scaleRatio
               } );
+
+              /*
+              if ( $("body")[0].filters !== undefined ) {
+                $scaleContainer.children().each( function ( i ) {
+                  $( this ).css( "filter", "progid:DXImageTransform.Microsoft.Matrix(FilterType=bilinear,M11=" + scaleRatio + ",M22=" + scaleRatio + ",sizingmethod='auto expand')" );
+                } );
+              }
+              */
             }
-            */
           });
         }
       },
@@ -133,12 +134,12 @@
 
           if (!scaleContainer.size()) {
             $serviceContainer.append("<div style='-webkit-transform:translateZ(0);position:absolute; left:" + serviceLeft % tileWidth + "px; top:" + serviceTop % tileHeight + "px; width:" + tileWidth + "px; height:" + tileHeight + "px; margin:0; padding:0;' data-pixel-size='" + pixelSize + "'></div>");
-            scaleContainer = $serviceContainer.children(":last").data("scaleOrigin", (serviceLeft % tileWidth) + "," + (serviceTop % tileHeight));
+            scaleContainer = $serviceContainer.children(":last").data("scaleOrigin", map._toMap( [ (serviceLeft % tileWidth), (serviceTop % tileHeight) ] ) );
           } else {
             scaleContainer.css({
               left: (serviceLeft % tileWidth) + "px",
               top: (serviceTop % tileHeight) + "px"
-            }).data("scaleOrigin", (serviceLeft % tileWidth) + "," + (serviceTop % tileHeight));
+            }).data("scaleOrigin", map._toMap( [ (serviceLeft % tileWidth), (serviceTop % tileHeight) ] ) );
 
             scaleContainer.children().each(function (i) {
               var 

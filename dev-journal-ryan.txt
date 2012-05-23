@@ -215,6 +215,10 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2012-05-23==
+===tiled===
+The new origin stuff appears to work better. I'm going to run through the other examples & see if I'm ready for a build.
+
 ==2012-05-22==
 ===mouseup===
 I'm ignoring rogue mouseup events now. Hopefully, that will clean resize up a bit on Chrome & Firefox.

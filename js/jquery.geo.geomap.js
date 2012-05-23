@@ -413,6 +413,9 @@
         this._$shapesContainer.geographics("destroy");
         this._$shapesContainer = undefined;
       } else {
+        clearTimeout( this._timeoutInteractive );
+        this._timeoutInteractive = null;
+
         this._created = false;
 
         $(window).unbind("resize", this._windowHandler);
@@ -1431,6 +1434,9 @@
 
         this._centerInteractive = centerAndSize.center;
         this._pixelSizeInteractive = centerAndSize.pixelSize;
+
+        // #newpanzoom
+        this._$servicesShapesContainers.geographics("clear");
 
         for ( i = 0; i < this._currentServices.length; i++ ) {
           service = this._currentServices[ i ];
