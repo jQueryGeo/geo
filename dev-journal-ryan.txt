@@ -233,6 +233,17 @@ The programatic changes are going to be a part of this, too. I need a way to tur
 ===programatic===
 I updated all the programatic calls to use the new system with the ability to say not to trigger. I will need to test these but for now, I do think I'm finally ready to merge.
 
+===merge===
+I merged the interactive rewrite into b1. There are bugs that I will have to work through before this becomes beta.
+
+===initial zoom===
+No matter what your initial zoom is, you can see the map at zoom 0 before the new tiles show up. That makes sense given the changes I've made.
+
+ok, the area that handles init options checks to see if the widget has been created before heading into intractiveTransform mode.
+
+===ie8===
+I *know* ie8 support is broken. I haven't even tried it yet. We will keep supporting that browser, though.
+
 ==2012-05-22==
 ===mouseup===
 I'm ignoring rogue mouseup events now. Hopefully, that will clean resize up a bit on Chrome & Firefox.

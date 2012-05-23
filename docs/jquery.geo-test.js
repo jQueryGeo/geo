@@ -4328,7 +4328,7 @@ $.Widget.prototype = {
           this._setOption("center", this._initOptions.center, false);
         }
         if (this._initOptions.zoom !== undefined) {
-          this._setZoom(this._initOptions.zoom, false, false);
+          this._setOption("zoom", this._initOptions.zoom, false);
         }
       }
 
@@ -4354,32 +4354,62 @@ $.Widget.prototype = {
         this._panFinalize();
       }
 
+      var center, pixelSize, zoom;
+
       switch (key) {
         case "bbox":
-          this._clearInteractiveTimeout( );
+          if ( this._created ) {
+            this._clearInteractiveTimeout( );
+          }
 
           this._userGeodetic = $.geo.proj && $.geo._isGeodetic( value );
           if ( this._userGeodetic ) {
             value = $.geo.proj.fromGeodetic( value );
           }
 
-          this._setBbox(value, false, refresh);
-          this._setInteractiveTimeout( false );
+          center = [value[0] + (value[2] - value[0]) / 2, value[1] + (value[3] - value[1]) / 2];
+          pixelSize = Math.max($.geo.width(value, true) / this._contentBounds.width, $.geo.height(value, true) / this._contentBounds.height);
+
+          if (this._options["tilingScheme"]) {
+            zoom = this._getZoom( center, pixelSize );
+            pixelSize = this._getPixelSize( zoom );
+          } else {
+            if ( this._getZoom( center, pixelSize ) < 0 ) {
+              pixelSize = this._pixelSizeMax;
+            }
+          }
+
+          if ( this._created ) {
+            this._centerInteractive = center;
+            this._pixelSizeInteractive = pixelSize;
+
+            this._setInteractiveTimeout( false );
+          } else {
+            this._center = center;
+            this._pixelSize = pixelSize;
+          }
 
           value = this._getBbox();
           break;
 
         case "center":
-          this._clearInteractiveTimeout( );
+          if ( this._created ) {
+            this._clearInteractiveTimeout( );
+          }
 
           this._userGeodetic = $.geo.proj && $.geo._isGeodetic( value );
           if ( this._userGeodetic ) {
             value = $.geo.proj.fromGeodetic( value );
           }
 
-          this._centerInteractive[ 0 ] = value[ 0 ];
-          this._centerInteractive[ 1 ] = value[ 1 ];
-          this._setInteractiveTimeout( false );
+          if ( this._created ) {
+            this._centerInteractive[ 0 ] = value[ 0 ];
+            this._centerInteractive[ 1 ] = value[ 1 ];
+            this._setInteractiveTimeout( false );
+          } else {
+            this._center[ 0 ] = value[ 0 ];
+            this._center[ 1 ] = value[ 1 ];
+          }
           break;
 
         case "measureLabels":
@@ -4411,7 +4441,12 @@ $.Widget.prototype = {
           break;
 
         case "zoom":
-          this._setZoom(value, false, refresh);
+          if ( this._created ) {
+            this._setZoom(value, false, refresh);
+          } else {
+            value = Math.max( value, 0 );
+            this._pixelSize = this._getPixelSize( value );
+          }
           break;
       }
 
