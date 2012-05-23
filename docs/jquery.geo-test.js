@@ -4966,7 +4966,6 @@ $.Widget.prototype = {
             labelShape.coordinates[ 0 ].push( coords[ 0 ] );
 
             label = $.render[ this._tmplAreaId ]( { area: $.geo.area( labelShape, true ) } );
-            //labelPixel = $.merge( [], pixels[ pixels.length - 1 ] );
             labelPixel = this._toPixel( $.geo.centroid( labelShape ).coordinates );
             pixels = [ pixels ];
             break;
@@ -5161,9 +5160,6 @@ $.Widget.prototype = {
       if (this._wheelLevel !== 0) {
         var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, this._options[ "tilingScheme" ] !== null );
 
-        // #newpanzoom
-        //this._setCenterAndSize(wheelCenterAndSize.center, wheelCenterAndSize.pixelSize, true, true);
-
         this._wheelLevel = 0;
       } else if ( refresh ) {
         this._refresh();
@@ -5179,12 +5175,6 @@ $.Widget.prototype = {
             image = this._options[ "axisLayout" ] === "image",
             dxMap = -dx * this._pixelSize,
             dyMap = ( image ? -1 : 1 ) * dy * this._pixelSize;
-
-        //this._$panContainer.css({ left: 0, top: 0 });
-        //this._$servicesContainer.find( ".geo-shapes-container" ).css( { left: 0, top: 0 } );
-
-        // #newpanzoom
-        //this._setCenterAndSize([this._center[0] + dxMap, this._center[1] + dyMap], this._pixelSize, true, true);
 
         this._$eventTarget.css("cursor", this._options["cursors"][this._options["mode"]]);
 
@@ -5232,8 +5222,6 @@ $.Widget.prototype = {
         this._timeoutInteractive = null;
         return true;
       } else {
-        //console.log( "clearInteractiveTimeout( " + this._center.join( ", " ) + ", " + this._pixelSize + ")" );
-
         this._centerInteractive[ 0 ] = this._center[ 0 ];
         this._centerInteractive[ 1 ] = this._center[ 1 ];
         this._pixelSizeInteractive = this._pixelSize;
@@ -5293,8 +5281,6 @@ $.Widget.prototype = {
     },
 
     _setCenterAndSize: function (center, pixelSize, trigger, refresh) {
-      //console.log( "setCenterAndSize( " + center.join( ", " ) + ", " + pixelSize + ")" );
-
       if ( ! $.isArray( center ) || center.length != 2 || typeof center[ 0 ] !== "number" || typeof center[ 1 ] !== "number" ) {
         return;
       }
@@ -5474,9 +5460,6 @@ $.Widget.prototype = {
         return;
       }
 
-      // #newpanzoom
-      //this._panFinalize();
-
       if (this._drawTimeout) {
         window.clearTimeout(this._drawTimeout);
         this._drawTimeout = null;
@@ -5537,13 +5520,6 @@ $.Widget.prototype = {
       if ( !this._supportTouch && e.which != 1 ) {
         return;
       }
-
-      // #newpanzoom
-      //this._panFinalize();
-      //this._mouseWheelFinish( false );
-
-      //console.log("start centerI: " + this._centerInteractive.toString());
-      //console.log("start pixelSizeI: " + this._pixelSizeInteractive);
 
       var doInteractiveTimeout = this._clearInteractiveTimeout( );
 
@@ -5638,9 +5614,6 @@ $.Widget.prototype = {
         return;
       }
 
-      //console.log("move centerI: " + this._centerInteractive.toString());
-      //console.log("move pixelSizeI: " + this._pixelSizeInteractive);
-
       var doInteractiveTimeout = this._clearInteractiveTimeout( );
 
       var offset = this._$eventTarget.offset(),
@@ -5650,14 +5623,10 @@ $.Widget.prototype = {
           service,
           i = 0;
 
-      // $("h1").text("s: " + this._pixelSizeInteractive);
-
       if ( this._supportTouch ) {
         if ( !this._isMultiTouch && touches[ 0 ].identifier !== this._multiTouchAnchor[ 0 ].identifier ) {
           // switch to multitouch
           this._mouseDown = false;
-          //this._dragTarget_touchstop( e );
-
           this._isMultiTouch = true;
           this._wheelLevel = 0;
 
@@ -5707,8 +5676,6 @@ $.Widget.prototype = {
           var delta = wheelLevel - this._wheelLevel;
 
           this._wheelLevel = wheelLevel;
-
-          //$("h1").text("w: " + delta + ", s: " + this._pixelSizeInteractive);
 
           var pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, false );
 
@@ -5825,16 +5792,13 @@ $.Widget.prototype = {
           // we fake regular click here to cause soft dblclick
           this._eventTarget_touchstart(e);
         } else {
-          // Chrome & Firefox trigger an rogue mouseup event when doing a dblclick maximize in Windows(/Linux?)
+          // Chrome & Firefox trigger a rogue mouseup event when doing a dblclick maximize in Windows(/Linux?)
           // ignore it
           return false;
         }
       }
 
       var doInteractiveTimeout = this._clearInteractiveTimeout( );
-
-      //console.log("stop centerI: " + this._centerInteractive.toString());
-      //console.log("stop pixelSizeI: " + this._pixelSizeInteractive);
 
       var mouseWasDown = this._mouseDown,
           wasToolPan = this._toolPan,
@@ -5870,11 +5834,6 @@ $.Widget.prototype = {
       if ( this._isMultiTouch ) {
         e.preventDefault( );
         this._isMultiTouch = false;
-
-        //var pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, false );
-
-        // #newpanzoom
-        //this._setCenterAndSize(pinchCenterAndSize.center, pinchCenterAndSize.pixelSize, true, true);
 
         this._wheelLevel = 0;
 
@@ -5918,7 +5877,6 @@ $.Widget.prototype = {
                   bbox = $.geo.scaleBy( this._getBbox( $.geo.center( bbox, true ) ), 0.5, true );
                 }
 
-                // #newpanzoom
                 this._setBbox(bbox, true, true);
                 doInteractiveTimeout = true;
               } else {
@@ -6017,8 +5975,6 @@ $.Widget.prototype = {
       }
 
       e.preventDefault();
-
-      //this._panFinalize();
 
       if ( this._mouseDown ) {
         return false;
