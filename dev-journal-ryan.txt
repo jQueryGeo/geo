@@ -31,6 +31,9 @@
 ** be sure their template names are unique so they don't overwrite each other
 * docs - warn users about potential CSS/JavaScript issues relating to generated elements
 ** ul, li, div, span, img
+* geomap - [bug] there's an extra service.refresh call after a non-mousedown touchmove after a refresh
+** most noticeable on shingled services
+* geomap - [bug] tiled services with pixelSizes set do not render zoom level 0?
 * geomap - [bug] pinch-zoom doesn't follow user's fingers close enough when scaling
 * docs - geomap - describe "graphic service" as shingled with src set to empty string or null
 * geomap - [bug] errors when setting src to empty string
@@ -62,6 +65,7 @@
 * geomap - create _defaultState object, use for widget-local _widgetState property, reinit _widgetState on _createWidget
 * geomap - don't redraw shapes after interactiveScale, they've already been drawn at new scale
 * geomap - [bug] exception when calling destroy on uninitialized div
+* geographics - try removing the blit canvas from the DOM, i.e., don't attach
 * geomap - maybe throw an error when setting center to an invalid object, such as the first number in a coordinate array: coordinates[ 0 ] <== wrong!
 * geomap - merge interactive pan and zoom into one, faster system (pan/zoom rewrite)
 ** pan and zoom in same interactive session (_interactiveCenter & _interactivePixelSize)
@@ -99,6 +103,10 @@
 
 === future ===
 
+* geomap - integrate resize with interactiveTransform
+* geomap - determine if moz-transform improves speed in Firefox
+* geomap - [bug] once we detect a pan, disable the ability to go to multitouch
+* geomap - [bug] after one finger is removed, stop processing as if multitouch is still on
 * geomap - [bug] verify label clamping is correct in axisLayout=image maps
 * docs - geomap - pass the service id (if there is one) to the src callback as a view property
 * geomap - pass the service id (if there is one) to the src callback as a view property
@@ -110,14 +118,18 @@
 * docs - geomap - zoom events (pattern after HTML5 drag)
 ** can cancel with preventDefault
 * docs - geomap - support two-finger vertical slide as zoom on mobile devices
+* geomap - create own .position function b/c $.position is doing too much
+** we don't have to worry about border or margin, all elements are within map div
 * geomap - pan events (pattern after HTML5 drag)
 * geomap - zoom events (pattern after HTML5 drag)
 * geomap - test jQuery widget call chaining when setting option values
+* geomap - tiled data-scaleOrigin should be stored as an array
 * geomap - when scroll is zoom, attempt to not zoom while user is scrolling the page anyway
 * geomap - allow src to return a callback function or Promise to delay image requests for some reason (multiple requests, etc.)
 * docs - geomap - document the correct way to add a service after init
 * geomap - remember last map unit type set with bbox and center, return all coords and arguments in that type
 * geomap - unbind keydown handler on destroy, it's on the document
+* geomap - use requestAnimationFrame instead of setTimeout when waiting to move the map during intractiveTransform
 * docs - $.geo.WKT object
 * geo - $.geo.WKT object
 * geomap - panning cursor (for when user is actually panning)
@@ -203,6 +215,179 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2012-05-23==
+===tiled===
+The new origin stuff appears to work better. I'm going to run through the other examples & see if I'm ready for a build.
+
+===chrome===
+Chrome's screen tearing is really bad. I'm going to try to disable 3d transform in Chrome. Maybe it's just my laptop, Chrome is doing the tearing even without translateZ. I'm reverting the changes for that test.
+
+===bbox===
+I'm getting a bbox event after a single tap.
+
+===setInteractiveTimemout===
+I need to only call this if: a) it's already been called once (to keep it going) & b) we actually change centerInteractive or pixelSizeInteractive.
+
+The programatic changes are going to be a part of this, too. I need a way to turn on trigger during setInteractiveTimemout.
+
+===programatic===
+I updated all the programatic calls to use the new system with the ability to say not to trigger. I will need to test these but for now, I do think I'm finally ready to merge.
+
+==2012-05-22==
+===mouseup===
+I'm ignoring rogue mouseup events now. Hopefully, that will clean resize up a bit on Chrome & Firefox.
+
+===resize===
+Seems to work like it did before. I'm going to increase the frequency (decrease the timeout) of the resize check. In the future, I want the resize in two parts, one to move stuff around in real time/animationFrame time, another to perform the final refresh. Maybe move the latter back up to 500ms? Maybe not.
+
+67ms is too soon, Chrome flickers. I'm bumping it back up to 500ms for now.
+
+This should really be part of the new interactiveTransform code. At least, moving the images around and waiting for the final setCenterAndZoom. The issue I'm seeing with tiled now is that if I pan and the resize before the new tiles come in, the map jumps from the interactive to the final center. Same with shingled.
+
+For now, I think I may be done enough with this to merge back into the main project. That's a lie. I disabled a bunch of stuff before doing this, like marquee zoom. Any of the immediate mode changes.
+
+===immediate===
+I'm going to try to tie these into the new interactiveTransform.
+
+===draw===
+The last obvious thing broken is moving the draw points during interactiveTransform.
+
+shapesContainer is no longer part of panContainer which is now only draw or measure layers.
+
+Scratch that, I'm not going to move the original panContainer. I need to include the draw and measure coordinates in the new interactiveTransform stuff as well.
+
+That works ok, I think. I might change it later depending on how was shape drawing to img elements goes.
+
+I still need to test scale changes with drawing but I have a feeling it's fine. Took the code from pinch zoom.
+
+===tiled===
+I forgot, tiled still needs some of the origin fixes I put into shingled.
+
+==2012-05-14==
+===mouseup===
+Chrome & Firefox trigger a rogue mouseup event when maximizing the window. I don't think that's right but I suppose I have to handle it. But, for some reason, geomap in Firefox doesn't trigger the refresh.
+
+==2012-05-10==
+===shingled===
+Much better now! Two things I was missing: 1) I needed to base calculation on the original map origin of the scale container & 2) the position is now %-based, like tiled.
+
+===keepAlive===
+I don't think there's a need for this any more so I removed it. I had better make sure :) Oh, right. It was for opacity. We don't want to layer semi-transparent images.
+
+The code's not here. I see where I set keepAlive but can't find where I delete the images. This may be a regression from, like a2.
+
+I probably had it chained to a line I deleted. 
+
+Oooh, I didn't need it anymore when I added the concept of a pan container way back. Since I no longer have pan containers, I have to add keepAlive back.
+
+Yep, I had to add it back with the pan/zoom rewrite.
+
+===resize===
+For resize, I should be able to just resize each scale container. Everything else is %-based.
+
+==2012-05-07==
+===shapes===
+I need to finish the rewrite by making sure graphic overlays move correctly.
+
+I might cheap out and hide the graphics for the b1 release. The geographics widget needs its own interactiveTransform method.
+
+===canvas===
+Do I need my blit canvas to be part of the document? I hope now, will remove it soon.
+
+===wow===
+I was originally moving all the servicesContainer for all services INSIDE the loop where I was moving all services.
+
+Also, _$servicesShapesContainer did not include the draw or primary shapes containers. I wonder if that was on purpose. It should not include the draw container because those shapes change during any change in the mouse or map.
+
+===shapesContainers===
+shapesContainers will eventually need the transform, but again, maybe not now. For now, I'm hiding the drawn shapes during interactiveTransform.
+
+===jump===
+There's still a jumpiness issue when you catch it just before/during refresh. Old tiles that have already been scaled pop into weird locations. Should I fix it now or continue with shapes? Probably, I should finish with shapes and then work on bugs.
+
+===pinch zoom===
+Hmm, there are issues here once I turned refresh back on.
+
+It's with double click zoom as well, once you start panning.
+
+A single hardware pinch zoom appears to work perfectly if you don't pan any time after the zoom. I end up in Africa or the Virgin Island a lot from MA on the iPad.
+
+Definitely a problem with refresh. Disabling the refresh timer shows that interactiveTransform still works fine.
+
+I'm not doing any pixelSize clamping in _setCenterAndSize. That must have originally been somewhere else. With that change, there is still the jump issue of old transformed tiles but I don't seem to end up in Africa.
+
+===pinch jump===
+I need to jump to the closest pixelSize, not the smallest. It will make this smoother...maybe in the future as well as it only affects when they zoom in just shy of the half-level mark.
+
+===shingled===
+I'm creating a new shingle for each pan, which is right, but not positioning it correctly after refresh.
+
+Actually, this is a much better representation of the jump issue I'm seeing in tiled. If I fix this, I may be able to fix tiled based on it.
+
+===data vs. parseInt===
+I'm going to guess that storing a number with $.data is much faster than trying to use parseInt on current CSS values. Although, the parseInt would only happen on refresh, while the .data call will happen with every pixel move.
+
+==2012-05-06==
+===shinged===
+I have to get this started. Appears to work pretty well. What's left for beta?
+
+===non-moving divs===
+I don't think I need the transform on divs that don't move, such as the event target and content frame. I'm removing it for now.
+
+==2012-05-01==
+===rewrite===
+I turned refresh back on and there's still that image repeating. I'm going to log some stuff and see what I can discover.
+
+First step, interactiveTransform is being called on every mouse move even when the mouse isn't down, that has to stop.
+
+===pixel-size===
+Wow, I was making a new scale container every time because I had changed to using data-pixel-size but was still testing for data-pixelSize.
+
+The duplication is now gone. You can still mess up the view if you start panning right at the right moment, just as it's about to refresh but I can live with that for now.
+
+===shingled===
+I suppose shingled is next.
+
+==2012-05-01==
+===shingled===
+Since tiled is pretty much ready for linking to the true refresh, I can either fix shinged now or actually implement the refresh. I suppose I should try to finish the rest of the geomap widget with tiled for now. It's not fun to be unable to refresh the map in this in-between state.
+
+===refresh===
+Tiled services are ready to be merged into refresh. I'm going to skip the _panEnd stuff now and just go to _panFinalize. I can add the inertial pan back later.
+
+Calling _setCenterAndSize at the end of my timer now. Pretty fast! I'm getting weird behavior with tiles that aren't in the current view, though. And some, look like they're repeating. It all settles down after the refresh but the quarter second leading up to it there is a visible jump.
+
+==2012-04-27==
+===transform===
+Setting the transform on the images helped iOS. Settig it on the map div itself helped Android a lot and iOS a little.
+
+===iOS===
+If there's anything else over the map, iOS doesn't respond very well. It doesn't let me pan (scrolling the page instead) and pinch zoom is just weird.
+
+Out of a whim, I didn't include the jQuery UI style sheet. iOS now works like the others. I wonder what's in the style that it doesn't like. Latest version of jQuery UI (1.8.19) still has the issue. I wonder which widget does it.
+
+Weird, if I take out the .button() calls, the demo works on iPad.
+
+iOS works fine with fixed position. It's still the .button calls. I'm sniffing out the button calls for iOS 4-5 for now. I don't have time to figure out that issue.
+
+===ie9===
+I've been wanting to use better features in ie9 for a while. Let's see how this goes because with the new code, I have to drop the filter. I didn't like using filter anyway.
+
+I cannot belive how nicely the transform scale + transform-origin work in ie9! I might investigate using them instead of the % hook on the scale container for webkit & Firefox.
+
+==2012-04-27==
+===panzoom===
+_inOp gets set to true during pan.
+
+When to have the interactive center and pixelSize match the current values? Any function where timeoutInteractive is null, likely.
+
+I may have been moving the services' shapesContainers twice, once in _panMove and again in the service's serviceContainer.children().css call. No, the service container is the data-geo-service object. Its only children are scale containers.
+
+I'm not going to move the scaleContainers separately during pan...oh, I have to because they will move at different velocities.
+
+===transform===
+I'm attempting to add transform support for iOS. 3D CSS transforms make the images bounce around funny during scaling. At least, when I set the CSS on the scaleContainer.
+
 ==2012-04-26==
 ===measure===
 In some instances, the measure tool doesn't position properly. Going to change it from a div to a span to calculate width better. The container can stay a div. Only the actual label needs to be inline.
@@ -216,6 +401,15 @@ I can tell I will have to add support for axisLayout=image into the measure code
 On bad polygon geometry (hourglass is the common example), our centroid function returns weird results. I might clamp to the bbox for now as a stopgap until I fix it for real.
 
 That's better. Not great but not nearly as much weirdness.
+
+===pan/zoom===
+Back to this. I need to disable the pan pop as well as calls to refresh.
+
+When panning, we move the _$panContainer. It contains various top-level items (shapes/draw/measure containers). Each service moves their own content. Pan finalize resets the pan container as well as the shapes container for all services.
+
+I'm still doing too much in touchmove.
+
+Now caching the reference to services shapesContainers.
 
 ==2012-04-24==
 ===pan/zoom===

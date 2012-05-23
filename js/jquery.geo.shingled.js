@@ -9,7 +9,7 @@
             loadCount: 0
           };
 
-          var scHtml = '<div data-geo-service="shingled" style="position:absolute; left:0; top:0; width:16px; height:16px; margin:0; padding:0;"></div>';
+          var scHtml = '<div data-geo-service="shingled" style="-webkit-transform:translateZ(0);position:absolute; left:0; top:0; width:16px; height:16px; margin:0; padding:0;"></div>';
 
           serviceContainer.append(scHtml);
 
@@ -28,68 +28,52 @@
         $.removeData(service, "geoServiceState");
       },
 
-      interactivePan: function (map, service, dx, dy) {
-        var serviceState = $.data(service, "geoServiceState");
+      interactiveTransform: function ( map, service, center, pixelSize ) {
+        var serviceState = $.data( service, "geoServiceState" ),
+
+            contentBounds = map._getContentBounds(),
+            mapWidth = contentBounds[ "width" ],
+            mapHeight = contentBounds[ "height" ],
+
+            halfWidth = mapWidth / 2,
+            halfHeight = mapHeight / 2,
+
+            bbox = [ center[ 0 ] - halfWidth, center[ 1 ] - halfHeight, center[ 0 ] + halfWidth, center[ 1 ] + halfHeight ];
 
         if ( serviceState ) {
-          this._cancelUnloaded(map, service);
+          this._cancelUnloaded( map, service );
 
-          var serviceContainer = serviceState.serviceContainer,
-              pixelSize = map._pixelSize,
-              scaleContainer = serviceContainer.children("[data-pixelSize='" + pixelSize + "']"),
-              panContainer = scaleContainer.children("div");
-
-          if ( !panContainer.length ) {
-            scaleContainer.children("img").wrap('<div style="position:absolute; left:0; top:0; width:100%; height:100%;"></div>');
-            panContainer = scaleContainer.children("div");
-          }
-
-          panContainer.css( {
-            left: function (index, value) {
-              return parseInt(value, 10) + dx;
-            },
-            top: function (index, value) {
-              return parseInt(value, 10) + dy;
-            }
-          } );
-
-          // until pan/zoom rewrite, remove all containers not in this scale
-          serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
-        }
-      },
-
-      interactiveScale: function (map, service, center, pixelSize) {
-        var serviceState = $.data(service, "geoServiceState");
-
-        if ( serviceState ) {
-          this._cancelUnloaded(map, service);
-
-          var serviceContainer = serviceState.serviceContainer,
-
-              contentBounds = map._getContentBounds(),
-              mapWidth = contentBounds["width"],
-              mapHeight = contentBounds["height"],
-
-              halfWidth = mapWidth / 2,
-              halfHeight = mapHeight / 2,
-
-              bbox = [center[0] - halfWidth, center[1] - halfHeight, center[0] + halfWidth, center[1] + halfHeight];
-
-          serviceContainer.children().each(function (i) {
+          serviceState.serviceContainer.children( ).each( function ( i ) {
             var $scaleContainer = $(this),
-                scalePixelSize = $scaleContainer.attr("data-pixelSize"),
-                ratio = scalePixelSize / pixelSize;
+                scalePixelSize = $scaleContainer.data( "pixelSize" ),
+                scaleRatio = scalePixelSize / pixelSize;
                 
-            $scaleContainer.css( {
-              width: mapWidth * ratio,
-              height: mapHeight * ratio } ).children("img").each(function (i) {
-              var $img = $(this),
-                  imgCenter = $img.data("center"),
-                  x = (Math.round((imgCenter[0] - center[0]) / scalePixelSize) - halfWidth) * ratio,
-                  y = (Math.round((center[1] - imgCenter[1]) / scalePixelSize) - halfHeight) * ratio;
+            if ( scalePixelSize > 0 ) {
+              scaleRatio = Math.round(scaleRatio * 1000) / 1000;
 
-              $img.css({ left: x + "px", top: y + "px" });
-            });
+              var oldMapOrigin = $scaleContainer.data( "origin" ),
+                  newPixelPoint = map._toPixel( oldMapOrigin, center, pixelSize );
+
+              $scaleContainer.css( {
+                left: Math.round( newPixelPoint[ 0 ] ),
+                top: Math.round( newPixelPoint[ 1 ] ),
+                width: mapWidth * scaleRatio,
+                height: mapHeight * scaleRatio
+              } );
+              
+              
+              // #newpanzoom
+              /*
+             .children("img").each(function (i) {
+                var $img = $(this),
+                    imgCenter = $img.data("center"),
+                    x = (Math.round((imgCenter[0] - center[0]) / scalePixelSize) - halfWidth) * scaleRatio,
+                    y = (Math.round((center[1] - imgCenter[1]) / scalePixelSize) - halfHeight) * scaleRatio;
+
+                $img.css({ left: x + "px", top: y + "px" });
+              });
+              */
+            }
           });
         }
       },
@@ -111,32 +95,19 @@
               mapWidth = contentBounds["width"],
               mapHeight = contentBounds["height"],
 
-              halfWidth = mapWidth / 2,
-              halfHeight = mapHeight / 2,
-
-              scaleContainer = serviceContainer.children('[data-pixelSize="' + pixelSize + '"]'),
+              scaleContainer = serviceContainer.children('[data-pixel-size="' + pixelSize + '"]'),
 
               opacity = service.style.opacity,
 
               $img;
 
-          if ( !scaleContainer.size() ) {
-            serviceContainer.append('<div style="position:absolute; left:' + halfWidth + 'px; top:' + halfHeight + 'px; width:' + mapWidth + 'px; height:' + mapHeight + 'px; margin:0; padding:0;" data-pixelSize="' + pixelSize + '"></div>');
-            scaleContainer = serviceContainer.children(":last");
+          if (opacity < 1) {
+            serviceContainer.find("img").attr("data-keep-alive", "0");
           }
 
-          scaleContainer.children("img").each(function (i) {
-            var $thisimg = $(this),
-                imgCenter = $thisimg.data("center"),
-                center = map._getCenter(),
-                x = Math.round((imgCenter[0] - center[0]) / pixelSize) - halfWidth,
-                y = Math.round((center[1] - imgCenter[1]) / pixelSize) - halfHeight;
-
-            $thisimg.css({ left: x + "px", top: y + "px" });
-          });
-
-          if (opacity < 1) {
-            serviceContainer.find("img").attr("data-keepAlive", "0");
+          if ( !scaleContainer.size() ) {
+            serviceContainer.append('<div style="-webkit-transform:translateZ(0);position:absolute; left:0px; top: 0px; width:' + mapWidth + 'px; height:' + mapHeight + 'px; margin:0; padding:0;" data-pixel-size="' + pixelSize + '" data-origin="[' + map._toMap( [ 0, 0 ] ) + ']"></div>');
+            scaleContainer = serviceContainer.children(":last");
           }
 
           var urlProp = ( service.hasOwnProperty("src") ? "src" : "getUrl" ),
@@ -149,8 +120,11 @@
                 index: 0
               },
               isFunc = $.isFunction( service[ urlProp ] ),
-              imageUrl;
+              imageUrl,
+              imagePos = scaleContainer.position( );
 
+          imagePos.left = - ( imagePos.left );
+          imagePos.top = - ( imagePos.top );
 
           if ( isFunc ) {
             imageUrl = service[ urlProp ]( urlArgs );
@@ -162,8 +136,8 @@
           serviceState.loadCount++;
           //this._map._requestQueued();
 
-          scaleContainer.append('<img style="position:absolute; left:-' + halfWidth + 'px; top:-' + halfHeight + 'px; width:100%; height:100%; margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;" unselectable="on" />');
-          $img = scaleContainer.children(":last").data("center", map._getCenter());
+          scaleContainer.append('<img style="-webkit-transform:translateZ(0);position:absolute; left:' + ( imagePos.left / scaleContainer.width( ) * 100 ) + '%; top:' + ( imagePos.top / scaleContainer.height( ) * 100 ) + '%; width:100%; height:100%; margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;" unselectable="on" />');
+          $img = scaleContainer.children(":last").data("center", map._center);
 
           if ( typeof imageUrl === "string" ) {
             serviceObj._loadImage( $img, imageUrl, pixelSize, serviceState, serviceContainer, opacity );
@@ -192,16 +166,31 @@
               mapWidth = contentBounds["width"],
               mapHeight = contentBounds["height"],
 
-              halfWidth = mapWidth / 2,
-              halfHeight = mapHeight / 2,
+              scaleContainers = serviceContainer.children();
 
-              scaleContainer = serviceContainer.children();
+          scaleContainers.attr("data-pixel-size", "0");
 
-          scaleContainer.attr("data-pixelSize", "0");
+          scaleContainers.each( function ( i ) {
+            var $scaleContainer = $(this),
+                position = $scaleContainer.position( );
+
+            var oldMapOrigin = $scaleContainer.data( "origin" ),
+                newPixelPoint = map._toPixel( oldMapOrigin );
+
+            $scaleContainer.css( {
+              left: position.left + ( mapWidth - $scaleContainer.width( ) ) / 2,
+              top: position.top + ( mapHeight - $scaleContainer.height( ) ) / 2
+            } );
+
+          } );
+            
+
+          /*
           scaleContainer.css({
             left: halfWidth + 'px',
             top: halfHeight + 'px'
           });
+          */
         }
       },
 
@@ -237,22 +226,10 @@
           serviceState.loadCount--;
 
           if (serviceState.loadCount <= 0) {
-            serviceContainer.children(':not([data-pixelSize="' + pixelSize + '"])').remove();
+            // #newpanzoom
+            serviceContainer.children(':not([data-pixel-size="' + pixelSize + '"])').remove();
 
-            var panContainer = serviceContainer.find('[data-pixelSize="' + pixelSize + '"]>div');
-            if (panContainer.size() > 0) {
-              var panContainerPos = panContainer.position();
-
-              panContainer.children("img").each(function (i) {
-                var $thisimg = $(this),
-                    x = panContainerPos.left + parseInt($thisimg.css("left"), 10),
-                    y = panContainerPos.top + parseInt($thisimg.css("top"), 10);
-
-                $thisimg.css({ left: x + "px", top: y + "px" });
-              }).unwrap();
-
-              panContainer.remove();
-            }
+            serviceContainer.find( "img[data-keep-alive]" ).remove( );
 
             serviceState.loadCount = 0;
           }
@@ -261,7 +238,7 @@
           serviceState.loadCount--;
 
           if (serviceState.loadCount <= 0) {
-            serviceContainer.children(":not([data-pixelSize='" + pixelSize + "'])").remove();
+            serviceContainer.children(":not([data-pixel-size='" + pixelSize + "'])").remove();
             serviceState.loadCount = 0;
           }
         }).attr("src", url);
