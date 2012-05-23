@@ -27,7 +27,10 @@ $(function () {
     {
       id: "massgis_hydrography",
       type: "shingled",
-      src: "http://giswebservices.massgis.state.ma.us/geoserver/wms?LAYERS=massgis%3AGISDATA.MAJPOND_POLY,massgis%3AGISDATA.MAJSTRM_ARC&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX={{:bbox}}&WIDTH={{:width}}&HEIGHT={{:height}}"
+      src: "http://giswebservices.massgis.state.ma.us/geoserver/wms?LAYERS=massgis%3AGISDATA.MAJPOND_POLY,massgis%3AGISDATA.MAJSTRM_ARC&TRANSPARENT=true&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX={{:bbox}}&WIDTH={{:width}}&HEIGHT={{:height}}",
+      style: {
+        opacity: .8
+      }
     }
   ];
 
@@ -48,7 +51,7 @@ $(function () {
 
     // center & zoom values that fit MassGIS's projection
     center: [ 235670.21967, 900771.290247 ],
-    zoom: 13,
+    zoom: 14,
 
     bboxchange: function( e, geo ) {
       // when the bbox changes, update the info section with new option values
@@ -125,8 +128,12 @@ $(function () {
     }
   } );
 
-  // jQuery UI for pretty buttons
-  $( "button, #togglePannable" ).button( );
+  // jQuery UI for pretty button
+  // (except iOS 5, for some reason)
+  // (also, don't use user agent sniffing like this, will have to figure out the issue)
+  if (!navigator.userAgent.match(/OS [4-5](_\d)+ like Mac OS X/i)) {
+    $( "button, #togglePannable" ).button( );
+  }
   $( ".modes, .scrollOptions, .clickTargets, .toggleTargets" ).buttonset( );
 
   $( "#toggle-info" ).click( function( ) {

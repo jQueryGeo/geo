@@ -129,8 +129,12 @@ $(function () {
     }
   } );
 
-  // jQuery UI for pretty buttons
-  $( "button, #togglePannable" ).button( );
+  // jQuery UI for pretty button
+  // (except iOS 5, for some reason)
+  // (also, don't use user agent sniffing like this, will have to figure out the issue)
+  if (!navigator.userAgent.match(/OS [4-5](_\d)+ like Mac OS X/i)) {
+    $( "button, #togglePannable" ).button( );
+  }
   $( ".modes, .scrollOptions, .clickTargets, .toggleTargets" ).buttonset( );
 
   $( "#toggle-info" ).click( function( ) {
