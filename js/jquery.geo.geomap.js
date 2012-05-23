@@ -1209,7 +1209,7 @@
     _setInteractiveTimeout: function() {
       var geomap = this;
       this._timeoutInteractive = setTimeout( function () {
-        if ( geomap._timeoutInteractive ) {
+        if ( geomap._created && geomap._timeoutInteractive ) {
           geomap._setCenterAndSize( geomap._centerInteractive, geomap._pixelSizeInteractive, true, true );
           //geomap._refresh( );
           geomap._timeoutInteractive = null;
