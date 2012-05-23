@@ -95,6 +95,7 @@
     _centerInteractive: undefined,
     _pixelSizeInteractive: undefined,
     _timeoutInteractive: null,
+    _triggerInteractive: false,
 
     _wheelTimeout: null,
     _wheelLevel: 0,
@@ -310,22 +311,30 @@
 
       switch (key) {
         case "bbox":
+          this._clearInteractiveTimeout( );
+
           this._userGeodetic = $.geo.proj && $.geo._isGeodetic( value );
           if ( this._userGeodetic ) {
             value = $.geo.proj.fromGeodetic( value );
           }
 
           this._setBbox(value, false, refresh);
+          this._setInteractiveTimeout( false );
+
           value = this._getBbox();
           break;
 
         case "center":
+          this._clearInteractiveTimeout( );
+
           this._userGeodetic = $.geo.proj && $.geo._isGeodetic( value );
           if ( this._userGeodetic ) {
             value = $.geo.proj.fromGeodetic( value );
           }
 
-          this._setCenterAndSize( value, this._pixelSize, false, refresh );
+          this._centerInteractive[ 0 ] = value[ 0 ];
+          this._centerInteractive[ 1 ] = value[ 1 ];
+          this._setInteractiveTimeout( false );
           break;
 
         case "measureLabels":
@@ -691,9 +700,7 @@
 
       this._centerInteractive = center;
       this._pixelSizeInteractive = pixelSize;
-
-      // #newpanzoom
-      //this._setCenterAndSize(center, pixelSize, trigger, refresh);
+      this._interactiveTransform( );
     },
 
     _getBboxMax: function () {
@@ -747,9 +754,12 @@
     },
 
     _setZoom: function ( value, trigger, refresh ) {
-      value = Math.max( value, 0 );
+      this._clearInteractiveTimeout( );
 
-      this._setCenterAndSize( this._center, this._getPixelSize( value ), trigger, refresh );
+      value = Math.max( value, 0 );
+      this._pixelSizeInteractive = this._getPixelSize( value );
+
+      this._setInteractiveTimeout( trigger );
     },
 
     _createChildren: function () {
@@ -1080,25 +1090,6 @@
       }
     },
 
-    _panEnd: function () {
-      this._velocity = [
-        (this._velocity[0] > 0 ? Math.floor(this._velocity[0] * this._friction[0]) : Math.ceil(this._velocity[0] * this._friction[0])),
-        (this._velocity[1] > 0 ? Math.floor(this._velocity[1] * this._friction[1]) : Math.ceil(this._velocity[1] * this._friction[1]))
-      ];
-
-      if (Math.abs(this._velocity[0]) < 4 && Math.abs(this._velocity[1]) < 4) {
-        this._panFinalize();
-      } else {
-        this._current = [
-          this._current[0] + this._velocity[0],
-          this._current[1] + this._velocity[1]
-        ];
-
-        this._panMove();
-        setTimeout($.proxy(this._panEnd, this), 30);
-      }
-    },
-
     _panFinalize: function () {
       if (this._panning) {
         this._velocity = [0, 0];
@@ -1148,50 +1139,9 @@
           this._panning = true;
           this._lastDrag = this._current;
 
-          // #newpanzoom
-          /*
-          translateObj = {
-            left: function (index, value) {
-              return parseInt(value, 10) + dx;
-            },
-            top: function (index, value) {
-              return parseInt(value, 10) + dy;
-            }
-          };
-          */
-
           this._centerInteractive[ 0 ] -= ( dx * this._pixelSizeInteractive );
           this._centerInteractive[ 1 ] += ( ( this._options[ "axisLayout" ] === "image" ? -1 : 1 ) * dy * this._pixelSizeInteractive );
-
-          // #newpanzoom
-          this._$servicesShapesContainers.geographics("clear");
-
-          for ( i = 0; i < this._currentServices.length; i++ ) {
-            service = this._currentServices[ i ];
-            $.geo[ "_serviceTypes" ][ service.type ].interactiveTransform( this, service, this._centerInteractive, this._pixelSizeInteractive );
-            
-            //this._$servicesShapesContainers.css( translateObj );
-          }
-
-          if (this._drawCoords.length > 0) {
-            this._drawPixels = this._toPixel( this._drawCoords, this._centerInteractive, this._pixelSizeInteractive );
-            this._refreshDrawing();
-          }
-
-
-          //this._$panContainer.css( translateObj );
-
-          /*
-          var geomap = this;
-          this._timeoutInteractive = setTimeout( function () {
-            if ( geomap._timeoutInteractive ) {
-              geomap._refresh( );
-              geomap._timeoutInteractive = null;
-            }
-          }, 500 );
-          */
-          //this._refreshDrawing();
-
+          this._interactiveTransform( );
         }
       }
     },
@@ -1200,24 +1150,43 @@
       if ( this._timeoutInteractive ) {
         clearTimeout( this._timeoutInteractive );
         this._timeoutInteractive = null;
+        return true;
       } else {
         //console.log( "clearInteractiveTimeout( " + this._center.join( ", " ) + ", " + this._pixelSize + ")" );
 
         this._centerInteractive[ 0 ] = this._center[ 0 ];
         this._centerInteractive[ 1 ] = this._center[ 1 ];
         this._pixelSizeInteractive = this._pixelSize;
+        return false;
       }
     },
 
-    _setInteractiveTimeout: function() {
+    _interactiveTransform: function( ) {
+      if ( this._$servicesShapesContainers ) {
+        this._$servicesShapesContainers.geographics("clear");
+      }
+
+      for ( var i = 0; i < this._currentServices.length; i++ ) {
+        service = this._currentServices[ i ];
+        $.geo[ "_serviceTypes" ][ service.type ].interactiveTransform( this, service, this._centerInteractive, this._pixelSizeInteractive );
+      }
+
+      if (this._drawCoords.length > 0) {
+        this._drawPixels = this._toPixel( this._drawCoords, this._centerInteractive, this._pixelSizeInteractive );
+        this._refreshDrawing();
+      }
+    },
+
+    _setInteractiveTimeout: function( trigger ) {
       var geomap = this;
       this._timeoutInteractive = setTimeout( function () {
         if ( geomap._created && geomap._timeoutInteractive ) {
-          geomap._setCenterAndSize( geomap._centerInteractive, geomap._pixelSizeInteractive, true, true );
-          //geomap._refresh( );
+          geomap._setCenterAndSize( geomap._centerInteractive, geomap._pixelSizeInteractive, geomap._triggerInteractive, true );
           geomap._timeoutInteractive = null;
+          geomap._triggerInteractive = false;
         }
       }, 500 );
+      this._triggerInteractive |= trigger;
     },
 
     _refresh: function () {
@@ -1251,13 +1220,7 @@
       }
 
       // the final call during any extent change
-
-      // #newpanzoom
-      //if (this._pixelSize != pixelSize) {
-        if ( this._$servicesShapesContainers !== undefined ) {
-          this._$servicesShapesContainers.geographics("clear");
-        }
-      //}
+      // only called by timeoutInteractive & resize
 
       if ( this._options[ "tilingScheme" ] ) {
         var zoom = this._getZoom( center, pixelSize );
@@ -1266,11 +1229,6 @@
         if ( this._getZoom( center, pixelSize ) < 0 ) {
           this._pixelSizeInteractive = pixelSize = this._pixelSizeMax;
         }
-      }
-
-      for (var i = 0; i < this._currentServices.length; i++) {
-        var service = this._currentServices[i];
-        $.geo["_serviceTypes"][service.type].interactiveTransform(this, service, center, pixelSize);
       }
 
       this._center[ 0 ] = center[ 0 ];
@@ -1286,10 +1244,6 @@
       }
 
       this._options["zoom"] = this._getZoom();
-
-      if (this._drawCoords.length > 0) {
-        this._drawPixels = this._toPixel(this._drawCoords);
-      }
 
       if (trigger) {
         this._trigger("bboxchange", window.event, { bbox: $.merge( [ ], this._options["bbox"] ) });
@@ -1397,15 +1351,6 @@
       return isMultiPolygon ? result : isMultiLineStringOrPolygon ? result[ 0 ] : isMultiPointOrLineString ? result[ 0 ][ 0 ] : result[ 0 ][ 0 ][ 0 ];
     },
 
-    _zoomTo: function (coord, zoom, trigger, refresh) {
-      // #deprecated
-      zoom = zoom < 0 ? 0 : zoom;
-
-      var pixelSize = this._getPixelSize( zoom );
-
-      this._setCenterAndSize( coord, pixelSize, trigger, refresh );
-    },
-
     _document_keydown: function (e) {
       var len = this._drawCoords.length;
       if (len > 0 && e.which == 27) {
@@ -1425,7 +1370,7 @@
     },
 
     _eventTarget_dblclick_zoom: function(e) {
-      this._clearInteractiveTimeout( );
+      var doInteractiveTimeout = this._clearInteractiveTimeout( );
 
       this._trigger("dblclick", e, { type: "Point", coordinates: this._toMap(this._current, this._centerInteractive, this._pixelSizeInteractive ) });
 
@@ -1434,27 +1379,14 @@
 
         this._centerInteractive = centerAndSize.center;
         this._pixelSizeInteractive = centerAndSize.pixelSize;
+        this._interactiveTransform( );
 
-        // #newpanzoom
-        this._$servicesShapesContainers.geographics("clear");
-
-        for ( i = 0; i < this._currentServices.length; i++ ) {
-          service = this._currentServices[ i ];
-          $.geo[ "_serviceTypes" ][ service.type ].interactiveTransform( this, service, this._centerInteractive, this._pixelSizeInteractive );
-        }
-
-        if (this._drawCoords.length > 0) {
-          this._drawPixels = this._toPixel( this._drawCoords, this._centerInteractive, this._pixelSizeInteractive );
-          this._refreshDrawing();
-        }
-
-
-
-        // #newpanzoom
-        //this._setCenterAndSize(centerAndSize.center, centerAndSize.pixelSize, true, true);
+        doInteractiveTimeout = true;
       }
 
-      this._setInteractiveTimeout( );
+      if ( doInteractiveTimeout ) {
+        this._setInteractiveTimeout( true );
+      }
     },
 
     _eventTarget_dblclick: function (e) {
@@ -1533,7 +1465,7 @@
       //console.log("start centerI: " + this._centerInteractive.toString());
       //console.log("start pixelSizeI: " + this._pixelSizeInteractive);
 
-      this._clearInteractiveTimeout( );
+      var doInteractiveTimeout = this._clearInteractiveTimeout( );
 
       var offset = $(e.currentTarget).offset(),
           touches = e.originalEvent.changedTouches;
@@ -1614,7 +1546,9 @@
 
       e.preventDefault();
 
-      this._setInteractiveTimeout( );
+      if ( doInteractiveTimeout ) {
+        this._setInteractiveTimeout( true );
+      }
 
       return false;
     },
@@ -1627,9 +1561,7 @@
       //console.log("move centerI: " + this._centerInteractive.toString());
       //console.log("move pixelSizeI: " + this._pixelSizeInteractive);
 
-      if ( this._mouseDown ) {
-        this._clearInteractiveTimeout( );
-      }
+      var doInteractiveTimeout = this._clearInteractiveTimeout( );
 
       var offset = this._$eventTarget.offset(),
           drawCoordsLen = this._drawCoords.length,
@@ -1663,7 +1595,9 @@
           this._mouseDown = true;
           this._anchor = this._current = $.geo.center( this._multiTouchCurrentBbox, true );
 
-          this._setInteractiveTimeout( );
+          if ( doInteractiveTimeout ) {
+            this._setInteractiveTimeout( true );
+          }
           return false;
         }
 
@@ -1700,27 +1634,9 @@
 
           this._centerInteractive = pinchCenterAndSize.center;
           this._pixelSizeInteractive = pinchCenterAndSize.pixelSize;
-          //$("h1").text("move multi: " + this._pixelSizeInteractive);
+          this._interactiveTransform( );
 
-          this._$servicesShapesContainers.geographics("clear");
-
-          for ( i = 0; i < this._currentServices.length; i++ ) {
-            service = this._currentServices[ i ];
-            $.geo[ "_serviceTypes" ][ service.type ].interactiveTransform( this, service, this._centerInteractive, this._pixelSizeInteractive );
-          }
-
-          // #newpanzoom
-          /*
-          if (this._graphicShapes.length > 0 && this._graphicShapes.length < 256) {
-            this._refreshShapes(this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes, pinchCenterAndSize.center, pinchCenterAndSize.pixelSize);
-          }
-          */
-
-
-          if (this._drawCoords.length > 0) {
-            this._drawPixels = this._toPixel( this._drawCoords, this._centerInteractive, this._pixelSizeInteractive );
-            this._refreshDrawing();
-          }
+          doInteractiveTimeout = true;
 
           current = $.geo.center( this._multiTouchCurrentBbox, true );
         } else {
@@ -1733,7 +1649,9 @@
       if (current[0] === this._lastMove[0] && current[1] === this._lastMove[1]) {
         if ( this._inOp ) {
           e.preventDefault();
-          this._setInteractiveTimeout( );
+          if ( doInteractiveTimeout ) {
+            this._setInteractiveTimeout( true );
+          }
           return false;
         }
       }
@@ -1745,12 +1663,14 @@
       if (this._mouseDown) {
         this._current = current;
         this._moveDate = $.now();
-        this._setInteractiveTimeout( );
       }
 
       if ( this._isMultiTouch ) {
         e.preventDefault( );
         this._isDbltap = this._isTap = false;
+        if ( doInteractiveTimeout ) {
+          this._setInteractiveTimeout( true );
+        }
         return false;
       }
 
@@ -1779,6 +1699,7 @@
         case "measureArea":
           if (this._mouseDown || this._toolPan) {
             this._panMove();
+            doInteractiveTimeout = true;
           } else {
             if (drawCoordsLen > 0) {
               this._drawCoords[drawCoordsLen - 1] = this._toMap( current, this._centerInteractive, this._pixelSizeInteractive );
@@ -1794,6 +1715,7 @@
         default:
           if (this._mouseDown || this._toolPan) {
             this._panMove();
+            doInteractiveTimeout = true;
           } else {
             this._trigger("move", e, { type: "Point", coordinates: this.toMap(current) });
           }
@@ -1801,6 +1723,10 @@
       }
 
       this._lastMove = current;
+
+      if ( doInteractiveTimeout ) {
+        this._setInteractiveTimeout( true );
+      }
 
       if ( this._inOp ) {
         e.preventDefault();
@@ -1825,7 +1751,7 @@
         }
       }
 
-      this._clearInteractiveTimeout( );
+      var doInteractiveTimeout = this._clearInteractiveTimeout( );
 
       //console.log("stop centerI: " + this._centerInteractive.toString());
       //console.log("stop pixelSizeI: " + this._pixelSizeInteractive);
@@ -1872,7 +1798,9 @@
 
         this._wheelLevel = 0;
 
-        this._setInteractiveTimeout( );
+        if ( doInteractiveTimeout ) {
+          this._setInteractiveTimeout( true );
+        }
         return false;
       }
 
@@ -1912,6 +1840,7 @@
 
                 // #newpanzoom
                 this._setBbox(bbox, true, true);
+                doInteractiveTimeout = true;
               } else {
                 polygon = $.geo.polygonize( bbox, true );
                 this._trigger( "shape", e, this._userGeodetic ? {
@@ -1970,8 +1899,6 @@
 
           default:
             if (wasToolPan) {
-              // #newpanzoom
-              //this._panEnd();
               this._panFinalize();
             } else {
               if (clickDate - this._clickDate > 100) {
@@ -1986,13 +1913,17 @@
 
         if (this._softDblClick && this._isDbltap) {
           this._isDbltap = this._isTap = false;
-          this._setInteractiveTimeout( );
+          if ( doInteractiveTimeout ) {
+            this._setInteractiveTimeout( true );
+          }
           this._$eventTarget.trigger("dblclick", e);
           return false;
         }
       }
 
-      this._setInteractiveTimeout( );
+      if ( doInteractiveTimeout ) {
+        this._setInteractiveTimeout( true );
+      }
 
       if ( this._inOp ) {
         e.preventDefault();
@@ -2016,20 +1947,6 @@
       if (delta !== 0) {
         this._clearInteractiveTimeout( );
 
-        /*
-        if (this._wheelTimeout) {
-          window.clearTimeout(this._wheelTimeout);
-          this._wheelTimeout = null;
-        } else {
-          var offset = $(e.currentTarget).offset();
-          this._anchor = [e.pageX - offset.left, e.pageY - offset.top];
-        }
-        */
-
-        //$("h1").text("w: " + delta);
-
-        //this._wheelLevel += delta;
-        //
         var offset = $(e.currentTarget).offset();
         this._anchor = [e.pageX - offset.left, e.pageY - offset.top];
 
@@ -2039,35 +1956,9 @@
 
         this._centerInteractive = wheelCenterAndSize.center;
         this._pixelSizeInteractive = wheelCenterAndSize.pixelSize;
-        //$("h1").text("wheel: " + this._pixelSizeInteractive);
+        this._interactiveTransform( );
 
-        // #newpanzoom
-        //this._$elem.find( ".geo-shapes-container" ).geographics("clear");
-        this._$servicesShapesContainers.geographics("clear");
-
-        for ( ; i < this._currentServices.length; i++ ) {
-          service = this._currentServices[ i ];
-          $.geo["_serviceTypes"][service.type].interactiveTransform(this, service, this._centerInteractive, this._pixelSizeInteractive);
-        }
-
-        /*
-        if (this._graphicShapes.length > 0 && this._graphicShapes.length < 256) {
-          this._refreshShapes(this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes, wheelCenterAndSize.center, wheelCenterAndSize.pixelSize);
-        }
-        */
-
-        if (this._drawCoords.length > 0) {
-          this._drawPixels = this._toPixel( this._drawCoords, this._centerInteractive, this._pixelSizeInteractive );
-          this._refreshDrawing();
-        }
-
-        this._setInteractiveTimeout( );
-
-        // #newpanzoom
-        //var geomap = this;
-        //this._wheelTimeout = window.setTimeout(function () {
-          //geomap._mouseWheelFinish( true );
-        //}, 1000);
+        this._setInteractiveTimeout( true );
       }
 
       return false;

@@ -219,6 +219,20 @@
 ===tiled===
 The new origin stuff appears to work better. I'm going to run through the other examples & see if I'm ready for a build.
 
+===chrome===
+Chrome's screen tearing is really bad. I'm going to try to disable 3d transform in Chrome. Maybe it's just my laptop, Chrome is doing the tearing even without translateZ. I'm reverting the changes for that test.
+
+===bbox===
+I'm getting a bbox event after a single tap.
+
+===setInteractiveTimemout===
+I need to only call this if: a) it's already been called once (to keep it going) & b) we actually change centerInteractive or pixelSizeInteractive.
+
+The programatic changes are going to be a part of this, too. I need a way to turn on trigger during setInteractiveTimemout.
+
+===programatic===
+I updated all the programatic calls to use the new system with the ability to say not to trigger. I will need to test these but for now, I do think I'm finally ready to merge.
+
 ==2012-05-22==
 ===mouseup===
 I'm ignoring rogue mouseup events now. Hopefully, that will clean resize up a bit on Chrome & Firefox.
