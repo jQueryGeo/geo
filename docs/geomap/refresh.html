@@ -29,16 +29,31 @@
         </tr>
         <tr>
           <th>syntax</th>
-          <td>.geomap( &quot;refresh&quot; )</td>
+          <td>.geomap( &quot;refresh&quot; [ , force ] )</td>
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>$(&quot;#map&quot;).geomap( &quot;refresh&quot; )</code></pre></td>
+          <td><pre><code>$(&quot;#map&quot;).geomap( &quot;refresh&quot; )
+
+$(&quot;#map&quot;).geomap( &quot;refresh&quot;, true )</code></pre></td>
         </tr>
       </table>
-      <p>
-        This method refreshes 
-        all services and graphics in the map. Usually, changing geomap properties or calling methods automatically refreshes the map appropriately. However, you can call this after you have added or removed shapes to geomap by passing false as the refresh argument to the append, remove, or empty methods.</p>
+
+      <p>This method refreshes all services and graphics in the map. Usually, changing geomap options or calling methods automatically refreshes the map appropriately. However, you can call this after you have added or removed shapes to geomap by passing false as the refresh argument to the append, remove, or empty methods.</p>
+
+      <p>The force option will re-request images for tiles already in the map view. Keep in mind, though, that this does not guarantee you will get updated images. See the Dynamic Data section below for tips.</p>
+
+      <h2>Dynamic Data</h2>
+
+      <p>There are three factors that can prevent jQuery Geo from getting a fresh image from a web server.</p>
+      
+      <ul>
+        <li>if the user does not interact with the map, jQuery Geo will not request a new image or new tiles</li>
+        <li>if the user does interact with the map, you call refresh with no arguments, or you call .geomap( &quot;refresh&quot;, false ), jQuery Geo will only request images for tiles that it does not already have for tiled services; a new image is always requested for shingeld service</li>
+        <li>if you call .geomap( &quot;refresh&quot;, true ), jQuery Geo will request a new image for existing tiles but the web browser is free to supply a cached image instead of retriving one from the web server; this is also true for shinged services if the final image URL is the same as a previous image URL</li>
+      </ul>
+
+      <p>A web browser will normally cache images that have already been loaded. On top of that, jQuery Geo will not, by default, request images for tiles that it has already placed. In the case of dynamic data, where you want to update what's on the map without requiring a pan or zoom, you have a couple options.</p>
     </div>
   </div> <!-- end of #container -->
 

@@ -80,6 +80,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * geomap - android - browser stops pan/zoom after 7 logos on logo demo
 * geomap - [bug] mouse wheel on bad or missing tile doesn't zoom out on first rotate
 * geomap - increase mobile performance by 9000
+* docs - geomap - add argument to refresh to force reload of images (in case of dynamic data)
 
 ### 1.0a4 (2012-02-19)
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax
