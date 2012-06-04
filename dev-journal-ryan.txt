@@ -1,6 +1,7 @@
 ﻿== to do ==
 
 === b1 ===
+* geomap - allow service-level refresh
 * geomap - loadstart, loadend events
 * geomap - [bug] dragBbox doesn't include the bbox property in the shape
 * geomap - allow append to take an array of shapes
@@ -123,8 +124,6 @@
 * geomap - completely original cursor set for pan, zoom, draw, etc.
 * docs - geomap - replace method
 * geomap - replace method
-* docs - geomap - allow service-level refresh
-* geomap - allow service-level refresh
 * geomap - draw shapes to img and integrate with interactiveTransform
 * docs & examples - settle on the word "option" in all text (instead of property) to match widget function
 * docs - make all map examples live
