@@ -82,6 +82,8 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * geomap - increase mobile performance by 9000
 * docs - geomap - add argument to refresh to force reload of images for dynamic data
 * docs - geomap - allow service-level refresh
+* docs - geomap - zoomMax option (tiled & shingled)
+* docs - geo - include method for bbox
 
 ### 1.0a4 (2012-02-19)
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax

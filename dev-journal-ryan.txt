@@ -7,9 +7,7 @@
 * geomap - allow append to take an array of shapes
 * geomap - allow remove to take an array of shapes
 * geomap - add argument to refresh to force reload of images (in case of dynamic data)
-* docs - geomap - zoomMax option (tiled & shingled)
 * geomap - zoomMax option
-* docs - geo - include method for bbox
 ** accept null first argument and coordinate or bbox second argument
 * geo - include method for bbox
 * geomap - test changing shingled service URL to get updated images (in case of dynamic data)
@@ -52,9 +50,14 @@
 * examples - geomap resize method
 * examples - Codecademy course
 * examples - SVG & other neat elements/media in labels
+* examples - continent puzzle
+** http://stephanmendler.de/thinkmaps/puzzle/index_en.html
 
 === future ===
 
+* geomap - don't repeat attr text if the same as one previously added
+* docs - geomap - zoomMin, zoomMax on service object
+* geomap - zoomMin, zoomMax on service object
 * geomap - remove this-style state properties
 * geomap - add delegate handler for image load instead of one load handler per image
 * geomap - remove "px" from .css calls
@@ -71,7 +74,6 @@
 * geomap - implement service-level shape redrawing during interactive movement
 * geomap - use CSS transition or transform for smoother tiling
 * geomap - don't request tiles that > max possible y for scale
-* geomap - repeat horizontal tiles
 * docs - geomap - view.service.row & view.service.column to string multiple services together or repeat horizontal tiles
 * geomap - Firefox - [bug] inertial pan is choppy post touchstop
 ** post inertial pan rewrite
@@ -192,6 +194,13 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-06-07==
+===vacation===
+I've been away for almost two weeks. Time to finish b1.
+
+===zoomMax===
+This is where I left off. I'm also considering zoomMin and zoomMax on service objects but that's not until later if needed.
 
 ==2012-05-23==
 ===tiled===
