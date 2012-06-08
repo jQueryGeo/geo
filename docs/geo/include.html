@@ -1,0 +1,59 @@
+<!doctype html>  
+
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+
+  <title>include | $.geo</title>
+  <meta name="description" content="jQuery Geo include method">
+  <meta name="author" content="Ryan Westphal">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="../css/style.css?v=2">
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
+</head>
+
+<body>
+
+  <div id="include" data-role="page">
+    <div data-role="header" data-theme="b">
+      <h1>include</h1>
+    </div>
+    
+    <div data-role="content">
+      <table>
+        <tr>
+          <th>return type</th>
+          <td>Array ( <a href="http://geojson.org/geojson-spec.html#bounding-boxes" rel="external">GeoJSON bounding box</a> ) </td>
+        </tr>
+        <tr>
+          <th>syntax</th>
+          <td>$.geo.include( null | Array bbox ( <a href="http://geojson.org/geojson-spec.html#bounding-boxes" rel="external">GeoJSON bounding box</a> ),  Array position ( <a href="http://geojson.org/geojson-spec.html#positions" rel="external">GeoJSON position</a> ) | Array bbox ( <a href="http://geojson.org/geojson-spec.html#bounding-boxes" rel="external">GeoJSON bounding box</a> )  )</td>
+        </tr>
+        <tr>
+          <th>usage</th>
+          <td><pre><code>var bboxOfCoord = $.geo.include( null, [ -70, 42 ] );
+var sameAsSecondArgument = $.geo.include( null, [ -71, 41, -69, 43 ] );
+var includeCoord = $.geo.include( bbox, [ -70, 42 ] );
+var includeBbox = $.geo.include( bbox, [ -71, 41, -69, 43 ] );</code></pre></td>
+        </tr>
+      </table>
+
+      <p>The include method expands a bbox to include either a coordinate or another bbox. The expanded bbox is returned.</p>
+
+      <p>If the first argument is null or undefined, the result is a new bbox and will contain the second argument.</p>
+
+      <p>For efficency, if the second argument is a valid bbox, it is modified in place and a reference is returned.</p>
+
+      <p>This function is similar to Envelope.expandToInclude in JTS.</p>
+    </div>
+  </div> <!-- end of #container -->
+
+  <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a4.min.js"></script>
+  <script src="../js/script.js"></script>
+  <script src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
+</body>
+</html>
+

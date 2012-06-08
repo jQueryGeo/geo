@@ -66,6 +66,24 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * geomap - clamp measure labels to [0, 0]
 * geo - clamp centroid to bbox
 * geomap - measure label for polygon should be in centroid
+* geomap - merge interactive pan and zoom into one, faster system (pan/zoom rewrite)
+* geomap - [bug] iOS - panning is visually jumpy but settles on the correct bbox in the end
+* geomap - pinch-zoom doesn't follow user's fingers close enough when scaling
+* geomap - [bug] pinch zoom on iPad 2 (iOS 5) doesn't refresh tiles when zooming out
+* geomap - request new image in shingled service during interactive pan
+* geomap - [bug] zoom in more than once with zoom method moves tiles to the wrong spot
+* geomap - [bug] only services that have finished refreshing move when the user pans
+* geomap - [bug] map panning is jumpy, appears to be related to shapes and/or drawing context
+* geomap - [bug] pan sometimes lags on first drag
+* geomap - tiled data-scaleOrigin should be stored as an array
+* geomap - android - [bug] cannot always pan map after appending shapes
+* geomap - android - browser stops pan/zoom after 7 logos on logo demo
+* geomap - [bug] mouse wheel on bad or missing tile doesn't zoom out on first rotate
+* geomap - increase mobile performance by 9000
+* docs - geomap - add argument to refresh to force reload of images for dynamic data
+* docs - geomap - allow service-level refresh
+* docs - geomap - zoomMax option (tiled & shingled)
+* docs - geo - include method for bbox
 
 ### 1.0a4 (2012-02-19)
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax
@@ -119,7 +137,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * geomap - [bug] mouse wheel doesn't work with jQuery 1.7
 ** upgrade to latest jquery.mousewheel plugin
 * geomap - service object visibility and opacity options should be moved to a style property
-* geomap - use _currentServices in all functions unless we actually need to update the public options services object
+* geomap - use currentServices in all functions unless we actually need to update the public options services object
 * geomap - don't change user's service objects in opacity/toggle
 * geomap - show attr text
 * docs - geomap - selector argument to find method
@@ -133,12 +151,13 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * geomap - don't request tiles that are -y index
 * geomap - [bug] initializing tiled map by non-geodetic bbox always causes zoom level 0
 * docs - geomap - empty string needed for label element
+* geomap - label divs should have class="geo-label" & style="position: absolute;"
 * geomap - [bug] double tap to end shapes adds two points before ending the shape, in different places
 * geomap - [bug] lifting fingers after pinch zoom in drawLineString or drawPolygon modes sometimes adds fake visual coordinate on touch point last lifted
 * docs - upgrade to jQuery 1.7.1
 * geomap - [bug] scroll=off doesn't zoom map but also doesn't allow document scroll
 * geomap - [bug] changing mode does not reset measure drawing
-* geomap - [bug] jQuery UI Widget Factory no longer passes pageX & pageY event properties during _trigger when using jQuery 1.7
+* geomap - [bug] jQuery UI Widget Factory no longer passes pageX & pageY event properties during trigger when using jQuery 1.7
 ** upgrade to Widget Factory 1.8.17
 * examples - all demo (shingled)
 * docs - geomap - custom modes
@@ -171,7 +190,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * docs - geomap - zoom method
 * geomap - zoom method
 * geo - calculate bbox in projected coordinates
-* docs - proj - mention that *Geodetic methods can also do bbox
+* docs - proj - mention that Geodetic methods can also do bbox
 * geo - geometry - bbox function
 * docs - geomap - destroy method
 * geo - bbox - center function

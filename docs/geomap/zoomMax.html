@@ -1,0 +1,64 @@
+<!doctype html>  
+
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+
+  <title>zoomMax | geomap</title>
+  <meta name="description" content="geomap zoomMax option">
+  <meta name="author" content="Ryan Westphal">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="../css/style.css?v=2">
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
+</head>
+
+<body>
+
+  <div id="zoomMax" data-role="page">
+    <div data-role="header" data-theme="f">
+      <h1>zoomMax</h1>
+    </div>
+    
+    <div data-role="content">
+      <table>
+        <tr>
+          <th>type</th>
+          <td>Number</td>
+        </tr>
+        <tr>
+          <th>default</th>
+          <td>Number.POSITIVE_INFINITY</td>
+        </tr>
+        <tr>
+          <th>init</th>
+          <td><pre><code>$( <i>selector</i> ).geomap( { zoomMax: 17 } );</code></pre></td>
+        </tr>
+        <tr>
+          <th>get</th>
+          <td><pre><code>var zoomMax = $( <i>selector</i> ).geomap( &quot;option&quot;, &quot;zoomMax&quot; );</code></pre></td>
+        </tr>
+        <tr>
+          <th>set</th>
+          <td><pre><code>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;zoomMax&quot;, 7 );</code></pre></td>
+        </tr>
+      </table>
+
+      <p>The zoomMax option gets or sets the maximum value of the <a href="zoom.html">zoom option</a> for the map.</p>
+
+      <p>For tiled maps, this option overrides the <a href="tilingScheme.html">tilingScheme option</a> when it is smaller than what you've specified in the tilingScheme. For example, if the tilingScheme has a total of 18 levels but you set the zoomMax option to 7, the user will not be able to zoom past level 7.</p>
+
+      <p>For non-tiled maps, i.e., tilingScheme is null and you're using all shingled services, this option determines the maximum zoom (and therefore pixelSize) a user can achieve. Without setting this option for non-tiled maps, users will be able to infinitely zoom in to fully dynamic maps which is likely not what you want. Non-tiled maps require the <a href="bboxMax.html">bboxMax option</a> to determine what zoom level 0 means. This option represents the other side of the zoom range.</p>
+
+      <p>This option also overrides programmatic changes. If zoomMax is 7 and you try to set the zoom option to 8 using JavaScript, it will be set to 7 instead.</p>
+    </div>
+  </div> <!-- end of #container -->
+
+  <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a4.min.js"></script>
+  <script src="../js/script.js"></script>
+  <script src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
+</body>
+</html>
+
