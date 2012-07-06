@@ -84,6 +84,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * docs - geomap - allow service-level refresh
 * docs - geomap - zoomMax option (tiled & shingled)
 * docs - geo - include method for bbox
+* geomap - bboxMax should reset center & pixelSize
 
 ### 1.0a4 (2012-02-19)
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax

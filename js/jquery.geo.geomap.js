@@ -269,12 +269,18 @@
       this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
 
       if (this._initOptions) {
-        if (this._initOptions.tilingScheme) {
-          this._setOption("tilingScheme", this._initOptions.tilingScheme, false);
+        // always init tilingScheme right away, even if it's null
+        if ( this._initOptions.tilingScheme !== undefined ) {
+          this._setOption("tilingScheme", this._initOptions.tilingScheme || null, false);
         }
+
         if ( this._initOptions.services ) {
           // jQuery UI Widget Factory merges user services with our default, we want to clobber the default
           this._options[ "services" ] = $.merge( [ ], this._initOptions.services );
+        }
+        if (this._initOptions.bboxMax) {
+          this._setOption("bboxMax", this._initOptions.bboxMax, false);
+          this._setOption("bbox", this._initOptions.bboxMax, false);
         }
         if (this._initOptions.bbox) {
           this._setOption("bbox", this._initOptions.bbox, false);
@@ -345,6 +351,10 @@
           }
 
           value = this._getBbox();
+          break;
+
+        case "bboxMax":
+          this._userGeodetic = $.geo.proj && $.geo._isGeodetic( value );
           break;
 
         case "center":
@@ -427,13 +437,13 @@
           break;
 
         case "bboxMax":
-          this._pixelSizeMax = this._getPixelSize( 0 );
-
           if ( $.geo.proj && $.geo._isGeodetic( value ) ) {
             this._centerMax = $.geo.center( $.geo.proj.fromGeodetic( value ) );
           } else {
             this._centerMax = $.geo.center( value );
           }
+
+          this._pixelSizeMax = Math.max($.geo.width(value, true) / this._contentBounds.width, $.geo.height(value, true) / this._contentBounds.height);
           break;
 
         case "services":

@@ -4,6 +4,7 @@
 * geomap - allow service-level refresh
 * geomap - loadstart, loadend events
 * geomap - [bug] dragBbox doesn't include the bbox property in the shape
+* geomap - dragBbox should send a Point (with bbox) for single clicks
 * geomap - allow append to take an array of shapes
 * geomap - allow remove to take an array of shapes
 * geomap - add argument to refresh to force reload of images (in case of dynamic data)
@@ -11,6 +12,7 @@
 ** accept null first argument and coordinate or bbox second argument
 * geo - include method for bbox
 * geomap - test changing shingled service URL to get updated images (in case of dynamic data)
+* geomap - stop using $.data to store bbox since it's only used for drawing; store on _graphicShapes instead
 * geomap - [bug] there's an extra service.refresh call after a non-mousedown touchmove after a refresh
 ** most noticeable on shingled services
 * geomap - [bug] tiled services with pixelSizes set do not render zoom level 0
@@ -55,6 +57,7 @@
 
 === future ===
 
+* geomap - include bboxMax in interactiveTransform engine
 * geomap - don't repeat attr text if the same as one previously added
 * docs - geomap - zoomMin, zoomMax on service object
 * geomap - zoomMin, zoomMax on service object
@@ -68,6 +71,10 @@
 * geomap - create _defaultState object, use for widget-local _widgetState property, reinit _widgetState on _createWidget
 * geographics - draw to img elements to include in interactiveTransform 
 * geographics - try removing the blit canvas from the DOM, i.e., don't attach
+* geographics - better support retna displays
+** http://mir.aculo.us/2012/06/26/flowchart-how-to-retinafy-your-website/
+* geomap - see what knowledge Gamecore.js has to offer
+** http://blog.getplaycraft.com/gamecore-js/
 * geomap - maybe throw an error when setting center to an invalid object, such as the first number in a coordinate array: coordinates[ 0 ] <== wrong!
 ** oddly, iPod Touch 4 (iOS 4) is fine
 ** might be related to the jQuery UI bug I found
@@ -77,6 +84,8 @@
 * docs - geomap - view.service.row & view.service.column to string multiple services together or repeat horizontal tiles
 * geomap - Firefox - [bug] inertial pan is choppy post touchstop
 ** post inertial pan rewrite
+* docs - better describe append/find connection and how to append data and use the click event to find it later
+** see email reply to Marc
 * docs - geomap - describe "graphic service" as shingled with src set to empty string or null
 * docs - warn users about potential CSS/JavaScript issues relating to generated elements
 ** ul, li, div, span, img
@@ -139,7 +148,6 @@
 * geo - support up to GeometryCollection in contains
 * docs - geo - support up to GeometryCollection in centroid
 * geo - support up to GeometryCollection in centroid
-* geomap - stop using $.data to store bbox since it's only used for drawing; store on _graphicShapes instead
 * geomap - show a drawPoint style while the mouse is down, hide if toolPan or dbltap scale
 * geomap - audit allocations and reduce garbage
 ** see http://www.scirra.com/blog/76/how-to-write-low-garbage-real-time-javascript
@@ -194,6 +202,28 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-07-06==
+===bboxMax===
+A side effect of changing bboxMax is that zoom's value will have to change. This means that changing bboxMax should refresh the map services.
+
+There's going to be more to do later when I want to handle changing bboxMax properly at runtime. It should hook into the interactiveTransform engine. For now, though, I'm going to make it work right during init.
+
+Heh, bboxMax wasn't doing anything right :) It now sets both centerMax & pixelSizeMax.
+
+==2012-07-05==
+===inset shingled map is off===
+If I pre-render an inset map and use a shingled service, the extent box is wrong vs. what we see on the map.
+
+===bboxMax===
+Initializing this property should set _userGeodetic because sometimes you want to init with bboxMax: [], zoom: 0.
+
+==2012-06-22==
+===client work===
+I finished the docs last time, then client work stopped me from finishing the code.
+
+===bostock===
+In implementing the Bostock demo, I found a bug in jQuery Geo. There's a way around it but it's a little slower. The bug will go away when I fix bbox storage on appended shapes.
 
 ==2012-06-07==
 ===vacation===

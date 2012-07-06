@@ -1,0 +1,153 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Shingled inset map bug</title>
+  <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+  <meta name="description" content="Shingled inset map bug">
+  <meta name="author" content="Ryan Westphal">
+  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/blitzer/jquery-ui.css" />
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+  <style type="text/css">
+    #map
+    {
+      position: fixed;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+
+.Panel
+{
+  position: absolute;
+  background-color: White;
+  border: solid 1px #8080A8;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-box-shadow: #909090 2px 2px 4px;
+  -moz-box-shadow: #909090 2px 2px 4px;
+  box-shadow: #909090 2px 2px 4px;
+}
+
+
+#pnlInsetContainer
+{
+  right: 6px;
+  bottom: 6px;
+}
+
+#insetFrame
+{
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  right: 2px;
+  bottom: 2px;
+  border: solid 1px Silver;
+  overflow: hidden;
+}
+
+#insetMap
+{
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+    
+  </style>
+</head>
+<body>
+  <div>
+    <div id="map">
+    </div>
+    <div id="pnlInsetContainer" class="Panel" style="width: 246px; height: 206px;">
+      <div id="insetFrame">
+        <div id="insetMap"></div>
+      </div>
+    </div>
+    <div class="info">
+      <div class="links">
+        <a href="../" class="docLink">&lt; docs</a>
+        <a href="http://jsfiddle.net/ryanttb/==JSFIDDLE==/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
+      </div>
+      <h1>Shingled inset map bug</h1>
+      <p></p>
+    </div>
+  </div>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+  <script src="../../js/excanvas.js"></script>
+  <script src="../../js/jsrender.js"></script>
+  <script src="../../js/jquery.mousewheel.js"></script>
+  <script src="../../js/jquery.ui.widget.js"></script>
+  <script src="../../js/jquery.geo.core.js"></script>
+  <script src="../../js/jquery.geo.geographics.js"></script>
+  <script src="../../js/jquery.geo.geomap.js"></script>
+  <script src="../../js/jquery.geo.tiled.js"></script>
+  <script src="../../js/jquery.geo.shingled.js"></script>
+  <!--<script src="../jquery.geo-test.min.js"></script>-->
+  <script>
+    $( function ( ) {
+      $.geo.proj = null;
+
+      // create a map
+      var map = $( "#map" ).geomap( {
+        tilingScheme: {
+          tileWidth: 256,
+          tileHeight: 256,
+          levels: 20,
+          basePixelSize: 156543.03392799936,
+          origin: [-20037508.342787, 20037508.342787]
+        },
+        services: [
+          {
+            type: "tiled",
+            src: "http://s3.amazonaws.com/MapGeo_ME/Cumberland/Basemap/{{:zoom}}/{{:tile.row}}/{{:tile.column}}"
+          }
+        ],
+        bbox: [ -7830703, 5423841, -7808643, 5442224 ],
+        zoom: 12,
+        bboxchange: function( e, geo ) {
+          drawInsetBox(geo.bbox);
+        }
+      } );
+
+      var inset = $( "#insetMap" ).geomap( {
+        tilingScheme: null,
+        bboxMax: [ -7830703, 5423841, -7808643, 5442224 ],
+        //bbox: [ -7830703, 5423841, -7808643, 5442224 ],
+        zoom: 0,
+        mode: "static",
+        services: [
+          {
+            id: "inset",
+            type: "shingled",
+            src: "img/inset.png"
+          }
+        ],
+        shapeStyle: {
+          color: "#FF0000"
+        },
+      });
+
+      function drawInsetBox(extent) {
+        inset.geomap( "empty" ).geomap( "append", $.geo.polygonize( extent ) );
+      }
+
+      drawInsetBox( map.geomap( "option", "bbox" ) );
+    } );  
+  </script>
+
+  <script>
+    var _gaq = [['_setAccount', 'UA-26084853-1'], ['_trackPageview']];
+    (function (d, t) {
+      var g = d.createElement(t), s = d.getElementsByTagName(t)[0]; g.async = 1;
+      g.src = ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+      s.parentNode.insertBefore(g, s);
+    } (document, 'script'));
+  </script>
+</body>
+</html>
