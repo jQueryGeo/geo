@@ -346,8 +346,7 @@
 
             this._setInteractiveTimeout( false );
           } else {
-            this._center = center;
-            this._pixelSize = pixelSize;
+            this._setCenterAndSize( center, pixelSize, false, refresh );
           }
 
           value = this._getBbox();
@@ -372,8 +371,7 @@
             this._centerInteractive[ 1 ] = value[ 1 ];
             this._setInteractiveTimeout( false );
           } else {
-            this._center[ 0 ] = value[ 0 ];
-            this._center[ 1 ] = value[ 1 ];
+            this._setCenterAndSize( value, this._pixelSize, false, refresh );
           }
           break;
 
@@ -410,7 +408,7 @@
             this._setZoom(value, false, refresh);
           } else {
             value = Math.max( value, 0 );
-            this._pixelSize = this._getPixelSize( value );
+            this._setCenterAndSize( this._center, this._getPixelSize( value ), false, refresh );
           }
           break;
       }

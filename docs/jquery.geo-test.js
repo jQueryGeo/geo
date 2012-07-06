@@ -4391,8 +4391,7 @@ $.Widget.prototype = {
 
             this._setInteractiveTimeout( false );
           } else {
-            this._center = center;
-            this._pixelSize = pixelSize;
+            this._setCenterAndSize( center, pixelSize, false, refresh );
           }
 
           value = this._getBbox();
@@ -4417,8 +4416,7 @@ $.Widget.prototype = {
             this._centerInteractive[ 1 ] = value[ 1 ];
             this._setInteractiveTimeout( false );
           } else {
-            this._center[ 0 ] = value[ 0 ];
-            this._center[ 1 ] = value[ 1 ];
+            this._setCenterAndSize( value, this._pixelSize, false, refresh );
           }
           break;
 
@@ -4455,7 +4453,7 @@ $.Widget.prototype = {
             this._setZoom(value, false, refresh);
           } else {
             value = Math.max( value, 0 );
-            this._pixelSize = this._getPixelSize( value );
+            this._setCenterAndSize( this._center, this._getPixelSize( value ), false, refresh );
           }
           break;
       }
@@ -4468,11 +4466,7 @@ $.Widget.prototype = {
           if ( this._userGeodetic ) {
             this._options[ "bbox" ] = $.geo.proj.toGeodetic( this._options[ "bbox" ] );
             this._options[ "center" ] = $.geo.proj.toGeodetic( this._center );
-          } else {
-            this._options[ "center" ][ 0 ] = this._center[ 0 ];
-            this._options[ "center" ][ 1 ] = this._center[ 1 ];
           }
-          this._options[ "pixelSize" ] = this._pixelSize;
           break;
 
         case "tilingScheme":
