@@ -51,7 +51,7 @@ $(function () {
 
     // center & zoom values that fit MassGIS's projection
     center: [ 235670.21967, 900771.290247 ],
-    zoom: 14,
+    zoom: 4,
 
     bboxchange: function( e, geo ) {
       // when the bbox changes, update the info section with new option values
@@ -59,10 +59,10 @@ $(function () {
     },
 
     shape: function( e, geo ) {
-      // both the measure and draw modes trigger the shape event
-      // but we only want to append for the draw
-      if ( map.geomap( "option", "mode" ).substr( 0, 4 ) == "draw" ) {
-        // when the user draws a shape, show it on the map
+      // both the measure and draw/drag modes trigger the shape event
+      // but we only want to append for the draw & drag
+      if ( map.geomap( "option", "mode" ).substr( 0, 3 ) == "dra" ) {
+        // when the user draws or drags a shape, show it on the map
         // the shape event triggers when the user finishes drawing a shape
         // the geo argument is a GeoJSON object representing the shape
 
@@ -164,12 +164,12 @@ $(function () {
     var modeValue = $( this ).val( );
     map.geomap( "option", "mode", modeValue );
 
-    // if mode is one of the draw modes (or remove), show the target section, otherwise hide it
-    $( "#clickTarget" ).toggle( modeValue.substr( 0, 4 ) === "draw" || modeValue === "remove" );
+    // if mode is one of the draw/drag modes (or remove), show the target section, otherwise hide it
+    $( "#clickTarget" ).toggle( modeValue.substr( 0, 3 ) === "dra" || modeValue === "remove" );
 
-    // if mode is one of the draw modes,
+    // if mode is one of the draw/drag modes,
     // show the label inputs & shape style as well
-    $( "#shapeLabels, #drawStyle" ).toggle( modeValue.substr( 0, 4 ) === "draw" );
+    $( "#shapeLabels, #drawStyle" ).toggle( modeValue.substr( 0, 3 ) === "dra" );
 
     // also display the current mode on the button
     $( "#change-mode .ui-button-text" ).text( modeValue );
