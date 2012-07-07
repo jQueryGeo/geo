@@ -46,8 +46,11 @@
       </table>
       <p>The bboxMax option calculates or modifies a bounding box that surrounds all of the data you wish to show in the map. Users can pan the map once they reach bboxMax but cannot zoom out further.</p>
       <p>This option is a JavaScript array consisting of four values which can be thought of as: minx, miny, maxx and maxy of the maximum map view you wish to allow in map units and in that order.</p>
-      <p>Setting a new bboxMax will not refresh the map services.</p>
-      <p>A bboxMax option must be set properly for shinged (dynamic) services if you wish to use the zoom option since the value of the map's zoom is based on a ratio between the current bbox and bboxMax. If you have a fully dynamic map by setting tilingScheme to null, you should explicitly set bboxMax.</p>
+      <p>Setting a new bboxMax will refresh the map services.</p>
+      <p><b>If you set <a href="tilingScheme.html">tilingScheme</a> to null, you must explicitly set bboxMax.</b></p>
+      <p><b>Also, if you are using only shingled services you must set tilingScheme to null, and therefore explicitly set bboxMax.</b></p>
+
+      <p>A bboxMax option must be set properly for shingled (dynamic) services since the value of the map's zoom is based on a ratio between the current bbox and bboxMax.</p>
     </div>
   </div> <!-- end of #container -->
 

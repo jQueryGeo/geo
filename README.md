@@ -84,6 +84,11 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * docs - geomap - allow service-level refresh
 * docs - geomap - zoomMax option (tiled & shingled)
 * docs - geo - include method for bbox
+* geomap - bboxMax should reset center & pixelSize
+* geomap - [bug] initializing center, zoom, & bbox doesn't set all properties
+* geo - [bug] polygonize doesn't return valid polygon when using geodetic coordinates
+* geomap - [bug] dragBbox doesn't include the bbox property in the shape
+* geomap - dragBbox should send a Point (with bbox) for single clicks
 
 ### 1.0a4 (2012-02-19)
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax

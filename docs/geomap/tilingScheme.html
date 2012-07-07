@@ -58,13 +58,23 @@
           <td><code><pre>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;tilingScheme&quot;, null );</pre></code></td>
         </tr>
       </table>
+
       <p>The tilingScheme property defines a grid that the geomap widget can use to build a map view as adjacent tiles instead of a single, full image each time.</p>
+
       <p>Only tiled services will get a non-null tile property as an argument to their src method or template. Shingled services, even when layered on top of a tiled map will only get bbox data.</p>
+
       <p>When a tilingScheme is set, the geomap widget will limit the user to specific zoom levels defined by the tiling scheme.</p>
+
+      <p><b>If you set tilingScheme to null, you must explicitly set <a href="bboxMax.html">bboxMax</a>.</b></p>
+
+      <p><b>Also, if you are using only shingled services you must set tilingScheme to null, and therefore explicitly set bboxMax.</b></p>
+
       <p>You can set the map widget to be fully dynamic and allow any arbitrary zoom level by setting the tilingScheme to null. This is only useful if all of your services are backed by live spatial data and can produce map images at any scale.</p>
+
       <p>This is one of the few places where you must use non-geodetic (i.e., non-lon/lat) units even if you are using longitude &amp; latitude for properties such as center or bbox. You must use projected units when defining a tiling scheme. The default map tiles use web mercator meters.</p>
-      <p>
-      All tilingScheme objects have the first three of the following properties. Apart from those, a tilingScheme object must have either <b>just</b> the pixelSizes property or <b>both</b> basePixelSize &amp; levels.</p>
+
+      <p>All tilingScheme objects have the first three of the following properties. Apart from those, a tilingScheme object must have either <b>just</b> the pixelSizes property or <b>both</b> basePixelSize &amp; levels.</p>
+
       <table>
         <tr><th>tileWidth (Number)</th><td>the width in pixels of a single tile</td></tr>
         <tr><th>tileHeight (Number)</th><td>the height in pixels of a single tile</td></tr>

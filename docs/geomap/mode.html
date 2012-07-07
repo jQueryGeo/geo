@@ -122,7 +122,7 @@
       <p>As a developer, you can still call geomap methods and set options in order to change the static map's appearance. Events are not triggered when you change the map programmatically.</p>
 
       <h3>events</h3>
-      <p>All regular browser events bubble up to parent controls and eventually the document. No widget-specific events trigger.</p>
+      <p>All regular browser events bubble up to parent elements and eventually the document. No widget-specific events trigger. You are free to handle events on the map div as normal events, e.g., click, but you won't get the geo argument. You can ask the map widget for information such as map locations based on the pixel arguments in the event. See the <a href="../examples/inset.html" rel="external">Inset example</a> for help with this.</p>
 
       <h2>pan</h2>
       <h3>user experience</h3>
@@ -167,6 +167,8 @@
 
       <p>Similar to zoom, in this mode the user can click and hold one point and then drag the mouse cursor. A box will form. When the user lets go of the mouse, jQuery Geo will trigger a shape event passing a GeoJSON Polygon representation of the dragged bbox as the geo argument. The Polygon object also has the GeoJSON the bbox property.</p>
 
+      <p>The user can also click the map instead of dragging a box. In this case, jQuery Geo will still trigger a shape event, but this time it will pass a GeoJSON Point representing the clicked location. The Point object will also have the bbox property with the min and max values matching each other, i.e., bbox[0] (minx) = bbox[2] (maxx) and bbox[1] (miny) = bbox[3] (maxy).</p>
+
       <p>The user cannot pan the map while in dragBbox mode. The user can zoom in or out with the scroll wheel as well as double-click or double-tap to zoom in one level. On some multitouch devices, users can use two fingers to &quot;pinch zoom&quot; (currently not available on Android).</p>
 
       <p>The user can hold the shift key to temporarily switch to zoom mode.</p>
@@ -175,7 +177,6 @@
       <p>In dragBbox mode the geomap widget triggers the following events on the original map div.</p>
       <ul>
         <li>move &ndash; when the user moves the mouse above the map but is not actively dragging a bbox</li>
-        <li>click &ndash; when the user clicks or taps a point on the map without initiating a marquee drag, i.e., they let go of the map at the same point and within a short time threshold</li>
         <li>dblclick &ndash; when the user double-clicks or double-taps a point on the map</li>
         <li>bboxchange &ndash; when the user changes the bbox by zooming</li>
         <li>shape &ndash; when the user lets go of the mouse after dragging to make a bbox, jQuery Geo will send a GeoJSON Polygon object to the developer; this Polygon object has a bbox property which is set to the bbox of the rectangle drawn</li>
