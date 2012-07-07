@@ -69,15 +69,14 @@
 <div class="info">
   <div class="links">
     <a href="../" class="docLink">&lt; docs</a>
-    <a href="http://jsfiddle.net/ryanttb/==JSFIDDLE==/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
+    <a href="http://jsfiddle.net/ryanttb/wHRKc/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
   </div>
   <h1>Inset map example</h1>
-  <p class="not-mobile">Add an inset map to display the current bbox against a larger area. The inset map, in this example, is a pre-rendered image drawn a shingled service.</p>
+  <p class="not-mobile">Add an inset map to display the current bbox against a larger area. The inset map, in this example, is a pre-rendered image drawn a shingled service. You can click the inset map to recenter the main map.</p>
   <a href="http://www.mapgeo.com/CumberlandME/">Inspired by MapGeo</a>
 </div>
   </div>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
   <script src="../jquery.geo-test.min.js"></script>
   <script>
     $( function ( ) {
@@ -89,7 +88,7 @@
             src: "http://s3.amazonaws.com/MapGeo_ME/Cumberland/Basemap/{{:zoom}}/{{:tile.row}}/{{:tile.column}}"
           }
         ],
-        bbox: [ -70.35, 43.74, -70.13, 43.83 ], //< set an initial bbox to Cumberland, ME
+        bbox: [-70.34, 43.73, -70.14, 43.84], //< set an initial bbox to Cumberland, ME
         zoom: 13, //< modify the bbox to force zoom level 13
         bboxchange: function( e, geo ) {
           // when the bbox changes, update the shape on the inset
@@ -100,19 +99,39 @@
       // create an inset map, it's static so user's can't mess with it
       var inset = $( "#insetMap" ).geomap( {
         tilingScheme: null, //< set to null because there are no tiled service, i.e., we're using bboxMax
-        bboxMax: [ -70.35, 43.74, -70.13, 43.83 ], //< required if you set tilingScheme to null
+        bboxMax: [-70.3444019030059, 43.730566740521596, -70.14623355132912, 43.849775819303616], //< required when you set tilingScheme to null, needs to precisely match our static image's bbox
         mode: "static",
         services: [
           {
             id: "inset",
             type: "shingled", //< we can use shingled services to display a single, unchanging image
-            src: "img/inset.png" //< our src is a single, static image
+            src: "http://www.mapgeo.com/CumberlandME/Custom/Images/Inset.png" //< our src is a single, static image
           }
         ],
         shapeStyle: {
           color: "#f00"
-        },
+        }
       });
+
+      // since mode is static, we can trap user events on the inset map div itself
+      $( "#insetMap" ).click( function( e ) {
+        // allow users to recenter by clicking the inset map
+
+        // we don't get the geo argument (this is a normal jQuery event),
+        // but we can ask jQuery Geo for it, we have to account for map placement
+        var offset = $( "#insetMap" ).offset( ),
+            geo = inset.geomap( "toMap", [
+              e.pageX - offset.left,
+              e.pageY - offset.top
+            ] );
+
+        // recenter the map
+        map.geomap( "option", "center", geo );
+
+        // redraw the bbox
+        // (we won't be getting the bboxchange event because we changed it via code)
+        drawInsetBox( map.geomap( "option", "bbox" ) );
+      } );
 
       function drawInsetBox(extent) {
         // clear and redraw the main map's bbox onto the inset map

@@ -2759,7 +2759,11 @@ $.Widget.prototype = {
         ] ]
       };
 
-      return wasGeodetic ? $.geo.proj.toGeodetic(polygon) : polygon;
+      if ( wasGeodetic ) {
+        polygon.coordinates = $.geo.proj.toGeodetic( polygon.coordinates );
+      }
+
+      return polygon;
     },
 
     reaspect: function (bbox, ratio, _ignoreGeo /* Internal Use Only */ ) {
