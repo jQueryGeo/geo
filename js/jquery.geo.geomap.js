@@ -269,12 +269,18 @@
       this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
 
       if (this._initOptions) {
-        if (this._initOptions.tilingScheme) {
-          this._setOption("tilingScheme", this._initOptions.tilingScheme, false);
+        // always init tilingScheme right away, even if it's null
+        if ( this._initOptions.tilingScheme !== undefined ) {
+          this._setOption("tilingScheme", this._initOptions.tilingScheme || null, false);
         }
+
         if ( this._initOptions.services ) {
           // jQuery UI Widget Factory merges user services with our default, we want to clobber the default
           this._options[ "services" ] = $.merge( [ ], this._initOptions.services );
+        }
+        if (this._initOptions.bboxMax) {
+          this._setOption("bboxMax", this._initOptions.bboxMax, false);
+          this._setOption("bbox", this._initOptions.bboxMax, false);
         }
         if (this._initOptions.bbox) {
           this._setOption("bbox", this._initOptions.bbox, false);
@@ -340,11 +346,14 @@
 
             this._setInteractiveTimeout( false );
           } else {
-            this._center = center;
-            this._pixelSize = pixelSize;
+            this._setCenterAndSize( center, pixelSize, false, refresh );
           }
 
           value = this._getBbox();
+          break;
+
+        case "bboxMax":
+          this._userGeodetic = $.geo.proj && $.geo._isGeodetic( value );
           break;
 
         case "center":
@@ -362,8 +371,7 @@
             this._centerInteractive[ 1 ] = value[ 1 ];
             this._setInteractiveTimeout( false );
           } else {
-            this._center[ 0 ] = value[ 0 ];
-            this._center[ 1 ] = value[ 1 ];
+            this._setCenterAndSize( value, this._pixelSize, false, refresh );
           }
           break;
 
@@ -400,7 +408,7 @@
             this._setZoom(value, false, refresh);
           } else {
             value = Math.max( value, 0 );
-            this._pixelSize = this._getPixelSize( value );
+            this._setCenterAndSize( this._center, this._getPixelSize( value ), false, refresh );
           }
           break;
       }
@@ -427,13 +435,13 @@
           break;
 
         case "bboxMax":
-          this._pixelSizeMax = this._getPixelSize( 0 );
-
           if ( $.geo.proj && $.geo._isGeodetic( value ) ) {
             this._centerMax = $.geo.center( $.geo.proj.fromGeodetic( value ) );
           } else {
             this._centerMax = $.geo.center( value );
           }
+
+          this._pixelSizeMax = Math.max($.geo.width(value, true) / this._contentBounds.width, $.geo.height(value, true) / this._contentBounds.height);
           break;
 
         case "services":
@@ -1809,6 +1817,8 @@
         switch ( mode ) {
           case "zoom":
           case "dragBbox":
+            var triggerShape;
+
             if ( dx !== 0 || dy !== 0 ) {
               var minSize = this._pixelSize * 6,
                   bboxCoords = this._toMap( [ [
@@ -1824,8 +1834,7 @@
                     bboxCoords[0][1],
                     bboxCoords[1][0],
                     bboxCoords[1][1]
-                  ],
-                  polygon;
+                  ];
 
               if ( mode === "zoom" ) {
                 if ( ( bbox[2] - bbox[0] ) < minSize && ( bbox[3] - bbox[1] ) < minSize ) {
@@ -1835,11 +1844,28 @@
                 this._setBbox(bbox, true, true);
                 doInteractiveTimeout = true;
               } else {
-                polygon = $.geo.polygonize( bbox, true );
-                this._trigger( "shape", e, this._userGeodetic ? {
-                  type: "Polygon",
-                  coordinates: $.geo.proj.toGeodetic( polygon.coordinates )
-                } : polygon );
+                triggerShape = $.geo.polygonize( bbox, true );
+                triggerShape.bbox = bbox;
+                if ( this._userGeodetic ) {
+                  triggerShape.coordinates = $.geo.proj.toGeodetic( triggerShape.coordinates );
+                }
+                this._trigger( "shape", e, triggerShape );
+              }
+            } else {
+              if ( mode === "dragBbox" ) {
+                var pointCoords = this._toMap( current );
+
+                triggerShape = {
+                  type: "Point",
+                  coordinates: [ pointCoords[ 0 ], pointCoords[ 1 ] ],
+                  bbox: [ pointCoords[ 0 ], pointCoords[ 1 ], pointCoords[ 0 ], pointCoords[ 1 ] ]
+                };
+
+                if ( this._userGeodetic ) {
+                  triggerShape.coordinates = $.geo.proj.toGeodetic( triggerShape.coordinates );
+                }
+
+                this._trigger( "shape", e, triggerShape );
               }
             }
 
