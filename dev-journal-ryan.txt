@@ -13,7 +13,7 @@
 * geomap - stop using $.data to store bbox since it's only used for drawing; store on _graphicShapes instead
 * geomap - [bug] there's an extra service.refresh call after a non-mousedown touchmove after a refresh
 ** most noticeable on shingled services
-* geomap - [bug] tiled services with pixelSizes set do not render zoom level 0
+* geomap - [bug] tiled services with pixelSizes set do not render zoom level 0, when src is a template string
 * geomap - [bug] errors when setting src to empty string
 ** "When I added services for my graphics layers with src set to an empty string I got very weird results -- I was seeing the single image from my inset map repeated over and over.  I had to set it to a function that returns an empty string for it to work."
 ** possibly an object reference error when multiple maps are created
