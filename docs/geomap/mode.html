@@ -122,7 +122,7 @@
       <p>As a developer, you can still call geomap methods and set options in order to change the static map's appearance. Events are not triggered when you change the map programmatically.</p>
 
       <h3>events</h3>
-      <p>All regular browser events bubble up to parent controls and eventually the document. No widget-specific events trigger.</p>
+      <p>All regular browser events bubble up to parent elements and eventually the document. No widget-specific events trigger. You are free to handle events on the map div as normal events, e.g., click, but you won't get the geo argument. You can ask the map widget for information such as map locations based on the pixel arguments in the event. See the <a href="../examples/inset.html" rel="external">Inset example</a> for help with this.</p>
 
       <h2>pan</h2>
       <h3>user experience</h3>
