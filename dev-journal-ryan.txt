@@ -3,8 +3,6 @@
 === b1 ===
 * geomap - allow service-level refresh
 * geomap - loadstart, loadend events
-* geomap - [bug] dragBbox doesn't include the bbox property in the shape
-* geomap - dragBbox should send a Point (with bbox) for single clicks
 * geomap - allow append to take an array of shapes
 * geomap - allow remove to take an array of shapes
 * geomap - add argument to refresh to force reload of images (in case of dynamic data)
@@ -15,7 +13,7 @@
 * geomap - stop using $.data to store bbox since it's only used for drawing; store on _graphicShapes instead
 * geomap - [bug] there's an extra service.refresh call after a non-mousedown touchmove after a refresh
 ** most noticeable on shingled services
-* geomap - [bug] tiled services with pixelSizes set do not render zoom level 0
+* geomap - [bug] tiled services with pixelSizes set do not render zoom level 0, when src is a template string
 * geomap - [bug] errors when setting src to empty string
 ** "When I added services for my graphics layers with src set to an empty string I got very weird results -- I was seeing the single image from my inset map repeated over and over.  I had to set it to a function that returns an empty string for it to work."
 ** possibly an object reference error when multiple maps are created
@@ -37,6 +35,7 @@
 ** pixelSizeMax calculated by zoomMax on non-tiled maps
 * expose jQuery Geo as an AMD module so asynchronous loaders like RequireJS and curl.js can use it
 * geomap - [bug] when a singled image hasn't loaded after pan and you double click on empty space, the zoomed bbox seems wrong
+* geomap - [bug] using shift-zoom during interactiveTransform doesn't zoom to correct location
 * cdn - test cache headers with http://redbot.org/ before release
 
 === examples ===
@@ -210,6 +209,12 @@ A side effect of changing bboxMax is that zoom's value will have to change. This
 There's going to be more to do later when I want to handle changing bboxMax properly at runtime. It should hook into the interactiveTransform engine. For now, though, I'm going to make it work right during init.
 
 Heh, bboxMax wasn't doing anything right :) It now sets both centerMax & pixelSizeMax.
+
+===inset===
+A new example is up based on AppGeo's MapGeo product's inset map.
+
+===dragBbox===
+This needs to finally send a bbox. Also, handle points differently. No more click event but you will get a Point shape event.
 
 ==2012-07-05==
 ===inset shingled map is off===

@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0.0b1 - 2012-07-06
+/*! jQuery Geo - v1.0.0b1 - 2012-07-07
  * http://jquerygeo.com
  * Copyright (c) 2012 Ryan Westphal/Applied Geographics, Inc.; Licensed MIT, GPL */
 
@@ -5866,6 +5866,8 @@ $.Widget.prototype = {
         switch ( mode ) {
           case "zoom":
           case "dragBbox":
+            var triggerShape;
+
             if ( dx !== 0 || dy !== 0 ) {
               var minSize = this._pixelSize * 6,
                   bboxCoords = this._toMap( [ [
@@ -5881,8 +5883,7 @@ $.Widget.prototype = {
                     bboxCoords[0][1],
                     bboxCoords[1][0],
                     bboxCoords[1][1]
-                  ],
-                  polygon;
+                  ];
 
               if ( mode === "zoom" ) {
                 if ( ( bbox[2] - bbox[0] ) < minSize && ( bbox[3] - bbox[1] ) < minSize ) {
@@ -5892,11 +5893,28 @@ $.Widget.prototype = {
                 this._setBbox(bbox, true, true);
                 doInteractiveTimeout = true;
               } else {
-                polygon = $.geo.polygonize( bbox, true );
-                this._trigger( "shape", e, this._userGeodetic ? {
-                  type: "Polygon",
-                  coordinates: $.geo.proj.toGeodetic( polygon.coordinates )
-                } : polygon );
+                triggerShape = $.geo.polygonize( bbox, true );
+                triggerShape.bbox = bbox;
+                if ( this._userGeodetic ) {
+                  triggerShape.coordinates = $.geo.proj.toGeodetic( triggerShape.coordinates );
+                }
+                this._trigger( "shape", e, triggerShape );
+              }
+            } else {
+              if ( mode === "dragBbox" ) {
+                var pointCoords = this._toMap( current );
+
+                triggerShape = {
+                  type: "Point",
+                  coordinates: [ pointCoords[ 0 ], pointCoords[ 1 ] ],
+                  bbox: [ pointCoords[ 0 ], pointCoords[ 1 ], pointCoords[ 0 ], pointCoords[ 1 ] ]
+                };
+
+                if ( this._userGeodetic ) {
+                  triggerShape.coordinates = $.geo.proj.toGeodetic( triggerShape.coordinates );
+                }
+
+                this._trigger( "shape", e, triggerShape );
               }
             }
 
