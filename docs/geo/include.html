@@ -44,7 +44,9 @@ var includeBbox = $.geo.include( bbox, [ -71, 41, -69, 43 ] );</code></pre></td>
 
       <p>If the first argument is null or undefined, the result is a new bbox and will contain the second argument.</p>
 
-      <p>For efficency, if the second argument is a valid bbox, it is modified in place and a reference is returned.</p>
+      <p>For efficency, if the first argument is a valid bbox, it is modified in-place and a reference is returned.</p>
+
+      <p>If the second argument is not a coordinate or bbox, this function returns the first argument.</p>
 
       <p>This function is similar to Envelope.expandToInclude in JTS.</p>
     </div>

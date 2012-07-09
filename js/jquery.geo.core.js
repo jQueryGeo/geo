@@ -106,6 +106,37 @@
              bbox2[ 3 ] < bbox1[ 1 ];
     },
 
+    include: function( bbox, value, _ignoreGeo /* Internal Use Only */ ) {
+      // similar to Envelope.expandToInclude in JTS
+      if ( value && $.isArray( value ) ) {
+        return bbox;
+      }
+
+      var wasGeodetic = false;
+      if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( bbox || value ) ) {
+        wasGeodetic = true;
+      }
+
+      if ( !bbox ) {
+        bbox = [ pos_oo, pos_oo, neg_oo, neg_oo ];
+      } else if ( wasGeodetic ) {
+        bbox = $.geo.proj.fromGeodetic( bbox );
+      }
+
+      if ( value.length === 2 ) {
+        value = [ value[ 0 ], value[ 1 ], value[ 0 ], value[ 1 ] ];
+      }
+
+      value = $.geo.proj.fromGeodetic( value );
+
+      bbox[0] = Math.min( value[ 0 ], bbox[ 0 ] );
+      bbox[1] = Math.min( value[ 1 ], bbox[ 1 ] );
+      bbox[2] = Math.max( value[ 2 ], bbox[ 2 ] );
+      bbox[3] = Math.max( value[ 3 ], bbox[ 3 ] );
+
+      return wasGeodetic ? $.geo.proj.toGeodetic( bbox ) : bbox;
+    },
+
     polygonize: function( bbox, _ignoreGeo /* Internal Use Only */ ) {
       // adaptation of Polygonizer class in JTS for use with bboxes
       var wasGeodetic = false;

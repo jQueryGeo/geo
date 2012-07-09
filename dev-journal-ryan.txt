@@ -8,7 +8,6 @@
 * geomap - add argument to refresh to force reload of images (in case of dynamic data)
 * geomap - zoomMax option
 ** accept null first argument and coordinate or bbox second argument
-* geo - include method for bbox
 * geomap - test changing shingled service URL to get updated images (in case of dynamic data)
 * geomap - stop using $.data to store bbox since it's only used for drawing; store on _graphicShapes instead
 * geomap - [bug] there's an extra service.refresh call after a non-mousedown touchmove after a refresh
@@ -56,6 +55,8 @@
 
 === future ===
 
+* docs - geo - audit in-place geo calls, e.g., fromGeodetic
+* geo - audit in-place geo calls, e.g., fromGeodetic
 * geomap - include bboxMax in interactiveTransform engine
 * geomap - don't repeat attr text if the same as one previously added
 * docs - geomap - zoomMin, zoomMax on service object
