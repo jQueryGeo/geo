@@ -1789,7 +1789,10 @@
           shift = this._options[ "shift" ],
           mode = this._shiftDown ? ( shift === "default" ? "zoom" : shift ) : this._options["mode"],
           current, i, clickDate,
-          dx, dy;
+          dx, dy,
+          coordBuffer,
+          triggerShape;
+
 
       if (this._supportTouch) {
         current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
@@ -1837,8 +1840,6 @@
         switch ( mode ) {
           case "zoom":
           case "dragBbox":
-            var triggerShape;
-
             if ( dx !== 0 || dy !== 0 ) {
               var minSize = this._pixelSize * 6,
                   bboxCoords = this._toMap( [ [
@@ -1866,23 +1867,26 @@
               } else {
                 triggerShape = $.geo.polygonize( bbox, true );
                 triggerShape.bbox = bbox;
+
                 if ( this._userGeodetic ) {
                   triggerShape.coordinates = $.geo.proj.toGeodetic( triggerShape.coordinates );
+                  triggerShape.bbox = $.geo.proj.toGeodetic( triggerShape.bbox );
                 }
                 this._trigger( "shape", e, triggerShape );
               }
             } else {
               if ( mode === "dragBbox" ) {
-                var pointCoords = this._toMap( current );
+                coordBuffer = this._toMap( current );
 
                 triggerShape = {
                   type: "Point",
-                  coordinates: [ pointCoords[ 0 ], pointCoords[ 1 ] ],
-                  bbox: [ pointCoords[ 0 ], pointCoords[ 1 ], pointCoords[ 0 ], pointCoords[ 1 ] ]
+                  coordinates: [ coordBuffer[ 0 ], coordBuffer[ 1 ] ],
+                  bbox: [ coordBuffer[ 0 ], coordBuffer[ 1 ], coordBuffer[ 0 ], coordBuffer[ 1 ] ]
                 };
 
                 if ( this._userGeodetic ) {
                   triggerShape.coordinates = $.geo.proj.toGeodetic( triggerShape.coordinates );
+                  triggerShape.bbox = $.geo.proj.toGeodetic( triggerShape.bbox );
                 }
 
                 this._trigger( "shape", e, triggerShape );
@@ -1908,14 +1912,46 @@
                 ];
               }
 
-              this._drawPixels[ n ] = $.merge( [ ], this._drawPixels[ 0 ] );
+              this._drawPixels[ n ] = [
+                this._drawPixels[ 0 ][ 0 ],
+                this._drawPixels[ 0 ][ 1 ]
+              ];
 
-              this._trigger( "shape", e, {
+              // using coordBuffer for bbox coords
+              coordBuffer = this._toMap( [
+                [ this._anchor[ 0 ] - d, this._anchor[ 1 ] - d ],
+                [ this._anchor[ 0 ] + d, this._anchor[ 1 ] + d ]
+              ] );
+
+              triggerShape = {
                 type: "Polygon",
-                coordinates: [ this._toMap( this._drawPixels ) ]
-              } );
+                coordinates: [ this._toMap( this._drawPixels ) ],
+                bbox: [ coordBuffer[ 0 ][ 0 ], coordBuffer[ 0 ][ 1 ], coordBuffer[ 1 ][ 0 ], coordBuffer[ 1 ][ 1 ] ]
+              };
+
+              if ( this._userGeodetic ) {
+                triggerShape.coordinates = $.geo.proj.toGeodetic( triggerShape.coordinates );
+                triggerShape.bbox = $.geo.proj.toGeodetic( triggerShape.bbox );
+              }
+
+              this._trigger( "shape", e, triggerShape );
 
               this._resetDrawing();
+            } else {
+              coordBuffer = this._toMap( current );
+
+              triggerShape = {
+                type: "Point",
+                coordinates: [ coordBuffer[ 0 ], coordBuffer[ 1 ] ],
+                bbox: [ coordBuffer[ 0 ], coordBuffer[ 1 ], coordBuffer[ 0 ], coordBuffer[ 1 ] ]
+              };
+
+              if ( this._userGeodetic ) {
+                triggerShape.coordinates = $.geo.proj.toGeodetic( triggerShape.coordinates );
+                triggerShape.bbox = $.geo.proj.toGeodetic( triggerShape.bbox );
+              }
+
+              this._trigger( "shape", e, triggerShape );
             }
             break;
 
