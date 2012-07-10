@@ -90,6 +90,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * geomap - [bug] dragBbox doesn't include the bbox property in the shape
 * geomap - dragBbox should send a Point (with bbox) for single clicks
 * docs - geomap - dragCircle mode
+* geo - include method for bbox
 
 ### 1.0a4 (2012-02-19)
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax
