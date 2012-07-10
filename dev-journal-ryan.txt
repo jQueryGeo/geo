@@ -206,6 +206,10 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2012-07-10==
+===dragCircle===
+Time to move this into _refreshDrawing. But first, I have to trigger the Point shape event.
+
 ==2012-07-07==
 ===dragCircle===
 I'm going to add this to beta. It will work similar to dragBbox, including sending the bbox.

@@ -1898,7 +1898,8 @@
 
           case "dragCircle":
             if ( dx !== 0 || dy !== 0 ) {
-              var d = Math.sqrt( ( dx * dx) + ( dy * dy ) ),
+              var image = this._options[ "axisLayout" ] === "image",
+                  d = Math.sqrt( ( dx * dx) + ( dy * dy ) ),
                   n = 180,
                   a;
 
@@ -1919,8 +1920,8 @@
 
               // using coordBuffer for bbox coords
               coordBuffer = this._toMap( [
-                [ this._anchor[ 0 ] - d, this._anchor[ 1 ] - d ],
-                [ this._anchor[ 0 ] + d, this._anchor[ 1 ] + d ]
+                [ this._anchor[ 0 ] - d, this._anchor[ 1 ] + ( image ? -d : d ) ],
+                [ this._anchor[ 0 ] + d, this._anchor[ 1 ] + ( image ? d : -d ) ]
               ] );
 
               triggerShape = {
