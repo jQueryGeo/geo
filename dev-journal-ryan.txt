@@ -1,7 +1,6 @@
 ﻿== to do ==
 
 === b1 ===
-* geomap - dragCircle mode
 * geomap - allow service-level refresh
 * geomap - loadstart, loadend events
 * geomap - allow append to take an array of shapes
@@ -208,7 +207,7 @@
 
 ==2012-07-10==
 ===dragCircle===
-Time to move this into _refreshDrawing. But first, I have to trigger the Point shape event.
+Time to move this into _refreshDrawing. But first, I have to trigger the Point shape event. Maybe not. I can't zoom. That's against the docs but I think I can leave it for b2.
 
 ==2012-07-07==
 ===dragCircle===
