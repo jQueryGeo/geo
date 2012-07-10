@@ -17,6 +17,7 @@
           pan: "url(data:image/vnd.microsoft.icon;base64,AAACAAEAICACAAgACAAwAQAAFgAAACgAAAAgAAAAQAAAAAEAAQAAAAAAAAEAAAAAAAAAAAAAAgAAAAAAAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD8AAAA/AAAAfwAAAP+AAAH/gAAB/8AAA//AAAd/wAAGf+AAAH9gAADbYAAA2yAAAZsAAAGbAAAAGAAAAAAAAA//////////////////////////////////////////////////////////////////////////////////////gH///4B///8Af//+AD///AA///wAH//4AB//8AAf//AAD//5AA///gAP//4AD//8AF///AB///5A////5///8=), move",
           zoom: "crosshair",
           dragBbox: "crosshair",
+          dragCircle: "crosshair",
           drawPoint: "crosshair",
           drawLineString: "crosshair",
           drawPolygon: "crosshair",
@@ -1551,10 +1552,10 @@
       if (!this._inOp && e.shiftKey && shift !== "off") {
         this._shiftDown = true;
         this._$eventTarget.css( "cursor", this._options[ "cursors" ][ shift === "default" ? "zoom" : shift ] );
-      } else if ( !this._isMultiTouch && ( this._options[ "pannable" ] || mode === "dragBbox" ) ) {
+      } else if ( !this._isMultiTouch && ( this._options[ "pannable" ] || mode === "dragBbox" || mode === "dragCircle" ) ) {
         this._inOp = true;
 
-        if ( mode !== "zoom" && mode !== "dragBbox" ) {
+        if ( mode !== "zoom" && mode !== "dragBbox" && mode !== "dragCircle" ) {
           this._lastDrag = this._current;
 
           if (e.currentTarget.setCapture) {
@@ -1685,7 +1686,8 @@
       }
 
       var shift = this._options[ "shift" ],
-          mode = this._shiftDown ? ( shift === "default" ? "zoom" : shift ) : this._options["mode"];
+          mode = this._shiftDown ? ( shift === "default" ? "zoom" : shift ) : this._options["mode"],
+          dx, dy, circleSize;
 
       switch (mode) {
         case "zoom":
@@ -1698,6 +1700,24 @@
               current[ 0 ],
               current[ 1 ]
             ] );
+          } else {
+            this._trigger("move", e, { type: "Point", coordinates: this.toMap(current) });
+          }
+          break;
+
+        case "dragCircle":
+          if ( this._mouseDown ) {
+            dx = current[ 0 ] - this._anchor[ 0 ];
+            dy = current[ 1 ] - this._anchor[ 1 ];
+            circleSize = Math.sqrt( ( dx * dx) + ( dy * dy ) ) * 2;
+            //circleSize = Math.max( Math.abs( current[ 0 ] - this._anchor[ 0 ] ), Math.abs( current[ 1 ] - this._anchor[ 1 ] ) ) * 2;
+
+            // not part of _refreshDrawing
+            this._$drawContainer.geographics( "clear" );
+            this._$drawContainer.geographics( "drawArc", this._anchor, 0, 360, {
+              width: circleSize,
+              height: circleSize
+            } );
           } else {
             this._trigger("move", e, { type: "Point", coordinates: this.toMap(current) });
           }
@@ -1769,7 +1789,10 @@
           shift = this._options[ "shift" ],
           mode = this._shiftDown ? ( shift === "default" ? "zoom" : shift ) : this._options["mode"],
           current, i, clickDate,
-          dx, dy;
+          dx, dy,
+          coordBuffer,
+          triggerShape;
+
 
       if (this._supportTouch) {
         current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
@@ -1817,8 +1840,6 @@
         switch ( mode ) {
           case "zoom":
           case "dragBbox":
-            var triggerShape;
-
             if ( dx !== 0 || dy !== 0 ) {
               var minSize = this._pixelSize * 6,
                   bboxCoords = this._toMap( [ [
@@ -1846,23 +1867,26 @@
               } else {
                 triggerShape = $.geo.polygonize( bbox, true );
                 triggerShape.bbox = bbox;
+
                 if ( this._userGeodetic ) {
                   triggerShape.coordinates = $.geo.proj.toGeodetic( triggerShape.coordinates );
+                  triggerShape.bbox = $.geo.proj.toGeodetic( triggerShape.bbox );
                 }
                 this._trigger( "shape", e, triggerShape );
               }
             } else {
               if ( mode === "dragBbox" ) {
-                var pointCoords = this._toMap( current );
+                coordBuffer = this._toMap( current );
 
                 triggerShape = {
                   type: "Point",
-                  coordinates: [ pointCoords[ 0 ], pointCoords[ 1 ] ],
-                  bbox: [ pointCoords[ 0 ], pointCoords[ 1 ], pointCoords[ 0 ], pointCoords[ 1 ] ]
+                  coordinates: [ coordBuffer[ 0 ], coordBuffer[ 1 ] ],
+                  bbox: [ coordBuffer[ 0 ], coordBuffer[ 1 ], coordBuffer[ 0 ], coordBuffer[ 1 ] ]
                 };
 
                 if ( this._userGeodetic ) {
                   triggerShape.coordinates = $.geo.proj.toGeodetic( triggerShape.coordinates );
+                  triggerShape.bbox = $.geo.proj.toGeodetic( triggerShape.bbox );
                 }
 
                 this._trigger( "shape", e, triggerShape );
@@ -1870,6 +1894,66 @@
             }
 
             this._resetDrawing();
+            break;
+
+          case "dragCircle":
+            if ( dx !== 0 || dy !== 0 ) {
+              var image = this._options[ "axisLayout" ] === "image",
+                  d = Math.sqrt( ( dx * dx) + ( dy * dy ) ),
+                  n = 180,
+                  a;
+
+              this._drawPixels.length = n + 1;
+
+              for ( i = 0; i < n; i++ ) {
+                a = ( i * 360 / n ) * ( Math.PI / 180 );
+                this._drawPixels[ i ] = [
+                  this._anchor[ 0 ] + Math.cos( a ) * d,
+                  this._anchor[ 1 ] + Math.sin( a ) * d
+                ];
+              }
+
+              this._drawPixels[ n ] = [
+                this._drawPixels[ 0 ][ 0 ],
+                this._drawPixels[ 0 ][ 1 ]
+              ];
+
+              // using coordBuffer for bbox coords
+              coordBuffer = this._toMap( [
+                [ this._anchor[ 0 ] - d, this._anchor[ 1 ] + ( image ? -d : d ) ],
+                [ this._anchor[ 0 ] + d, this._anchor[ 1 ] + ( image ? d : -d ) ]
+              ] );
+
+              triggerShape = {
+                type: "Polygon",
+                coordinates: [ this._toMap( this._drawPixels ) ],
+                bbox: [ coordBuffer[ 0 ][ 0 ], coordBuffer[ 0 ][ 1 ], coordBuffer[ 1 ][ 0 ], coordBuffer[ 1 ][ 1 ] ]
+              };
+
+              if ( this._userGeodetic ) {
+                triggerShape.coordinates = $.geo.proj.toGeodetic( triggerShape.coordinates );
+                triggerShape.bbox = $.geo.proj.toGeodetic( triggerShape.bbox );
+              }
+
+              this._trigger( "shape", e, triggerShape );
+
+              this._resetDrawing();
+            } else {
+              coordBuffer = this._toMap( current );
+
+              triggerShape = {
+                type: "Point",
+                coordinates: [ coordBuffer[ 0 ], coordBuffer[ 1 ] ],
+                bbox: [ coordBuffer[ 0 ], coordBuffer[ 1 ], coordBuffer[ 0 ], coordBuffer[ 1 ] ]
+              };
+
+              if ( this._userGeodetic ) {
+                triggerShape.coordinates = $.geo.proj.toGeodetic( triggerShape.coordinates );
+                triggerShape.bbox = $.geo.proj.toGeodetic( triggerShape.bbox );
+              }
+
+              this._trigger( "shape", e, triggerShape );
+            }
             break;
 
           case "drawPoint":

@@ -8,7 +8,6 @@
 * geomap - add argument to refresh to force reload of images (in case of dynamic data)
 * geomap - zoomMax option
 ** accept null first argument and coordinate or bbox second argument
-* geo - include method for bbox
 * geomap - test changing shingled service URL to get updated images (in case of dynamic data)
 * geomap - stop using $.data to store bbox since it's only used for drawing; store on _graphicShapes instead
 * geomap - [bug] there's an extra service.refresh call after a non-mousedown touchmove after a refresh
@@ -56,6 +55,8 @@
 
 === future ===
 
+* docs - geo - audit in-place geo calls, e.g., fromGeodetic
+* geo - audit in-place geo calls, e.g., fromGeodetic
 * geomap - include bboxMax in interactiveTransform engine
 * geomap - don't repeat attr text if the same as one previously added
 * docs - geomap - zoomMin, zoomMax on service object
@@ -83,6 +84,8 @@
 * docs - geomap - view.service.row & view.service.column to string multiple services together or repeat horizontal tiles
 * geomap - Firefox - [bug] inertial pan is choppy post touchstop
 ** post inertial pan rewrite
+* geomap - dragCircle must hook into _refreshDrawing so that the circle moves correctly when the user zooms; which means I have to store the center coordinate as well as pixel
+* geomap - [bug] on that note, I can't zoom in dragCircle mode
 * docs - better describe append/find connection and how to append data and use the click event to find it later
 ** see email reply to Marc
 * docs - geomap - describe "graphic service" as shingled with src set to empty string or null
@@ -201,6 +204,17 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-07-10==
+===dragCircle===
+Time to move this into _refreshDrawing. But first, I have to trigger the Point shape event. Maybe not. I can't zoom. That's against the docs but I think I can leave it for b2.
+
+==2012-07-07==
+===dragCircle===
+I'm going to add this to beta. It will work similar to dragBbox, including sending the bbox.
+
+===dragBbox===
+I may rename this to dragRectangle before the b1 release to keep the drawing modes more about geometry than geography.
 
 ==2012-07-06==
 ===bboxMax===
