@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0.0b1 - 2012-07-07
+/*! jQuery Geo - v1.0.0b1 - 2012-07-10
  * http://jquerygeo.com
  * Copyright (c) 2012 Ryan Westphal/Applied Geographics, Inc.; Licensed MIT, GPL */
 
@@ -2740,6 +2740,37 @@ $.Widget.prototype = {
              bbox2[ 3 ] < bbox1[ 1 ];
     },
 
+    include: function( bbox, value, _ignoreGeo /* Internal Use Only */ ) {
+      // similar to Envelope.expandToInclude in JTS
+      if ( value && $.isArray( value ) ) {
+        return bbox;
+      }
+
+      var wasGeodetic = false;
+      if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( bbox || value ) ) {
+        wasGeodetic = true;
+      }
+
+      if ( !bbox ) {
+        bbox = [ pos_oo, pos_oo, neg_oo, neg_oo ];
+      } else if ( wasGeodetic ) {
+        bbox = $.geo.proj.fromGeodetic( bbox );
+      }
+
+      if ( value.length === 2 ) {
+        value = [ value[ 0 ], value[ 1 ], value[ 0 ], value[ 1 ] ];
+      }
+
+      value = $.geo.proj.fromGeodetic( value );
+
+      bbox[0] = Math.min( value[ 0 ], bbox[ 0 ] );
+      bbox[1] = Math.min( value[ 1 ], bbox[ 1 ] );
+      bbox[2] = Math.max( value[ 2 ], bbox[ 2 ] );
+      bbox[3] = Math.max( value[ 3 ], bbox[ 3 ] );
+
+      return wasGeodetic ? $.geo.proj.toGeodetic( bbox ) : bbox;
+    },
+
     polygonize: function( bbox, _ignoreGeo /* Internal Use Only */ ) {
       // adaptation of Polygonizer class in JTS for use with bboxes
       var wasGeodetic = false;
@@ -4066,6 +4097,7 @@ $.Widget.prototype = {
           pan: "url(data:image/vnd.microsoft.icon;base64,AAACAAEAICACAAgACAAwAQAAFgAAACgAAAAgAAAAQAAAAAEAAQAAAAAAAAEAAAAAAAAAAAAAAgAAAAAAAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD8AAAA/AAAAfwAAAP+AAAH/gAAB/8AAA//AAAd/wAAGf+AAAH9gAADbYAAA2yAAAZsAAAGbAAAAGAAAAAAAAA//////////////////////////////////////////////////////////////////////////////////////gH///4B///8Af//+AD///AA///wAH//4AB//8AAf//AAD//5AA///gAP//4AD//8AF///AB///5A////5///8=), move",
           zoom: "crosshair",
           dragBbox: "crosshair",
+          dragCircle: "crosshair",
           drawPoint: "crosshair",
           drawLineString: "crosshair",
           drawPolygon: "crosshair",
@@ -5600,10 +5632,10 @@ $.Widget.prototype = {
       if (!this._inOp && e.shiftKey && shift !== "off") {
         this._shiftDown = true;
         this._$eventTarget.css( "cursor", this._options[ "cursors" ][ shift === "default" ? "zoom" : shift ] );
-      } else if ( !this._isMultiTouch && ( this._options[ "pannable" ] || mode === "dragBbox" ) ) {
+      } else if ( !this._isMultiTouch && ( this._options[ "pannable" ] || mode === "dragBbox" || mode === "dragCircle" ) ) {
         this._inOp = true;
 
-        if ( mode !== "zoom" && mode !== "dragBbox" ) {
+        if ( mode !== "zoom" && mode !== "dragBbox" && mode !== "dragCircle" ) {
           this._lastDrag = this._current;
 
           if (e.currentTarget.setCapture) {
@@ -5734,7 +5766,8 @@ $.Widget.prototype = {
       }
 
       var shift = this._options[ "shift" ],
-          mode = this._shiftDown ? ( shift === "default" ? "zoom" : shift ) : this._options["mode"];
+          mode = this._shiftDown ? ( shift === "default" ? "zoom" : shift ) : this._options["mode"],
+          dx, dy, circleSize;
 
       switch (mode) {
         case "zoom":
@@ -5747,6 +5780,24 @@ $.Widget.prototype = {
               current[ 0 ],
               current[ 1 ]
             ] );
+          } else {
+            this._trigger("move", e, { type: "Point", coordinates: this.toMap(current) });
+          }
+          break;
+
+        case "dragCircle":
+          if ( this._mouseDown ) {
+            dx = current[ 0 ] - this._anchor[ 0 ];
+            dy = current[ 1 ] - this._anchor[ 1 ];
+            circleSize = Math.sqrt( ( dx * dx) + ( dy * dy ) ) * 2;
+            //circleSize = Math.max( Math.abs( current[ 0 ] - this._anchor[ 0 ] ), Math.abs( current[ 1 ] - this._anchor[ 1 ] ) ) * 2;
+
+            // not part of _refreshDrawing
+            this._$drawContainer.geographics( "clear" );
+            this._$drawContainer.geographics( "drawArc", this._anchor, 0, 360, {
+              width: circleSize,
+              height: circleSize
+            } );
           } else {
             this._trigger("move", e, { type: "Point", coordinates: this.toMap(current) });
           }
@@ -5818,7 +5869,10 @@ $.Widget.prototype = {
           shift = this._options[ "shift" ],
           mode = this._shiftDown ? ( shift === "default" ? "zoom" : shift ) : this._options["mode"],
           current, i, clickDate,
-          dx, dy;
+          dx, dy,
+          coordBuffer,
+          triggerShape;
+
 
       if (this._supportTouch) {
         current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
@@ -5866,8 +5920,6 @@ $.Widget.prototype = {
         switch ( mode ) {
           case "zoom":
           case "dragBbox":
-            var triggerShape;
-
             if ( dx !== 0 || dy !== 0 ) {
               var minSize = this._pixelSize * 6,
                   bboxCoords = this._toMap( [ [
@@ -5895,23 +5947,26 @@ $.Widget.prototype = {
               } else {
                 triggerShape = $.geo.polygonize( bbox, true );
                 triggerShape.bbox = bbox;
+
                 if ( this._userGeodetic ) {
                   triggerShape.coordinates = $.geo.proj.toGeodetic( triggerShape.coordinates );
+                  triggerShape.bbox = $.geo.proj.toGeodetic( triggerShape.bbox );
                 }
                 this._trigger( "shape", e, triggerShape );
               }
             } else {
               if ( mode === "dragBbox" ) {
-                var pointCoords = this._toMap( current );
+                coordBuffer = this._toMap( current );
 
                 triggerShape = {
                   type: "Point",
-                  coordinates: [ pointCoords[ 0 ], pointCoords[ 1 ] ],
-                  bbox: [ pointCoords[ 0 ], pointCoords[ 1 ], pointCoords[ 0 ], pointCoords[ 1 ] ]
+                  coordinates: [ coordBuffer[ 0 ], coordBuffer[ 1 ] ],
+                  bbox: [ coordBuffer[ 0 ], coordBuffer[ 1 ], coordBuffer[ 0 ], coordBuffer[ 1 ] ]
                 };
 
                 if ( this._userGeodetic ) {
                   triggerShape.coordinates = $.geo.proj.toGeodetic( triggerShape.coordinates );
+                  triggerShape.bbox = $.geo.proj.toGeodetic( triggerShape.bbox );
                 }
 
                 this._trigger( "shape", e, triggerShape );
@@ -5919,6 +5974,66 @@ $.Widget.prototype = {
             }
 
             this._resetDrawing();
+            break;
+
+          case "dragCircle":
+            if ( dx !== 0 || dy !== 0 ) {
+              var image = this._options[ "axisLayout" ] === "image",
+                  d = Math.sqrt( ( dx * dx) + ( dy * dy ) ),
+                  n = 180,
+                  a;
+
+              this._drawPixels.length = n + 1;
+
+              for ( i = 0; i < n; i++ ) {
+                a = ( i * 360 / n ) * ( Math.PI / 180 );
+                this._drawPixels[ i ] = [
+                  this._anchor[ 0 ] + Math.cos( a ) * d,
+                  this._anchor[ 1 ] + Math.sin( a ) * d
+                ];
+              }
+
+              this._drawPixels[ n ] = [
+                this._drawPixels[ 0 ][ 0 ],
+                this._drawPixels[ 0 ][ 1 ]
+              ];
+
+              // using coordBuffer for bbox coords
+              coordBuffer = this._toMap( [
+                [ this._anchor[ 0 ] - d, this._anchor[ 1 ] + ( image ? -d : d ) ],
+                [ this._anchor[ 0 ] + d, this._anchor[ 1 ] + ( image ? d : -d ) ]
+              ] );
+
+              triggerShape = {
+                type: "Polygon",
+                coordinates: [ this._toMap( this._drawPixels ) ],
+                bbox: [ coordBuffer[ 0 ][ 0 ], coordBuffer[ 0 ][ 1 ], coordBuffer[ 1 ][ 0 ], coordBuffer[ 1 ][ 1 ] ]
+              };
+
+              if ( this._userGeodetic ) {
+                triggerShape.coordinates = $.geo.proj.toGeodetic( triggerShape.coordinates );
+                triggerShape.bbox = $.geo.proj.toGeodetic( triggerShape.bbox );
+              }
+
+              this._trigger( "shape", e, triggerShape );
+
+              this._resetDrawing();
+            } else {
+              coordBuffer = this._toMap( current );
+
+              triggerShape = {
+                type: "Point",
+                coordinates: [ coordBuffer[ 0 ], coordBuffer[ 1 ] ],
+                bbox: [ coordBuffer[ 0 ], coordBuffer[ 1 ], coordBuffer[ 0 ], coordBuffer[ 1 ] ]
+              };
+
+              if ( this._userGeodetic ) {
+                triggerShape.coordinates = $.geo.proj.toGeodetic( triggerShape.coordinates );
+                triggerShape.bbox = $.geo.proj.toGeodetic( triggerShape.bbox );
+              }
+
+              this._trigger( "shape", e, triggerShape );
+            }
             break;
 
           case "drawPoint":

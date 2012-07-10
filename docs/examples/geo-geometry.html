@@ -44,7 +44,7 @@
       </div>
       <h1>
         geometry functions</h1>
-      <p>This example appends a few Points, LineStrings, and Polygons. It then calculates some relationships and info about the shapes using the geometry functions in the $.geo namespace.</p>
+      <p>This example appends a few Points, LineStrings, and Polygons. It then calculates some relationships and info about the shapes using the geometry functions in the $.geo namespace. The red box is the bbox of all red shapes.</p>
       <div class="calc">
         <table>
           <tr>
@@ -198,12 +198,18 @@
         zoom: 8
       });
 
+      // bbox of all red shapes
+      var redBbox = null;
+
       // append a red Point
       var pt = {
         type: "Point",
         coordinates: [-71, 42]
       };
       map.geomap("append", pt);
+
+      // use the point's coordinate as our initial bbox (will be converted to bbox)
+      redBbox = $.geo.include( redBbox, pt.coordinates );
 
       // append a red LineString
       var line = {
@@ -214,6 +220,9 @@
         ]
       };
       map.geomap("append", line);
+
+      // include the line's bbox
+      redBbox = $.geo.include( redBbox, $.geo.bbox( line ) );
 
       // append a red Polygon
       var poly = {
@@ -226,6 +235,15 @@
         ]]
       };
       map.geomap("append", poly);
+
+      // include the polygon's bbox
+      redBbox = $.geo.include( redBbox, $.geo.bbox( poly ) );
+
+      // draw the bbox of red shapes
+      map.geomap( "append", $.geo.polygonize( redBbox ), {
+        fill: "transparent",
+        strokeWidth: 1
+      } );
 
       // distance calculations between all red shapes
       $(".rpt-2-rpt-distance").text($.geo.distance(pt, pt));

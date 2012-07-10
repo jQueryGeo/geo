@@ -1,0 +1,84 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Bostock demo</title>
+  <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+  <meta name="description" content="D3 + Leaflet demo done in jQuery Geo">
+  <meta name="author" content="Ryan Westphal">
+  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/blitzer/jquery-ui.css" />
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+  <style type="text/css">
+    #map
+    {
+      position: fixed;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <div id="map">
+    </div>
+    <div class="info">
+      <div class="links">
+        <a href="../" class="docLink">&lt; docs</a>
+        <a href="http://jsfiddle.net/ryanttb/==JSFIDDLE==/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
+      </div>
+      <h1>Bostock demo</h1>
+      <p>Inspired by: <a href="http://bost.ocks.org/mike/leaflet/">D3 + Leaflet</a></p>
+    </div>
+  </div>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+  <script src="../jquery.geo-test.min.js"></script>
+  <script src="js/iecors.js"></script>
+  <script>
+    $( function ( ) {
+      // create a map
+      var state = null,
+          map = $( "#map" ).geomap( {
+            center: [ -96.9, 37.8 ],
+            zoom: 4,
+            shapeStyle: {
+              fill: "#000",
+              fillOpacity: .2,
+              stroke: "#fff",
+              strokeWidth: "1.5px"
+            },
+            move: function( e, geo ) {
+              if ( state ) {
+                map.geomap( "remove", state );
+              }
+
+              var states = map.geomap( "find", geo, 1 );
+              if ( states.length > 0 ) {
+                state = $.extend( true, { }, states[ 0 ] );
+                map.geomap( "append", state, {
+                  fill: "brown",
+                  fillOpacity: .7
+                } );
+              }
+            }
+          } );
+
+      $.getJSON( "http://data.jquerygeo.com/usastates.json", function (result) {
+          map.geomap("append", result);
+        } );
+
+    } );  
+  </script>
+
+  <script>
+    var _gaq = [['_setAccount', 'UA-26084853-1'], ['_trackPageview']];
+    (function (d, t) {
+      var g = d.createElement(t), s = d.getElementsByTagName(t)[0]; g.async = 1;
+      g.src = ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+      s.parentNode.insertBefore(g, s);
+    } (document, 'script'));
+  </script>
+</body>
+</html>
