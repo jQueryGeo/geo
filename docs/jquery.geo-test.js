@@ -4590,6 +4590,10 @@ $.Widget.prototype = {
             var service = this._currentServices[ i ];
             if ( !_serviceContainer || service.serviceContainer[ 0 ] == _serviceContainer[ 0 ] ) {
               service.style.opacity = value;
+
+              // update the original service object's style property
+              service.serviceObject.style = $.extend( { }, service.serviceObject.style, service.style );
+
               $.geo[ "_serviceTypes" ][ service.type ].opacity( this, service );
             }
           }
@@ -4612,6 +4616,9 @@ $.Widget.prototype = {
             }
 
             service.style.visibility = ( value ? "visible" : "hidden" );
+
+            // update the original service object's style property
+            service.serviceObject.style = $.extend( { }, service.serviceObject.style, service.style );
 
             service.serviceContainer.toggle( value );
 
@@ -4943,6 +4950,9 @@ $.Widget.prototype = {
 
       for ( i = 0; i < this._options[ "services" ].length; i++ ) {
         service = this._currentServices[ i ] = $.extend( { }, this._options[ "services" ][ i ] );
+
+        // keep a reference to the original
+        service.serviceObject = this._options[ "services" ][ i ];
 
         // default the service style property on our copy
         service.style = $.extend( {

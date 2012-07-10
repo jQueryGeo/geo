@@ -1,6 +1,7 @@
 ﻿== to do ==
 
 === b1 ===
+* geomap - [regression] refresh & toggle methods no longer keep original service objects in sync
 * geomap - allow service-level refresh
 * geomap - loadstart, loadend events
 * geomap - allow append to take an array of shapes
@@ -63,6 +64,12 @@
 * geomap - zoomMin, zoomMax on service object
 * geomap - remove this-style state properties
 * geomap - add delegate handler for image load instead of one load handler per image
+* docs - geomap - services option on actual services should return an array of the services in the selector
+* geomap - services option on actual services should return an array of the services in the selector
+* geomap - [bug] cannot wheel zoom in dragCircle mode
+* geomap - users should be able to escape out of dragCircle
+* geomap - [bug] cannot wheel zoom in dragBbox mode
+* geomap - users should be able to escape out of dragBbox
 * geomap - remove "px" from .css calls
 * geo - use Array.push instead of $.merge where needed
 * docs - upgrade to jQuery Mobile 1.1.0

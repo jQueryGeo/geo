@@ -92,6 +92,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * docs - geomap - dragCircle mode
 * geo - include method for bbox
 * geomap - dragCircle mode
+* geomap - [regression] refresh & toggle methods no longer keep original service objects in sync
 
 ### 1.0a4 (2012-02-19)
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax
