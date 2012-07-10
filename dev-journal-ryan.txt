@@ -1,6 +1,7 @@
 ﻿== to do ==
 
 === b1 ===
+* geomap - dragCircle mode
 * geomap - allow service-level refresh
 * geomap - loadstart, loadend events
 * geomap - allow append to take an array of shapes
@@ -83,6 +84,8 @@
 * docs - geomap - view.service.row & view.service.column to string multiple services together or repeat horizontal tiles
 * geomap - Firefox - [bug] inertial pan is choppy post touchstop
 ** post inertial pan rewrite
+* geomap - dragCircle must hook into _refreshDrawing so that the circle moves correctly when the user zooms; which means I have to store the center coordinate as well as pixel
+* geomap - [bug] on that note, I can't zoom in dragCircle mode
 * docs - better describe append/find connection and how to append data and use the click event to find it later
 ** see email reply to Marc
 * docs - geomap - describe "graphic service" as shingled with src set to empty string or null
@@ -201,6 +204,13 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-07-07==
+===dragCircle===
+I'm going to add this to beta. It will work similar to dragBbox, including sending the bbox.
+
+===dragBbox===
+I may rename this to dragRectangle before the b1 release to keep the drawing modes more about geometry than geography.
 
 ==2012-07-06==
 ===bboxMax===
