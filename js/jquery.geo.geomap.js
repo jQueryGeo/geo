@@ -1224,7 +1224,7 @@
           geomap._timeoutInteractive = null;
           geomap._triggerInteractive = false;
         }
-      }, 500 );
+      }, 256 );
       this._triggerInteractive |= trigger;
     },
 
