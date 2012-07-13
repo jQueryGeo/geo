@@ -1268,6 +1268,7 @@
       }
 
       this._options["pixelSize"] = pixelSize;
+      this._options["zoom"] = this._getZoom( center, pixelSize );
     },
 
     _setCenterAndSize: function (center, pixelSize, trigger, refresh) {

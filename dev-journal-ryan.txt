@@ -217,7 +217,7 @@
 ===interactiveTransform===
 A side effect of the way I'm doing interactiveTransform is that changes to the widget options bbox, center, and pixelSize aren't immediately available. I need to at least update the public options during each change. That may be a little expensive because I will have to do projection but is necessary.
 
-Ok, I think that's better, except that I forgot the zoom option.
+Ok, I think that's better, except that I forgot the zoom option. Added.
 
 ===tile query===
 I've decreased the delay to begin checking for new images from 500ms to 256ms. There's a balance here somewhere.
