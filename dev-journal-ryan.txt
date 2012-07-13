@@ -1,7 +1,6 @@
 ﻿== to do ==
 
 === b1 ===
-* geomap - [regression] refresh & toggle methods no longer keep original service objects in sync
 * geomap - allow service-level refresh
 * geomap - loadstart, loadend events
 * geomap - allow append to take an array of shapes
@@ -74,6 +73,8 @@
 * geo - use Array.push instead of $.merge where needed
 * docs - upgrade to jQuery Mobile 1.1.0
 * docs - non-mobile version via adaptive check
+* geomap - [bug] centroid is wrong (for labels?) at high tile levels (19+)
+** see MapGeo showtiles switch
 * geomap - [bug] changing services array (without changing all services) after initialization fails
 * geomap - create _defaultState object, use for widget-local _widgetState property, reinit _widgetState on _createWidget
 * geographics - draw to img elements to include in interactiveTransform 

@@ -556,8 +556,8 @@
       }
     },
 
-    refresh: function () {
-      this._refresh();
+    refresh: function ( force ) {
+      this._refresh( force );
     },
 
     resize: function ( _trigger /* Internal Use Only */ ) {
@@ -1231,7 +1231,7 @@
       this._triggerInteractive |= trigger;
     },
 
-    _refresh: function () {
+    _refresh: function ( force ) {
       var service,
           i = 0;
 
