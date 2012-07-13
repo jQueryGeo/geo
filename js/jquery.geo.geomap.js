@@ -342,9 +342,7 @@
           }
 
           if ( this._created ) {
-            this._centerInteractive = center;
-            this._pixelSizeInteractive = pixelSize;
-
+            this._setInteractiveCenterAndSize( center, pixelSize );
             this._setInteractiveTimeout( false );
           } else {
             this._setCenterAndSize( center, pixelSize, false, refresh );
@@ -368,8 +366,7 @@
           }
 
           if ( this._created ) {
-            this._centerInteractive[ 0 ] = value[ 0 ];
-            this._centerInteractive[ 1 ] = value[ 1 ];
+            this._setInteractiveCenterAndSize( value, this._pixelSize );
             this._setInteractiveTimeout( false );
           } else {
             this._setCenterAndSize( value, this._pixelSize, false, refresh );
@@ -510,6 +507,10 @@
             var service = this._currentServices[ i ];
             if ( !_serviceContainer || service.serviceContainer[ 0 ] == _serviceContainer[ 0 ] ) {
               service.style.opacity = value;
+
+              // update the original service object's style property
+              service.serviceObject.style = $.extend( { }, service.serviceObject.style, service.style );
+
               $.geo[ "_serviceTypes" ][ service.type ].opacity( this, service );
             }
           }
@@ -533,6 +534,9 @@
 
             service.style.visibility = ( value ? "visible" : "hidden" );
 
+            // update the original service object's style property
+            service.serviceObject.style = $.extend( { }, service.serviceObject.style, service.style );
+
             service.serviceContainer.toggle( value );
 
             if ( value ) {
@@ -549,8 +553,8 @@
       }
     },
 
-    refresh: function () {
-      this._refresh();
+    refresh: function ( force ) {
+      this._refresh( force );
     },
 
     resize: function ( _trigger /* Internal Use Only */ ) {
@@ -742,8 +746,7 @@
         }
       }
 
-      this._centerInteractive = center;
-      this._pixelSizeInteractive = pixelSize;
+      this._setInteractiveCenterAndSize( center, pixelSize );
       this._interactiveTransform( );
     },
 
@@ -801,7 +804,7 @@
       this._clearInteractiveTimeout( );
 
       value = Math.max( value, 0 );
-      this._pixelSizeInteractive = this._getPixelSize( value );
+      this._setInteractiveCenterAndSize( this._center, value );
 
       this._setInteractiveTimeout( trigger );
     },
@@ -863,6 +866,9 @@
 
       for ( i = 0; i < this._options[ "services" ].length; i++ ) {
         service = this._currentServices[ i ] = $.extend( { }, this._options[ "services" ][ i ] );
+
+        // keep a reference to the original
+        service.serviceObject = this._options[ "services" ][ i ];
 
         // default the service style property on our copy
         service.style = $.extend( {
@@ -1175,6 +1181,7 @@
 
           this._centerInteractive[ 0 ] -= ( dx * this._pixelSizeInteractive );
           this._centerInteractive[ 1 ] += ( ( this._options[ "axisLayout" ] === "image" ? -1 : 1 ) * dy * this._pixelSizeInteractive );
+          this._setInteractiveCenterAndSize( this._centerInteractive, this._pixelSizeInteractive );
           this._interactiveTransform( );
         }
       }
@@ -1217,11 +1224,11 @@
           geomap._timeoutInteractive = null;
           geomap._triggerInteractive = false;
         }
-      }, 500 );
+      }, 256 );
       this._triggerInteractive |= trigger;
     },
 
-    _refresh: function () {
+    _refresh: function ( force ) {
       var service,
           i = 0;
 
@@ -1242,6 +1249,26 @@
           this._refreshShapes( this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes );
         }
       }
+    },
+
+    _setInteractiveCenterAndSize: function ( center, pixelSize ) {
+      // set the temporary (interactive) center & size
+      // also, update the public-facing options
+      this._centerInteractive[ 0 ] = center[ 0 ];
+      this._centerInteractive[ 1 ] = center[ 1 ];
+      this._pixelSizeInteractive = pixelSize;
+
+      if ( this._userGeodetic ) {
+        this._options["bbox"] = $.geo.proj.toGeodetic( this._getBbox( center, pixelSize ) );
+        this._options["center"] = $.geo.proj.toGeodetic( center );
+      } else {
+        this._options["bbox"] = this._getBbox( center, pixelSize );
+        this._options["center"][ 0 ] = center[ 0 ];
+        this._options["center"][ 1 ] = center[ 1 ];
+      }
+
+      this._options["pixelSize"] = pixelSize;
+      this._options["zoom"] = this._getZoom( center, pixelSize );
     },
 
     _setCenterAndSize: function (center, pixelSize, trigger, refresh) {
@@ -1407,8 +1434,7 @@
       if (!e.isDefaultPrevented()) {
         var centerAndSize = this._getZoomCenterAndSize(this._current, 1, true );
 
-        this._centerInteractive = centerAndSize.center;
-        this._pixelSizeInteractive = centerAndSize.pixelSize;
+        this._setInteractiveCenterAndSize( centerAndSize.center, centerAndSize.pixelSize );
         this._interactiveTransform( );
 
         doInteractiveTimeout = true;
@@ -1643,8 +1669,7 @@
 
           var pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, false );
 
-          this._centerInteractive = pinchCenterAndSize.center;
-          this._pixelSizeInteractive = pinchCenterAndSize.pixelSize;
+          this._setInteractiveCenterAndSize( pinchCenterAndSize.center, pinchCenterAndSize.pixelSize );
           this._interactiveTransform( );
 
           doInteractiveTimeout = true;
@@ -2055,8 +2080,7 @@
             service,
             i = 0;
 
-        this._centerInteractive = wheelCenterAndSize.center;
-        this._pixelSizeInteractive = wheelCenterAndSize.pixelSize;
+        this._setInteractiveCenterAndSize( wheelCenterAndSize.center, wheelCenterAndSize.pixelSize );
         this._interactiveTransform( );
 
         this._setInteractiveTimeout( true );

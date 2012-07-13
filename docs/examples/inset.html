@@ -130,7 +130,7 @@
 
         // draw the new bbox
         // (we won't be getting the bboxchange event because we changed it via code)
-        drawInsetBox( $.geo.recenter( map.geomap( "option", "bbox" ), geo ) );
+        drawInsetBox( map.geomap( "option", "bbox" ) );
       } );
 
       function drawInsetBox(extent) {
