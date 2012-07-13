@@ -63,10 +63,18 @@
 * geomap - zoomMin, zoomMax on service object
 * geomap - remove this-style state properties
 * geomap - add delegate handler for image load instead of one load handler per image
+* docs - geomap - services option on actual services should return an array of the services in the selector
+* geomap - services option on actual services should return an array of the services in the selector
+* geomap - [bug] cannot wheel zoom in dragCircle mode
+* geomap - users should be able to escape out of dragCircle
+* geomap - [bug] cannot wheel zoom in dragBbox mode
+* geomap - users should be able to escape out of dragBbox
 * geomap - remove "px" from .css calls
 * geo - use Array.push instead of $.merge where needed
 * docs - upgrade to jQuery Mobile 1.1.0
 * docs - non-mobile version via adaptive check
+* geomap - [bug] centroid is wrong (for labels?) at high tile levels (19+)
+** see MapGeo showtiles switch
 * geomap - [bug] changing services array (without changing all services) after initialization fails
 * geomap - create _defaultState object, use for widget-local _widgetState property, reinit _widgetState on _createWidget
 * geographics - draw to img elements to include in interactiveTransform 
@@ -204,6 +212,15 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-07-13==
+===interactiveTransform===
+A side effect of the way I'm doing interactiveTransform is that changes to the widget options bbox, center, and pixelSize aren't immediately available. I need to at least update the public options during each change. That may be a little expensive because I will have to do projection but is necessary.
+
+Ok, I think that's better, except that I forgot the zoom option. Added.
+
+===tile query===
+I've decreased the delay to begin checking for new images from 500ms to 256ms. There's a balance here somewhere.
 
 ==2012-07-10==
 ===dragCircle===
