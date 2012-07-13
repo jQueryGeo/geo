@@ -213,6 +213,10 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2012-07-13==
+===interactiveTransform===
+A side effect of the way I'm doing interactiveTransform is that changes to the widget options bbox, center, and pixelSize aren't immediately availble. I need to at least update the public options during each change. That may be a little expensive because I will have to do projection but is necessary.
+
 ==2012-07-10==
 ===dragCircle===
 Time to move this into _refreshDrawing. But first, I have to trigger the Point shape event. Maybe not. I can't zoom. That's against the docs but I think I can leave it for b2.
