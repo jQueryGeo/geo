@@ -3714,7 +3714,7 @@ $.Widget.prototype = {
     _$canvas: undefined,
     _context: undefined,
 
-    _$blitcanvas: undefined,
+    _blitcanvas: undefined,
     _blitcontext: undefined,
 
     _$labelsContainer: undefined,
@@ -3764,9 +3764,10 @@ $.Widget.prototype = {
         this._$canvas = this._$elem.children(':last');
         this._context = this._$canvas[0].getContext("2d");
 
-        this._$elem.append('<canvas ' + sizeAttr + ' style="' + posCss + ' visibility: hidden;"></canvas>');
-        this._$blitcanvas = this._$elem.children(':last');
-        this._blitcontext = this._$blitcanvas[0].getContext("2d");
+        this._blitcanvas = document.createElement( "canvas" );
+        this._blitcanvas.width = this._width;
+        this._blitcanvas.height = this._height;
+        this._blitcontext = this._blitcanvas.getContext("2d");
       } else if (_ieVersion <= 8) {
         this._trueCanvas = false;
         this._$elem.append( '<div ' + sizeAttr + ' style="' + posCss + sizeCss + '"></div>');
@@ -3978,7 +3979,7 @@ $.Widget.prototype = {
           pixelBbox[ 2 ] = Math.min( pixelBbox[ 2 ], this._width );
           pixelBbox[ 3 ] = Math.min( pixelBbox[ 3 ], this._height );
 
-          this._context.drawImage(this._$blitcanvas[ 0 ], pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ], pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ] );
+          this._context.drawImage(this._blitcanvas, pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ], pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ] );
         }
       }
     },
@@ -4141,6 +4142,7 @@ $.Widget.prototype = {
     _$elem: undefined, //< map div for maps, service div for services
     _map: undefined, //< only defined in services
     _created: false,
+    _createdGraphics: false,
     _widgetId: 0,
     _tmplLengthId: "",
     _tmplAreaId: "",
@@ -4154,10 +4156,10 @@ $.Widget.prototype = {
     _$existingChildren: undefined,
     _$attrList: undefined,
     _$servicesContainer: undefined,
-    _$servicesShapesContainers: undefined,
+    _$shapesContainers: undefined, //< all shapesContainer divs (map only)
 
     _$panContainer: undefined, //< all non-service elements that move while panning
-    _$shapesContainer: undefined,
+    _$shapesContainer: undefined, //< just "our" shapesContainer div (map & service)
     _$drawContainer: undefined,
     _$measureContainer: undefined,
     _$measureLabel: undefined,
@@ -4231,9 +4233,6 @@ $.Widget.prototype = {
       this._$elem = $(element);
 
       if (this._$elem.is(".geo-service")) {
-        var $contentFrame = this._$elem.closest( ".geo-content-frame" );
-        this._$elem.append('<div class="geo-shapes-container" style="position:absolute; left:0; top:0; width:' + $contentFrame.css( "width" ) + '; height:' + $contentFrame.css( "height" ) + '; margin:0; padding:0;"></div>');
-        this._$shapesContainer = this._$elem.children(':last');
         this._graphicShapes = [];
         $.Widget.prototype._createWidget.apply(this, arguments);
         return;
@@ -4304,8 +4303,6 @@ $.Widget.prototype = {
       if (this._$elem.is(".geo-service")) {
         this._map = this._$elem.data( "geoMap" );
         this._$elem.data( "geoService", this );
-        this._$shapesContainer.geographics( );
-        this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
         return;
       }
 
@@ -4348,6 +4345,8 @@ $.Widget.prototype = {
       this._options["drawStyle"] = this._$drawContainer.geographics("option", "style");
 
       this._$shapesContainer.geographics( { style: this._initOptions.shapeStyle || { } } );
+      this._createdGraphics = true;
+
       this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
 
       if (this._initOptions) {
@@ -4471,7 +4470,7 @@ $.Widget.prototype = {
           break;
 
         case "shapeStyle":
-          if (this._$shapesContainer) {
+          if ( this._createdGraphics ) {
             this._$shapesContainer.geographics("option", "style", value);
             value = this._$shapesContainer.geographics("option", "style");
           }
@@ -4531,7 +4530,7 @@ $.Widget.prototype = {
           break;
 
         case "shapeStyle":
-          if ( refresh ) {
+          if ( refresh && this._createdGraphics ) {
             this._$shapesContainer.geographics("clear");
             this._refreshShapes( this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes );
           }
@@ -4541,8 +4540,11 @@ $.Widget.prototype = {
 
     destroy: function () {
       if ( this._$elem.is(".geo-service") ) {
-        this._$shapesContainer.geographics("destroy");
-        this._$shapesContainer = undefined;
+        if ( this._createdGraphics ) {
+          this._$shapesContainer.geographics("destroy");
+          this._$shapesContainer = undefined;
+          this._createdGraphics = false;
+        }
       } else {
         clearTimeout( this._timeoutInteractive );
         this._timeoutInteractive = null;
@@ -4558,6 +4560,8 @@ $.Widget.prototype = {
 
         this._$shapesContainer.geographics("destroy");
         this._$shapesContainer = undefined;
+        this._createdGraphics = false;
+
         this._$drawContainer.geographics("destroy");
         this._$drawContainer = undefined;
 
@@ -4679,6 +4683,19 @@ $.Widget.prototype = {
 
     append: function ( shape, style, label, refresh ) {
       if ( shape && $.isPlainObject( shape ) ) {
+        if ( !this._createdGraphics ) {
+          var $contentFrame = this._$elem.closest( ".geo-content-frame" );
+          this._$elem.append('<div class="geo-shapes-container" style="position:absolute; left:0; top:0; width:' + $contentFrame.css( "width" ) + '; height:' + $contentFrame.css( "height" ) + '; margin:0; padding:0;"></div>');
+          this._$shapesContainer = this._$elem.children(':last');
+
+          this._map._$shapesContainers = this._map._$shapesContainers.add( this._$shapesContainer );
+
+          this._$shapesContainer.geographics( );
+          this._createdGraphics = true;
+
+          this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
+        }
+
         var shapes, arg, i, realStyle, realLabel, realRefresh;
 
         if ( shape.type == "FeatureCollection" ) {
@@ -4991,7 +5008,7 @@ $.Widget.prototype = {
         }
       }
 
-      this._$servicesShapesContainers = this._$elem.find( ".geo-shapes-container" );
+      this._$shapesContainers = this._$elem.find( ".geo-shapes-container" );
 
       this._$attrList.find( "a" ).css( {
         position: "relative",
@@ -5298,8 +5315,8 @@ $.Widget.prototype = {
     },
 
     _interactiveTransform: function( ) {
-      if ( this._$servicesShapesContainers ) {
-        this._$servicesShapesContainers.geographics("clear");
+      if ( this._$shapesContainers ) {
+        this._$shapesContainers.geographics("clear");
       }
 
       for ( var i = 0; i < this._currentServices.length; i++ ) {
@@ -5336,7 +5353,7 @@ $.Widget.prototype = {
           $.geo[ "_serviceTypes" ][ service.type ].refresh( this, service );
           geoService = service.serviceContainer.data( "geoService" );
 
-          if ( geoService._$shapesContainer ) {
+          if ( geoService._createdGraphics ) {
             geoService._$shapesContainer.geographics( "clear" );
             if ( geoService._graphicShapes.length > 0 ) {
               geoService._refreshShapes( geoService._$shapesContainer, geoService._graphicShapes, geoService._graphicShapes, geoService._graphicShapes );
@@ -5345,7 +5362,7 @@ $.Widget.prototype = {
         }
       }
 
-      if ( this._$shapesContainer ) {
+      if ( this._createdGraphics ) {
         this._$shapesContainer.geographics( "clear" );
         if ( this._graphicShapes.length > 0 ) {
           this._refreshShapes( this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes );

@@ -73,7 +73,6 @@
 * geomap - [bug] changing services array (without changing all services) after initialization fails
 * geomap - create _defaultState object, use for widget-local _widgetState property, reinit _widgetState on _createWidget
 * geographics - draw to img elements to include in interactiveTransform 
-* geographics - try removing the blit canvas from the DOM, i.e., don't attach
 * geographics - better support retna displays
 ** http://mir.aculo.us/2012/06/26/flowchart-how-to-retinafy-your-website/
 * geomap - see what knowledge Gamecore.js has to offer
@@ -184,7 +183,7 @@
 * geomap - custering demo/support
 * proj - take scale factor into account when calculating distance in web mercator
 * geographics - disable fill by setting style.fill to "" & stroke by style.stroke to ""
-* graphics - See Modernizr for comment on BB Storm & canvas detection
+* geographics - See Modernizr for comment on BB Storm & canvas detection
 * geographics - document graphics widget
 * geographics - support border, padding, and margin
 * geographics - undo manual outer div style changes
@@ -217,6 +216,11 @@ There's new syntax for default templating. It uses the {{>var}} syntax. I think 
 
 ===refresh===
 I need to take control of when this is called so I can handle service-level refresh properly.
+
+That's better. _refresh will only run on the map itself and calls _refreshShapes on all the service objects.
+
+===interactiveTransform===
+I turned the timeout back up to 500. Panning was no longer happy in IE with some shapes to manage.
 
 ==2012-07-13==
 ===interactiveTransform===
