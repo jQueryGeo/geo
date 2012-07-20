@@ -1,7 +1,6 @@
 ﻿== to do ==
 
 === b1 ===
-* geomap - allow service-level refresh
 * geomap - add argument to refresh to force reload of images (in case of dynamic data)
 * geomap - loadstart, loadend events
 * geomap - allow append to take an array of shapes
@@ -9,6 +8,7 @@
 * geomap - zoomMax option
 * geomap - [bug] tiled services with pixelSizes set do not render zoom level 0, when src is a template string
 * geomap - [bug] using shift-zoom during interactiveTransform doesn't zoom to correct location
+** tiled maps only
 
 === examples ===
 
@@ -166,6 +166,7 @@
 * geomap - remove wheel plugin and use built-in mousewheel event
 * geomap - test how the comma selector works with the find method
 * geomap - compile service src templates, refresh when services changes
+* geomap - audit destroy and memory leaks (jQuery data values, JavaScript object references, etc.)
 * code - prefer $.data over $.fn.data
 * docs - internal - explain what projection is and which one we use by default (3395) and maybe why we call it web mercator & why we can't get to +/- 90 lat
 * docs - internal - document how geomap draws shapes, the geomapgraphics widget and the reason shapeStyle is a method
@@ -209,6 +210,13 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-07-20==
+===jsRender===
+There's new syntax for default templating. It uses the {{>var}} syntax. I think the old one is still valid, {{:var}} but the new one is preferred. I will change jQuery Geo to use the new one by default. I should also change the docs. Ah, no, it's new syntax to do HTML encoding. I'll have to check the measure templates but I think I will go with higher performance {{:var}}.
+
+===refresh===
+I need to take control of when this is called so I can handle service-level refresh properly.
 
 ==2012-07-13==
 ===interactiveTransform===

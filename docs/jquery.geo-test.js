@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0.0b1 - 2012-07-13
+/*! jQuery Geo - v1.0.0b1 - 2012-07-20
  * http://jquerygeo.com
  * Copyright (c) 2012 Ryan Westphal/Applied Geographics, Inc.; Licensed MIT, GPL */
 
@@ -4303,6 +4303,7 @@ $.Widget.prototype = {
 
       if (this._$elem.is(".geo-service")) {
         this._map = this._$elem.data( "geoMap" );
+        this._$elem.data( "geoService", this );
         this._$shapesContainer.geographics( );
         this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
         return;
@@ -4633,8 +4634,12 @@ $.Widget.prototype = {
       }
     },
 
-    refresh: function ( force ) {
-      this._refresh( force );
+    refresh: function ( force, _serviceContainer ) {
+      if ( this._$elem.is( ".geo-service" ) ) {
+        this._$elem.closest( ".geo-map" ).geomap( "refresh", force, this._$elem );
+      } else {
+        this._refresh( force, _serviceContainer );
+      }
     },
 
     resize: function ( _trigger /* Internal Use Only */ ) {
@@ -4711,7 +4716,11 @@ $.Widget.prototype = {
         }
 
         if ( realRefresh === undefined || realRefresh ) {
-          this._refresh( );
+          if ( this._$elem.is( ".geo-service" ) ) {
+            this._refresh( false, this._$elem );
+          } else {
+            this._refresh( );
+          }
         }
       }
     },
@@ -4724,7 +4733,11 @@ $.Widget.prototype = {
       this._graphicShapes = [];
 
       if ( refresh === undefined || refresh ) {
-        this._refresh();
+        if ( this._$elem.is( ".geo-service" ) ) {
+          this._refresh( false, this._$elem );
+        } else {
+          this._refresh( );
+        }
       }
     },
 
@@ -4799,7 +4812,11 @@ $.Widget.prototype = {
       }
 
       if ( refresh === undefined || refresh ) {
-        this._refresh();
+        if ( this._$elem.is( ".geo-service" ) ) {
+          this._refresh( false, this._$elem );
+        } else {
+          this._refresh( );
+        }
       }
     },
 
@@ -4963,7 +4980,7 @@ $.Widget.prototype = {
 
         this._$servicesContainer.append( scHtml );
         serviceContainer = this._$servicesContainer.children( ":last" );
-        this._currentServices[ i ].serviceContainer = serviceContainer;
+        service.serviceContainer = serviceContainer;
         
         $.geo[ "_serviceTypes" ][ service.type ].create( this, serviceContainer, service, i );
 
@@ -5304,21 +5321,26 @@ $.Widget.prototype = {
           geomap._timeoutInteractive = null;
           geomap._triggerInteractive = false;
         }
-      }, 256 );
+      }, 500 );
       this._triggerInteractive |= trigger;
     },
 
-    _refresh: function ( force ) {
+    _refresh: function ( force, _serviceContainer ) {
       var service,
+          geoService,
           i = 0;
 
-      if ( this._$elem.is( ".geo-map" ) ) {
-        for ( ; i < this._currentServices.length; i++ ) {
-          service = this._currentServices[ i ];
+      for ( ; i < this._currentServices.length; i++ ) {
+        service = this._currentServices[ i ];
+        if ( !_serviceContainer || service.serviceContainer[ 0 ] == _serviceContainer[ 0 ] ) {
+          $.geo[ "_serviceTypes" ][ service.type ].refresh( this, service );
+          geoService = service.serviceContainer.data( "geoService" );
 
-          if ( $.geo[ "_serviceTypes" ][ service.type ] !== null ) {
-            $.geo[ "_serviceTypes" ][ service.type ].refresh( this, service );
-            service.serviceContainer.geomap( "refresh" );
+          if ( geoService._$shapesContainer ) {
+            geoService._$shapesContainer.geographics( "clear" );
+            if ( geoService._graphicShapes.length > 0 ) {
+              geoService._refreshShapes( geoService._$shapesContainer, geoService._graphicShapes, geoService._graphicShapes, geoService._graphicShapes );
+            }
           }
         }
       }
