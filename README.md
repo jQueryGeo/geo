@@ -95,6 +95,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * geomap - [regression] refresh & toggle methods no longer keep original service objects in sync
 * geomap - [bug] when a singled image hasn't loaded after pan and you double click on empty space, the zoomed bbox seems wrong
 * geomap - allow service-level refresh
+* geographics - remove the blit canvas from the DOM, i.e., don't attach
 
 ### 1.0a4 (2012-02-19)
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax
