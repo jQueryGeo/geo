@@ -71,6 +71,7 @@
 * geomap - [bug] centroid is wrong (for labels?) at high tile levels (19+)
 ** see MapGeo showtiles switch
 * geomap - [bug] changing services array (without changing all services) after initialization fails
+* geomap - if a service is not visible, detach it's container from the DOM
 * geomap - create _defaultState object, use for widget-local _widgetState property, reinit _widgetState on _createWidget
 * geographics - draw to img elements to include in interactiveTransform 
 * geographics - better support retna displays

@@ -927,7 +927,7 @@
         }
       }
 
-      this._$shapesContainers = this._$elem.find( ".geo-shapes-container" );
+      this._$shapesContainers = new jQuery();
 
       this._$attrList.find( "a" ).css( {
         position: "relative",
