@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0.0b1 - 2012-07-20
+/*! jQuery Geo - v1.0.0b1 - 2012-07-22
  * http://jquerygeo.com
  * Copyright (c) 2012 Ryan Westphal/Applied Geographics, Inc.; Licensed MIT, GPL */
 
@@ -5008,7 +5008,7 @@ $.Widget.prototype = {
         }
       }
 
-      this._$shapesContainers = this._$elem.find( ".geo-shapes-container" );
+      this._$shapesContainers = jQuery();
 
       this._$attrList.find( "a" ).css( {
         position: "relative",
@@ -5350,7 +5350,7 @@ $.Widget.prototype = {
       for ( ; i < this._currentServices.length; i++ ) {
         service = this._currentServices[ i ];
         if ( !_serviceContainer || service.serviceContainer[ 0 ] == _serviceContainer[ 0 ] ) {
-          $.geo[ "_serviceTypes" ][ service.type ].refresh( this, service );
+          $.geo[ "_serviceTypes" ][ service.type ].refresh( this, service, force );
           geoService = service.serviceContainer.data( "geoService" );
 
           if ( geoService._createdGraphics ) {
@@ -6282,14 +6282,18 @@ $.Widget.prototype = {
         }
       },
 
-      refresh: function (map, service) {
+      refresh: function (map, service, force) {
         //console.log( "tiled.refresh( " + map._center.join( ", " ) + ", " + map._pixelSize + ")" );
         var serviceState = $.data( service, "geoServiceState" );
 
         this._cancelUnloaded(map, service);
 
-        if ( serviceState && service && service.style.visibility === "visible" && !( serviceState.serviceContainer.is( ":hidden" ) ) ) {
+        if ( serviceState && force ) {
+          // if hidden atm, we want to make sure we reload this service after it becomes visible
+          serviceState.reloadTiles = true;
+        }
 
+        if ( serviceState && service && service.style.visibility === "visible" && !( serviceState.serviceContainer.is( ":hidden" ) ) ) {
           var bbox = map._getBbox(),
               pixelSize = map._pixelSize,
 

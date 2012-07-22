@@ -68,14 +68,18 @@
         }
       },
 
-      refresh: function (map, service) {
+      refresh: function (map, service, force) {
         //console.log( "tiled.refresh( " + map._center.join( ", " ) + ", " + map._pixelSize + ")" );
         var serviceState = $.data( service, "geoServiceState" );
 
         this._cancelUnloaded(map, service);
 
-        if ( serviceState && service && service.style.visibility === "visible" && !( serviceState.serviceContainer.is( ":hidden" ) ) ) {
+        if ( serviceState && force ) {
+          // if hidden atm, we want to make sure we reload this service after it becomes visible
+          serviceState.reloadTiles = true;
+        }
 
+        if ( serviceState && service && service.style.visibility === "visible" && !( serviceState.serviceContainer.is( ":hidden" ) ) ) {
           var bbox = map._getBbox(),
               pixelSize = map._pixelSize,
 

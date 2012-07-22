@@ -927,7 +927,7 @@
         }
       }
 
-      this._$shapesContainers = new jQuery();
+      this._$shapesContainers = jQuery();
 
       this._$attrList.find( "a" ).css( {
         position: "relative",
@@ -1269,7 +1269,7 @@
       for ( ; i < this._currentServices.length; i++ ) {
         service = this._currentServices[ i ];
         if ( !_serviceContainer || service.serviceContainer[ 0 ] == _serviceContainer[ 0 ] ) {
-          $.geo[ "_serviceTypes" ][ service.type ].refresh( this, service );
+          $.geo[ "_serviceTypes" ][ service.type ].refresh( this, service, force );
           geoService = service.serviceContainer.data( "geoService" );
 
           if ( geoService._createdGraphics ) {

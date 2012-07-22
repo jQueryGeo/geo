@@ -1,14 +1,11 @@
 ﻿== to do ==
 
 === b1 ===
-* geomap - add argument to refresh to force reload of images (in case of dynamic data)
 * geomap - loadstart, loadend events
 * geomap - allow append to take an array of shapes
 * geomap - allow remove to take an array of shapes
 * geomap - zoomMax option
 * geomap - [bug] tiled services with pixelSizes set do not render zoom level 0, when src is a template string
-* geomap - [bug] using shift-zoom during interactiveTransform doesn't zoom to correct location
-** tiled maps only
 
 === examples ===
 
@@ -28,6 +25,8 @@
 
 === future ===
 
+* geomap - [bug] using shift-zoom during interactiveTransform doesn't zoom to correct location
+** tiled maps only
 * geomap - test changing shingled service URL to get updated images (in case of dynamic data)
 * geomap - stop using $.data to store bbox since it's only used for drawing; store on _graphicShapes instead
 * geomap - [bug] exception when calling destroy on uninitialized div
@@ -55,6 +54,7 @@
 * geomap - [bug] errors when setting src to empty string
 ** "When I added services for my graphics layers with src set to an empty string I got very weird results -- I was seeing the single image from my inset map repeated over and over.  I had to set it to a function that returns an empty string for it to work."
 ** possibly an object reference error when multiple maps are created
+* geomap - [bug] on two-finger scroll on some laptops, scroll zoom doesn't move much at first, then moves too fast
 * geomap - zoomMin, zoomMax on service object
 * geomap - remove this-style state properties
 * geomap - add delegate handler for image load instead of one load handler per image
@@ -210,6 +210,10 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-07-22==
+===force===
+There is code from our original implementation to reload tiles. It is no longer being triggered. I'm wondering if I should remove it. There is also code for dirty tiles. They are removed at the end of refresh. I'm not sure I need to keep that code in there because I don't think it's being triggered either.
 
 ==2012-07-20==
 ===jsRender===
