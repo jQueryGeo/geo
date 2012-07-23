@@ -99,6 +99,8 @@
     _timeoutInteractive: null,
     _triggerInteractive: false,
 
+    _loadCount: 0,
+
     _wheelTimeout: null,
     _wheelLevel: 0,
 
@@ -1347,6 +1349,20 @@
       if (refresh) {
         this._refresh();
         this._refreshDrawing();
+      }
+    },
+
+    _requestQueued: function ( ) {
+      if ( this._loadCount === 0 ) {
+        this._trigger( "loadstart", window.event );
+      }
+      this._loadCount++;
+    },
+
+    _requestComplete: function ( ) {
+      this._loadCount--;
+      if ( this._loadCount === 0 ) {
+        this._trigger( "loadend", window.event );
       }
     },
 

@@ -124,7 +124,7 @@
               loadImageDeferredDone = function( url ) {
                 // when a Deferred call is done, add the image to the map
                 // a reference to the correct img element is on the Deferred object itself
-                serviceObj._loadImage( $.data( this, "img" ), url, pixelSize, serviceState, $serviceContainer, opacity );
+                serviceObj._loadImage( $.data( this, "img" ), url, map, serviceState, opacity );
               },
 
               loadImageDeferredFail = function( ) {
@@ -202,7 +202,7 @@
                 }
 
                 serviceState.loadCount++;
-                //this._map._requestQueued();
+                map._requestQueued();
 
                 if (serviceState.reloadTiles && $img.size() > 0) {
                   $img.attr("src", imageUrl);
@@ -227,7 +227,7 @@
                 }
 
                 if ( typeof imageUrl === "string" ) {
-                  serviceObj._loadImage( $img, imageUrl, pixelSize, serviceState, $serviceContainer, opacity );
+                  serviceObj._loadImage( $img, imageUrl, pixelSize, map, serviceState, opacity );
                 } else if ( imageUrl ) {
                   // assume Deferred
                   $.data( imageUrl, "img", $img );
@@ -268,7 +268,9 @@
         }
       },
 
-      _loadImage: function ( $img, url, pixelSize, serviceState, serviceContainer, opacity ) {
+      _loadImage: function ( $img, url, pixelSize, map, serviceState, opacity ) {
+        var serviceContainer = serviceState.serviceContainer;
+
         $img.load(function (e) {
           if (opacity < 1) {
             $(e.target).fadeTo(0, opacity);
@@ -285,6 +287,7 @@
         }).error(function (e) {
           $(e.target).remove();
           serviceState.loadCount--;
+          map._requestCompleted();
 
           if (serviceState.loadCount <= 0) {
             serviceContainer.children(":not([data-pixel-size='" + pixelSize + "'])").remove();
