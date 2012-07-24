@@ -1260,7 +1260,7 @@
           geomap._timeoutInteractive = null;
           geomap._triggerInteractive = false;
         }
-      }, 500 );
+      }, 128 );
       this._triggerInteractive |= trigger;
     },
 
