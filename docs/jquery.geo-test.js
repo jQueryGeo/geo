@@ -4920,7 +4920,8 @@ $.Widget.prototype = {
       this._clearInteractiveTimeout( );
 
       value = Math.max( value, 0 );
-      this._setInteractiveCenterAndSize( this._center, value );
+      this._setInteractiveCenterAndSize( this._center, this._getPixelSize( value ) );
+      this._interactiveTransform( );
 
       this._setInteractiveTimeout( trigger );
     },
@@ -5010,7 +5011,8 @@ $.Widget.prototype = {
         }
       }
 
-      this._$shapesContainers = jQuery();
+      // start with our map-level shapesContainer
+      this._$shapesContainers = this._$shapesContainer;
 
       this._$attrList.find( "a" ).css( {
         position: "relative",
@@ -5345,7 +5347,7 @@ $.Widget.prototype = {
     },
 
     _refresh: function ( force, _serviceContainer ) {
-      //var profileStart = $.now();
+      var profileStart = $.now();
 
       var service,
           geoService,
@@ -5373,8 +5375,8 @@ $.Widget.prototype = {
         }
       }
 
-      //var profileLen = $.now() - profileStart;
-      //$("h1").text("load: " + profileLen + "ms");
+      var profileLen = $.now() - profileStart;
+      $(".loadtime").text("load: " + profileLen + "ms");
     },
 
     _setInteractiveCenterAndSize: function ( center, pixelSize ) {

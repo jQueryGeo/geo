@@ -839,7 +839,8 @@
       this._clearInteractiveTimeout( );
 
       value = Math.max( value, 0 );
-      this._setInteractiveCenterAndSize( this._center, value );
+      this._setInteractiveCenterAndSize( this._center, this._getPixelSize( value ) );
+      this._interactiveTransform( );
 
       this._setInteractiveTimeout( trigger );
     },
