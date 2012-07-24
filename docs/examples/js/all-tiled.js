@@ -54,6 +54,16 @@ $(function () {
     center: [ -89.34, 38.84 ],
     zoom: 5,
 
+    loadstart: function( ) {
+      // we can show an indicator when the map widget is loading images via the loadstart event
+      $("#indicator").show( );
+    },
+
+    loadend: function( ) {
+      // we can hide the indicator when the map widget is done loading images via the loadend event
+      $("#indicator").hide( );
+    },
+
     bboxchange: function( e, geo ) {
       // when the bbox changes, update the info section with new option values
       updateInfo( );

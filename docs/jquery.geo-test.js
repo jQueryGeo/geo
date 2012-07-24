@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0.0b1 - 2012-07-13
+/*! jQuery Geo - v1.0.0b1 - 2012-07-24
  * http://jquerygeo.com
  * Copyright (c) 2012 Ryan Westphal/Applied Geographics, Inc.; Licensed MIT, GPL */
 
@@ -3714,7 +3714,7 @@ $.Widget.prototype = {
     _$canvas: undefined,
     _context: undefined,
 
-    _$blitcanvas: undefined,
+    _blitcanvas: undefined,
     _blitcontext: undefined,
 
     _$labelsContainer: undefined,
@@ -3764,9 +3764,10 @@ $.Widget.prototype = {
         this._$canvas = this._$elem.children(':last');
         this._context = this._$canvas[0].getContext("2d");
 
-        this._$elem.append('<canvas ' + sizeAttr + ' style="' + posCss + ' visibility: hidden;"></canvas>');
-        this._$blitcanvas = this._$elem.children(':last');
-        this._blitcontext = this._$blitcanvas[0].getContext("2d");
+        this._blitcanvas = document.createElement( "canvas" );
+        this._blitcanvas.width = this._width;
+        this._blitcanvas.height = this._height;
+        this._blitcontext = this._blitcanvas.getContext("2d");
       } else if (_ieVersion <= 8) {
         this._trueCanvas = false;
         this._$elem.append( '<div ' + sizeAttr + ' style="' + posCss + sizeCss + '"></div>');
@@ -3978,7 +3979,7 @@ $.Widget.prototype = {
           pixelBbox[ 2 ] = Math.min( pixelBbox[ 2 ], this._width );
           pixelBbox[ 3 ] = Math.min( pixelBbox[ 3 ], this._height );
 
-          this._context.drawImage(this._$blitcanvas[ 0 ], pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ], pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ] );
+          this._context.drawImage(this._blitcanvas, pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ], pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ] );
         }
       }
     },
@@ -4141,6 +4142,7 @@ $.Widget.prototype = {
     _$elem: undefined, //< map div for maps, service div for services
     _map: undefined, //< only defined in services
     _created: false,
+    _createdGraphics: false,
     _widgetId: 0,
     _tmplLengthId: "",
     _tmplAreaId: "",
@@ -4154,10 +4156,10 @@ $.Widget.prototype = {
     _$existingChildren: undefined,
     _$attrList: undefined,
     _$servicesContainer: undefined,
-    _$servicesShapesContainers: undefined,
+    _$shapesContainers: undefined, //< all shapesContainer divs (map only)
 
     _$panContainer: undefined, //< all non-service elements that move while panning
-    _$shapesContainer: undefined,
+    _$shapesContainer: undefined, //< just "our" shapesContainer div (map & service)
     _$drawContainer: undefined,
     _$measureContainer: undefined,
     _$measureLabel: undefined,
@@ -4177,6 +4179,8 @@ $.Widget.prototype = {
     _pixelSizeInteractive: undefined,
     _timeoutInteractive: null,
     _triggerInteractive: false,
+
+    _loadCount: 0,
 
     _wheelTimeout: null,
     _wheelLevel: 0,
@@ -4231,9 +4235,6 @@ $.Widget.prototype = {
       this._$elem = $(element);
 
       if (this._$elem.is(".geo-service")) {
-        var $contentFrame = this._$elem.closest( ".geo-content-frame" );
-        this._$elem.append('<div class="geo-shapes-container" style="position:absolute; left:0; top:0; width:' + $contentFrame.css( "width" ) + '; height:' + $contentFrame.css( "height" ) + '; margin:0; padding:0;"></div>');
-        this._$shapesContainer = this._$elem.children(':last');
         this._graphicShapes = [];
         $.Widget.prototype._createWidget.apply(this, arguments);
         return;
@@ -4303,8 +4304,7 @@ $.Widget.prototype = {
 
       if (this._$elem.is(".geo-service")) {
         this._map = this._$elem.data( "geoMap" );
-        this._$shapesContainer.geographics( );
-        this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
+        this._$elem.data( "geoService", this );
         return;
       }
 
@@ -4347,6 +4347,8 @@ $.Widget.prototype = {
       this._options["drawStyle"] = this._$drawContainer.geographics("option", "style");
 
       this._$shapesContainer.geographics( { style: this._initOptions.shapeStyle || { } } );
+      this._createdGraphics = true;
+
       this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
 
       if (this._initOptions) {
@@ -4470,7 +4472,7 @@ $.Widget.prototype = {
           break;
 
         case "shapeStyle":
-          if (this._$shapesContainer) {
+          if ( this._createdGraphics ) {
             this._$shapesContainer.geographics("option", "style", value);
             value = this._$shapesContainer.geographics("option", "style");
           }
@@ -4530,7 +4532,7 @@ $.Widget.prototype = {
           break;
 
         case "shapeStyle":
-          if ( refresh ) {
+          if ( refresh && this._createdGraphics ) {
             this._$shapesContainer.geographics("clear");
             this._refreshShapes( this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes );
           }
@@ -4540,8 +4542,11 @@ $.Widget.prototype = {
 
     destroy: function () {
       if ( this._$elem.is(".geo-service") ) {
-        this._$shapesContainer.geographics("destroy");
-        this._$shapesContainer = undefined;
+        if ( this._createdGraphics ) {
+          this._$shapesContainer.geographics("destroy");
+          this._$shapesContainer = undefined;
+          this._createdGraphics = false;
+        }
       } else {
         clearTimeout( this._timeoutInteractive );
         this._timeoutInteractive = null;
@@ -4557,6 +4562,8 @@ $.Widget.prototype = {
 
         this._$shapesContainer.geographics("destroy");
         this._$shapesContainer = undefined;
+        this._createdGraphics = false;
+
         this._$drawContainer.geographics("destroy");
         this._$drawContainer = undefined;
 
@@ -4633,8 +4640,12 @@ $.Widget.prototype = {
       }
     },
 
-    refresh: function ( force ) {
-      this._refresh( force );
+    refresh: function ( force, _serviceContainer ) {
+      if ( this._$elem.is( ".geo-service" ) ) {
+        this._$elem.closest( ".geo-map" ).geomap( "refresh", force, this._$elem );
+      } else {
+        this._refresh( force, _serviceContainer );
+      }
     },
 
     resize: function ( _trigger /* Internal Use Only */ ) {
@@ -4674,6 +4685,19 @@ $.Widget.prototype = {
 
     append: function ( shape, style, label, refresh ) {
       if ( shape && $.isPlainObject( shape ) ) {
+        if ( !this._createdGraphics ) {
+          var $contentFrame = this._$elem.closest( ".geo-content-frame" );
+          this._$elem.append('<div class="geo-shapes-container" style="position:absolute; left:0; top:0; width:' + $contentFrame.css( "width" ) + '; height:' + $contentFrame.css( "height" ) + '; margin:0; padding:0;"></div>');
+          this._$shapesContainer = this._$elem.children(':last');
+
+          this._map._$shapesContainers = this._map._$shapesContainers.add( this._$shapesContainer );
+
+          this._$shapesContainer.geographics( );
+          this._createdGraphics = true;
+
+          this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
+        }
+
         var shapes, arg, i, realStyle, realLabel, realRefresh;
 
         if ( shape.type == "FeatureCollection" ) {
@@ -4711,7 +4735,11 @@ $.Widget.prototype = {
         }
 
         if ( realRefresh === undefined || realRefresh ) {
-          this._refresh( );
+          if ( this._$elem.is( ".geo-service" ) ) {
+            this._refresh( false, this._$elem );
+          } else {
+            this._refresh( );
+          }
         }
       }
     },
@@ -4724,7 +4752,11 @@ $.Widget.prototype = {
       this._graphicShapes = [];
 
       if ( refresh === undefined || refresh ) {
-        this._refresh();
+        if ( this._$elem.is( ".geo-service" ) ) {
+          this._refresh( false, this._$elem );
+        } else {
+          this._refresh( );
+        }
       }
     },
 
@@ -4799,7 +4831,11 @@ $.Widget.prototype = {
       }
 
       if ( refresh === undefined || refresh ) {
-        this._refresh();
+        if ( this._$elem.is( ".geo-service" ) ) {
+          this._refresh( false, this._$elem );
+        } else {
+          this._refresh( );
+        }
       }
     },
 
@@ -4963,7 +4999,7 @@ $.Widget.prototype = {
 
         this._$servicesContainer.append( scHtml );
         serviceContainer = this._$servicesContainer.children( ":last" );
-        this._currentServices[ i ].serviceContainer = serviceContainer;
+        service.serviceContainer = serviceContainer;
         
         $.geo[ "_serviceTypes" ][ service.type ].create( this, serviceContainer, service, i );
 
@@ -4974,7 +5010,7 @@ $.Widget.prototype = {
         }
       }
 
-      this._$servicesShapesContainers = this._$elem.find( ".geo-shapes-container" );
+      this._$shapesContainers = jQuery();
 
       this._$attrList.find( "a" ).css( {
         position: "relative",
@@ -5281,8 +5317,8 @@ $.Widget.prototype = {
     },
 
     _interactiveTransform: function( ) {
-      if ( this._$servicesShapesContainers ) {
-        this._$servicesShapesContainers.geographics("clear");
+      if ( this._$shapesContainers ) {
+        this._$shapesContainers.geographics("clear");
       }
 
       for ( var i = 0; i < this._currentServices.length; i++ ) {
@@ -5304,31 +5340,41 @@ $.Widget.prototype = {
           geomap._timeoutInteractive = null;
           geomap._triggerInteractive = false;
         }
-      }, 256 );
+      }, 500 );
       this._triggerInteractive |= trigger;
     },
 
-    _refresh: function ( force ) {
+    _refresh: function ( force, _serviceContainer ) {
+      //var profileStart = $.now();
+
       var service,
+          geoService,
           i = 0;
 
-      if ( this._$elem.is( ".geo-map" ) ) {
-        for ( ; i < this._currentServices.length; i++ ) {
-          service = this._currentServices[ i ];
+      for ( ; i < this._currentServices.length; i++ ) {
+        service = this._currentServices[ i ];
+        if ( !_serviceContainer || service.serviceContainer[ 0 ] == _serviceContainer[ 0 ] ) {
+          $.geo[ "_serviceTypes" ][ service.type ].refresh( this, service, force );
+          geoService = service.serviceContainer.data( "geoService" );
 
-          if ( $.geo[ "_serviceTypes" ][ service.type ] !== null ) {
-            $.geo[ "_serviceTypes" ][ service.type ].refresh( this, service );
-            service.serviceContainer.geomap( "refresh" );
+          if ( geoService._createdGraphics ) {
+            geoService._$shapesContainer.geographics( "clear" );
+            if ( geoService._graphicShapes.length > 0 ) {
+              geoService._refreshShapes( geoService._$shapesContainer, geoService._graphicShapes, geoService._graphicShapes, geoService._graphicShapes );
+            }
           }
         }
       }
 
-      if ( this._$shapesContainer ) {
+      if ( this._createdGraphics ) {
         this._$shapesContainer.geographics( "clear" );
         if ( this._graphicShapes.length > 0 ) {
           this._refreshShapes( this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes );
         }
       }
+
+      //var profileLen = $.now() - profileStart;
+      //$("h1").text("load: " + profileLen + "ms");
     },
 
     _setInteractiveCenterAndSize: function ( center, pixelSize ) {
@@ -5389,6 +5435,21 @@ $.Widget.prototype = {
       if (refresh) {
         this._refresh();
         this._refreshDrawing();
+      }
+    },
+
+    _requestQueued: function ( ) {
+      if ( this._loadCount === 0 ) {
+        this._trigger( "loadstart", window.event );
+      }
+      this._loadCount++;
+    },
+
+    _requestComplete: function ( ) {
+      this._loadCount--;
+      if ( this._loadCount <= 0 ) {
+        this._loadCount = 0;
+        this._trigger( "loadend", window.event );
       }
     },
 
@@ -6243,14 +6304,18 @@ $.Widget.prototype = {
         }
       },
 
-      refresh: function (map, service) {
+      refresh: function (map, service, force) {
         //console.log( "tiled.refresh( " + map._center.join( ", " ) + ", " + map._pixelSize + ")" );
         var serviceState = $.data( service, "geoServiceState" );
 
         this._cancelUnloaded(map, service);
 
-        if ( serviceState && service && service.style.visibility === "visible" && !( serviceState.serviceContainer.is( ":hidden" ) ) ) {
+        if ( serviceState && force ) {
+          // if hidden atm, we want to make sure we reload this service after it becomes visible
+          serviceState.reloadTiles = true;
+        }
 
+        if ( serviceState && service && service.style.visibility === "visible" && !( serviceState.serviceContainer.is( ":hidden" ) ) ) {
           var bbox = map._getBbox(),
               pixelSize = map._pixelSize,
 
@@ -6295,12 +6360,13 @@ $.Widget.prototype = {
               loadImageDeferredDone = function( url ) {
                 // when a Deferred call is done, add the image to the map
                 // a reference to the correct img element is on the Deferred object itself
-                serviceObj._loadImage( $.data( this, "img" ), url, pixelSize, serviceState, $serviceContainer, opacity );
+                serviceObj._loadImage( $.data( this, "img" ), url, map, serviceState, opacity );
               },
 
               loadImageDeferredFail = function( ) {
                 $.data( this, "img" ).remove( );
                 serviceState.loadCount--;
+                map._requestComplete();
               };
 
           if (serviceState.reloadTiles) {
@@ -6373,7 +6439,7 @@ $.Widget.prototype = {
                 }
 
                 serviceState.loadCount++;
-                //this._map._requestQueued();
+                map._requestQueued();
 
                 if (serviceState.reloadTiles && $img.size() > 0) {
                   $img.attr("src", imageUrl);
@@ -6398,7 +6464,7 @@ $.Widget.prototype = {
                 }
 
                 if ( typeof imageUrl === "string" ) {
-                  serviceObj._loadImage( $img, imageUrl, pixelSize, serviceState, $serviceContainer, opacity );
+                  serviceObj._loadImage( $img, imageUrl, pixelSize, map, serviceState, opacity );
                 } else if ( imageUrl ) {
                   // assume Deferred
                   $.data( imageUrl, "img", $img );
@@ -6435,11 +6501,14 @@ $.Widget.prototype = {
           serviceState.serviceContainer.find("img:hidden").remove();
           while (serviceState.loadCount > 0) {
             serviceState.loadCount--;
+            map._requestComplete();
           }
         }
       },
 
-      _loadImage: function ( $img, url, pixelSize, serviceState, serviceContainer, opacity ) {
+      _loadImage: function ( $img, url, pixelSize, map, serviceState, opacity ) {
+        var serviceContainer = serviceState.serviceContainer;
+
         $img.load(function (e) {
           if (opacity < 1) {
             $(e.target).fadeTo(0, opacity);
@@ -6448,6 +6517,7 @@ $.Widget.prototype = {
           }
 
           serviceState.loadCount--;
+          map._requestComplete();
 
           if (serviceState.loadCount <= 0) {
             serviceContainer.children(":not([data-pixel-size='" + pixelSize + "'])").remove();
@@ -6456,6 +6526,7 @@ $.Widget.prototype = {
         }).error(function (e) {
           $(e.target).remove();
           serviceState.loadCount--;
+          map._requestComplete();
 
           if (serviceState.loadCount <= 0) {
             serviceContainer.children(":not([data-pixel-size='" + pixelSize + "'])").remove();
@@ -6603,20 +6674,21 @@ $.Widget.prototype = {
           }
 
           serviceState.loadCount++;
-          //this._map._requestQueued();
+          map._requestQueued();
 
           scaleContainer.append('<img style="-webkit-transform:translateZ(0);position:absolute; left:' + ( imagePos.left / scaleContainer.width( ) * 100 ) + '%; top:' + ( imagePos.top / scaleContainer.height( ) * 100 ) + '%; width:100%; height:100%; margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;" unselectable="on" />');
           $img = scaleContainer.children(":last").data("center", map._center);
 
           if ( typeof imageUrl === "string" ) {
-            serviceObj._loadImage( $img, imageUrl, pixelSize, serviceState, serviceContainer, opacity );
+            serviceObj._loadImage( $img, imageUrl, pixelSize, map, serviceState, opacity );
           } else {
             // assume Deferred
             imageUrl.done( function( url ) {
-              serviceObj._loadImage( $img, url, pixelSize, serviceState, serviceContainer, opacity );
+              serviceObj._loadImage( $img, url, pixelSize, map, serviceState, opacity );
             } ).fail( function( ) {
               $img.remove( );
               serviceState.loadCount--;
+              map._requestComplete();
             } );
           }
 
@@ -6680,11 +6752,14 @@ $.Widget.prototype = {
           serviceState.serviceContainer.find("img:hidden").remove();
           while (serviceState.loadCount > 0) {
             serviceState.loadCount--;
+            map._requestComplete();
           }
         }
       },
 
-      _loadImage: function ( $img, url, pixelSize, serviceState, serviceContainer, opacity ) {
+      _loadImage: function ( $img, url, pixelSize, map, serviceState, opacity ) {
+        var serviceContainer = serviceState.serviceContainer;
+
         $img.load(function (e) {
           if (opacity < 1) {
             $(e.target).fadeTo(0, opacity);
@@ -6693,6 +6768,7 @@ $.Widget.prototype = {
           }
 
           serviceState.loadCount--;
+          map._requestComplete();
 
           if (serviceState.loadCount <= 0) {
             // #newpanzoom
@@ -6705,6 +6781,7 @@ $.Widget.prototype = {
         }).error(function (e) {
           $(e.target).remove();
           serviceState.loadCount--;
+          map._requestComplete();
 
           if (serviceState.loadCount <= 0) {
             serviceContainer.children(":not([data-pixel-size='" + pixelSize + "'])").remove();

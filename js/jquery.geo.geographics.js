@@ -18,7 +18,7 @@
     _$canvas: undefined,
     _context: undefined,
 
-    _$blitcanvas: undefined,
+    _blitcanvas: undefined,
     _blitcontext: undefined,
 
     _$labelsContainer: undefined,
@@ -68,9 +68,10 @@
         this._$canvas = this._$elem.children(':last');
         this._context = this._$canvas[0].getContext("2d");
 
-        this._$elem.append('<canvas ' + sizeAttr + ' style="' + posCss + ' visibility: hidden;"></canvas>');
-        this._$blitcanvas = this._$elem.children(':last');
-        this._blitcontext = this._$blitcanvas[0].getContext("2d");
+        this._blitcanvas = document.createElement( "canvas" );
+        this._blitcanvas.width = this._width;
+        this._blitcanvas.height = this._height;
+        this._blitcontext = this._blitcanvas.getContext("2d");
       } else if (_ieVersion <= 8) {
         this._trueCanvas = false;
         this._$elem.append( '<div ' + sizeAttr + ' style="' + posCss + sizeCss + '"></div>');
@@ -282,7 +283,7 @@
           pixelBbox[ 2 ] = Math.min( pixelBbox[ 2 ], this._width );
           pixelBbox[ 3 ] = Math.min( pixelBbox[ 3 ], this._height );
 
-          this._context.drawImage(this._$blitcanvas[ 0 ], pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ], pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ] );
+          this._context.drawImage(this._blitcanvas, pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ], pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ] );
         }
       }
     },
