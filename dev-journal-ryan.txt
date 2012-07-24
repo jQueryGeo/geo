@@ -1,8 +1,6 @@
 ﻿== to do ==
 
 === b1 ===
-* geomap - allow append to take an array of shapes
-* geomap - allow remove to take an array of shapes
 * geomap - zoomMax option
 * geomap - [bug] tiled services with pixelSizes set do not render zoom level 0, when src is a template string
 
@@ -216,6 +214,9 @@ I'm going to see if I can set jQuery Geo up to load tiles faster on faster brows
 
 ===click===
 The y value of a clicked coordinate is off a little. I'm creating a jsFiddle to find out what's up. It's not off. Something in their website is messing up my calculations for map point location.
+
+===refresh===
+Wow, I didn't notice until now that the new interactiveTransform code wasn't triggering refresh if the user was moving the mouse, even if they weren't actively panning. That's a good one to not have in b1 :)
 
 ==2012-07-22==
 ===force===

@@ -115,7 +115,7 @@ $(function () {
       if ( map.geomap( "option", "mode" ) == "remove" ) {
         // when the user clicks the map while in our custom mode, remove,
         // we will search for shapes on either the map widget itself
-        // ( and, by design, all map services) or a single, specific map service
+        // (and, by design, all map services) or a single, specific map service
 
         // we'll use a nice, fat 5px radius for the searches here, that's what the (, 5) is below
 
@@ -132,9 +132,9 @@ $(function () {
 
         // even though we potentially found service-level shapes with the find method,
         // calling remove on the map does not remove from all services
-        $.each( shapes, function( ) {
-          target.geomap( "remove", this );
-        } );
+        // however, here we're calling remove on the same target where we found the shapes
+        // (note: remove can take an array of shapes, which the find method returns)
+        target.geomap( "remove", shapes );
       }
     }
   } );

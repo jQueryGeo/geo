@@ -603,7 +603,7 @@
     },
 
     append: function ( shape, style, label, refresh ) {
-      if ( shape && $.isPlainObject( shape ) ) {
+      if ( shape && ( $.isPlainObject( shape ) || ( $.isArray( shape ) && shape.length > 0 ) ) ) {
         if ( !this._createdGraphics ) {
           var $contentFrame = this._$elem.closest( ".geo-content-frame" );
           this._$elem.append('<div class="geo-shapes-container" style="position:absolute; left:0; top:0; width:' + $contentFrame.css( "width" ) + '; height:' + $contentFrame.css( "height" ) + '; margin:0; padding:0;"></div>');
@@ -619,10 +619,12 @@
 
         var shapes, arg, i, realStyle, realLabel, realRefresh;
 
-        if ( shape.type == "FeatureCollection" ) {
+        if ( $.isArray( shape ) ) {
+          shapes = shape;
+        } else if ( shape.type == "FeatureCollection" ) {
           shapes = shape.features;
         } else {
-          shapes = $.isArray( shape ) ? shape : [ shape ];
+          shapes = [ shape ];
         }
 
         for ( i = 1; i < arguments.length; i++ ) {
@@ -739,21 +741,26 @@
     },
 
     remove: function ( shape, refresh ) {
-      for ( var i = 0; i < this._graphicShapes.length; i++ ) {
-        if ( this._graphicShapes[ i ].shape == shape ) {
-          $.removeData( shape, "geoBbox" );
-          var rest = this._graphicShapes.slice( i + 1 );
-          this._graphicShapes.length = i;
-          this._graphicShapes.push.apply( this._graphicShapes, rest );
-          break;
-        }
-      }
+      if ( shape && ( $.isPlainObject( shape ) || ( $.isArray( shape ) && shape.length > 0 ) ) ) {
+        var shapes = $.isArray( shape ) ? shape : [ shape ],
+            rest;
 
-      if ( refresh === undefined || refresh ) {
-        if ( this._$elem.is( ".geo-service" ) ) {
-          this._refresh( false, this._$elem );
-        } else {
-          this._refresh( );
+        for ( var i = 0; i < this._graphicShapes.length; i++ ) {
+          if ( $.inArray( this._graphicShapes[ i ].shape, shapes ) >= 0 ) {
+            $.removeData( shape, "geoBbox" );
+            rest = this._graphicShapes.slice( i + 1 );
+            this._graphicShapes.length = i;
+            this._graphicShapes.push.apply( this._graphicShapes, rest );
+            i--;
+          }
+        }
+
+        if ( refresh === undefined || refresh ) {
+          if ( this._$elem.is( ".geo-service" ) ) {
+            this._refresh( false, this._$elem );
+          } else {
+            this._refresh( );
+          }
         }
       }
     },

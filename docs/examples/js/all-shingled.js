@@ -131,9 +131,9 @@ $(function () {
 
         // even though we potentially found service-level shapes with the find method,
         // calling remove on the map does not remove from all services
-        $.each( shapes, function( ) {
-          target.geomap( "remove", this );
-        } );
+        // however, here we're calling remove on the same target where we found the shapes
+        // (note: remove can take an array of shapes, which the find method returns)
+        target.geomap( "remove", shapes );
       }
     }
   } );
