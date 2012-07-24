@@ -929,7 +929,8 @@
         }
       }
 
-      this._$shapesContainers = jQuery();
+      // start with our map-level shapesContainer
+      this._$shapesContainers = this._$shapesContainer;
 
       this._$attrList.find( "a" ).css( {
         position: "relative",
