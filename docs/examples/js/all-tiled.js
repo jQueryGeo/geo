@@ -54,6 +54,9 @@ $(function () {
     center: [ -89.34, 38.84 ],
     zoom: 5,
 
+    // the speedtest service only supports up to zoom level 10
+    zoomMax: 10,
+
     loadstart: function( ) {
       // we can show an indicator when the map widget is loading images via the loadstart event
       $("#indicator").show( );

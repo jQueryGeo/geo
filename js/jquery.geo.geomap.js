@@ -53,6 +53,7 @@
         },
         axisLayout: "map",
         zoom: 0,
+        zoomMax: Number.POSITIVE_INFINITY,
         pixelSize: 0
       };
 
@@ -290,6 +291,9 @@
         if (this._initOptions.center) {
           this._setOption("center", this._initOptions.center, false);
         }
+        if (this._initOptions.zoomMax !== undefined) {
+          this._setOption("zoomMax", this._initOptions.zoomMax, false);
+        }
         if (this._initOptions.zoom !== undefined) {
           this._setOption("zoom", this._initOptions.zoom, false);
         }
@@ -333,12 +337,16 @@
           center = [value[0] + (value[2] - value[0]) / 2, value[1] + (value[3] - value[1]) / 2];
           pixelSize = Math.max($.geo.width(value, true) / this._contentBounds.width, $.geo.height(value, true) / this._contentBounds.height);
 
+          // clamp to zoom
+          zoom = this._getZoom( center, pixelSize );
+
           if (this._options["tilingScheme"]) {
-            zoom = this._getZoom( center, pixelSize );
             pixelSize = this._getPixelSize( zoom );
           } else {
-            if ( this._getZoom( center, pixelSize ) < 0 ) {
+            if ( zoom < 0 ) {
               pixelSize = this._pixelSizeMax;
+            } else if ( zoom > this._options[ "zoomMax" ] ) {
+              pixelSize = this._getPixelSize( this._options[ "zoomMax" ] );
             }
           }
 
@@ -825,27 +833,27 @@
 
           for ( ; i >= 0; i-- ) {
             if ( Math.floor( tilingScheme.pixelSizes[ i ] * 1000 ) >= roundedPixelSize ) {
-              return i;
+              return Math.min( i, this._options[ "zoomMax" ] );
             }
           }
 
           return 0;
         } else {
-          return Math.max( Math.round( Math.log( tilingScheme.basePixelSize / pixelSize) / Math.log( 2 ) ), 0 );
+          return Math.min( Math.max( Math.round( Math.log( tilingScheme.basePixelSize / pixelSize) / Math.log( 2 ) ), 0 ), this._options[ "zoomMax" ] );
         }
       } else {
         var ratio = this._contentBounds["width"] / this._contentBounds["height"],
             bbox = $.geo.reaspect( this._getBbox( center, pixelSize ), ratio, true ),
             bboxMax = $.geo.reaspect(this._getBboxMax(), ratio, true);
 
-        return Math.max( Math.round( Math.log($.geo.width(bboxMax, true) / $.geo.width(bbox, true)) / Math.log(this._zoomFactor) ), 0 );
+        return Math.min( Math.max( Math.round( Math.log($.geo.width(bboxMax, true) / $.geo.width(bbox, true)) / Math.log(this._zoomFactor) ), 0 ), this._options[ "zoomMax" ] );
       }
     },
 
     _setZoom: function ( value, trigger, refresh ) {
       this._clearInteractiveTimeout( );
 
-      value = Math.max( value, 0 );
+      value = Math.min( Math.max( value, 0 ), this._options[ "zoomMax" ] );
       this._setInteractiveCenterAndSize( this._center, this._getPixelSize( value ) );
       this._interactiveTransform( );
 

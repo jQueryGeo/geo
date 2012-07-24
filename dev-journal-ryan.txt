@@ -218,6 +218,9 @@ The y value of a clicked coordinate is off a little. I'm creating a jsFiddle to 
 ===refresh===
 Wow, I didn't notice until now that the new interactiveTransform code wasn't triggering refresh if the user was moving the mouse, even if they weren't actively panning. That's a good one to not have in b1 :)
 
+===zoomMax===
+I have too much redundant code calculating/testing agains zoomMax. I need to specify which functions don't test agains it. Likely _getPixelSize should not but _getZoom should.
+
 ==2012-07-22==
 ===force===
 There is code from our original implementation to reload tiles. It is no longer being triggered. I'm wondering if I should remove it. There is also code for dirty tiles. They are removed at the end of refresh. I'm not sure I need to keep that code in there because I don't think it's being triggered either.

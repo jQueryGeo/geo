@@ -14,6 +14,7 @@ $(function () {
 
   // define two shingled services
   var services = [
+  /*
     // define a basemap service
     {
       id: "massgis_basemap",
@@ -21,6 +22,7 @@ $(function () {
       src: "http://giswebservices.massgis.state.ma.us/geoserver/wms?LAYERS=massgis_basemap&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&FORMAT=image%2Fpng&SRS=EPSG%3A26986&BBOX={{:bbox}}&WIDTH={{:width}}&HEIGHT={{:height}}",
       attr: "&copy; 2011 Commonwealth of Massachusetts"
     },
+    */
 
     // define a second service as a layer on top of the basemap
     // we use this service as the target when "target" is set to service in this demo
@@ -52,6 +54,9 @@ $(function () {
     // center & zoom values that fit MassGIS's projection
     center: [ 235670.21967, 900771.290247 ],
     zoom: 4,
+
+    // the Charles River is too large after zoom level 8
+    zoomMax: 8,
 
     loadstart: function( ) {
       // we can show an indicator when the map widget is loading images via the loadstart event
