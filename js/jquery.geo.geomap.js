@@ -61,6 +61,7 @@
     _$elem: undefined, //< map div for maps, service div for services
     _map: undefined, //< only defined in services
     _created: false,
+    _createdGraphics: false,
     _widgetId: 0,
     _tmplLengthId: "",
     _tmplAreaId: "",
@@ -74,10 +75,10 @@
     _$existingChildren: undefined,
     _$attrList: undefined,
     _$servicesContainer: undefined,
-    _$servicesShapesContainers: undefined,
+    _$shapesContainers: undefined, //< all shapesContainer divs (map only)
 
     _$panContainer: undefined, //< all non-service elements that move while panning
-    _$shapesContainer: undefined,
+    _$shapesContainer: undefined, //< just "our" shapesContainer div (map & service)
     _$drawContainer: undefined,
     _$measureContainer: undefined,
     _$measureLabel: undefined,
@@ -97,6 +98,8 @@
     _pixelSizeInteractive: undefined,
     _timeoutInteractive: null,
     _triggerInteractive: false,
+
+    _loadCount: 0,
 
     _wheelTimeout: null,
     _wheelLevel: 0,
@@ -151,9 +154,6 @@
       this._$elem = $(element);
 
       if (this._$elem.is(".geo-service")) {
-        var $contentFrame = this._$elem.closest( ".geo-content-frame" );
-        this._$elem.append('<div class="geo-shapes-container" style="position:absolute; left:0; top:0; width:' + $contentFrame.css( "width" ) + '; height:' + $contentFrame.css( "height" ) + '; margin:0; padding:0;"></div>');
-        this._$shapesContainer = this._$elem.children(':last');
         this._graphicShapes = [];
         $.Widget.prototype._createWidget.apply(this, arguments);
         return;
@@ -223,8 +223,7 @@
 
       if (this._$elem.is(".geo-service")) {
         this._map = this._$elem.data( "geoMap" );
-        this._$shapesContainer.geographics( );
-        this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
+        this._$elem.data( "geoService", this );
         return;
       }
 
@@ -267,6 +266,8 @@
       this._options["drawStyle"] = this._$drawContainer.geographics("option", "style");
 
       this._$shapesContainer.geographics( { style: this._initOptions.shapeStyle || { } } );
+      this._createdGraphics = true;
+
       this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
 
       if (this._initOptions) {
@@ -390,7 +391,7 @@
           break;
 
         case "shapeStyle":
-          if (this._$shapesContainer) {
+          if ( this._createdGraphics ) {
             this._$shapesContainer.geographics("option", "style", value);
             value = this._$shapesContainer.geographics("option", "style");
           }
@@ -450,7 +451,7 @@
           break;
 
         case "shapeStyle":
-          if ( refresh ) {
+          if ( refresh && this._createdGraphics ) {
             this._$shapesContainer.geographics("clear");
             this._refreshShapes( this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes );
           }
@@ -460,8 +461,11 @@
 
     destroy: function () {
       if ( this._$elem.is(".geo-service") ) {
-        this._$shapesContainer.geographics("destroy");
-        this._$shapesContainer = undefined;
+        if ( this._createdGraphics ) {
+          this._$shapesContainer.geographics("destroy");
+          this._$shapesContainer = undefined;
+          this._createdGraphics = false;
+        }
       } else {
         clearTimeout( this._timeoutInteractive );
         this._timeoutInteractive = null;
@@ -477,6 +481,8 @@
 
         this._$shapesContainer.geographics("destroy");
         this._$shapesContainer = undefined;
+        this._createdGraphics = false;
+
         this._$drawContainer.geographics("destroy");
         this._$drawContainer = undefined;
 
@@ -553,8 +559,12 @@
       }
     },
 
-    refresh: function ( force ) {
-      this._refresh( force );
+    refresh: function ( force, _serviceContainer ) {
+      if ( this._$elem.is( ".geo-service" ) ) {
+        this._$elem.closest( ".geo-map" ).geomap( "refresh", force, this._$elem );
+      } else {
+        this._refresh( force, _serviceContainer );
+      }
     },
 
     resize: function ( _trigger /* Internal Use Only */ ) {
@@ -594,6 +604,19 @@
 
     append: function ( shape, style, label, refresh ) {
       if ( shape && $.isPlainObject( shape ) ) {
+        if ( !this._createdGraphics ) {
+          var $contentFrame = this._$elem.closest( ".geo-content-frame" );
+          this._$elem.append('<div class="geo-shapes-container" style="position:absolute; left:0; top:0; width:' + $contentFrame.css( "width" ) + '; height:' + $contentFrame.css( "height" ) + '; margin:0; padding:0;"></div>');
+          this._$shapesContainer = this._$elem.children(':last');
+
+          this._map._$shapesContainers = this._map._$shapesContainers.add( this._$shapesContainer );
+
+          this._$shapesContainer.geographics( );
+          this._createdGraphics = true;
+
+          this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
+        }
+
         var shapes, arg, i, realStyle, realLabel, realRefresh;
 
         if ( shape.type == "FeatureCollection" ) {
@@ -631,7 +654,11 @@
         }
 
         if ( realRefresh === undefined || realRefresh ) {
-          this._refresh( );
+          if ( this._$elem.is( ".geo-service" ) ) {
+            this._refresh( false, this._$elem );
+          } else {
+            this._refresh( );
+          }
         }
       }
     },
@@ -644,7 +671,11 @@
       this._graphicShapes = [];
 
       if ( refresh === undefined || refresh ) {
-        this._refresh();
+        if ( this._$elem.is( ".geo-service" ) ) {
+          this._refresh( false, this._$elem );
+        } else {
+          this._refresh( );
+        }
       }
     },
 
@@ -719,7 +750,11 @@
       }
 
       if ( refresh === undefined || refresh ) {
-        this._refresh();
+        if ( this._$elem.is( ".geo-service" ) ) {
+          this._refresh( false, this._$elem );
+        } else {
+          this._refresh( );
+        }
       }
     },
 
@@ -883,7 +918,7 @@
 
         this._$servicesContainer.append( scHtml );
         serviceContainer = this._$servicesContainer.children( ":last" );
-        this._currentServices[ i ].serviceContainer = serviceContainer;
+        service.serviceContainer = serviceContainer;
         
         $.geo[ "_serviceTypes" ][ service.type ].create( this, serviceContainer, service, i );
 
@@ -894,7 +929,7 @@
         }
       }
 
-      this._$servicesShapesContainers = this._$elem.find( ".geo-shapes-container" );
+      this._$shapesContainers = jQuery();
 
       this._$attrList.find( "a" ).css( {
         position: "relative",
@@ -1201,8 +1236,8 @@
     },
 
     _interactiveTransform: function( ) {
-      if ( this._$servicesShapesContainers ) {
-        this._$servicesShapesContainers.geographics("clear");
+      if ( this._$shapesContainers ) {
+        this._$shapesContainers.geographics("clear");
       }
 
       for ( var i = 0; i < this._currentServices.length; i++ ) {
@@ -1224,31 +1259,41 @@
           geomap._timeoutInteractive = null;
           geomap._triggerInteractive = false;
         }
-      }, 256 );
+      }, 500 );
       this._triggerInteractive |= trigger;
     },
 
-    _refresh: function ( force ) {
+    _refresh: function ( force, _serviceContainer ) {
+      //var profileStart = $.now();
+
       var service,
+          geoService,
           i = 0;
 
-      if ( this._$elem.is( ".geo-map" ) ) {
-        for ( ; i < this._currentServices.length; i++ ) {
-          service = this._currentServices[ i ];
+      for ( ; i < this._currentServices.length; i++ ) {
+        service = this._currentServices[ i ];
+        if ( !_serviceContainer || service.serviceContainer[ 0 ] == _serviceContainer[ 0 ] ) {
+          $.geo[ "_serviceTypes" ][ service.type ].refresh( this, service, force );
+          geoService = service.serviceContainer.data( "geoService" );
 
-          if ( $.geo[ "_serviceTypes" ][ service.type ] !== null ) {
-            $.geo[ "_serviceTypes" ][ service.type ].refresh( this, service );
-            service.serviceContainer.geomap( "refresh" );
+          if ( geoService._createdGraphics ) {
+            geoService._$shapesContainer.geographics( "clear" );
+            if ( geoService._graphicShapes.length > 0 ) {
+              geoService._refreshShapes( geoService._$shapesContainer, geoService._graphicShapes, geoService._graphicShapes, geoService._graphicShapes );
+            }
           }
         }
       }
 
-      if ( this._$shapesContainer ) {
+      if ( this._createdGraphics ) {
         this._$shapesContainer.geographics( "clear" );
         if ( this._graphicShapes.length > 0 ) {
           this._refreshShapes( this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes );
         }
       }
+
+      //var profileLen = $.now() - profileStart;
+      //$("h1").text("load: " + profileLen + "ms");
     },
 
     _setInteractiveCenterAndSize: function ( center, pixelSize ) {
@@ -1309,6 +1354,21 @@
       if (refresh) {
         this._refresh();
         this._refreshDrawing();
+      }
+    },
+
+    _requestQueued: function ( ) {
+      if ( this._loadCount === 0 ) {
+        this._trigger( "loadstart", window.event );
+      }
+      this._loadCount++;
+    },
+
+    _requestComplete: function ( ) {
+      this._loadCount--;
+      if ( this._loadCount <= 0 ) {
+        this._loadCount = 0;
+        this._trigger( "loadend", window.event );
       }
     },
 
