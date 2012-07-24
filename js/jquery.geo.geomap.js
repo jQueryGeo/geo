@@ -1264,6 +1264,8 @@
     },
 
     _refresh: function ( force, _serviceContainer ) {
+      //var profileStart = $.now();
+
       var service,
           geoService,
           i = 0;
@@ -1289,6 +1291,9 @@
           this._refreshShapes( this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes );
         }
       }
+
+      //var profileLen = $.now() - profileStart;
+      //$("h1").text("load: " + profileLen + "ms");
     },
 
     _setInteractiveCenterAndSize: function ( center, pixelSize ) {
@@ -1361,7 +1366,8 @@
 
     _requestComplete: function ( ) {
       this._loadCount--;
-      if ( this._loadCount === 0 ) {
+      if ( this._loadCount <= 0 ) {
+        this._loadCount = 0;
         this._trigger( "loadend", window.event );
       }
     },

@@ -134,20 +134,21 @@
           }
 
           serviceState.loadCount++;
-          //this._map._requestQueued();
+          map._requestQueued();
 
           scaleContainer.append('<img style="-webkit-transform:translateZ(0);position:absolute; left:' + ( imagePos.left / scaleContainer.width( ) * 100 ) + '%; top:' + ( imagePos.top / scaleContainer.height( ) * 100 ) + '%; width:100%; height:100%; margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;" unselectable="on" />');
           $img = scaleContainer.children(":last").data("center", map._center);
 
           if ( typeof imageUrl === "string" ) {
-            serviceObj._loadImage( $img, imageUrl, pixelSize, serviceState, serviceContainer, opacity );
+            serviceObj._loadImage( $img, imageUrl, pixelSize, map, serviceState, opacity );
           } else {
             // assume Deferred
             imageUrl.done( function( url ) {
-              serviceObj._loadImage( $img, url, pixelSize, serviceState, serviceContainer, opacity );
+              serviceObj._loadImage( $img, url, pixelSize, map, serviceState, opacity );
             } ).fail( function( ) {
               $img.remove( );
               serviceState.loadCount--;
+              map._requestComplete();
             } );
           }
 
@@ -211,11 +212,14 @@
           serviceState.serviceContainer.find("img:hidden").remove();
           while (serviceState.loadCount > 0) {
             serviceState.loadCount--;
+            map._requestComplete();
           }
         }
       },
 
-      _loadImage: function ( $img, url, pixelSize, serviceState, serviceContainer, opacity ) {
+      _loadImage: function ( $img, url, pixelSize, map, serviceState, opacity ) {
+        var serviceContainer = serviceState.serviceContainer;
+
         $img.load(function (e) {
           if (opacity < 1) {
             $(e.target).fadeTo(0, opacity);
@@ -224,6 +228,7 @@
           }
 
           serviceState.loadCount--;
+          map._requestComplete();
 
           if (serviceState.loadCount <= 0) {
             // #newpanzoom
@@ -236,6 +241,7 @@
         }).error(function (e) {
           $(e.target).remove();
           serviceState.loadCount--;
+          map._requestComplete();
 
           if (serviceState.loadCount <= 0) {
             serviceContainer.children(":not([data-pixel-size='" + pixelSize + "'])").remove();

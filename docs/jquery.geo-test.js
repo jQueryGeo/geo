@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0.0b1 - 2012-07-22
+/*! jQuery Geo - v1.0.0b1 - 2012-07-24
  * http://jquerygeo.com
  * Copyright (c) 2012 Ryan Westphal/Applied Geographics, Inc.; Licensed MIT, GPL */
 
@@ -4180,6 +4180,8 @@ $.Widget.prototype = {
     _timeoutInteractive: null,
     _triggerInteractive: false,
 
+    _loadCount: 0,
+
     _wheelTimeout: null,
     _wheelLevel: 0,
 
@@ -5343,6 +5345,8 @@ $.Widget.prototype = {
     },
 
     _refresh: function ( force, _serviceContainer ) {
+      //var profileStart = $.now();
+
       var service,
           geoService,
           i = 0;
@@ -5368,6 +5372,9 @@ $.Widget.prototype = {
           this._refreshShapes( this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes );
         }
       }
+
+      //var profileLen = $.now() - profileStart;
+      //$("h1").text("load: " + profileLen + "ms");
     },
 
     _setInteractiveCenterAndSize: function ( center, pixelSize ) {
@@ -5428,6 +5435,21 @@ $.Widget.prototype = {
       if (refresh) {
         this._refresh();
         this._refreshDrawing();
+      }
+    },
+
+    _requestQueued: function ( ) {
+      if ( this._loadCount === 0 ) {
+        this._trigger( "loadstart", window.event );
+      }
+      this._loadCount++;
+    },
+
+    _requestComplete: function ( ) {
+      this._loadCount--;
+      if ( this._loadCount <= 0 ) {
+        this._loadCount = 0;
+        this._trigger( "loadend", window.event );
       }
     },
 
@@ -6338,12 +6360,13 @@ $.Widget.prototype = {
               loadImageDeferredDone = function( url ) {
                 // when a Deferred call is done, add the image to the map
                 // a reference to the correct img element is on the Deferred object itself
-                serviceObj._loadImage( $.data( this, "img" ), url, pixelSize, serviceState, $serviceContainer, opacity );
+                serviceObj._loadImage( $.data( this, "img" ), url, map, serviceState, opacity );
               },
 
               loadImageDeferredFail = function( ) {
                 $.data( this, "img" ).remove( );
                 serviceState.loadCount--;
+                map._requestComplete();
               };
 
           if (serviceState.reloadTiles) {
@@ -6416,7 +6439,7 @@ $.Widget.prototype = {
                 }
 
                 serviceState.loadCount++;
-                //this._map._requestQueued();
+                map._requestQueued();
 
                 if (serviceState.reloadTiles && $img.size() > 0) {
                   $img.attr("src", imageUrl);
@@ -6441,7 +6464,7 @@ $.Widget.prototype = {
                 }
 
                 if ( typeof imageUrl === "string" ) {
-                  serviceObj._loadImage( $img, imageUrl, pixelSize, serviceState, $serviceContainer, opacity );
+                  serviceObj._loadImage( $img, imageUrl, pixelSize, map, serviceState, opacity );
                 } else if ( imageUrl ) {
                   // assume Deferred
                   $.data( imageUrl, "img", $img );
@@ -6478,11 +6501,14 @@ $.Widget.prototype = {
           serviceState.serviceContainer.find("img:hidden").remove();
           while (serviceState.loadCount > 0) {
             serviceState.loadCount--;
+            map._requestComplete();
           }
         }
       },
 
-      _loadImage: function ( $img, url, pixelSize, serviceState, serviceContainer, opacity ) {
+      _loadImage: function ( $img, url, pixelSize, map, serviceState, opacity ) {
+        var serviceContainer = serviceState.serviceContainer;
+
         $img.load(function (e) {
           if (opacity < 1) {
             $(e.target).fadeTo(0, opacity);
@@ -6491,6 +6517,7 @@ $.Widget.prototype = {
           }
 
           serviceState.loadCount--;
+          map._requestComplete();
 
           if (serviceState.loadCount <= 0) {
             serviceContainer.children(":not([data-pixel-size='" + pixelSize + "'])").remove();
@@ -6499,6 +6526,7 @@ $.Widget.prototype = {
         }).error(function (e) {
           $(e.target).remove();
           serviceState.loadCount--;
+          map._requestComplete();
 
           if (serviceState.loadCount <= 0) {
             serviceContainer.children(":not([data-pixel-size='" + pixelSize + "'])").remove();
@@ -6646,20 +6674,21 @@ $.Widget.prototype = {
           }
 
           serviceState.loadCount++;
-          //this._map._requestQueued();
+          map._requestQueued();
 
           scaleContainer.append('<img style="-webkit-transform:translateZ(0);position:absolute; left:' + ( imagePos.left / scaleContainer.width( ) * 100 ) + '%; top:' + ( imagePos.top / scaleContainer.height( ) * 100 ) + '%; width:100%; height:100%; margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;" unselectable="on" />');
           $img = scaleContainer.children(":last").data("center", map._center);
 
           if ( typeof imageUrl === "string" ) {
-            serviceObj._loadImage( $img, imageUrl, pixelSize, serviceState, serviceContainer, opacity );
+            serviceObj._loadImage( $img, imageUrl, pixelSize, map, serviceState, opacity );
           } else {
             // assume Deferred
             imageUrl.done( function( url ) {
-              serviceObj._loadImage( $img, url, pixelSize, serviceState, serviceContainer, opacity );
+              serviceObj._loadImage( $img, url, pixelSize, map, serviceState, opacity );
             } ).fail( function( ) {
               $img.remove( );
               serviceState.loadCount--;
+              map._requestComplete();
             } );
           }
 
@@ -6723,11 +6752,14 @@ $.Widget.prototype = {
           serviceState.serviceContainer.find("img:hidden").remove();
           while (serviceState.loadCount > 0) {
             serviceState.loadCount--;
+            map._requestComplete();
           }
         }
       },
 
-      _loadImage: function ( $img, url, pixelSize, serviceState, serviceContainer, opacity ) {
+      _loadImage: function ( $img, url, pixelSize, map, serviceState, opacity ) {
+        var serviceContainer = serviceState.serviceContainer;
+
         $img.load(function (e) {
           if (opacity < 1) {
             $(e.target).fadeTo(0, opacity);
@@ -6736,6 +6768,7 @@ $.Widget.prototype = {
           }
 
           serviceState.loadCount--;
+          map._requestComplete();
 
           if (serviceState.loadCount <= 0) {
             // #newpanzoom
@@ -6748,6 +6781,7 @@ $.Widget.prototype = {
         }).error(function (e) {
           $(e.target).remove();
           serviceState.loadCount--;
+          map._requestComplete();
 
           if (serviceState.loadCount <= 0) {
             serviceContainer.children(":not([data-pixel-size='" + pixelSize + "'])").remove();

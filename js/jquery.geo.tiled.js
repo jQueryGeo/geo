@@ -130,6 +130,7 @@
               loadImageDeferredFail = function( ) {
                 $.data( this, "img" ).remove( );
                 serviceState.loadCount--;
+                map._requestComplete();
               };
 
           if (serviceState.reloadTiles) {
@@ -264,6 +265,7 @@
           serviceState.serviceContainer.find("img:hidden").remove();
           while (serviceState.loadCount > 0) {
             serviceState.loadCount--;
+            map._requestComplete();
           }
         }
       },
@@ -279,6 +281,7 @@
           }
 
           serviceState.loadCount--;
+          map._requestComplete();
 
           if (serviceState.loadCount <= 0) {
             serviceContainer.children(":not([data-pixel-size='" + pixelSize + "'])").remove();
@@ -287,7 +290,7 @@
         }).error(function (e) {
           $(e.target).remove();
           serviceState.loadCount--;
-          map._requestCompleted();
+          map._requestComplete();
 
           if (serviceState.loadCount <= 0) {
             serviceContainer.children(":not([data-pixel-size='" + pixelSize + "'])").remove();
