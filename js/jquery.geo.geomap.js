@@ -1266,8 +1266,6 @@
     },
 
     _refresh: function ( force, _serviceContainer ) {
-      //var profileStart = $.now();
-
       var service,
           geoService,
           i = 0;
@@ -1293,9 +1291,6 @@
           this._refreshShapes( this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes );
         }
       }
-
-      //var profileLen = $.now() - profileStart;
-      //$("h1").text("load: " + profileLen + "ms");
     },
 
     _setInteractiveCenterAndSize: function ( center, pixelSize ) {
@@ -1666,7 +1661,10 @@
         return;
       }
 
-      var doInteractiveTimeout = this._clearInteractiveTimeout( );
+      var doInteractiveTimeout = false;
+      if ( this._mouseDown ) {
+        doInteractiveTimeout = this._clearInteractiveTimeout( );
+      }
 
       var offset = this._$eventTarget.offset(),
           drawCoordsLen = this._drawCoords.length,

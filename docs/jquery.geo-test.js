@@ -5747,7 +5747,10 @@ $.Widget.prototype = {
         return;
       }
 
-      var doInteractiveTimeout = this._clearInteractiveTimeout( );
+      var doInteractiveTimeout = false;
+      if ( this._mouseDown ) {
+        doInteractiveTimeout = this._clearInteractiveTimeout( );
+      }
 
       var offset = this._$eventTarget.offset(),
           drawCoordsLen = this._drawCoords.length,
