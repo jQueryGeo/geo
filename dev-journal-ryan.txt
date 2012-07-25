@@ -208,6 +208,13 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2012-07-25==
+===zoomMax===
+Only clamp if it's *over* the zoomMax value.
+
+===shapeStyle===
+Since I'm not creating geographics widgets (or elements) for layers during startup, the shapeStyle property doesn't work.
+
 ==2012-07-24==
 ===refresh tiles===
 I'm going to see if I can set jQuery Geo up to load tiles faster on faster browsers. Depending on how fast the initial refresh runs, I can decrease the timout delay.
