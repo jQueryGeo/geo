@@ -1,7 +1,6 @@
 ﻿== to do ==
 
 === b1 ===
-* geomap - zoomMax option
 * geomap - [bug] tiled services with pixelSizes set do not render zoom level 0, when src is a template string
 
 === examples ===
@@ -207,6 +206,10 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-07-26==
+===zoomMax===
+Seems to work ok with tiled & shingled. I think I should document and add zoomMin this weekend.
 
 ==2012-07-25==
 ===zoomMax===

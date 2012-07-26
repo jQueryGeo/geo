@@ -340,12 +340,12 @@
           // clamp to zoom
           zoom = this._getZoom( center, pixelSize );
 
-          if (this._options["tilingScheme"]) {
-            pixelSize = this._getPixelSize( zoom );
+          if ( this._options[ "tilingScheme" ] ) {
+            pixelSize = this._getPixelSize( Math.min( zoom, this._options[ "zoomMax" ] ) );
           } else {
             if ( zoom < 0 ) {
               pixelSize = this._pixelSizeMax;
-            } else if ( zoom > this._options[ "zoomMax" ] ) {
+            } else if ( zoom >= this._options[ "zoomMax" ] ) {
               pixelSize = this._getPixelSize( this._options[ "zoomMax" ] );
             }
           }
@@ -785,14 +785,17 @@
 
     _setBbox: function (value, trigger, refresh) {
       var center = [value[0] + (value[2] - value[0]) / 2, value[1] + (value[3] - value[1]) / 2],
-          pixelSize = Math.max($.geo.width(value, true) / this._contentBounds.width, $.geo.height(value, true) / this._contentBounds.height);
+          pixelSize = Math.max($.geo.width(value, true) / this._contentBounds.width, $.geo.height(value, true) / this._contentBounds.height),
+          zoom = this._getZoom( center, pixelSize );
 
-      if (this._options["tilingScheme"]) {
-        var zoom = this._getZoom( center, pixelSize );
-        pixelSize = this._getPixelSize( zoom );
+      // clamp to zoom
+      if ( this._options[ "tilingScheme" ] ) {
+        pixelSize = this._getPixelSize( Math.min( zoom, this._options[ "zoomMax" ] ) );
       } else {
-        if ( this._getZoom( center, pixelSize ) < 0 ) {
+        if ( zoom < 0 ) {
           pixelSize = this._pixelSizeMax;
+        } else if ( zoom >= this._options[ "zoomMax" ] ) {
+          pixelSize = this._getPixelSize( this._options[ "zoomMax" ] );
         }
       }
 
@@ -820,10 +823,11 @@
     },
 
     _getZoom: function ( center, pixelSize ) {
+      // calculate the internal zoom level, vs. public zoom property
+      // this does not take zoomMax into account
       center = center || this._center;
       pixelSize = pixelSize || this._pixelSize;
 
-      // calculate the internal zoom level, vs. public zoom property
       var tilingScheme = this._options["tilingScheme"];
       if ( tilingScheme ) {
         if ( tilingScheme.pixelSizes ) {
@@ -833,24 +837,25 @@
 
           for ( ; i >= 0; i-- ) {
             if ( Math.floor( tilingScheme.pixelSizes[ i ] * 1000 ) >= roundedPixelSize ) {
-              return Math.min( i, this._options[ "zoomMax" ] );
+              return i;
             }
           }
 
           return 0;
         } else {
-          return Math.min( Math.max( Math.round( Math.log( tilingScheme.basePixelSize / pixelSize) / Math.log( 2 ) ), 0 ), this._options[ "zoomMax" ] );
+          return Math.max( Math.round( Math.log( tilingScheme.basePixelSize / pixelSize) / Math.log( 2 ) ), 0 );
         }
       } else {
         var ratio = this._contentBounds["width"] / this._contentBounds["height"],
             bbox = $.geo.reaspect( this._getBbox( center, pixelSize ), ratio, true ),
             bboxMax = $.geo.reaspect(this._getBboxMax(), ratio, true);
 
-        return Math.min( Math.max( Math.round( Math.log($.geo.width(bboxMax, true) / $.geo.width(bbox, true)) / Math.log(this._zoomFactor) ), 0 ), this._options[ "zoomMax" ] );
+        return Math.max( Math.round( Math.log($.geo.width(bboxMax, true) / $.geo.width(bbox, true)) / Math.log(this._zoomFactor) ), 0 );
       }
     },
 
     _setZoom: function ( value, trigger, refresh ) {
+      // set the map widget's zoom, taking zoomMax into account
       this._clearInteractiveTimeout( );
 
       value = Math.min( Math.max( value, 0 ), this._options[ "zoomMax" ] );
@@ -1154,17 +1159,17 @@
     _getZoomCenterAndSize: function ( anchor, zoomDelta, full ) {
       var zoomFactor = ( full ? this._fullZoomFactor : this._partialZoomFactor ),
           scale = Math.pow( zoomFactor, -zoomDelta ),
-          pixelSize,
-          zoomLevel;
+          pixelSize = this._pixelSizeInteractive * scale,
+          zoom = this._getZoom(this._centerInteractive, pixelSize);
 
+      // clamp to zoom
       if ( full && this._options[ "tilingScheme" ] ) {
-        zoomLevel = this._getZoom(this._centerInteractive, this._pixelSizeInteractive * scale);
-        pixelSize = this._getPixelSize(zoomLevel);
+        pixelSize = this._getPixelSize( Math.min( zoom, this._options[ "zoomMax" ] ) );
       } else {
-        pixelSize = this._pixelSizeInteractive * scale;
-
-        if ( this._getZoom( this._centerInteractive, pixelSize ) < 0 ) {
+        if ( zoom < 0 ) {
           pixelSize = this._pixelSizeMax;
+        } else if ( zoomDelta > 0 && zoom >= this._options[ "zoomMax" ] ) {
+          pixelSize = this._getPixelSize( this._options[ "zoomMax" ] );
         }
       }
 
@@ -1311,6 +1316,7 @@
     _setInteractiveCenterAndSize: function ( center, pixelSize ) {
       // set the temporary (interactive) center & size
       // also, update the public-facing options
+      // this does not take zoomMax into account
       this._centerInteractive[ 0 ] = center[ 0 ];
       this._centerInteractive[ 1 ] = center[ 1 ];
       this._pixelSizeInteractive = pixelSize;
@@ -1335,13 +1341,16 @@
 
       // the final call during any extent change
       // only called by timeoutInteractive & resize
+      // clamp to zoom
+      var zoom = this._getZoom( center, pixelSize );
 
       if ( this._options[ "tilingScheme" ] ) {
-        var zoom = this._getZoom( center, pixelSize );
-        this._pixelSizeInteractive = pixelSize = this._getPixelSize( zoom );
+        this._pixelSizeInteractive = pixelSize = this._getPixelSize( Math.min( zoom, this._options[ "zoomMax" ] ) );
       } else {
-        if ( this._getZoom( center, pixelSize ) < 0 ) {
+        if ( zoom < 0 ) {
           this._pixelSizeInteractive = pixelSize = this._pixelSizeMax;
+        } else if ( zoom >= this._options[ "zoomMax" ] ) {
+          this._pixelSizeInteractive = pixelSize = this._getPixelSize( this._options[ "zoomMax" ] );
         }
       }
 
@@ -1357,7 +1366,7 @@
         this._options["center"] = $.merge( [ ], center );
       }
 
-      this._options["zoom"] = this._getZoom();
+      this._options["zoom"] = zoom; // this._getZoom();
 
       if (trigger) {
         this._trigger("bboxchange", window.event, { bbox: $.merge( [ ], this._options["bbox"] ) });
