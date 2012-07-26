@@ -53,6 +53,7 @@
         },
         axisLayout: "map",
         zoom: 0,
+        zoomMax: Number.POSITIVE_INFINITY,
         pixelSize: 0
       };
 
@@ -290,6 +291,9 @@
         if (this._initOptions.center) {
           this._setOption("center", this._initOptions.center, false);
         }
+        if (this._initOptions.zoomMax !== undefined) {
+          this._setOption("zoomMax", this._initOptions.zoomMax, false);
+        }
         if (this._initOptions.zoom !== undefined) {
           this._setOption("zoom", this._initOptions.zoom, false);
         }
@@ -333,12 +337,16 @@
           center = [value[0] + (value[2] - value[0]) / 2, value[1] + (value[3] - value[1]) / 2];
           pixelSize = Math.max($.geo.width(value, true) / this._contentBounds.width, $.geo.height(value, true) / this._contentBounds.height);
 
-          if (this._options["tilingScheme"]) {
-            zoom = this._getZoom( center, pixelSize );
-            pixelSize = this._getPixelSize( zoom );
+          // clamp to zoom
+          zoom = this._getZoom( center, pixelSize );
+
+          if ( this._options[ "tilingScheme" ] ) {
+            pixelSize = this._getPixelSize( Math.min( zoom, this._options[ "zoomMax" ] ) );
           } else {
-            if ( this._getZoom( center, pixelSize ) < 0 ) {
+            if ( zoom < 0 ) {
               pixelSize = this._pixelSizeMax;
+            } else if ( zoom >= this._options[ "zoomMax" ] ) {
+              pixelSize = this._getPixelSize( this._options[ "zoomMax" ] );
             }
           }
 
@@ -391,6 +399,10 @@
           break;
 
         case "shapeStyle":
+          if ( this._$elem.is( ".geo-service" ) && !this._createdGraphics ) {
+            this._createServiceGraphics( );
+          }
+
           if ( this._createdGraphics ) {
             this._$shapesContainer.geographics("option", "style", value);
             value = this._$shapesContainer.geographics("option", "style");
@@ -603,26 +615,19 @@
     },
 
     append: function ( shape, style, label, refresh ) {
-      if ( shape && $.isPlainObject( shape ) ) {
+      if ( shape && ( $.isPlainObject( shape ) || ( $.isArray( shape ) && shape.length > 0 ) ) ) {
         if ( !this._createdGraphics ) {
-          var $contentFrame = this._$elem.closest( ".geo-content-frame" );
-          this._$elem.append('<div class="geo-shapes-container" style="position:absolute; left:0; top:0; width:' + $contentFrame.css( "width" ) + '; height:' + $contentFrame.css( "height" ) + '; margin:0; padding:0;"></div>');
-          this._$shapesContainer = this._$elem.children(':last');
-
-          this._map._$shapesContainers = this._map._$shapesContainers.add( this._$shapesContainer );
-
-          this._$shapesContainer.geographics( );
-          this._createdGraphics = true;
-
-          this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
+          this._createServiceGraphics( );
         }
 
         var shapes, arg, i, realStyle, realLabel, realRefresh;
 
-        if ( shape.type == "FeatureCollection" ) {
+        if ( $.isArray( shape ) ) {
+          shapes = shape;
+        } else if ( shape.type == "FeatureCollection" ) {
           shapes = shape.features;
         } else {
-          shapes = $.isArray( shape ) ? shape : [ shape ];
+          shapes = [ shape ];
         }
 
         for ( i = 1; i < arguments.length; i++ ) {
@@ -739,21 +744,26 @@
     },
 
     remove: function ( shape, refresh ) {
-      for ( var i = 0; i < this._graphicShapes.length; i++ ) {
-        if ( this._graphicShapes[ i ].shape == shape ) {
-          $.removeData( shape, "geoBbox" );
-          var rest = this._graphicShapes.slice( i + 1 );
-          this._graphicShapes.length = i;
-          this._graphicShapes.push.apply( this._graphicShapes, rest );
-          break;
-        }
-      }
+      if ( shape && ( $.isPlainObject( shape ) || ( $.isArray( shape ) && shape.length > 0 ) ) ) {
+        var shapes = $.isArray( shape ) ? shape : [ shape ],
+            rest;
 
-      if ( refresh === undefined || refresh ) {
-        if ( this._$elem.is( ".geo-service" ) ) {
-          this._refresh( false, this._$elem );
-        } else {
-          this._refresh( );
+        for ( var i = 0; i < this._graphicShapes.length; i++ ) {
+          if ( $.inArray( this._graphicShapes[ i ].shape, shapes ) >= 0 ) {
+            $.removeData( shape, "geoBbox" );
+            rest = this._graphicShapes.slice( i + 1 );
+            this._graphicShapes.length = i;
+            this._graphicShapes.push.apply( this._graphicShapes, rest );
+            i--;
+          }
+        }
+
+        if ( refresh === undefined || refresh ) {
+          if ( this._$elem.is( ".geo-service" ) ) {
+            this._refresh( false, this._$elem );
+          } else {
+            this._refresh( );
+          }
         }
       }
     },
@@ -770,14 +780,17 @@
 
     _setBbox: function (value, trigger, refresh) {
       var center = [value[0] + (value[2] - value[0]) / 2, value[1] + (value[3] - value[1]) / 2],
-          pixelSize = Math.max($.geo.width(value, true) / this._contentBounds.width, $.geo.height(value, true) / this._contentBounds.height);
+          pixelSize = Math.max($.geo.width(value, true) / this._contentBounds.width, $.geo.height(value, true) / this._contentBounds.height),
+          zoom = this._getZoom( center, pixelSize );
 
-      if (this._options["tilingScheme"]) {
-        var zoom = this._getZoom( center, pixelSize );
-        pixelSize = this._getPixelSize( zoom );
+      // clamp to zoom
+      if ( this._options[ "tilingScheme" ] ) {
+        pixelSize = this._getPixelSize( Math.min( zoom, this._options[ "zoomMax" ] ) );
       } else {
-        if ( this._getZoom( center, pixelSize ) < 0 ) {
+        if ( zoom < 0 ) {
           pixelSize = this._pixelSizeMax;
+        } else if ( zoom >= this._options[ "zoomMax" ] ) {
+          pixelSize = this._getPixelSize( this._options[ "zoomMax" ] );
         }
       }
 
@@ -805,10 +818,11 @@
     },
 
     _getZoom: function ( center, pixelSize ) {
+      // calculate the internal zoom level, vs. public zoom property
+      // this does not take zoomMax into account
       center = center || this._center;
       pixelSize = pixelSize || this._pixelSize;
 
-      // calculate the internal zoom level, vs. public zoom property
       var tilingScheme = this._options["tilingScheme"];
       if ( tilingScheme ) {
         if ( tilingScheme.pixelSizes ) {
@@ -836,10 +850,12 @@
     },
 
     _setZoom: function ( value, trigger, refresh ) {
+      // set the map widget's zoom, taking zoomMax into account
       this._clearInteractiveTimeout( );
 
-      value = Math.max( value, 0 );
-      this._setInteractiveCenterAndSize( this._center, value );
+      value = Math.min( Math.max( value, 0 ), this._options[ "zoomMax" ] );
+      this._setInteractiveCenterAndSize( this._center, this._getPixelSize( value ) );
+      this._interactiveTransform( );
 
       this._setInteractiveTimeout( trigger );
     },
@@ -929,12 +945,27 @@
         }
       }
 
-      this._$shapesContainers = jQuery();
+      // start with our map-level shapesContainer
+      this._$shapesContainers = this._$shapesContainer;
 
       this._$attrList.find( "a" ).css( {
         position: "relative",
         zIndex: 100
       } );
+    },
+
+    _createServiceGraphics: function( ) { 
+      // only called in the context of a service-level geomap
+      var $contentFrame = this._$elem.closest( ".geo-content-frame" );
+      this._$elem.append('<div class="geo-shapes-container" style="position:absolute; left:0; top:0; width:' + $contentFrame.css( "width" ) + '; height:' + $contentFrame.css( "height" ) + '; margin:0; padding:0;"></div>');
+      this._$shapesContainer = this._$elem.children(':last');
+
+      this._map._$shapesContainers = this._map._$shapesContainers.add( this._$shapesContainer );
+
+      this._$shapesContainer.geographics( );
+      this._createdGraphics = true;
+
+      this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
     },
 
     _refreshDrawing: function ( ) {
@@ -1137,17 +1168,17 @@
     _getZoomCenterAndSize: function ( anchor, zoomDelta, full ) {
       var zoomFactor = ( full ? this._fullZoomFactor : this._partialZoomFactor ),
           scale = Math.pow( zoomFactor, -zoomDelta ),
-          pixelSize,
-          zoomLevel;
+          pixelSize = this._pixelSizeInteractive * scale,
+          zoom = this._getZoom(this._centerInteractive, pixelSize);
 
+      // clamp to zoom
       if ( full && this._options[ "tilingScheme" ] ) {
-        zoomLevel = this._getZoom(this._centerInteractive, this._pixelSizeInteractive * scale);
-        pixelSize = this._getPixelSize(zoomLevel);
+        pixelSize = this._getPixelSize( Math.min( zoom, this._options[ "zoomMax" ] ) );
       } else {
-        pixelSize = this._pixelSizeInteractive * scale;
-
-        if ( this._getZoom( this._centerInteractive, pixelSize ) < 0 ) {
+        if ( zoom < 0 ) {
           pixelSize = this._pixelSizeMax;
+        } else if ( zoomDelta > 0 && zoom >= this._options[ "zoomMax" ] ) {
+          pixelSize = this._getPixelSize( this._options[ "zoomMax" ] );
         }
       }
 
@@ -1259,13 +1290,11 @@
           geomap._timeoutInteractive = null;
           geomap._triggerInteractive = false;
         }
-      }, 500 );
+      }, 128 );
       this._triggerInteractive |= trigger;
     },
 
     _refresh: function ( force, _serviceContainer ) {
-      //var profileStart = $.now();
-
       var service,
           geoService,
           i = 0;
@@ -1291,14 +1320,12 @@
           this._refreshShapes( this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes );
         }
       }
-
-      //var profileLen = $.now() - profileStart;
-      //$("h1").text("load: " + profileLen + "ms");
     },
 
     _setInteractiveCenterAndSize: function ( center, pixelSize ) {
       // set the temporary (interactive) center & size
       // also, update the public-facing options
+      // this does not take zoomMax into account
       this._centerInteractive[ 0 ] = center[ 0 ];
       this._centerInteractive[ 1 ] = center[ 1 ];
       this._pixelSizeInteractive = pixelSize;
@@ -1323,13 +1350,16 @@
 
       // the final call during any extent change
       // only called by timeoutInteractive & resize
+      // clamp to zoom
+      var zoom = this._getZoom( center, pixelSize );
 
       if ( this._options[ "tilingScheme" ] ) {
-        var zoom = this._getZoom( center, pixelSize );
-        this._pixelSizeInteractive = pixelSize = this._getPixelSize( zoom );
+        this._pixelSizeInteractive = pixelSize = this._getPixelSize( Math.min( zoom, this._options[ "zoomMax" ] ) );
       } else {
-        if ( this._getZoom( center, pixelSize ) < 0 ) {
+        if ( zoom < 0 ) {
           this._pixelSizeInteractive = pixelSize = this._pixelSizeMax;
+        } else if ( zoom >= this._options[ "zoomMax" ] ) {
+          this._pixelSizeInteractive = pixelSize = this._getPixelSize( this._options[ "zoomMax" ] );
         }
       }
 
@@ -1345,7 +1375,7 @@
         this._options["center"] = $.merge( [ ], center );
       }
 
-      this._options["zoom"] = this._getZoom();
+      this._options["zoom"] = zoom; // this._getZoom();
 
       if (trigger) {
         this._trigger("bboxchange", window.event, { bbox: $.merge( [ ], this._options["bbox"] ) });
@@ -1664,7 +1694,10 @@
         return;
       }
 
-      var doInteractiveTimeout = this._clearInteractiveTimeout( );
+      var doInteractiveTimeout = false;
+      if ( this._mouseDown ) {
+        doInteractiveTimeout = this._clearInteractiveTimeout( );
+      }
 
       var offset = this._$eventTarget.offset(),
           drawCoordsLen = this._drawCoords.length,
