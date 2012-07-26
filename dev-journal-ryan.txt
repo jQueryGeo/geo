@@ -1,7 +1,6 @@
 ﻿== to do ==
 
 === b1 ===
-* geomap - [bug] tiled services with pixelSizes set do not render zoom level 0, when src is a template string
 
 === examples ===
 
@@ -210,6 +209,13 @@
 ==2012-07-26==
 ===zoomMax===
 Seems to work ok with tiled & shingled. I think I should document and add zoomMin this weekend.
+
+===pixelSizes===
+That bug where rendering zoom 0 with string src...this one:
+
+* geomap - [bug] tiled services with pixelSizes set do not render zoom level 0, when src is a template string
+
+appears to have been fixed with the latest jsRender for me. Here's a jsFiddle to prove it: http://jsfiddle.net/ryanttb/RNrNC/
 
 ==2012-07-25==
 ===zoomMax===
