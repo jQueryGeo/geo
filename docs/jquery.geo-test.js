@@ -4480,6 +4480,10 @@ $.Widget.prototype = {
           break;
 
         case "shapeStyle":
+          if ( this._$elem.is( ".geo-service" ) && !this._createdGraphics ) {
+            this._createServiceGraphics( );
+          }
+
           if ( this._createdGraphics ) {
             this._$shapesContainer.geographics("option", "style", value);
             value = this._$shapesContainer.geographics("option", "style");
@@ -4694,16 +4698,7 @@ $.Widget.prototype = {
     append: function ( shape, style, label, refresh ) {
       if ( shape && ( $.isPlainObject( shape ) || ( $.isArray( shape ) && shape.length > 0 ) ) ) {
         if ( !this._createdGraphics ) {
-          var $contentFrame = this._$elem.closest( ".geo-content-frame" );
-          this._$elem.append('<div class="geo-shapes-container" style="position:absolute; left:0; top:0; width:' + $contentFrame.css( "width" ) + '; height:' + $contentFrame.css( "height" ) + '; margin:0; padding:0;"></div>');
-          this._$shapesContainer = this._$elem.children(':last');
-
-          this._map._$shapesContainers = this._map._$shapesContainers.add( this._$shapesContainer );
-
-          this._$shapesContainer.geographics( );
-          this._createdGraphics = true;
-
-          this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
+          this._createServiceGraphics( );
         }
 
         var shapes, arg, i, realStyle, realLabel, realRefresh;
@@ -5038,6 +5033,20 @@ $.Widget.prototype = {
         position: "relative",
         zIndex: 100
       } );
+    },
+
+    _createServiceGraphics: function( ) { 
+      // only called in the context of a service-level geomap
+      var $contentFrame = this._$elem.closest( ".geo-content-frame" );
+      this._$elem.append('<div class="geo-shapes-container" style="position:absolute; left:0; top:0; width:' + $contentFrame.css( "width" ) + '; height:' + $contentFrame.css( "height" ) + '; margin:0; padding:0;"></div>');
+      this._$shapesContainer = this._$elem.children(':last');
+
+      this._map._$shapesContainers = this._map._$shapesContainers.add( this._$shapesContainer );
+
+      this._$shapesContainer.geographics( );
+      this._createdGraphics = true;
+
+      this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
     },
 
     _refreshDrawing: function ( ) {
