@@ -70,7 +70,7 @@ tilingScheme: {
     id: &quot;NewJersey&quot;,
     type: &quot;tiled&quot;,
     src: function (view) {
-      return &quot;http://njgin.state.nj.us/ArcGIS/rest/services/basemap_v4/MapServer/tile/&quot;
+      return &quot;http://njgin.state.nj.us/ArcGIS/rest/services/Basemap/basemap/MapServer/tile/&quot;
        + view.zoom + &quot;/&quot;
        + view.tile.row + &quot;/&quot;
        + view.tile.column;
@@ -142,7 +142,7 @@ tilingScheme: {
               id: "NewJersey",
               type: "tiled",
               src: function (view) {
-                return "http://njgin.state.nj.us/ArcGIS/rest/services/basemap_v4/MapServer/tile/" + view.zoom + "/" + view.tile.row + "/" + view.tile.column;
+                return "http://njgin.state.nj.us/ArcGIS/rest/services/Basemap/basemap/MapServer/tile/" + view.zoom + "/" + view.tile.row + "/" + view.tile.column;
               }
             }
           ],
