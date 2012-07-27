@@ -1,6 +1,8 @@
 ﻿== to do ==
 
 === b1 ===
+* geomap - support high-precision mice
+* geomap - use MapQuest Open by default; can't deny that it looks much nicer
 
 === examples ===
 
@@ -35,7 +37,6 @@
 ** a failed pan shouldn't add a point to drawCoords
 * geomap - ie (8?) - [bug] ie highlights entire map div during shift-zoom
 ** possibly only when axisLayout is image
-* geomap - iOS - [bug] after one finger is removed, stop processing as if multitouch is still on
 * geomap - [bug] first use of mouse/touch in any mode moves map by one pixel on mousedown/touch
 ** possibly only when axisLayout is image
 * geomap - [bug] iPad 2 measureLength puts current length on second to last coord instead of last coord
@@ -44,6 +45,7 @@
 * docs - geo - audit in-place geo calls, e.g., fromGeodetic
 * geo - audit in-place geo calls, e.g., fromGeodetic
 * geomap - include bboxMax in interactiveTransform engine
+* geomap - clean up touch tracking
 * geomap - don't repeat attr text if the same as one previously added
 * docs - geomap - zoomMin, zoomMax on service object
 * geomap - [bug] errors when setting src to empty string
@@ -205,6 +207,13 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-07-26==
+===mouse===
+Peter's mouse can't wheel zoom easilly. It's a high precision mouse and it doesn't click when you scroll it. I have a feeling I'm getting .25 delta and it's rounding down to zero.
+
+===iOS touch===
+I have to stop killing the document events on iOS. Phew! I wasn't shutting _inOp off after multitouch ends.
 
 ==2012-07-26==
 ===zoomMax===
