@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0.0b1 - 2012-07-26
+/*! jQuery Geo - v1.0.0b1 - 2012-07-27
  * http://jquerygeo.com
  * Copyright (c) 2012 Ryan Westphal/Applied Geographics, Inc.; Licensed MIT, GPL */
 
@@ -4216,7 +4216,7 @@ $.Widget.prototype = {
     _isDbltap: undefined,
 
     _isMultiTouch: undefined,
-    _multiTouchAnchor: undefined, //< TouchList
+    _multiTouchAnchor: [], //< TouchList
     _multiTouchAnchorBbox: undefined, //< bbox
     _multiTouchCurrentBbox: undefined, //< bbox
 
@@ -5788,7 +5788,7 @@ $.Widget.prototype = {
           i = 0;
 
       if ( this._supportTouch ) {
-        if ( !this._isMultiTouch && touches[ 0 ].identifier !== this._multiTouchAnchor[ 0 ].identifier ) {
+        if ( !this._isMultiTouch && this._mouseDown && this._multiTouchAnchor.length > 0 && touches[ 0 ].identifier !== this._multiTouchAnchor[ 0 ].identifier ) {
           // switch to multitouch
           this._mouseDown = false;
           this._isMultiTouch = true;
@@ -5995,6 +5995,8 @@ $.Widget.prototype = {
 
       if (this._supportTouch) {
         current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
+        this._multiTouchAnchor = [];
+        this._inOp = false;
       } else {
         current = [e.pageX - offset.left, e.pageY - offset.top];
       }
@@ -6025,7 +6027,7 @@ $.Widget.prototype = {
         if ( doInteractiveTimeout ) {
           this._setInteractiveTimeout( true );
         }
-        return false;
+        return;
       }
 
       if (document.releaseCapture) {
