@@ -1,7 +1,8 @@
 ﻿== to do ==
 
 === b1 ===
-* geomap - support high-precision mice
+* geomap - use linear distance for pinch zoom calculation
+* docs - geomap - use MapQuest Open by default; can't deny that it looks much nicer
 * geomap - use MapQuest Open by default; can't deny that it looks much nicer
 
 === examples ===
@@ -46,6 +47,7 @@
 * geo - audit in-place geo calls, e.g., fromGeodetic
 * geomap - include bboxMax in interactiveTransform engine
 * geomap - clean up touch tracking
+* geomap - support high-precision mice better in tiled maps
 * geomap - don't repeat attr text if the same as one previously added
 * docs - geomap - zoomMin, zoomMax on service object
 * geomap - [bug] errors when setting src to empty string

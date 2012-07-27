@@ -2168,6 +2168,12 @@
       if (delta !== 0) {
         this._clearInteractiveTimeout( );
 
+        if ( delta > 0 ) {
+          delta = Math.ceil( delta );
+        } else { 
+          delta = Math.floor( delta );
+        }
+
         var offset = $(e.currentTarget).offset();
         this._anchor = [e.pageX - offset.left, e.pageY - offset.top];
 
