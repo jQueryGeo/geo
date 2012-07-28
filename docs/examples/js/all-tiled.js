@@ -54,7 +54,10 @@ $(function () {
     center: [ -89.34, 38.84 ],
     zoom: 5,
 
-    // the speedtest service only supports up to zoom level 10
+    // the speedtest service only supports zooming out to level 3, lock the map to that min zoom
+    zoomMin: 3,
+
+    // the speedtest service only zooming in to level 10, lock the map to that max zoom
     zoomMax: 10,
 
     loadstart: function( ) {

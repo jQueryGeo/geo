@@ -1,0 +1,64 @@
+<!doctype html>  
+
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+
+  <title>zoomMin | geomap</title>
+  <meta name="description" content="geomap zoomMin option">
+  <meta name="author" content="Ryan Westphal">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="../css/style.css?v=2">
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
+</head>
+
+<body>
+
+  <div id="zoomMin" data-role="page">
+    <div data-role="header" data-theme="f">
+      <h1>zoomMin</h1>
+    </div>
+    
+    <div data-role="content">
+      <table>
+        <tr>
+          <th>type</th>
+          <td>Number</td>
+        </tr>
+        <tr>
+          <th>default</th>
+          <td>0</td>
+        </tr>
+        <tr>
+          <th>init</th>
+          <td><pre><code>$( <i>selector</i> ).geomap( { zoomMin: 5 } );</code></pre></td>
+        </tr>
+        <tr>
+          <th>get</th>
+          <td><pre><code>var zoomMin = $( <i>selector</i> ).geomap( &quot;option&quot;, &quot;zoomMin&quot; );</code></pre></td>
+        </tr>
+        <tr>
+          <th>set</th>
+          <td><pre><code>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;zoomMin&quot;, 7 );</code></pre></td>
+        </tr>
+      </table>
+
+      <p>The zoomMin option gets or sets the smallest allowed value of the <a href="zoom.html">zoom option</a> for the map.</p>
+
+      <p>For tiled maps, this option overrides the <a href="tilingScheme.html">tilingScheme option</a> when it is larger than zero. For example, a tilingScheme always defines what zoom level 0 is, but if you set the zoomMin option to 7, the user will not be able to zoom out past level 7.</p>
+
+      <p>For non-tiled maps, i.e., tilingScheme is null and you're using all shingled services, this option determines the minimum zoom (and therefore maximum pixelSize) a user can achieve. Non-tiled maps require the <a href="bboxMax.html">bboxMax option</a> to determine what zoom level 0 means. This option overrides the map's ability to get to zoom level 0. It is not so useful for non-tiled maps, as you can just set a smaller bboxMax and continue using 0 as the minimum zoom.</p>
+
+      <p>This option also overrides programmatic changes. If zoomMin is 2 and you try to set the zoom option to 0 using JavaScript, it will be set to 2 instead.</p>
+    </div>
+  </div> <!-- end of #container -->
+
+  <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0a4.min.js"></script>
+  <script src="../js/script.js"></script>
+  <script src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
+</body>
+</html>
+

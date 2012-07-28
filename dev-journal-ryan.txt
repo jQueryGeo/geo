@@ -22,10 +22,9 @@
 
 === future ===
 
-* docs - geomap - zoomMin option
-* geomap - zoomMin option
 * geomap - [bug] using shift-zoom during interactiveTransform doesn't zoom to correct location
 ** tiled maps only
+** not as noticeable now that the refresh timeout is shorter
 * geomap - test changing shingled service URL to get updated images (in case of dynamic data)
 * geomap - stop using $.data to store bbox since it's only used for drawing; store on _graphicShapes instead
 * geomap - [bug] exception when calling destroy on uninitialized div
@@ -226,6 +225,9 @@ Place it in touchmove.
 
 ===multitouch refresh===
 I'm disabling refresh during multitouch and it makes the whold multitouch experience better, I think.
+
+===zoomMin===
+I'm going to fit this in for b1; might as well complete the API.
 
 ==2012-07-26==
 ===mouse===
