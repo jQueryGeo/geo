@@ -1720,6 +1720,9 @@
 
           this._multiTouchAnchor.push( touches[ 0 ] );
 
+
+
+
           this._multiTouchCurrentBbox = [
             this._multiTouchCurrentBbox[ 0 ],
             this._multiTouchCurrentBbox[ 1 ],
@@ -1731,6 +1734,7 @@
 
           this._mouseDown = true;
           this._anchor = this._current = $.geo.center( this._multiTouchCurrentBbox, true );
+
 
           if ( doInteractiveTimeout ) {
             this._setInteractiveTimeout( true );
@@ -1750,16 +1754,12 @@
             }
           }
 
+          var anchorDistance = $.geo._distancePointPoint( [ this._multiTouchAnchorBbox[ 0 ], this._multiTouchAnchorBbox[ 1 ] ], [ this._multiTouchAnchorBbox[ 2 ], this._multiTouchAnchorBbox[ 3 ] ] ),
+              currentDistance = $.geo._distancePointPoint( [ this._multiTouchCurrentBbox[ 0 ], this._multiTouchCurrentBbox[ 1 ] ], [ this._multiTouchCurrentBbox[ 2 ], this._multiTouchCurrentBbox[ 3 ] ] );
+
           current = $.geo.center( this._multiTouchCurrentBbox, true );
 
-          var currentWidth = this._multiTouchCurrentBbox[ 2 ] - this._multiTouchCurrentBbox[ 0 ],
-              anchorWidth = this._multiTouchAnchorBbox[ 2 ] - this._multiTouchAnchorBbox[ 0 ],
-              ratioWidth = currentWidth / anchorWidth;
-
-          var wheelLevel = Math.abs( Math.floor( ( 1 - ratioWidth ) * 10 ) );
-          if ( Math.abs( currentWidth ) < Math.abs( anchorWidth ) ) {
-            wheelLevel = - wheelLevel;
-          }
+          var wheelLevel  = ( ( currentDistance - anchorDistance ) / anchorDistance * 5 );
 
           var delta = wheelLevel - this._wheelLevel;
 

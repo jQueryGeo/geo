@@ -1,7 +1,6 @@
 ﻿== to do ==
 
 === b1 ===
-* geomap - use linear distance for pinch zoom calculation
 * docs - geomap - use MapQuest Open by default; can't deny that it looks much nicer
 * geomap - use MapQuest Open by default; can't deny that it looks much nicer
 
@@ -212,6 +211,21 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-07-28==
+===multitouch status===
+Here's some code to render multitouch status to an h1 tag. For future reference/debugging:
+
+          $("h1").html("multitouch {<br>" + 
+            "anchorDistance: " + anchorDistance + "<br>" +
+            "currentDistance: " + currentDistance + "<br>" +
+            "delta: " + ( ( currentDistance - anchorDistance ) / anchorDistance * 5 ) + "<br>" +
+          "}" );
+
+Place it in touchmove.
+
+===multitouch refresh===
+I'm disabling refresh during multitouch and it makes the whold multitouch experience better, I think.
 
 ==2012-07-26==
 ===mouse===

@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0.0b1 - 2012-07-27
+/*! jQuery Geo - v1.0.0b1 - 2012-07-28
  * http://jquerygeo.com
  * Copyright (c) 2012 Ryan Westphal/Applied Geographics, Inc.; Licensed MIT, GPL */
 
@@ -5365,13 +5365,18 @@ $.Widget.prototype = {
 
     _setInteractiveTimeout: function( trigger ) {
       var geomap = this;
-      this._timeoutInteractive = setTimeout( function () {
-        if ( geomap._created && geomap._timeoutInteractive ) {
+
+      function interactiveTimeoutCallback( ) {
+        if ( geomap._isMultiTouch ) {
+          geomap._timeoutInteractive = setTimeout( interactiveTimeoutCallback, 128 );
+        } else if ( geomap._created && geomap._timeoutInteractive ) {
           geomap._setCenterAndSize( geomap._centerInteractive, geomap._pixelSizeInteractive, geomap._triggerInteractive, true );
           geomap._timeoutInteractive = null;
           geomap._triggerInteractive = false;
         }
-      }, 128 );
+      }
+
+      this._timeoutInteractive = setTimeout( interactiveTimeoutCallback, 128 );
       this._triggerInteractive |= trigger;
     },
 
@@ -5796,6 +5801,9 @@ $.Widget.prototype = {
 
           this._multiTouchAnchor.push( touches[ 0 ] );
 
+
+
+
           this._multiTouchCurrentBbox = [
             this._multiTouchCurrentBbox[ 0 ],
             this._multiTouchCurrentBbox[ 1 ],
@@ -5807,6 +5815,7 @@ $.Widget.prototype = {
 
           this._mouseDown = true;
           this._anchor = this._current = $.geo.center( this._multiTouchCurrentBbox, true );
+
 
           if ( doInteractiveTimeout ) {
             this._setInteractiveTimeout( true );
@@ -5826,16 +5835,12 @@ $.Widget.prototype = {
             }
           }
 
+          var anchorDistance = $.geo._distancePointPoint( [ this._multiTouchAnchorBbox[ 0 ], this._multiTouchAnchorBbox[ 1 ] ], [ this._multiTouchAnchorBbox[ 2 ], this._multiTouchAnchorBbox[ 3 ] ] ),
+              currentDistance = $.geo._distancePointPoint( [ this._multiTouchCurrentBbox[ 0 ], this._multiTouchCurrentBbox[ 1 ] ], [ this._multiTouchCurrentBbox[ 2 ], this._multiTouchCurrentBbox[ 3 ] ] );
+
           current = $.geo.center( this._multiTouchCurrentBbox, true );
 
-          var currentWidth = this._multiTouchCurrentBbox[ 2 ] - this._multiTouchCurrentBbox[ 0 ],
-              anchorWidth = this._multiTouchAnchorBbox[ 2 ] - this._multiTouchAnchorBbox[ 0 ],
-              ratioWidth = currentWidth / anchorWidth;
-
-          var wheelLevel = Math.abs( Math.floor( ( 1 - ratioWidth ) * 10 ) );
-          if ( Math.abs( currentWidth ) < Math.abs( anchorWidth ) ) {
-            wheelLevel = - wheelLevel;
-          }
+          var wheelLevel  = ( ( currentDistance - anchorDistance ) / anchorDistance * 5 );
 
           var delta = wheelLevel - this._wheelLevel;
 

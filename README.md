@@ -106,6 +106,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * geomap - iOS - [bug] after one finger is removed, stop processing as if multitouch is still on
 * geomap - dumb high-precision mice down on tiled maps
 ** otherwise, the high precision rounds down to zero change in zoom
+* geomap - use linear distance for pinch zoom calculation
 
 ### 1.0a4 (2012-02-19)
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax
