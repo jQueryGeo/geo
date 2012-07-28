@@ -1284,13 +1284,18 @@
 
     _setInteractiveTimeout: function( trigger ) {
       var geomap = this;
-      this._timeoutInteractive = setTimeout( function () {
-        if ( geomap._created && geomap._timeoutInteractive ) {
+
+      function interactiveTimeoutCallback( ) {
+        if ( geomap._isMultiTouch ) {
+          geomap._timeoutInteractive = setTimeout( interactiveTimeoutCallback, 128 );
+        } else if ( geomap._created && geomap._timeoutInteractive ) {
           geomap._setCenterAndSize( geomap._centerInteractive, geomap._pixelSizeInteractive, geomap._triggerInteractive, true );
           geomap._timeoutInteractive = null;
           geomap._triggerInteractive = false;
         }
-      }, 128 );
+      }
+
+      this._timeoutInteractive = setTimeout( interactiveTimeoutCallback, 128 );
       this._triggerInteractive |= trigger;
     },
 
