@@ -47,9 +47,9 @@
 
       <p>The zoomMax option gets or sets the maximum value of the <a href="zoom.html">zoom option</a> for the map.</p>
 
-      <p>For tiled maps, this option overrides the <a href="tilingScheme.html">tilingScheme option</a> when it is smaller than what you've specified in the tilingScheme. For example, if the tilingScheme has a total of 18 levels but you set the zoomMax option to 7, the user will not be able to zoom past level 7.</p>
+      <p>For tiled maps, this option overrides the <a href="tilingScheme.html">tilingScheme option</a> when it is smaller than what you've specified in the tilingScheme. For example, if the tilingScheme has a total of 18 levels but you set the zoomMax option to 7, the user will not be able to zoom in past level 7.</p>
 
-      <p>For non-tiled maps, i.e., tilingScheme is null and you're using all shingled services, this option determines the maximum zoom (and therefore pixelSize) a user can achieve. Without setting this option for non-tiled maps, users will be able to infinitely zoom in to fully dynamic maps which is likely not what you want. Non-tiled maps require the <a href="bboxMax.html">bboxMax option</a> to determine what zoom level 0 means. This option represents the other side of the zoom range.</p>
+      <p>For non-tiled maps, i.e., tilingScheme is null and you're using all shingled services, this option determines the maximum zoom (and therefore minimum pixelSize) a user can achieve. Without setting this option for non-tiled maps, users will be able to infinitely zoom in to fully dynamic maps which is likely not what you want. Non-tiled maps require the <a href="bboxMax.html">bboxMax option</a> to determine what zoom level 0 means. This option represents the other side of the zoom range.</p>
 
       <p>This option also overrides programmatic changes. If zoomMax is 7 and you try to set the zoom option to 8 using JavaScript, it will be set to 7 instead.</p>
     </div>

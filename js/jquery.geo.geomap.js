@@ -53,6 +53,7 @@
         },
         axisLayout: "map",
         zoom: 0,
+        zoomMin: 0,
         zoomMax: Number.POSITIVE_INFINITY,
         pixelSize: 0
       };
@@ -285,14 +286,17 @@
           this._setOption("bboxMax", this._initOptions.bboxMax, false);
           this._setOption("bbox", this._initOptions.bboxMax, false);
         }
+        if (this._initOptions.zoomMin !== undefined) {
+          this._setOption("zoomMin", this._initOptions.zoomMin, false);
+        }
+        if (this._initOptions.zoomMax !== undefined) {
+          this._setOption("zoomMax", this._initOptions.zoomMax, false);
+        }
         if (this._initOptions.bbox) {
           this._setOption("bbox", this._initOptions.bbox, false);
         }
         if (this._initOptions.center) {
           this._setOption("center", this._initOptions.center, false);
-        }
-        if (this._initOptions.zoomMax !== undefined) {
-          this._setOption("zoomMax", this._initOptions.zoomMax, false);
         }
         if (this._initOptions.zoom !== undefined) {
           this._setOption("zoom", this._initOptions.zoom, false);
@@ -341,11 +345,11 @@
           zoom = this._getZoom( center, pixelSize );
 
           if ( this._options[ "tilingScheme" ] ) {
-            pixelSize = this._getPixelSize( Math.min( zoom, this._options[ "zoomMax" ] ) );
+            pixelSize = this._getPixelSize( Math.min( Math.max( zoom, this._options[ "zoomMin" ] ), this._options[ "zoomMax" ] ) );
           } else {
-            if ( zoom < 0 ) {
-              pixelSize = this._pixelSizeMax;
-            } else if ( zoom >= this._options[ "zoomMax" ] ) {
+            if ( zoom < this._options[ "zoomMin" ] ) {
+              pixelSize = this._getPixelSize( this._options[ "zoomMin" ] );
+            } else if ( zoom > this._options[ "zoomMax" ] ) {
               pixelSize = this._getPixelSize( this._options[ "zoomMax" ] );
             }
           }
@@ -785,11 +789,11 @@
 
       // clamp to zoom
       if ( this._options[ "tilingScheme" ] ) {
-        pixelSize = this._getPixelSize( Math.min( zoom, this._options[ "zoomMax" ] ) );
+        pixelSize = this._getPixelSize( Math.min( Math.max( zoom, this._options[ "zoomMin" ] ), this._options[ "zoomMax" ] ) );
       } else {
-        if ( zoom < 0 ) {
-          pixelSize = this._pixelSizeMax;
-        } else if ( zoom >= this._options[ "zoomMax" ] ) {
+        if ( zoom < this._options[ "zoomMin" ] ) {
+          pixelSize = this._getPixelSize( this._options[ "zoomMin" ] );
+        } else if ( zoom > this._options[ "zoomMax" ] ) {
           pixelSize = this._getPixelSize( this._options[ "zoomMax" ] );
         }
       }
@@ -819,7 +823,7 @@
 
     _getZoom: function ( center, pixelSize ) {
       // calculate the internal zoom level, vs. public zoom property
-      // this does not take zoomMax into account
+      // this does not take zoomMin or zoomMax into account
       center = center || this._center;
       pixelSize = pixelSize || this._pixelSize;
 
@@ -838,22 +842,22 @@
 
           return 0;
         } else {
-          return Math.max( Math.round( Math.log( tilingScheme.basePixelSize / pixelSize) / Math.log( 2 ) ), 0 );
+          return Math.round( Math.log( tilingScheme.basePixelSize / pixelSize) / Math.log( 2 ) );
         }
       } else {
         var ratio = this._contentBounds["width"] / this._contentBounds["height"],
             bbox = $.geo.reaspect( this._getBbox( center, pixelSize ), ratio, true ),
             bboxMax = $.geo.reaspect(this._getBboxMax(), ratio, true);
 
-        return Math.max( Math.round( Math.log($.geo.width(bboxMax, true) / $.geo.width(bbox, true)) / Math.log(this._zoomFactor) ), 0 );
+        return Math.round( Math.log($.geo.width(bboxMax, true) / $.geo.width(bbox, true)) / Math.log(this._zoomFactor) );
       }
     },
 
     _setZoom: function ( value, trigger, refresh ) {
-      // set the map widget's zoom, taking zoomMax into account
+      // set the map widget's zoom, taking zoomMin and zoomMax into account
       this._clearInteractiveTimeout( );
 
-      value = Math.min( Math.max( value, 0 ), this._options[ "zoomMax" ] );
+      value = Math.min( Math.max( value, this._options[ "zoomMin" ] ), this._options[ "zoomMax" ] );
       this._setInteractiveCenterAndSize( this._center, this._getPixelSize( value ) );
       this._interactiveTransform( );
 
@@ -1173,12 +1177,12 @@
 
       // clamp to zoom
       if ( full && this._options[ "tilingScheme" ] ) {
-        pixelSize = this._getPixelSize( Math.min( zoom, this._options[ "zoomMax" ] ) );
+        pixelSize = this._getPixelSize( Math.min( Math.max( zoom, this._options[ "zoomMin" ] ), this._options[ "zoomMax" ] ) );
       } else {
-        if ( zoom < 0 ) {
-          pixelSize = this._pixelSizeMax;
-        } else if ( zoomDelta > 0 && zoom >= this._options[ "zoomMax" ] ) {
-          pixelSize = this._getPixelSize( this._options[ "zoomMax" ] );
+        if ( zoomDelta < 0 && zoom < this._options[ "zoomMin" ] ) {
+          pixelSize = this._pixelSizeInteractive;
+        } else if ( zoomDelta > 0 && zoom > this._options[ "zoomMax" ] ) {
+          pixelSize = this._pixelSizeInteractive;
         }
       }
 
@@ -1284,13 +1288,18 @@
 
     _setInteractiveTimeout: function( trigger ) {
       var geomap = this;
-      this._timeoutInteractive = setTimeout( function () {
-        if ( geomap._created && geomap._timeoutInteractive ) {
+
+      function interactiveTimeoutCallback( ) {
+        if ( geomap._isMultiTouch ) {
+          geomap._timeoutInteractive = setTimeout( interactiveTimeoutCallback, 128 );
+        } else if ( geomap._created && geomap._timeoutInteractive ) {
           geomap._setCenterAndSize( geomap._centerInteractive, geomap._pixelSizeInteractive, geomap._triggerInteractive, true );
           geomap._timeoutInteractive = null;
           geomap._triggerInteractive = false;
         }
-      }, 128 );
+      }
+
+      this._timeoutInteractive = setTimeout( interactiveTimeoutCallback, 128 );
       this._triggerInteractive |= trigger;
     },
 
@@ -1325,7 +1334,7 @@
     _setInteractiveCenterAndSize: function ( center, pixelSize ) {
       // set the temporary (interactive) center & size
       // also, update the public-facing options
-      // this does not take zoomMax into account
+      // this does not take zoomMin or zoomMax into account
       this._centerInteractive[ 0 ] = center[ 0 ];
       this._centerInteractive[ 1 ] = center[ 1 ];
       this._pixelSizeInteractive = pixelSize;
@@ -1354,11 +1363,11 @@
       var zoom = this._getZoom( center, pixelSize );
 
       if ( this._options[ "tilingScheme" ] ) {
-        this._pixelSizeInteractive = pixelSize = this._getPixelSize( Math.min( zoom, this._options[ "zoomMax" ] ) );
+        this._pixelSizeInteractive = pixelSize = this._getPixelSize( Math.min( Math.max( zoom, this._options[ "zoomMin" ] ), this._options[ "zoomMax" ] ) );
       } else {
-        if ( zoom < 0 ) {
-          this._pixelSizeInteractive = pixelSize = this._pixelSizeMax;
-        } else if ( zoom >= this._options[ "zoomMax" ] ) {
+        if ( zoom < this._options[ "zoomMin" ] ) {
+          this._pixelSizeInteractive = pixelSize = this._getPixelSize( this._options[ "zoomMin" ] );
+        } else if ( zoom > this._options[ "zoomMax" ] ) {
           this._pixelSizeInteractive = pixelSize = this._getPixelSize( this._options[ "zoomMax" ] );
         }
       }
@@ -1375,7 +1384,7 @@
         this._options["center"] = $.merge( [ ], center );
       }
 
-      this._options["zoom"] = zoom; // this._getZoom();
+      this._options["zoom"] = zoom;
 
       if (trigger) {
         this._trigger("bboxchange", window.event, { bbox: $.merge( [ ], this._options["bbox"] ) });
@@ -1715,6 +1724,9 @@
 
           this._multiTouchAnchor.push( touches[ 0 ] );
 
+
+
+
           this._multiTouchCurrentBbox = [
             this._multiTouchCurrentBbox[ 0 ],
             this._multiTouchCurrentBbox[ 1 ],
@@ -1726,6 +1738,7 @@
 
           this._mouseDown = true;
           this._anchor = this._current = $.geo.center( this._multiTouchCurrentBbox, true );
+
 
           if ( doInteractiveTimeout ) {
             this._setInteractiveTimeout( true );
@@ -1745,15 +1758,17 @@
             }
           }
 
+          var anchorDistance = $.geo._distancePointPoint( [ this._multiTouchAnchorBbox[ 0 ], this._multiTouchAnchorBbox[ 1 ] ], [ this._multiTouchAnchorBbox[ 2 ], this._multiTouchAnchorBbox[ 3 ] ] ),
+              currentDistance = $.geo._distancePointPoint( [ this._multiTouchCurrentBbox[ 0 ], this._multiTouchCurrentBbox[ 1 ] ], [ this._multiTouchCurrentBbox[ 2 ], this._multiTouchCurrentBbox[ 3 ] ] );
+
           current = $.geo.center( this._multiTouchCurrentBbox, true );
 
-          var currentWidth = this._multiTouchCurrentBbox[ 2 ] - this._multiTouchCurrentBbox[ 0 ],
-              anchorWidth = this._multiTouchAnchorBbox[ 2 ] - this._multiTouchAnchorBbox[ 0 ],
-              ratioWidth = currentWidth / anchorWidth;
+          var wheelLevel = ( ( currentDistance - anchorDistance ) / anchorDistance );
 
-          var wheelLevel = Math.abs( Math.floor( ( 1 - ratioWidth ) * 10 ) );
-          if ( Math.abs( currentWidth ) < Math.abs( anchorWidth ) ) {
-            wheelLevel = - wheelLevel;
+          if ( wheelLevel > 0 ) {
+            wheelLevel *= 5;
+          } else {
+            wheelLevel *= 10;
           }
 
           var delta = wheelLevel - this._wheelLevel;
@@ -2167,6 +2182,12 @@
 
       if (delta !== 0) {
         this._clearInteractiveTimeout( );
+
+        if ( delta > 0 ) {
+          delta = Math.ceil( delta );
+        } else { 
+          delta = Math.floor( delta );
+        }
 
         var offset = $(e.currentTarget).offset();
         this._anchor = [e.pageX - offset.left, e.pageY - offset.top];
