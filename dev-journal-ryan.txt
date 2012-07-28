@@ -1,7 +1,7 @@
 ﻿== to do ==
 
 === b1 ===
-* geomap - support high-precision mice
+* docs - geomap - use MapQuest Open by default; can't deny that it looks much nicer
 * geomap - use MapQuest Open by default; can't deny that it looks much nicer
 
 === examples ===
@@ -24,11 +24,12 @@
 
 * geomap - [bug] using shift-zoom during interactiveTransform doesn't zoom to correct location
 ** tiled maps only
+** not as noticeable now that the refresh timeout is shorter
 * geomap - test changing shingled service URL to get updated images (in case of dynamic data)
 * geomap - stop using $.data to store bbox since it's only used for drawing; store on _graphicShapes instead
 * geomap - [bug] exception when calling destroy on uninitialized div
 * geomap - do not interactiveTransform non-tiled maps out past pixelSizeMax
-** pixelSizeMax calculated by zoomMax on non-tiled maps
+** pixelSizeMax is calculated by bboxMax on non-tiled maps
 * geomap - [bug] multiples of the same event trigger after creating more than one map on the same div, even after destroy
 ** destroy should unbind all geomap events
 * geomap - [bug] there's an extra service.refresh call after a non-mousedown touchmove after a refresh
@@ -46,13 +47,15 @@
 * geo - audit in-place geo calls, e.g., fromGeodetic
 * geomap - include bboxMax in interactiveTransform engine
 * geomap - clean up touch tracking
+* geomap - support high-precision mice better in tiled maps
 * geomap - don't repeat attr text if the same as one previously added
 * docs - geomap - zoomMin, zoomMax on service object
+** determines if service is visible but doesn't change map interaction, only map zoomMax/zoomMin options do that
+* geomap - zoomMin, zoomMax on service object
 * geomap - [bug] errors when setting src to empty string
 ** "When I added services for my graphics layers with src set to an empty string I got very weird results -- I was seeing the single image from my inset map repeated over and over.  I had to set it to a function that returns an empty string for it to work."
 ** possibly an object reference error when multiple maps are created
 * geomap - [bug] on two-finger scroll on some laptops, scroll zoom doesn't move much at first, then moves too fast
-* geomap - zoomMin, zoomMax on service object
 * geomap - remove this-style state properties
 * geomap - add delegate handler for image load instead of one load handler per image
 * docs - geomap - services option on actual services should return an array of the services in the selector
@@ -207,6 +210,24 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-07-28==
+===multitouch status===
+Here's some code to render multitouch status to an h1 tag. For future reference/debugging:
+
+          $("h1").html("multitouch {<br>" + 
+            "anchorDistance: " + anchorDistance + "<br>" +
+            "currentDistance: " + currentDistance + "<br>" +
+            "delta: " + ( ( currentDistance - anchorDistance ) / anchorDistance * 5 ) + "<br>" +
+          "}" );
+
+Place it in touchmove.
+
+===multitouch refresh===
+I'm disabling refresh during multitouch and it makes the whold multitouch experience better, I think.
+
+===zoomMin===
+I'm going to fit this in for b1; might as well complete the API.
 
 ==2012-07-26==
 ===mouse===
