@@ -11,7 +11,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
 </head>
 
 <body>
@@ -56,7 +56,7 @@
     top: 10px;
     right: 10px;
     padding: 16px;
-    background: #ccc;
+    background: red;
     opacity: .8;
     border-radius: 8px;
     text-align: center;
@@ -71,22 +71,34 @@
   }
 &lt;/style&gt;
 &lt;div id=&quot;map&quot;&gt;&lt;div id=&quot;bar&quot;&gt;&lt;div&gt;&lt;/div&gt;&lt;span&gt;1134 meters&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;</code></pre>
-      <div style="position: relative; width: 90%; max-width: 640px; height: 128px; padding: 8px; border: solid 3px #444; margin: .5em; background: #ddf;"><div style="position: absolute; top: 10px; right: 10px; padding: 16px; background: #ccc; opacity: .8; border-radius: 8px; text-align: center; font-size: 10px;"><div style="width: 96px; height: 2px; margin-bottom: 8px; background: #444; color: #444;"></div><span>1134 meters</span></div></div>
-      <p>This rather large scale bar will not interfere with a user trying to pan the map.</p>
+
+      <div class="geomap-indoc" style="position: relative; width: 90%; max-width: 640px; height: 128px; padding: 8px; border: solid 3px #444; margin: .5em; background: red;"><div style="position: absolute; top: 10px; right: 10px; padding: 16px; background: #ccc; opacity: .8; border-radius: 8px; text-align: center; font-size: 10px;"><div style="width: 96px; height: 2px; margin-bottom: 8px; background: #444; color: #444;"></div><span>1134 meters</span></div></div>
+
+      <p>This rather large scale bar will not interfere with a user trying to pan the map. Ignore the scale bar value in this example, it's static text.</p>
+
       <h2>mobile</h2>
-      <p>The geomap widget works on modern mobile browsers without any additional JavaScript development. However, some web design is necessary. For starters, as with any mobile development you should add a viewport meta tag into your head element. This should appear above most other tags so the mobile browser can get ready for a mobile page before doing any other work.</p>
+      <p>The geomap widget works on modern mobile browsers without any additional JavaScript. However, some web design is necessary. For starters, as with any mobile development you should add a viewport meta tag into your head element. This should appear above most other tags so the mobile browser can get ready for a mobile page before doing any other work.</p>
+
+      <pre><code>&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, minimum-scale=1&quot;&gt;</code></pre>
+
+      <p>For a fullscreen map, you can also add a maximum-scale attribute.</p>
+
       <pre><code>&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, minimum-scale=1, maximum-scale=1&quot;&gt;</code></pre>
-      <p>If you have done any other mobile web developement, you're probably frowning at my decision to disable the default zoom capability of the device's web browser. If you haven't done much with mobile, I am disabling double-tap to zoom into a page by setting the min and max scale to 1.</p>
-      <p>In almost all other cases, I would agree that disabling browser zoom is a bad user experience, however for this example I am considering a full-screen mapping application. With that in mind, double-tap has a whole new meaning and users expect it to zoom the map itself, not the page. It is in this case only that I suggest you disable browser page zoom. If you are targeting modern mobile browsers such as iOS, Android, Windows Phone 7 or Opera Mobile, you can used fixed positioning and the HTML for the full screen mobile app would look like the first fullscreen example:</p>
+
+      <p>If you have done any other mobile web developement, you're probably frowning at my decision to disable the default zoom capability of the device's web browser. If you haven't done much with mobile, I am disabling double-tap to zoom a page by setting the min and max scale to 1.</p>
+
+      <p>In almost all other cases, I would agree that disabling browser zoom is a bad user experience, however for a full-screen mapping application, double-tap has a whole new meaning and users expect it to zoom the map itself, not the page. It is in this case only that I suggest you disable browser page zoom. If you are targeting modern mobile browsers such as iOS, Android, Windows Phone 7 or Opera Mobile, you can used fixed positioning and the HTML for the full screen mobile app would look like the first fullscreen example:</p>
+
       <pre><code>&lt;div style=&quot;position: fixed; top: 0; right: 0; bottom: 0; left: 0;&quot;&gt;&lt;/div&gt;</code></pre>
+
       <p>Other mobile browsers are currently untested.</p>
     </div>
   </div> <!-- end of #container -->
 
-  <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-  <script src="http://code.jquerygeo.com/jquery.geo-1.0a4.min.js"></script>
+  <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>
   <script src="../js/script.js"></script>
-  <script src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
+  <script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
 </body>
 </html>
 

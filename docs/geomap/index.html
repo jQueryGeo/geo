@@ -11,7 +11,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
 </head>
 
 <body>
@@ -34,7 +34,7 @@
 
       <h2>options</h2>
 
-      <p>The options argument is a JavaScript object that configures the map widget during the first instantiation on a div. No options are required. By default the map will show the whole world using the OpenStreetMap tile set.</p>
+      <p>The options argument is a JavaScript object that configures the map widget during the first instantiation on a div. No options are required. By default the map will show the whole world using the <a href="http://open.mapquest.com/" rel="external" target="_blank">mapquest open</a> tile set.</p>
 
       <p>After initializing a map with your first geomap call, you can get or set most of these options using the following syntax:</p>
 
@@ -74,10 +74,15 @@ $( <i>map selector</i> ).geomap( &quot;option&quot;, {
         <li><a href="tilingScheme.html"><h3>tilingScheme</h3><p>defines how tiles are placed in the viewport</p></a></li>
         <li><a href="axisLayout.html"><h3>axisLayout</h3><p>&quot;map&quot; or &quot;image&quot;</p></a></li>
       </ul>
+
       <h2>projection</h2>
-      <p>The geomap widget will match how you use projection with map units. The map unit type (projected or geodetic) you used when you last set either the <b>bbox</b> or the <b>center</b> option will be used as output for options and as values for arguments. If you never set the bbox or center options, the geomap widget will return geodetic coordinates.</p>
+
+      <p>The geomap widget will match how you use projection with map units. The map unit type (projected or geodetic) you used when you last set the <b>bbox</b>, <b>bboxMax</b>, or the <b>center</b> option will be used as output for options and as values for arguments. If you never set the bbox or center options, the geomap widget will return geodetic coordinates.</p>
+
       <p>For example, if you set the map's center option using geodetic coordinates (a longitude, latitude array), future requests for the value of the map's center or bbox options will be returned in geodetic coordinates. However, if you later set the bbox option using web mercator, future requests for the center or bbox options will be returned in that projection.</p>
+
       <p>Changing bbox or center will affect all options and arguments that use map units. The options and arguments involved are:</p>
+
       <ul>
         <li>bbox option</li>
         <li>bboxMax option</li>
@@ -86,8 +91,10 @@ $( <i>map selector</i> ).geomap( &quot;option&quot;, {
         <li>GeoJSON objects passed as the geo argument in all events</li>
         <li>return value of the toMap method</li>
       </ul>
+
       <p>To avoid confusion, it is recommended to stick to one map unit type for any single map widget.</p>
-      <p>The geomap widget will use $.geo.proj when needed to convert between geodetic and projected coordinates.</p>
+
+      <p>The geomap widget will use the <a href="../geo/proj.html">$.geo.proj object</a> when needed to convert between geodetic and projected coordinates.</p>
 
       <h2>events</h2>
 
@@ -280,10 +287,10 @@ $( <i>map selector</i> ).geomap( &quot;option&quot;, {
     </div>
   </div> <!-- end of #container -->
 
-  <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-  <script src="http://code.jquerygeo.com/jquery.geo-1.0a4.min.js"></script>
+  <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>
   <script src="../js/script.js"></script>
-  <script src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
+  <script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
 </body>
 </html>
 

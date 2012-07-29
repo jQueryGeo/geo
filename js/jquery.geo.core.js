@@ -108,7 +108,7 @@
 
     include: function( bbox, value, _ignoreGeo /* Internal Use Only */ ) {
       // similar to Envelope.expandToInclude in JTS
-      if ( value && $.isArray( value ) ) {
+      if ( !value || !$.isArray( value ) ) {
         return bbox;
       }
 
@@ -1024,7 +1024,8 @@
             // geometry
             var isMultiLineStringOrPolygon = isMultiPointOrLineString && $.isArray(coordinates[ 0 ][ 0 ]),
                 isMultiPolygon = isMultiLineStringOrPolygon && $.isArray(coordinates[ 0 ][ 0 ][ 0 ]),
-                result = [ ];
+                result = [ ],
+                i, j, k;
 
             if (!isMultiPolygon) {
               if (!isMultiLineStringOrPolygon) {

@@ -14,6 +14,11 @@ $(function () {
       center: center || [-71.0597732, 42.3584308],
       zoom: zoom || 10,
 
+      mode: "point",
+      cursors: {
+        point: "default"
+      },
+
       // set the shapeStyle to a largish solid but translucent circle
       // to give the tweets a heat map effect
       shapeStyle: {
