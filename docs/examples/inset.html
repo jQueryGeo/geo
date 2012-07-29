@@ -99,6 +99,7 @@
         ],
         bbox: [-70.34, 43.73, -70.14, 43.84], //< set an initial bbox to Cumberland, ME
         zoom: 13, //< modify the bbox to force zoom level 13
+        zoomMin: 12, //< the tile set is only rendered from zoom level 12 on
         bboxchange: function( e, geo ) {
           // when the bbox changes, update the shape on the inset
           drawInsetBox(geo.bbox);

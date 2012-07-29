@@ -4407,7 +4407,7 @@ $.Widget.prototype = {
         this._panFinalize();
       }
 
-      var center, pixelSize, zoom;
+      var center, pixelSize, bbox, zoom;
 
       switch (key) {
         case "bbox":
@@ -4533,12 +4533,13 @@ $.Widget.prototype = {
 
         case "bboxMax":
           if ( $.geo.proj && $.geo._isGeodetic( value ) ) {
-            this._centerMax = $.geo.center( $.geo.proj.fromGeodetic( value ) );
+            bbox = $.geo.proj.fromGeodetic( value );
           } else {
-            this._centerMax = $.geo.center( value );
+            bbox = value;
           }
 
-          this._pixelSizeMax = Math.max($.geo.width(value, true) / this._contentBounds.width, $.geo.height(value, true) / this._contentBounds.height);
+          this._centerMax = $.geo.center( bbox );
+          this._pixelSizeMax = Math.max( $.geo.width( bbox, true ) / this._contentBounds.width, $.geo.height( bbox, true ) / this._contentBounds.height );
           break;
 
         case "services":
