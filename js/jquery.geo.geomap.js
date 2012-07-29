@@ -16,7 +16,7 @@
           "static": "default",
           pan: "url(data:image/vnd.microsoft.icon;base64,AAACAAEAICACAAgACAAwAQAAFgAAACgAAAAgAAAAQAAAAAEAAQAAAAAAAAEAAAAAAAAAAAAAAgAAAAAAAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD8AAAA/AAAAfwAAAP+AAAH/gAAB/8AAA//AAAd/wAAGf+AAAH9gAADbYAAA2yAAAZsAAAGbAAAAGAAAAAAAAA//////////////////////////////////////////////////////////////////////////////////////gH///4B///8Af//+AD///AA///wAH//4AB//8AAf//AAD//5AA///gAP//4AD//8AF///AB///5A////5///8=), move",
           zoom: "crosshair",
-          dragBbox: "crosshair",
+          dragBox: "crosshair",
           dragCircle: "crosshair",
           drawPoint: "crosshair",
           drawLineString: "crosshair",
@@ -39,9 +39,9 @@
               "class": "osm",
               type: "tiled",
               src: function (view) {
-                return "http://tile.openstreetmap.org/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
+                return "http://otile" + ((view.index % 4) + 1) + ".mqcdn.com/tiles/1.0.0/osm/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
               },
-              attr: "&copy; OpenStreetMap &amp; contributors, CC-BY-SA"
+              attr: "Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='http://developer.mapquest.com/content/osm/mq_logo.png'>"
             }
           ],
         tilingScheme: {
@@ -325,7 +325,7 @@
         this._panFinalize();
       }
 
-      var center, pixelSize, zoom;
+      var center, pixelSize, bbox, zoom;
 
       switch (key) {
         case "bbox":
@@ -451,12 +451,13 @@
 
         case "bboxMax":
           if ( $.geo.proj && $.geo._isGeodetic( value ) ) {
-            this._centerMax = $.geo.center( $.geo.proj.fromGeodetic( value ) );
+            bbox = $.geo.proj.fromGeodetic( value );
           } else {
-            this._centerMax = $.geo.center( value );
+            bbox = value;
           }
 
-          this._pixelSizeMax = Math.max($.geo.width(value, true) / this._contentBounds.width, $.geo.height(value, true) / this._contentBounds.height);
+          this._centerMax = $.geo.center( bbox );
+          this._pixelSizeMax = Math.max( $.geo.width( bbox, true ) / this._contentBounds.width, $.geo.height( bbox, true ) / this._contentBounds.height );
           break;
 
         case "services":
@@ -1677,10 +1678,10 @@
       if (!this._inOp && e.shiftKey && shift !== "off") {
         this._shiftDown = true;
         this._$eventTarget.css( "cursor", this._options[ "cursors" ][ shift === "default" ? "zoom" : shift ] );
-      } else if ( !this._isMultiTouch && ( this._options[ "pannable" ] || mode === "dragBbox" || mode === "dragCircle" ) ) {
+      } else if ( !this._isMultiTouch && ( this._options[ "pannable" ] || mode === "dragBox" || mode === "dragCircle" ) ) {
         this._inOp = true;
 
-        if ( mode !== "zoom" && mode !== "dragBbox" && mode !== "dragCircle" ) {
+        if ( mode !== "zoom" && mode !== "dragBox" && mode !== "dragCircle" ) {
           this._lastDrag = this._current;
 
           if (e.currentTarget.setCapture) {
@@ -1824,7 +1825,7 @@
 
       switch (mode) {
         case "zoom":
-        case "dragBbox":
+        case "dragBox":
           if ( this._mouseDown ) {
             this._$drawContainer.geographics( "clear" );
             this._$drawContainer.geographics( "drawBbox", [
@@ -1974,7 +1975,7 @@
 
         switch ( mode ) {
           case "zoom":
-          case "dragBbox":
+          case "dragBox":
             if ( dx !== 0 || dy !== 0 ) {
               var minSize = this._pixelSize * 6,
                   bboxCoords = this._toMap( [ [
@@ -2010,7 +2011,7 @@
                 this._trigger( "shape", e, triggerShape );
               }
             } else {
-              if ( mode === "dragBbox" ) {
+              if ( mode === "dragBox" ) {
                 coordBuffer = this._toMap( current );
 
                 triggerShape = {

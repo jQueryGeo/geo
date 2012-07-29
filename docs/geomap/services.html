@@ -11,7 +11,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
 </head>
 
 <body>
@@ -35,10 +35,10 @@
   &quot;class&quot;: &quot;osm&quot;,
   type: &quot;tiled&quot;,
   src: function( view ) {
-    return &quot;http://tile.openstreetmap.org/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png&quot;;
+    return &quot;http://otile&quot; + ((view.index % 4) + 1) + &quot;.mqcdn.com/tiles/1.0.0/osm/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png&quot;;
   },
-  attr: &quot;&amp;copy; OpenStreetMap &amp;amp; contributors, CC-BY-SA&quot;
-} ]</pre></code></td>
+  attr: &quot;&lt;p&gt;Tiles Courtesy of &lt;a href='http://www.mapquest.com/' target='_blank'&gt;MapQuest&lt;/a&gt; &lt;img src='http://developer.mapquest.com/content/osm/mq_logo.png'&gt;&lt;/p&gt;&quot;
+} ] );</code></pre></td>
         </tr>
         <tr>
           <th>init</th>
@@ -66,14 +66,13 @@
         </tr>
         <tr>
           <td colspan=2><pre><code>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;services&quot;, [ {
-  id: &quot;mapquest-open&quot;,
-  &quot;class&quot;: &quot;basemap&quot;,
+  id: &quot;openstreetmap&quot;,
   type: &quot;tiled&quot;,
   src: function( view ) {
-    return &quot;http://otile&quot; + ((view.index % 4) + 1) + &quot;.mqcdn.com/tiles/1.0.0/osm/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png&quot;;
+    return &quot;http://tile.openstreetmap.org/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png&quot;;
   },
-  attr: &quot;&lt;p&gt;Tiles Courtesy of &lt;a href='http://www.mapquest.com/' target='_blank'&gt;MapQuest&lt;/a&gt; &lt;img src='http://developer.mapquest.com/content/osm/mq_logo.png'&gt;&lt;/p&gt;&quot;
-} ] );</code></pre></td>
+  attr: &quot;&amp;copy; OpenStreetMap &amp;amp; contributors, CC-BY-SA&quot;
+} ]</pre></code></td>
         </tr>
       </table>
 
@@ -126,16 +125,18 @@
       <pre><code>src: function ( view ) { return $.ajax( { ... } ); }</code></pre>
       <p>When src is a string, those same properties can be used in the template by surrounding each property with: {{:propertyName}}.</p>
 
-      <p>The default value for src is a function because it is slightly faster than rendering a template. However, as an example, we can rewrite the default src function as a template string:</p>
+      <p>The default value for src is a function because it is slightly faster than rendering a template and we have better control of the view.index property. However, as an example, we can rewrite the default src function as a template string:</p>
 
       <p><b>Note: Alpha releases used a {{= }} syntax but there is a breaking change in the beta version due to <a href="http://www.borismoore.com/2012/03/approaching-beta-whats-changing-in_06.html" rel="external">changes in jsRender</a>. Please use the new {{: }} syntax.</b></p>
 
-      <pre><code>src: &quot;http://tile.openstreetmap.org/{{:zoom}}/{{:tile.column}}/{{:tile.row}}.png&quot;</code></pre>
+      <pre><code>src: &quot;http://otile1.mqcdn.com/tiles/1.0.0/osm/{{:zoom}}/{{:tile.column}}/{{:tile.row}}.png&quot;</code></pre>
 
       <p>A couple advantages of using a string are that it is more concise and, unlike a function, can be stored as JSON.</p>
 
       <p>You do not have to have template parameters in the string, so if you want a static map image, you can set src to a static URL.</p>
+
       <h3>attr</h3>
+
       <p>The attr property is optional. It stands for attribution and is a way to give credit to the source of your map imagery. It defaults to an empty string if not specified in a service object. When present, the map widget displays the HTML provided on the bottom-left corner of the map when the service is visible. Users can click links but cannot interact with all other text or images.</p>
       <h3>style</h3>
       <p>The style property is optional. It contains presentation options for the service.</p>
@@ -146,7 +147,7 @@
 
       <h2>modifying services</h2>
 
-      <p>By default, the geomap widget starts with one service object in the services array. The default service object will display OpenStreetMap tiles. Setting the services option will replace all existing services with a new set that you specify. You can set a specific part of of a specific service by getting the current array, modifying, adding, or deleting one of the service objects and then re-setting the services option with the modified array.</p>
+      <p>By default, the geomap widget starts with one service object in the services array. The default service object will display OpenStreetMap data via <a href="http://open.mapquest.com/" rel="external" target="_blank">mapquest open</a> tiles. Setting the services option will replace all existing services with a new set that you specify. You can set a specific part of of a specific service by getting the current array, modifying, adding, or deleting one of the service objects and then re-setting the services option with the modified array.</p>
 
       <p><b>Note: It is always better to set the services option once, during init, rather than adding or modifying services after the map has been created.</b> Some of the following samples show that it is possible to modify the services option after map initialization through the services option even though it's not recommended.</p>
 
@@ -197,10 +198,10 @@ var map = $( &quot;#map&quot; ).geomap( { services: services } );</code></pre>
     </div>
   </div> <!-- end of #container -->
 
-  <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-  <script src="http://code.jquerygeo.com/jquery.geo-1.0a4.min.js"></script>
+  <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>
   <script src="../js/script.js"></script>
-  <script src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
+  <script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
 </body>
 </html>
 

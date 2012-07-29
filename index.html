@@ -6,7 +6,7 @@
   <meta name="description" content="jQuery Geo - A spatial mapping plugin for jQuery" />
   <meta name="author" content="Ryan Westphal" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/blitzer/jquery-ui.css" />
+  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/blitzer/jquery-ui.css" />
   <style type="text/css">
     html { font:13px/1.231 sans-serif; }
     
@@ -129,7 +129,7 @@
   <div class="container">
     <div class="main" role="main">
       <div class="nav project-links">
-        <a href="http://jquerygeo.com/1.0a4/" title="Documentation and demos">Docs &amp; Demos</a>
+        <a href="http://jquerygeo.com/1.0b1/" title="Documentation and demos">Docs &amp; Demos</a>
         <a href="https://github.com/AppGeo/geo/" title="Source code on GitHub">GitHub</a>
       </div>
 
@@ -144,8 +144,8 @@
       <h2>Download</h2>
       <p>Using jQuery Geo requires adding one element, including one script (apart from jQuery itself) and calling one function. The following copy-and-paste snippet will help you get started.</p>
       <pre>&lt;div id=&quot;map&quot; style=&quot;height: 320px;&quot;&gt;&lt;/div&gt;
-&lt;script src=&quot;http://code.jquery.com/jquery-1.7.1.min.js&quot;&gt;&lt;/script&gt;
-&lt;script src=&quot;http://code.jquerygeo.com/jquery.geo-1.0a4.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;http://code.jquery.com/jquery-1.7.2.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;http://code.jquerygeo.com/jquery.geo-1.0b1.min.js&quot;&gt;&lt;/script&gt;
 &lt;script&gt;$(function() { $( &quot;#map&quot; ).geomap( ); });&lt;/script&gt;</pre>
 
       <p>code.jquerygeo.com is on the CloudFlare Content Delivery Network (CDN) so our minified, gzipped library will get to your client as fast as possible!</p>
@@ -272,7 +272,7 @@
 * docs - geomap - empty string needed for label element
 * geomap - [bug] double tap to end shapes adds two points before ending the shape, in different places
 * geomap - [bug] lifting fingers after pinch zoom in drawLineString or drawPolygon modes sometimes adds fake visual coordinate on touch point last lifted
-* docs - upgrade to jQuery 1.7.1
+* docs - upgrade to jQuery 1.7.2
 * geomap - [bug] scroll=off doesn't zoom map but also doesn't allow document scroll
 * geomap - [bug] changing mode does not reset measure drawing
 * geomap - [bug] jQuery UI Widget Factory no longer passes pageX &amp; pageY event properties during _trigger when using jQuery 1.7
@@ -345,9 +345,9 @@
       
     </div>
   </div>
-  <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
-  <script type="text/javascript" src="http://code.jquerygeo.com/jquery.geo-1.0a4.min.js"></script>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>
   <script type="text/javascript">
     $(function () {
       var map;
@@ -371,7 +371,7 @@
           zoom: 7
         });
 
-        $( ".geomap .osm" ).geomap("opacity", .5);
+        $( ".osm" ).geomap("opacity", .5);
       }
    });
   </script>

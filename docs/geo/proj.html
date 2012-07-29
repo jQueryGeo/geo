@@ -11,7 +11,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
+  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
 </head>
 
 <body>
@@ -31,7 +31,7 @@
       <p>jQuery Geo will first convert the points to map units, a process called projection. jQuery Geo needs projected coordinates to properly calculate some relationships between shapes. After converting the points, $.geo.distance can then calculate the distance between them. This distance will be in meters because the default map service is web mercator meters.</p>
       <p>In order to work directly in map units, you used to have to set $.geo.proj to null. While still valid, you no longer have to do this. You can leave $.geo.proj set to, e.g., web mercator meters and send either projected web mercator GeoJSON geometry objects or geodetic (lon, lat) objects to $.geo functions. The return value will depend on the type of arguments passed.</p>
       <p>The geomap widget keeps track of how you set options. For example, if you set the map's center using geodetic coordinates, geodetic coordinates will then be returned when you ask for the center later. They will also be used when the geomap widget triggers events such as bboxchange or shape.</p>
-      <p>The default $.geo.proj object comes pre-built with functions that quickly convert between geodetic coordinates and web mercator meters so you can start using lon, lat right away with the default OpenStreetMap tiles. If your map service uses a different projection you can roll your own $.geo.proj object and continue to have the option to use geodetic coordinates. Read <a data-href="otherprojections" href="javascript:void(0);">Other projections</a> below for information on how to do that.</p>
+      <p>The default $.geo.proj object comes pre-built with functions that quickly convert between geodetic coordinates and web mercator meters so you can start using lon, lat right away with the default OpenStreetMap-based tiles. If your map service uses a different projection you can roll your own $.geo.proj object and continue to have the option to use geodetic coordinates. Read <a data-href="otherprojections" href="javascript:void(0);">Other projections</a> below for information on how to do that.</p>
 
       <h3>Usage</h3>
       <p>The two base functions, fromGeodetic and toGeodetic, can take and return: a single bounding box, a single GeoJSON position (Point.coordinates), an array of GeoJSON positions (MultiPoint.coordinates or LineString.coordinates), an array of arrays of positions (MultiLineString.coordinates or Polygon.coordinates) or an array of arrays of arrays of positions (MultiPolygon.coordinates). In other words, the $.geo.proj functions convert the coordinates property of any of the GeoJSON geometry types. For example, you can use the following to convert the position contained in a GeoJSON point object:</p>
@@ -105,10 +105,10 @@ $('map').geomap( {
   </div> <!-- end of #container -->
 
 
-  <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-  <script src="http://code.jquerygeo.com/jquery.geo-1.0a4.min.js"></script>
+  <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>
   <script src="../js/script.js"></script>
-  <script src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
+  <script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
 </body>
 </html>
 

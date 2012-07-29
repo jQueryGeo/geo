@@ -8,7 +8,7 @@ $(function () {
   });
 
   $(".ui-page").live("pageshow", function () {
-    $(this).find(".geomap-indoc").geomap({ zoom: 1, scroll: "off" });
+    $(this).find(".geomap-indoc").geomap({ zoom: 2, scroll: "off" });
   });
 
   $(".ui-page").live("pagebeforehide", function () {
