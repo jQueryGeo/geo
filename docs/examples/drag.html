@@ -31,19 +31,19 @@
 
       <h1>drag</h1>
 
-      <p>There is currently only one drag mode, dragBbox. This demo tests it.</p>
+      <p>There are currently two drag modes: dragBox and dragCircle. This demo tests only dragBox when set as the mode during init.</p>
     </div>
   </div>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js"></script>
-  <script src="../jquery.geo-test.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>
   <script>
     $( function ( ) {
-      // create a map, setting the mode to dragBbox
+      // create a map, setting the mode to dragBox
       var map = $( "#map" ).geomap( {
         center: [ -71.0595678, 42.3604823 ],
         zoom: 8,
-        mode: "dragBbox",
+        mode: "dragBox",
         shape: function( e, geo ) {
           // drag modes generate GeoJSON objects and send them as the geo argument
           // you can append them to the map

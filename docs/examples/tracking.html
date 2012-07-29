@@ -22,18 +22,16 @@
   <div>
     <div id="map">
     </div>
-    <div class="info">
+    <div class="info not-mobile">
       <a href="../" class="docLink">&lt; docs</a>
-      <h1>
-        GPS Tracking</h1>
-      <p>
-        This simple demo continually follows your location at zoom level 15 showing the Esri World Street Map tiles.</p>
+      <h1>GPS Tracking</h1>
+      <p>This simple demo continually follows your location at zoom level 15 showing the Esri World Street Map tiles. It now shows the geolocation accuracy buffer.</p>
       <p>
         <a href="http://roycesimpson.wordpress.com/2011/07/19/air-android-arcgis-server-flex-api-gps-activated-mapping-apps/" target="_blank">Inspired by Royce Simpson</a></p>
     </div>
   </div>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-  <script src="../jquery.geo-test.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>
   <script>
     $(function () {
       var map = null;
@@ -42,6 +40,9 @@
         map = $("#map").geomap({
           center: center || [-71.0597732, 42.3584308],
           zoom: 15,
+          mode: "static", //< this example is display-only; disable user interaction
+
+          // use an Esri map service to match the original sample
           services: [
             {
               type: "tiled",
@@ -60,7 +61,9 @@
           } else {
             map.geomap("option", "center", coord);
           }
-          map.geomap("empty");
+          map.geomap("empty", false);
+          var accuracyBuffer = p.coords.accuracy / map.geomap("option", "pixelSize");
+          map.geomap("append", { type: "Point", coordinates: coord }, { color: "#cc0", width: accuracyBuffer, height: accuracyBuffer, borderRadius: accuracyBuffer }, false);
           map.geomap("append", { type: "Point", coordinates: coord });
         }, function (error) {
           if ( !map ) {

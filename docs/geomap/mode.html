@@ -67,7 +67,7 @@
       <p>Drag modes disable panning and turn single swipes into shape events.</p>
 
       <ul>
-        <li>dragBbox</li>
+        <li>dragBox</li>
       </ul>
 
       <h3>draw</h3>
@@ -160,7 +160,7 @@
         <li>bboxchange &ndash; when the user changes the bbox by zooming</li>
       </ul>
 
-      <h2>dragBbox</h2>
+      <h2>dragBox</h2>
 
       <h3>user experience</h3>
       <p>The default cursor is a crosshair.</p>
@@ -169,12 +169,12 @@
 
       <p>The user can also click the map instead of dragging a box. In this case, jQuery Geo will still trigger a shape event, but this time it will pass a GeoJSON Point representing the clicked location. The Point object will also have the bbox property with the min and max values matching each other, i.e., bbox[0] (minx) = bbox[2] (maxx) and bbox[1] (miny) = bbox[3] (maxy).</p>
 
-      <p>The user cannot pan the map while in dragBbox mode. The user can zoom in or out with the scroll wheel as well as double-click or double-tap to zoom in one level. On some multitouch devices, users can use two fingers to &quot;pinch zoom&quot; (currently not available on Android).</p>
+      <p>The user cannot pan the map while in dragBox mode. The user can zoom in or out with the scroll wheel as well as double-click or double-tap to zoom in one level. On some multitouch devices, users can use two fingers to &quot;pinch zoom&quot; (currently not available on Android).</p>
 
       <p>The user can hold the shift key to temporarily switch to zoom mode.</p>
 
       <h3>events</h3>
-      <p>In dragBbox mode the geomap widget triggers the following events on the original map div.</p>
+      <p>In dragBox mode the geomap widget triggers the following events on the original map div.</p>
       <ul>
         <li>move &ndash; when the user moves the mouse above the map but is not actively dragging a bbox</li>
         <li>dblclick &ndash; when the user double-clicks or double-taps a point on the map</li>

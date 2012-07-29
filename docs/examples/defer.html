@@ -44,7 +44,7 @@
   <script src="../../js/jquery.geo.geomap.js"></script>
   <script src="../../js/jquery.geo.tiled.js"></script>
   <script src="../../js/jquery.geo.shingled.js"></script>
-  <!--<script src="../jquery.geo-test.min.js"></script>-->
+  <!--<script src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>-->
   <script>
     $( function ( ) {
       // create a map
@@ -110,7 +110,6 @@
               geodeticBbox[ 3 ] = geodeticBbox[ 3 ].toFixed( 2 );
 
               // draw the tile dimensions to the tile
-              context.font = "1.4em Arial";
               context.strokeText( "[ " + geodeticBbox.join( ", " ) + " ]", 32, 96 );
 
               // we are done, resolve the deferred object and complete this tile
@@ -124,8 +123,7 @@
 
             // return the Deferred object so the map widget can wait for done to be triggered
             return defer;
-          },
-          attr: "&copy; OpenStreetMap &amp; contributors, CC-BY-SA"
+          }
         } ]
       } );
     } );  
