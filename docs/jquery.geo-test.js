@@ -4098,7 +4098,7 @@ $.Widget.prototype = {
           "static": "default",
           pan: "url(data:image/vnd.microsoft.icon;base64,AAACAAEAICACAAgACAAwAQAAFgAAACgAAAAgAAAAQAAAAAEAAQAAAAAAAAEAAAAAAAAAAAAAAgAAAAAAAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD8AAAA/AAAAfwAAAP+AAAH/gAAB/8AAA//AAAd/wAAGf+AAAH9gAADbYAAA2yAAAZsAAAGbAAAAGAAAAAAAAA//////////////////////////////////////////////////////////////////////////////////////gH///4B///8Af//+AD///AA///wAH//4AB//8AAf//AAD//5AA///gAP//4AD//8AF///AB///5A////5///8=), move",
           zoom: "crosshair",
-          dragBbox: "crosshair",
+          dragBox: "crosshair",
           dragCircle: "crosshair",
           drawPoint: "crosshair",
           drawLineString: "crosshair",
@@ -5760,10 +5760,10 @@ $.Widget.prototype = {
       if (!this._inOp && e.shiftKey && shift !== "off") {
         this._shiftDown = true;
         this._$eventTarget.css( "cursor", this._options[ "cursors" ][ shift === "default" ? "zoom" : shift ] );
-      } else if ( !this._isMultiTouch && ( this._options[ "pannable" ] || mode === "dragBbox" || mode === "dragCircle" ) ) {
+      } else if ( !this._isMultiTouch && ( this._options[ "pannable" ] || mode === "dragBox" || mode === "dragCircle" ) ) {
         this._inOp = true;
 
-        if ( mode !== "zoom" && mode !== "dragBbox" && mode !== "dragCircle" ) {
+        if ( mode !== "zoom" && mode !== "dragBox" && mode !== "dragCircle" ) {
           this._lastDrag = this._current;
 
           if (e.currentTarget.setCapture) {
@@ -5907,7 +5907,7 @@ $.Widget.prototype = {
 
       switch (mode) {
         case "zoom":
-        case "dragBbox":
+        case "dragBox":
           if ( this._mouseDown ) {
             this._$drawContainer.geographics( "clear" );
             this._$drawContainer.geographics( "drawBbox", [
@@ -6057,7 +6057,7 @@ $.Widget.prototype = {
 
         switch ( mode ) {
           case "zoom":
-          case "dragBbox":
+          case "dragBox":
             if ( dx !== 0 || dy !== 0 ) {
               var minSize = this._pixelSize * 6,
                   bboxCoords = this._toMap( [ [
@@ -6093,7 +6093,7 @@ $.Widget.prototype = {
                 this._trigger( "shape", e, triggerShape );
               }
             } else {
-              if ( mode === "dragBbox" ) {
+              if ( mode === "dragBox" ) {
                 coordBuffer = this._toMap( current );
 
                 triggerShape = {
