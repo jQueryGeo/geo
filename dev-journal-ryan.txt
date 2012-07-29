@@ -1,8 +1,6 @@
 ﻿== to do ==
 
 === b1 ===
-* docs - geomap - use MapQuest Open by default; can't deny that it looks much nicer
-* geomap - use MapQuest Open by default; can't deny that it looks much nicer
 
 === examples ===
 

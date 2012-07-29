@@ -7,7 +7,7 @@ Using jQuery Geo requires adding one element, including one script (apart from j
 
 ```html
 <div id="map" style="height: 320px;"></div>
-<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
 <script src="http://code.jquerygeo.com/jquery.geo-1.0a4.min.js"></script>
 <script>
   $(function() {
@@ -109,6 +109,8 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * geomap - use linear distance for pinch zoom calculation
 * docs - geomap - zoomMin option
 * geomap - zoomMin option
+* docs - geomap - use MapQuest Open by default; can't deny that it looks much nicer
+* geomap - use MapQuest Open by default; can't deny that it looks much nicer
 
 ### 1.0a4 (2012-02-19)
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax
@@ -179,7 +181,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * geomap - label divs should have class="geo-label" & style="position: absolute;"
 * geomap - [bug] double tap to end shapes adds two points before ending the shape, in different places
 * geomap - [bug] lifting fingers after pinch zoom in drawLineString or drawPolygon modes sometimes adds fake visual coordinate on touch point last lifted
-* docs - upgrade to jQuery 1.7.1
+* docs - upgrade to jQuery 1.7.2
 * geomap - [bug] scroll=off doesn't zoom map but also doesn't allow document scroll
 * geomap - [bug] changing mode does not reset measure drawing
 * geomap - [bug] jQuery UI Widget Factory no longer passes pageX & pageY event properties during trigger when using jQuery 1.7
