@@ -113,6 +113,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * geomap - use MapQuest Open by default; can't deny that it looks much nicer
 * docs - geomap - rename dragBbox to dragBox
 * geomap - rename dragBbox to dragBox
+* geomap - [bug] error using tiled deferred services
 
 ### 1.0a4 (2012-02-19)
 * geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax

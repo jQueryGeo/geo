@@ -124,7 +124,7 @@
               loadImageDeferredDone = function( url ) {
                 // when a Deferred call is done, add the image to the map
                 // a reference to the correct img element is on the Deferred object itself
-                serviceObj._loadImage( $.data( this, "img" ), url, map, serviceState, opacity );
+                serviceObj._loadImage( $.data( this, "img" ), url, pixelSize, map, serviceState, opacity );
               },
 
               loadImageDeferredFail = function( ) {
