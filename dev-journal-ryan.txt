@@ -1,7 +1,5 @@
 ﻿== to do ==
 
-=== b1 ===
-
 === examples ===
 
 * examples - jQuery Mobile
@@ -46,6 +44,7 @@
 * geomap - include bboxMax in interactiveTransform engine
 * docs - geomap - add indexMax property to service object to limit the view.index number so it can be used in template src
 * geomap - add indexMax property to service object to limit the view.index number so it can be used in template src
+* geomap - [bug] page scroll effects zoom center on fixed position maps
 * geomap - clean up touch tracking
 * geomap - support high-precision mice better in tiled maps
 * geomap - don't repeat attr text if the same as one previously added

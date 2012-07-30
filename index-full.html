@@ -154,8 +154,6 @@
 
       <p>Over 120 commits and five months after the release of alpha 4, jQuery Geo is now feature complete with what we planned for version 1.0!</p>
 
-      <p>The highlights are mentioned here and you can follow the link at the end to read more details.</p>
-
       <h3>New interaction engine</h3>
 
       <p>User interaction is a big part of an interactive map widget, obviously!, and in beta 1 we have optimized panning, zooming, and how they work together. Your maps should feel more responsive overall.</p>
@@ -196,7 +194,244 @@
 
       <p>Thanks for checking out jQuery Geo! We hope you find it useful and will keep you updated as we press on to a 1.0 release!</p>
 
-      <p><a href="index-full.html">Click here to checkout the full changelog</a></p>
+      <p>Here's the full changelog:</p>
+
+      <pre>* geographics - use canvas compositing for Polygons with holes
+* geographics - [bug] on polygons with holes, stroke draws a line from exterior ring to interior one
+* docs - geomap - trigger a shape event when a user finishes measuring
+* geomap - trigger a shape event when a user finishes measuring
+* geomap - [bug] elements inside the map div lose their position setting
+* geomap - trigger bboxchange when we update the map size after the window resizes
+* geomap - [bug] multiple map widgets share the same compiled measureLabels template names and overwrite each other
+* examples - inset map/multiple maps example
+* geomap - [bug] in zoom mode, dragging from bottom-right to top-left draws box but doesn't zoom
+* geomap - [bug] any mouse down triggers refresh, even without pan
+* cdn - fix caching
+** Cache-Control header max-age set to 5 years
+** remove Expires header
+* geomap - upgrade to jsrender 1.0pre
+* deploy - build releases using grunt
+* deploy - make a package for new jQuery plugin directory
+** https://github.com/jquery/plugins.jquery.com/blob/master/docs/package.md
+* deploy - lint JavaScript files
+* docs - geomap - dragBbox mode
+* docs - geo - polygonize function for bbox
+* geo - polygonize function for bbox
+* geomap - dragBbox mode
+* docs - geomap - shift option (default, zoom, dragBbox, off)
+* geomap - shift option (default, zoom, dragBbox, off)
+* docs - geomap - loadstart, loadend events
+* docs - geomap - allow append to take an array of shapes
+* docs - geomap - allow remove to take an array of shapes
+* docs - geomap - improve services option documentation
+* geomap - clamp measure labels to [0, 0]
+* geo - clamp centroid to bbox
+* geomap - measure label for polygon should be in centroid
+* geomap - merge interactive pan and zoom into one, faster system (pan/zoom rewrite)
+* geomap - [bug] iOS - panning is visually jumpy but settles on the correct bbox in the end
+* geomap - pinch-zoom doesn't follow user's fingers close enough when scaling
+* geomap - [bug] pinch zoom on iPad 2 (iOS 5) doesn't refresh tiles when zooming out
+* geomap - request new image in shingled service during interactive pan
+* geomap - [bug] zoom in more than once with zoom method moves tiles to the wrong spot
+* geomap - [bug] only services that have finished refreshing move when the user pans
+* geomap - [bug] map panning is jumpy, appears to be related to shapes and/or drawing context
+* geomap - [bug] pan sometimes lags on first drag
+* geomap - tiled data-scaleOrigin should be stored as an array
+* geomap - android - [bug] cannot always pan map after appending shapes
+* geomap - android - browser stops pan/zoom after 7 logos on logo demo
+* geomap - [bug] mouse wheel on bad or missing tile doesn't zoom out on first rotate
+* geomap - increase mobile performance by 9000
+* docs - geomap - add argument to refresh to force reload of images for dynamic data
+* docs - geomap - allow service-level refresh
+* docs - geomap - zoomMax option (tiled &amp; shingled)
+* docs - geo - include method for bbox
+* geomap - bboxMax should reset center &amp; pixelSize
+* geomap - [bug] initializing center, zoom, &amp; bbox doesn't set all properties
+* geo - [bug] polygonize doesn't return valid polygon when using geodetic coordinates
+* geomap - [bug] dragBbox doesn't include the bbox property in the shape
+* geomap - dragBbox should send a Point (with bbox) for single clicks
+* docs - geomap - dragCircle mode
+* geo - include method for bbox
+* geomap - dragCircle mode
+* geomap - [regression] refresh &amp; toggle methods no longer keep original service objects in sync
+* geomap - [bug] when a singled image hasn't loaded after pan and you double click on empty space, the zoomed bbox seems wrong
+* geomap - allow service-level refresh
+* geographics - remove the blit canvas from the DOM, i.e., don't attach
+* geomap - don't initialze service-level geographics until they're used
+* geomap - add argument to refresh to force reload of images (in case of dynamic data)
+* geomap - loadstart, loadend events
+* geomap - allow append to take an array of shapes
+* geomap - allow remove to take an array of shapes
+* geomap - zoomMax option
+* geomap - [bug] cannot interact with other elements on the page on iOS after panning the map (#71)
+* geomap - iOS - [bug] after one finger is removed, stop processing as if multitouch is still on
+* geomap - dumb high-precision mice down on tiled maps
+** otherwise, the high precision rounds down to zero change in zoom
+* geomap - use linear distance for pinch zoom calculation
+* docs - geomap - zoomMin option
+* geomap - zoomMin option
+* docs - geomap - use MapQuest Open by default; can't deny that it looks much nicer
+* geomap - use MapQuest Open by default; can't deny that it looks much nicer
+* docs - geomap - rename dragBbox to dragBox
+* geomap - rename dragBbox to dragBox
+* geomap - [bug] error using tiled deferred services</pre>
+
+      <h2>Alpha 4 released!</h2>
+      <time>2012-02-19</time>
+
+      <p>It's been a long three months but we're very happy to announce the release of jQuery Geo 1.0a4! Here are some highlights and details:</p>
+
+      <h3>At the service level</h3>
+
+      <p>In alpha 3, you could append and interact with shapes on the map. In alpha 4, this is extended to services! Service-level shapes have their own shapeStyle apart from the map's and hide when their service is hidden.</p>
+
+      <h3>More modes!</h3>
+
+      <p>There are new modes to let you measure distance &amp; area, and a static mode for when you want to display a map but not let users interact with it. Apart from the three new built-in modes, you can also create custom modes to help organize your app.</p>
+
+      <h3>What's that? CSS labels!</h3>
+
+      <p>You can now give any shape a label when you append it. You can style the label from your regular style sheet using the .geo-label class which opens labeling up to all the design power of CSS3. There's even more potential if you put a class or id on your map service because you can target labels on different services using CSS rules. Also, labels can be any HTML which opens them up to new features in HTML5!</p>
+
+      <h3>More service src options</h3>
+
+      <p>The old getUrl property has been renamed to src (see Breaking below) and you can now set it to a string template. jQuery Geo will stick your tile row, column, zoom, or image bbox in for you. Services defined as a string are a little easier on the eyes than a function and can be stored as JSON data.</p> 
+
+      <p>You can still use a function and the function can now return a <a href="http://api.jquery.com/category/deferred-object/">jQuery Promise</a> to delay loading of the map image or tile. Want to calculate a Mandlebrot image in a JavaScript web worker without blocking user interaction? Return a new jQuery.Deferred() and call resolve when you're done!</p>
+
+      <h3>Mobile</h3>
+
+      <p>This version has better mobile support including pinch zoom on iOS and Android 3+ as well as other bug fixes for mobile devices.</p>
+
+      <h3>Don't worry about $.geo.proj so much</h3>
+
+      <p>You can now send either geodetic (lon, lat) or projected (x, y) coordinates to any library function and it will return accordingly if you stay on the default web mercator projection. You should still set it to null or implement the (to|from)GeodeticPos functions if you need to change projections.</p>
+
+      <h3>Breaking</h3>
+
+      <p>There is one deprecation (a service object property will be renamed in beta) and one minor breaking change.</p>
+
+      <p>To align this API with HTML itself, the getUrl property on service objects will be renamed to src. Using either src or getUrl will work for this alpha release but getUrl will be removed for beta. Please update any map services to use the new src property when you're defining them.</p>
+
+      <p>Also on service objects, the initial opacity and visibility are in a property of the service object itself named style. Your old services will still function but ones you may expect to be hidden initially will be visible until you update the service object.</p>
+
+      <p>To exemplify both of these changes, instead of: <pre><code>{
+  type: &quot;tiled&quot;,
+  getUrl: function( view ) { return &quot;&quot;; },
+  visibility: &quot;hidden&quot;
+}</code></pre> you should write: <pre><code>{
+  type: &quot;tiled&quot;,
+  src: function( view ) { return &quot;&quot;; },
+  style: { visibility: &quot;hidden&quot; }
+}</code></pre></p>
+
+      <h3>Everything else</h3>
+
+      <p>With over 60 commits, there are more features and bug fixes to write about. If you dare to click the link below (or read the README file on the project's GitHub page) you can get a better idea of what went into this build. This is the last alpha release (!) and the path to beta will add unit testing, a better build process, and smaller, more refined source code. Thanks for all your support!</p>
+
+<pre>* geomap - [bug] changing the tilingScheme doesn't update pixelSize, maxPixelSize, center or centerMax
+* geomap - [bug] shingled services throw exception during resize
+* docs - geomap - axisLayout option
+* geomap - axisLayout option
+* docs - upgrade to jQuery Mobile rc3
+* docs - allow page refreshing
+* docs - geomap - more modes: measureDistance, measureArea, static
+* docs - geomap - append label argument
+* docs - geomap - toPixel/toMap should take all coordinate dimensions like the proj functions
+* geomap - toPixel/toMap should take all coordinate dimensions like the proj functions
+* geomap - move the drawing container instead of individual points during pan
+* geomap - [bug] drawStyle resets after window resize
+* geomap - append label argument
+* docs - geomap - measureLabels option
+* geomap - measureLabels option
+* geomap - measureDistance mode
+* geomap - measureArea mode
+* docs - geomap - service-level shapeStyle
+* docs - geomap - getUrl string option
+* geomap - [bug] create doesn't clear drawing shapes
+* docs - geomap - service-level shapes
+* docs - geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
+* docs - geomap - add projection section explaining how bbox &amp; center affect map unit type
+* docs - geomap - rename getUrl to src
+* docs - geomap - scroll option
+* docs - geomap - pannable option
+* geomap - src string option
+* examples - string service src
+* geomap - [bug] map tracks mouse when not panning if click on other elements
+* geomap - pannable option
+* geomap - scroll option
+* geomap - [bug] shapesContainer is being cleared twice during mouse wheel zoom
+* geomap - support pinch zoom on iOS
+* docs - geo - add recenter function for bbox
+* geomap - static mode
+* docs - geomap - allow Deferred or Promise as return value from src function
+* geomap - [bug] widget factory merges first service with default sometimes causing exceptions with shingled services
+* geomap - allow Deferred or Promise as return value from src function
+* geomap - [bug] resize event triggered too many times during resize
+* geomap - service-level shapes
+* geomap - service-level find
+* geographics - add a resize method, call from geomap.resize
+* geo - add recenter function for bbox
+* geomap - [bug] errors creating second un-tiled map after destroying a first on same element
+* geomap - refresh shouldn't request new images if the map element is hidden
+* geomap - [bug] delayed multitouch isn't nearly as smooth as true multitouch
+* geomap - [bug] tiled pinch zoom isn't smooth
+* geo - detect geodetic coordinates and call $.geo.proj automatically, don't require devs to set $.geo.proj to null
+* geomap - [bug] mouse wheel doesn't work with jQuery 1.7
+** upgrade to latest jquery.mousewheel plugin
+* geomap - service object visibility and opacity options should be moved to a style property
+* geomap - use _currentServices in all functions unless we actually need to update the public options services object
+* geomap - don't change user's service objects in opacity/toggle
+* geomap - show attr text
+* docs - geomap - selector argument to find method
+* geomap - selector argument to find method
+* geomap - pan mode should use a hand cursor by default
+* geomap - [bug] only services that have finished refreshing move when the user pans
+** for a4: hide unfinished services
+* geomap - [bug] a user can mess with the center option, e.g., convert numbers to strings, and it can wreck havoc with map state
+* geomap - [bug] zoom option doesn't return proper values for shingled services
+* geomap - [bug] non-tiled maps can zoom out past zoom 0
+* geomap - don't request tiles that are -y index
+* geomap - [bug] initializing tiled map by non-geodetic bbox always causes zoom level 0
+* docs - geomap - empty string needed for label element
+* geomap - [bug] double tap to end shapes adds two points before ending the shape, in different places
+* geomap - [bug] lifting fingers after pinch zoom in drawLineString or drawPolygon modes sometimes adds fake visual coordinate on touch point last lifted
+* docs - upgrade to jQuery 1.7.2
+* geomap - [bug] scroll=off doesn't zoom map but also doesn't allow document scroll
+* geomap - [bug] changing mode does not reset measure drawing
+* geomap - [bug] jQuery UI Widget Factory no longer passes pageX &amp; pageY event properties during _trigger when using jQuery 1.7
+** upgrade to Widget Factory 1.8.17
+* examples - all demo (shingled)
+* docs - geomap - custom modes
+* examples - all demo (tiled)</pre>
+
+      <h2>Alpha 3 released!</h2>
+      <time>2011-11-01</time>
+
+      <h3>jQuery Geo 1.0 Alpha 3 is mostly about sketching!</h3>
+      <ul>
+        <li>new modes: drawPoint, drawLineString, and drawPolygon allow users to draw on your map</li>
+        <li>new event: shape triggers anytime a user draws a feature</li>
+        <li>new style option: drawStyle lets you change how the shapes look while being drawn</li>
+      </ul>
+      <h3>It's also about geometry functions!</h3>
+      <ul>
+        <li>$.geo's center, height/width, expandBy, scaleBy &amp; reaspect functions operate on bounding boxes</li>
+        <li>$.geo's bbox, distance, contains &amp; centroid functions operate on geometries</li>
+      </ul>
+      <p>Many examples have more class and now link to jsFiddles to further explain what's going on!</p>
+      <h3>And a tiny bit about size</h3>
+      <p>jQuery Geo is now hosted on a CDN with gzip enabled bringing the entire library to your neighborhood at under 18k.</p>
+      <h3>Breaking</h3>
+      <p>There are some minor breaking changes to make the API more consistent.</p>
+      <ul>
+        <li>The getPixelSize function is now a read-only option named pixelSize: <pre><code>$( &quot;#map&quot; ).geomap( &quot;option&quot;, &quot;pixelSize&quot; );</code></pre></li>
+        <li>The shapeStyle function is also now an option, e.g.: <pre><code>$( &quot;#map&quot; ).geomap( &quot;option&quot;, &quot;shapeStyle&quot;, { color: &quot;red&quot; } );</code></pre></li>
+        <li>
+          The boolean visible property on service objects is now the visibility property found in CSS and geomap styles and can be &quot;visible&quot; or &quot;hidden&quot;:
+          <pre><code>$( &quot;#map&quot; ).geomap( { services: [ { id: &quot;roads&quot;, visibility: &quot;hidden&quot;, ... } ] } );</code></pre>
+        </li>
+      </ul>
 
       <h2>Edge</h2>
       <p>The links above will always point to the latest stable release. However, you can test the most recently committed docs, code &amp; demos by heading over to the test release.</p>
