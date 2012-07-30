@@ -8,7 +8,7 @@ Using jQuery Geo requires adding one element, including one script (apart from j
 ```html
 <div id="map" style="height: 320px;"></div>
 <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
-<script src="http://code.jquerygeo.com/jquery.geo-1.0a4.min.js"></script>
+<script src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>
 <script>
   $(function() {
     $( "#map" ).geomap( ); // you've got a map!
@@ -18,23 +18,23 @@ Using jQuery Geo requires adding one element, including one script (apart from j
 
 You can also download the latest release as a [minified JavaScript file][min] or a [full, uncompressed one][max].
 
-[min]: http://code.jquerygeo.com/jquery.geo-1.0a4.min.js
-[max]: http://code.jquerygeo.com/jquery.geo-1.0a4.js
+[min]: http://code.jquerygeo.com/jquery.geo-1.0b1.min.js
+[max]: http://code.jquerygeo.com/jquery.geo-1.0b1.js
 
 
 ## Documentation
 The latest docs are hosted at: http://jquerygeo.com
 
-Release and other announcements via @jQueryGeo on Twitter: https://twitter.com/#!/jQueryGeo
+Release and other announcements via @jQueryGeo on Twitter: https://twitter.com/jQueryGeo
 
-News and smaller updates via @ryanttb on Twitter: https://twitter.com/#!/ryanttb
+News and smaller updates via @ryanttb on Twitter: https://twitter.com/ryanttb
 
 ## Contributing
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [grunt](https://github.com/cowboy/grunt).
 
 ## Release History
 
-### 1.0.0b1
+### 1.0b1 (2012-07-30)
 * geographics - use canvas compositing for Polygons with holes
 * geographics - [bug] on polygons with holes, stroke draws a line from exterior ring to interior one
 * docs - geomap - trigger a shape event when a user finishes measuring
