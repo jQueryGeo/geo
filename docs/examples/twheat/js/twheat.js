@@ -10,9 +10,30 @@ $(function () {
 
   function initMap(center, zoom) {
     // create a map using an optional center and zoom
+    var services = [
+          {
+            type: "tiled",
+            src: function( view ) {
+                return "http://otile" + ((view.index % 4) + 1) + ".mqcdn.com/tiles/1.0.0/osm/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
+            },
+            attr: "<p>Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='http://developer.mapquest.com/content/osm/mq_logo.png'></p>"
+          }
+        ],
+        i;
+      
+    for ( i = 0; i < 11; i++ ) {
+      services.push( {
+        id: "h" + ( 240 - ( i * 24 ) ),
+        type: "shingled",
+        src: ""
+      } );
+    }
+
     map = $("#map").geomap({
       center: center || [-71.0597732, 42.3584308],
       zoom: zoom || 10,
+
+      services: services,
 
       mode: "point",
       cursors: {
@@ -22,12 +43,12 @@ $(function () {
       // set the shapeStyle to a largish solid but translucent circle
       // to give the tweets a heat map effect
       shapeStyle: {
-        strokeOpacity: 0,
-        fillOpacity: .2,
-        width: "16px",
-        height: "16px",
-        borderRadius: "16px",
-        color: "#e44"
+        //strokeOpacity: 0,
+        fillOpacity: 1
+        //width: "16px",
+        //height: "16px",
+        //borderRadius: "16px",
+        //color: "#e44"
       },
 
       move: function (e, geo) {
@@ -77,6 +98,18 @@ $(function () {
         }
       }
     });
+
+    for ( i = 0; i < 11; i++ ) {
+      var hue = 240 - ( i * 24 ),
+          impact = hue + 16;
+      $( "#h" + hue ).geomap( "option", "shapeStyle", { 
+        color: "hsl(" + hue + ",100%,50%)",
+        width: impact,
+        height: impact,
+        borderRadius: impact,
+        fillOpacity: 1
+      } );
+    }
 
     if ( searchTerm && !searching ) {
       autoSearch();
@@ -218,8 +251,7 @@ $(function () {
         tweet.geo.coordinates[0]
       ];
 
-      map.geomap("append", feature);
-      appendedCount++;
+      appendTweetShape( feature );
     } else if ( tweet.location ) {
       // otherwise, attempt to geocode the location property
       $.ajax({
@@ -239,15 +271,32 @@ $(function () {
                 results[0].lat
               ];
 
-              // finally append the tweet
-              map.geomap( "append", feature );
-              appendedCount++;
-              $("#appendedCount").text(appendedCount + " tweets mapped!");
+              appendTweetShape( feature );
             }
           }
         }
       });
     }
+  }
+
+  function appendTweetShape( feature ) {
+    var searchService = $( "#h240" );
+
+    for ( var i = 0; i < 11; i++ ) {
+      var hue = 240 - ( i * 24 ),
+          hueService = $( "#h" + hue ),
+          impact = hue + 16 - i,
+          radius = ( hue + 16) / 2 - Math.floor( i / 2 ),
+          existing = searchService.geomap( "find", feature.geometry, radius );
+      
+      if ( existing.length >= i ) {
+        hueService.geomap( "append", feature, false );
+      }
+    }
+
+    map.geomap( "refresh" );
+    appendedCount++;
+    $("#appendedCount").text(appendedCount + " tweets mapped!");
   }
 
   function autoSearch() {
