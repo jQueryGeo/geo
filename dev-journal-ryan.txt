@@ -22,6 +22,8 @@
 ** tiled maps only
 ** not as noticeable now that the refresh timeout is shorter
 * geomap - test changing shingled service URL to get updated images (in case of dynamic data)
+* geomap - [bug] touchmove events trigger geomap move events even when the event is on a div above the maps
+** makes other parts of the UI feel sluggish
 * geomap - stop using $.data to store bbox since it's only used for drawing; store on _graphicShapes instead
 * geomap - [bug] exception when calling destroy on uninitialized div
 * geomap - do not interactiveTransform non-tiled maps out past pixelSizeMax
@@ -209,6 +211,16 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-07-31==
+===beta===
+1.0b1 is out. I hope people like it.
+
+===wkt===
+I will need to test bad input later so that there aren't JavaScript errors even when I will be returning null.
+
+===b2===
+No rest.
 
 ==2012-07-28==
 ===multitouch status===
