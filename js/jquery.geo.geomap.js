@@ -361,7 +361,7 @@
             this._setCenterAndSize( center, pixelSize, false, refresh );
           }
 
-          value = this._getBbox();
+          value = this._getBbox( center, pixelSize );
           break;
 
         case "bboxMax":
