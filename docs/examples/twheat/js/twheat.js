@@ -32,10 +32,13 @@ $(function () {
     map = $("#map").geomap({
       center: center || [-71.0597732, 42.3584308],
       zoom: zoom || 10,
+      zoomMin: 5,
+      zoomMax: 16,
 
       services: services,
 
       mode: "point",
+      scroll: "off",
       cursors: {
         point: "default"
       },
@@ -101,7 +104,8 @@ $(function () {
 
     for ( i = 0; i < 11; i++ ) {
       var hue = 240 - ( i * 24 ),
-          impact = hue + 16;
+          impact = ( hue + 16) / 2 - Math.floor( i / 2 );
+          //impact = hue + 16;
       $( "#h" + hue ).geomap( "option", "shapeStyle", { 
         color: "hsl(" + hue + ",100%,50%)",
         width: impact,
@@ -173,9 +177,6 @@ $(function () {
 
     return false;
   });
-
-  // jQueryUI for pretty buttons
-  $( "button" ).button();
 
   function search() {
     // called by autoSearch, this function actually searches Twitter for geo-enabled tweets
@@ -285,8 +286,8 @@ $(function () {
     for ( var i = 0; i < 11; i++ ) {
       var hue = 240 - ( i * 24 ),
           hueService = $( "#h" + hue ),
-          impact = hue + 16 - i,
-          radius = ( hue + 16) / 2 - Math.floor( i / 2 ),
+          impact = ( hue + 16) / 2 - Math.floor( i / 2 ), //hue + 16 - i,
+          radius = impact, //( hue + 16) / 2 - Math.floor( i / 2 ),
           existing = searchService.geomap( "find", feature.geometry, radius );
       
       if ( existing.length >= i ) {
@@ -303,7 +304,7 @@ $(function () {
     searching = true;
     if ( searchTerm ) {
       search();
-      setTimeout(autoSearch, 5000);
+      setTimeout(autoSearch, 10000);
     }
   }
 
