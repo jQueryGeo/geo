@@ -109,6 +109,7 @@
 * geomap - allow template for properties on style argument to append
 * docs - geomap - shapeLabel property
 ** template for labels for all shapes added via append
+* geomap - tiled - retry failed requests once if status === 0 (failed)
 * geomap - shapeLabel property
 * docs - geomap - allow template for properties on shapeStyle option
 * geomap - allow template for properties on shapeStyle option
