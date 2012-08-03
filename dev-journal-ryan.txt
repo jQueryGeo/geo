@@ -18,6 +18,7 @@
 
 === future ===
 
+* geomap - delay refresh after append (if refresh arg is undefined) until some timeout (hook into interactiveTransform)
 * geomap - [bug] using shift-zoom during interactiveTransform doesn't zoom to correct location
 ** tiled maps only
 ** not as noticeable now that the refresh timeout is shorter
