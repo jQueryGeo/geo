@@ -6,7 +6,8 @@ $(function () {
       searching = false,
       currentXhr = null, //< an ajax request reference if we need to cancel
       
-      twitterButtonHtml = '<a href="https://twitter.com/share" class="twitter-share-button" data-count="vertical" data-via="ryanttb">Tweet</a><script src="//platform.twitter.com/widgets.js">\x3C/script>';
+      twitterButtonHtml = '<a href="https://twitter.com/share" class="twitter-share-button" data-count="vertical" data-via="ryanttb">Tweet</a><script src="//platform.twitter.com/widgets.js">\x3C/script>',
+      timeoutRefresh = null;
 
   function initMap(center, zoom) {
     // create a map using an optional center and zoom
@@ -64,7 +65,7 @@ $(function () {
         if (searchTerm) {
           // spatial query, geo has the cursor location as a map point
           // this will find appended tweets within 3 pixels
-          var features = map.geomap("find", geo, 3),
+          var features = $( "#h240" ).geomap("find", geo, 63),
               popupHtml = "",
               i = 0;
 
@@ -214,8 +215,6 @@ $(function () {
               appendTweet( this );
 
             });
-
-            $("#appendedCount").text(appendedCount + " tweets mapped!");
           }
         }
       });
@@ -281,6 +280,11 @@ $(function () {
   }
 
   function appendTweetShape( feature ) {
+    if ( timeoutRefresh ) {
+      clearTimeout( timeoutRefresh );
+      timeoutRefresh = null;
+    }
+
     var searchService = $( "#h240" );
 
     for ( var i = 0; i < 11; i++ ) {
@@ -290,14 +294,20 @@ $(function () {
           radius = impact, //( hue + 16) / 2 - Math.floor( i / 2 ),
           existing = searchService.geomap( "find", feature.geometry, radius );
       
-      if ( existing.length >= i ) {
-        hueService.geomap( "append", feature, false );
+      hueService.geomap( "append", feature, false );
+
+      if ( existing.length <= i ) {
+        break;
       }
     }
 
-    map.geomap( "refresh" );
     appendedCount++;
     $("#appendedCount").text(appendedCount + " tweets mapped!");
+
+    timeoutRefresh = setTimeout( function( ) {
+      timeoutRefresh = null;
+      map.geomap( "refresh" );
+    }, 1000 );
   }
 
   function autoSearch() {
