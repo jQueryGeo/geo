@@ -2,9 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>i &lt;3 u, laura!</title>
+  <title>marker example</title>
   <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
-  <meta name="description" content="i &lt;3 u, laura!">
+  <meta name="description" content="marker example">
   <meta name="author" content="Ryan Westphal">
   <link rel="stylesheet" type="text/css" href="css/style.css" />
   <style type="text/css">
@@ -17,25 +17,27 @@
       bottom: 0;
     }
 
+    /* offset the container for labels on the .osm service b/c they'll all be image markers */
+    .osm .geo-labels-container
+    {
+      left: -16px !important;
+      top: -37px !important;
+    }
 
-    .heart
-{
-width: 64px;
-height: 64px;
-position: absolute;
-left: -28px;
-top: -28px;
-background-repeat: no-repeat;
-background-image: url(img/heart.png);
-}
-
+    /* set all labels on the .osm service to have an image background */
+    .osm .geo-label
+    {
+      width: 32px;
+      height: 37px;
+      background: url(img/marker.png);
+    }
   </style>
 </head>
 <body>
   <div>
     <div id="map">
       <div class="info">
-        <h1>i &lt;3 u, laura!</h1>
+        <h1>markers</h1>
       </div>
     </div>
   </div>
@@ -46,24 +48,35 @@ background-image: url(img/heart.png);
       var map = null;
 
       function setPosition( center ) {
+        // create a point for the center of the map, default to Boston
         var geo = {
               type: "Point",
               coordinates: center || [ -71.0595678, 42.3604823 ]
             };
 
         if ( ! map ) {
-          // create a map
+          // create a map & set it's center if we don't have one already
           map = $( "#map" ).geomap( {
             center: geo.coordinates,
-            zoom: 15,
-            shapeStyle: {
-              width: 0,
-              height: 0
-            }
-          } ).geomap( "append", geo, null, '<div class="heart"></div>' );
+            zoom: 15
+          } );
+          
+          // set the .osm service's shapeStyle to hide point shapes by giving them zero width/height
+          $( ".osm" ).geomap( "option", "shapeStyle", {
+            width: 0,
+            height: 0
+          } );
+
+          // append a shape to the .osm service at the center, give it an empty label
+          // the empty string is required because we're using labels as markers
+          // without the empty string, jQuery Geo won't create a label element
+          // the content of the label is set by the CSS above
+          $( ".osm" ).geomap( "append", geo, "" );
         } else {
-          map.geomap( "empty", false );
-          map.geomap( "append", geo, null, '<div class="heart"></div>', false );
+          // clear .osm service and append a new marker at the center, don't bother refreshing yet
+          $( ".osm" ).geomap( "empty", false ).geomap( "append", geo, "", false );
+
+          // set the map's center, this will refresh the service too
           map.geomap( "center", center );
         }
       }

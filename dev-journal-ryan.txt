@@ -214,6 +214,20 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2012-08-07==
+===labelsContainer===
+Since this is always positioned relative to the graphics container, I think I can tell developers that it exists, has the class geo-labels-container and that they can offset it. That would be the best way to get image markers with an offset center. However, I think I'm going to rename it .geo-labels instead because it's shorter.
+
+.geo-map
+  .geo-service
+    .geo-labels
+      .geo-label
+  .geo-service
+  .geo-service
+  .geo-labels
+    .geo-label
+
+
 ==2012-07-31==
 ===beta===
 1.0b1 is out. I hope people like it.
