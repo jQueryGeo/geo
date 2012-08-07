@@ -1,5 +1,11 @@
 ﻿== to do ==
 
+=== b2 ===
+* docs - geomap - .geo-labels CSS class
+* geographics - rename .geo-labels-container to .geo-labels
+* geomap - rename geo-measure-style style element to geo-style & include initial .geo-labels position style
+* geomap - delay refresh after append until some timeout; hook into interactiveTransform
+
 === examples ===
 
 * examples - jQuery Mobile
@@ -18,7 +24,6 @@
 
 === future ===
 
-* geomap - delay refresh after append (if refresh arg is undefined) until some timeout (hook into interactiveTransform)
 * geomap - [bug] using shift-zoom during interactiveTransform doesn't zoom to correct location
 ** tiled maps only
 ** not as noticeable now that the refresh timeout is shorter
