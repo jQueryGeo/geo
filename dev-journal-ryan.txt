@@ -219,6 +219,22 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2012-08-08==
+===image===
+There's a GigaPan of an Olymic Women's Volleyball tournament. It's a quadkey-based tile system and I can implement it in Geo. Here are some notes:
+
+      some gigapan tile ids
+http://tile111.gigapan.org/gigapans0/111225/tiles.83f6152eea5140f76880a283c3479288//rXX/rXXYYY.jpg
+http://tile111.gigapan.org/gigapans0/111225/tiles.83f6152eea5140f76880a283c3479288//rXX/YYY/rXXYYYZ.jpg
+
+level 0:
+r00/r000.jpg r00/r001.jpg r01/r010.jpg r01/r011.jpg r10/r100.jpg r10/r101.jpg
+r00/r002.jpg r00/r003.jpg r01/r012.jpg r01/r013.jpg r10/r102.jpg r10/r013.jpg
+
+level 1:
+r00/r0000.jpg r00/r0001.jpg r00/r0010.jpg r00/r0011.jpg 
+r00/r0002.jpg r00/r0003.jpg r00/r0010.jpg r00/r0011.jpg 
+
 ==2012-08-07==
 ===labelsContainer===
 Since this is always positioned relative to the graphics container, I think I can tell developers that it exists, has the class geo-labels-container and that they can offset it. That would be the best way to get image markers with an offset center. However, I think I'm going to rename it .geo-labels instead because it's shorter.

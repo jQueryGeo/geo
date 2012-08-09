@@ -6,16 +6,15 @@
   <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
   <meta name="description" content="An example of image display">
   <meta name="author" content="Ryan Westphal">
-  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/blitzer/jquery-ui.css" />
   <link rel="stylesheet" type="text/css" href="css/style.css" />
   <style type="text/css">
     #map
     {
-      position: fixed;
-      left: 0;
+      position: absolute;
       top: 0;
       right: 0;
       bottom: 0;
+      left: 0;
     }
   </style>
 </head>
@@ -26,15 +25,14 @@
     <div class="info">
       <div class="links">
         <a href="../" class="docLink">&lt; docs</a>
-        <a href="http://jsfiddle.net/ryanttb/==JSFIDDLE==/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
+        <a href="http://jsfiddle.net/ryanttb/x6Sq3/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
       </div>
-      <h1>image</h1>
-      <p></p>
-      <button id="cmdZoom" type="button">zoom in</button>
+      <h1>axisLayout: &quot;image&quot;</h1>
+      <p>Viewing a GigaPan image from the 2012 Olympic Games in London with jQuery Geo.</p>
+      <p>Inspired by: <a href="http://sportsillustrated.cnn.com/olympics/2012/gigapan/beach_volleyball/" target="_blank">Beach Volleyball GigaPan</a></p>
     </div>
   </div>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js"></script>
   <script src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>
   <script>
     $(function () {
@@ -43,39 +41,44 @@
 
       // create a map
       var map = $("#map").geomap({
-        center: [ 5616/2, 3744/2 ],
-        zoom: 0,
+        bbox: [ 0, 0, 768 * 64, 256 * 64 ],
+        zoom: 3,
+        zoomMin: 3,
         axisLayout: "image",
         services: [
           {
             type: "tiled",
             src: function (view) {
-              var quadKey = tileToQuadkey(view.tile.column, view.tile.row, view.zoom);
+              if ( view.tile.column >= 0 && view.tile.row >= 0 ) {
+                var quadKey = tileToQuadkey(view.tile.column, view.tile.row, view.zoom),
+                    r = quadKey.substr( 0, 2 );
 
-              //var r = quadKey
-              console.log(quadKey);
-              return "http://tile111.gigapan.org/gigapans0/111225/tiles.83f6152eea5140f76880a283c3479288//r00/r000.jpg";
+                console.log(quadKey);
+                if ( quadKey.length > 5 ) {
+                  return "http://tile111.gigapan.org/gigapans0/111225/tiles.83f6152eea5140f76880a283c3479288//r" + r + "/" + quadKey.substr( 2, 3 ) + "/r" + quadKey + ".jpg";
+                } else {
+                  return "http://tile111.gigapan.org/gigapans0/111225/tiles.83f6152eea5140f76880a283c3479288//r" + r + "/r" + quadKey + ".jpg";
+                }
+              } else {
+                return "";
+              }
             },
-            attr: "&copy; Sanborn"
+            attr: '<span style="color: white; font-weight: bold;">&copy; David Bergman, Sports Illustrated</span>'
           }
         ],
         tilingScheme: {
           tileWidth: 256,
           tileHeight: 256,
-          levels: 5,
+          levels: 9,
           basePixelSize: 256,
           origin: [ 0, 0 ]
         },
       });
 
-      $("#cmdZoom").button().click(function() {
-        map.geomap("zoom", +1);
-      });
-
       function tileToQuadkey(column, row, zoom) {
         var quadKey = "",
-          digit,
-          mask;
+            digit,
+            mask;
 
         for ( var i = zoom; i > 0; i-- ) {
           digit = 0;
@@ -90,45 +93,6 @@
         }
         return quadKey;
       }
-
-      /*
-      some gigapan tile ids
-http://tile111.gigapan.org/gigapans0/111225/tiles.83f6152eea5140f76880a283c3479288//rXX/rXXY.jpg
-
-level 0:
-r00/r000.jpg r00/r001.jpg r01/r010.jpg r01/r011.jpg r10/r100.jpg r10/r101.jpg
-r00/r002.jpg r00/r003.jpg r01/r012.jpg r01/r013.jpg r10/r102.jpg r10/r013.jpg
-
-level 1:
-r00/r0000.jpg r00/r0001.jpg r00/r0010.jpg r00/r0011.jpg 
-r00/r0002.jpg r00/r0003.jpg r00/r0010.jpg r00/r0011.jpg 
-      */
-
-
-      /*
-public static string TileXYToQuadKey(int tileX, int tileY, int levelOfDetail)
-        {
-            StringBuilder quadKey = new StringBuilder();
-            for (int i = levelOfDetail; i > 0; i--)
-            {
-                char digit = '0';
-                int mask = 1 << (i - 1);
-                if ((tileX & mask) != 0)
-                {
-                    digit++;
-                }
-                if ((tileY & mask) != 0)
-                {
-                    digit++;
-                    digit++;
-                }
-                quadKey.Append(digit);
-            }
-            return quadKey.ToString();
-        }
-*/
-
-
     });  
   </script>
 
