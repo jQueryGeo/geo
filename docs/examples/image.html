@@ -53,7 +53,6 @@
                 var quadKey = tileToQuadkey(view.tile.column, view.tile.row, view.zoom),
                     r = quadKey.substr( 0, 2 );
 
-                console.log(quadKey);
                 if ( quadKey.length > 5 ) {
                   return "http://tile111.gigapan.org/gigapans0/111225/tiles.83f6152eea5140f76880a283c3479288//r" + r + "/" + quadKey.substr( 2, 3 ) + "/r" + quadKey + ".jpg";
                 } else {
