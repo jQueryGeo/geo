@@ -219,6 +219,12 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2012-08-13==
+===Deferred===
+Here's a fiddle that shows the Deferred missing image on shingled service issue: http://fiddle.jshell.net/ryanttb/nZMEV/show/
+
+jQuery Geo gets the images but none are shown in the map frame after all is said & done.
+
 ==2012-08-08==
 ===image===
 There's a GigaPan of an Olymic Women's Volleyball tournament. It's a quadkey-based tile system and I can implement it in Geo. Here are some notes:
