@@ -2,7 +2,7 @@
   "name": "jquery.geo",
   "title": "jQuery Geo",
   "description": "An interactive mapping and spatial analysis plugin.",
-  "version": "1.0b1.0.1",
+  "version": "1.0test",
   "homepage": "http://jquerygeo.com",
   "author": {
     "name": "Ryan Westphal",
@@ -28,7 +28,7 @@
     }
   ],
   "dependencies": {
-    "jquery": "~1.5"
+    "jquery": "~1.7"
   },
   "keywords": []
 }

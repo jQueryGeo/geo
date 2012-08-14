@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0b1.0.1 - 2012-08-01
+/*! jQuery Geo - v1.0test - 2012-08-14
  * http://jquerygeo.com
  * Copyright (c) 2012 Ryan Westphal/Applied Geographics, Inc.; Licensed MIT, GPL */
 
@@ -6910,6 +6910,11 @@ $.Widget.prototype = {
         var serviceContainer = serviceState.serviceContainer;
 
         $img.load(function (e) {
+          if ( !$.contains(document.body, e.target.jquery ? e.target[0] : e.target) ) {
+            // this image has been canceled and removed from the DOM
+            return;
+          }
+
           if (opacity < 1) {
             $(e.target).fadeTo(0, opacity);
           } else {
@@ -6928,6 +6933,11 @@ $.Widget.prototype = {
             serviceState.loadCount = 0;
           }
         }).error(function (e) {
+          if ( !$.contains(document.body, e.target.jquery ? e.target[0] : e.target) ) {
+            // this image has been canceled and removed from the DOM
+            return;
+          }
+
           $(e.target).remove();
           serviceState.loadCount--;
           map._requestComplete();

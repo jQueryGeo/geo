@@ -221,6 +221,10 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2012-08-14==
+===Deferred===
+I fixed that issue. _cancelUnloaded was correctly removing image elments but the load event still fired and old images removed unloaded, but correct, images before they could be shown. Nice error!
+
 ==2012-08-13==
 ===Deferred===
 Here's a fiddle that shows the Deferred missing image on shingled service issue: http://fiddle.jshell.net/ryanttb/nZMEV/show/
