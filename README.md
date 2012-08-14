@@ -34,6 +34,9 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Release History
 
+### 1.0b2
+* geomap - [bug] shingled deferred services lose img elements when changing scales slowly
+
 ### 1.0b1 (2012-07-30)
 * geographics - use canvas compositing for Polygons with holes
 * geographics - [bug] on polygons with holes, stroke draws a line from exterior ring to interior one

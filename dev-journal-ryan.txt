@@ -9,6 +9,8 @@
 === examples ===
 
 * examples - jQuery Mobile
+* examples - weather
+** http://openweathermap.org/example-json
 * examples - MBCR: http://www.mbta.com/rider_tools/developers/default.asp?id=21899
 * examples - drag shapes
 * examples - ie7 - [bug] floating info div doesn't show up, inputs are alone and on the left
