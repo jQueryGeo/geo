@@ -229,6 +229,17 @@ There's an error in my culling logic where I get a bbox that has xmax and ymax t
 
 I just noticed I don't double buffer drawLineString or drawPoint!
 
+===zoom class!===
+I had what I think is a great idea today. I can have a class on the map div that changes based on zoom, e.g., .geo-zoom-7. It won't help as much for non-tiled maps but it would be great to show/hide labels for tiled maps. Hide labels at world scale:
+
+.geo-zoom-0 .geo-label { display: none; }
+
+:)
+
+Although, maybe it should be a data selector: [data-zoom='0'] .geo-label
+
+That will be slower but looks nicer. I'm not sure.
+
 ==2012-08-14==
 ===Deferred===
 I fixed that issue. _cancelUnloaded was correctly removing image elments but the load event still fired and old images removed unloaded, but correct, images before they could be shown. Nice error!
