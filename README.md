@@ -36,6 +36,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ### 1.0b2
 * geomap - [bug] shingled deferred services lose img elements when changing scales slowly
+* geomap - [bug] shapes don't render on smaller windows when zoomed in
 
 ### 1.0b1 (2012-07-30)
 * geographics - use canvas compositing for Polygons with holes

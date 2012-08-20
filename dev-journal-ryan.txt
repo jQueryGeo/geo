@@ -1,7 +1,9 @@
 ﻿== to do ==
 
 === b2 ===
+* geomap - [bug] setting shapeStyle opacity on init doesn't work right
 * docs - geomap - .geo-labels CSS class
+* geographics - double buffer drawLineString & drawPoint
 * geographics - rename .geo-labels-container to .geo-labels
 * geomap - rename geo-measure-style style element to geo-style & include initial .geo-labels position style
 * geomap - delay refresh after append until some timeout; hook into interactiveTransform
@@ -220,6 +222,12 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-08-26==
+===drawPolygon===
+There's an error in my culling logic where I get a bbox that has xmax and ymax that are smaller than the minimum.
+
+I just noticed I don't double buffer drawLineString or drawPoint!
 
 ==2012-08-14==
 ===Deferred===
