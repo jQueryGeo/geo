@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0b1.0.1 - 2012-08-01
+/*! jQuery Geo - v1.0b1.1 - 2012-08-24
  * http://jquerygeo.com
  * Copyright (c) 2012 Ryan Westphal/Applied Geographics, Inc.; Licensed MIT, GPL */
 
@@ -4066,12 +4066,14 @@ $.Widget.prototype = {
           }
 
           // blit
-          pixelBbox[ 0 ] = Math.max( pixelBbox[ 0 ], 0 );
-          pixelBbox[ 1 ] = Math.max( pixelBbox[ 1 ], 0 );
-          pixelBbox[ 2 ] = Math.min( pixelBbox[ 2 ], this._width );
-          pixelBbox[ 3 ] = Math.min( pixelBbox[ 3 ], this._height );
+          pixelBbox[ 0 ] = Math.min( Math.max( pixelBbox[ 0 ], 0), this._width );
+          pixelBbox[ 1 ] = Math.min( Math.max( pixelBbox[ 1 ], 0), this._height );
+          pixelBbox[ 2 ] = Math.min( Math.max( pixelBbox[ 2 ], 0), this._width );
+          pixelBbox[ 3 ] = Math.min( Math.max( pixelBbox[ 3 ], 0), this._height );
 
-          this._context.drawImage(this._blitcanvas, pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ], pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ] );
+          if ( pixelBbox[ 0 ] !== pixelBbox[ 2 ] && pixelBbox[ 1 ] !== pixelBbox[ 3 ] ) {
+            this._context.drawImage(this._blitcanvas, pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ], pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ] );
+          }
         }
       }
     },
@@ -5032,7 +5034,7 @@ $.Widget.prototype = {
       this._clearInteractiveTimeout( );
 
       value = Math.min( Math.max( value, this._options[ "zoomMin" ] ), this._options[ "zoomMax" ] );
-      this._setInteractiveCenterAndSize( this._center, this._getPixelSize( value ) );
+      this._setInteractiveCenterAndSize( this._centerInteractive, this._getPixelSize( value ) );
       this._interactiveTransform( );
 
       this._setInteractiveTimeout( trigger );
@@ -6910,6 +6912,11 @@ $.Widget.prototype = {
         var serviceContainer = serviceState.serviceContainer;
 
         $img.load(function (e) {
+          if ( !$.contains(document.body, e.target.jquery ? e.target[0] : e.target) ) {
+            // this image has been canceled and removed from the DOM
+            return;
+          }
+
           if (opacity < 1) {
             $(e.target).fadeTo(0, opacity);
           } else {
@@ -6928,6 +6935,11 @@ $.Widget.prototype = {
             serviceState.loadCount = 0;
           }
         }).error(function (e) {
+          if ( !$.contains(document.body, e.target.jquery ? e.target[0] : e.target) ) {
+            // this image has been canceled and removed from the DOM
+            return;
+          }
+
           $(e.target).remove();
           serviceState.loadCount--;
           map._requestComplete();

@@ -25,10 +25,18 @@
     </div>
     <div class="info">
       <a href="../" class="docLink">&lt; docs</a>
-      <h1>
-        WKT parse &amp; stringify</h1>
-      <p>
-        This example uses $.geo.WKT.stringify to turn your drawn GeoJSON objects into WKT. The Parse button uses $.geo.WKT.parse to read valid WKT from the text box and add shapes to the map.</p>
+      <h1>WKT parse &amp; stringify</h1>
+      <p>This example uses $.geo.WKT.stringify to turn your drawn GeoJSON objects into WKT. The Parse button uses $.geo.WKT.parse to read valid WKT from the text box and add shapes to the map.</p>
+<pre class="notmobile">
+POINT (-71.070554128125 42.36859979580157)
+LINESTRING (-71.570554128125 42.36859979580157, -71.63097893281248 42.47605758571917, -71.3645604757813 42.50036207893463)
+POLYGON ((-71.070554128125 42.36859979580157, -71.13097893281248 42.47605758571917, -70.8645604757813 42.50036207893463))
+MULTIPOINT (-71.070554128125 42.36859979580157, -71.13097893281248 42.47605758571917, -70.8645604757813 42.50036207893463)
+MULTIPOINT ((-71.070554128125 42.36859979580157),(-71.13097893281248 42.47605758571917),(-70.8645604757813 42.50036207893463))
+MULTIPOLYGON (((-71.070554128125 42.36859979580157, -71.13097893281248 42.47605758571917, -70.8645604757813 42.50036207893463)))
+MULTILINESTRING ((-71.070554128125 42.36859979580157, -71.13097893281248 42.47605758571917, -70.8645604757813 42.50036207893463))
+GEOMETRYCOLLECTION (POINT (-71.070554128125 42.36859979580157),LINESTRING (-71.570554128125 42.36859979580157, -71.63097893281248 42.47605758571917, -71.3645604757813 42.50036207893463),POLYGON ((-71.070554128125 42.86859979580157, -71.13097893281248 42.97605758571917, -70.8645604757813 43.00036207893463)))
+</pre>
       <textarea id="wkt" rows="4" cols="32"></textarea>
       <button id="parse" type="button">Parse</button>
       <button id="clear" type="button">Reset</button>
@@ -36,7 +44,16 @@
   </div>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
   <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js"></script>
-  <script src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>
+  <script src="../../js/excanvas.js"></script>
+  <script src="../../js/jsrender.js"></script>
+  <script src="../../js/jquery.mousewheel.js"></script>
+  <script src="../../js/jquery.ui.widget.js"></script>
+  <script src="../../js/jquery.geo.core.js"></script>
+  <script src="../../js/jquery.geo.geographics.js"></script>
+  <script src="../../js/jquery.geo.geomap.js"></script>
+  <script src="../../js/jquery.geo.tiled.js"></script>
+  <script src="../../js/jquery.geo.shingled.js"></script>
+  <!--<script src="../jquery.geo-test.min.js"></script>-->
   <script>
     $(function () {
       var map = $("#map").geomap({
@@ -48,12 +65,11 @@
         }
       });
 
-      $.geo.proj = null;
-
       $("#parse").button().click(function (e) {
         var geo = $.geo._WKT.parse($("textarea").val());
         if (geo) {
-          map.geomap("append", geo);
+          map.geomap("append", geo, false);
+          map.geomap( "option", "bbox", $.geo.scaleBy( $.geo.bbox( geo ), 2 ) );
         }
       });
 

@@ -6,15 +6,40 @@ $(function () {
       searching = false,
       currentXhr = null, //< an ajax request reference if we need to cancel
       
-      twitterButtonHtml = '<a href="https://twitter.com/share" class="twitter-share-button" data-count="vertical" data-via="ryanttb">Tweet</a><script src="//platform.twitter.com/widgets.js">\x3C/script>';
+      twitterButtonHtml = '<a href="https://twitter.com/share" class="twitter-share-button" data-count="vertical" data-via="ryanttb">Tweet</a><script src="//platform.twitter.com/widgets.js">\x3C/script>',
+      timeoutRefresh = null;
 
   function initMap(center, zoom) {
     // create a map using an optional center and zoom
+    var services = [
+          {
+            type: "tiled",
+            src: function( view ) {
+                return "http://otile" + ((view.index % 4) + 1) + ".mqcdn.com/tiles/1.0.0/osm/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
+            },
+            attr: "<p>Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='http://developer.mapquest.com/content/osm/mq_logo.png'></p>"
+          }
+        ],
+        i;
+      
+    for ( i = 0; i < 11; i++ ) {
+      services.push( {
+        id: "h" + ( 240 - ( i * 24 ) ),
+        type: "shingled",
+        src: ""
+      } );
+    }
+
     map = $("#map").geomap({
       center: center || [-71.0597732, 42.3584308],
       zoom: zoom || 10,
+      zoomMin: 5,
+      zoomMax: 16,
+
+      services: services,
 
       mode: "point",
+      scroll: "off",
       cursors: {
         point: "default"
       },
@@ -22,12 +47,12 @@ $(function () {
       // set the shapeStyle to a largish solid but translucent circle
       // to give the tweets a heat map effect
       shapeStyle: {
-        strokeOpacity: 0,
-        fillOpacity: .2,
-        width: "16px",
-        height: "16px",
-        borderRadius: "16px",
-        color: "#e44"
+        //strokeOpacity: 0,
+        fillOpacity: 1
+        //width: "16px",
+        //height: "16px",
+        //borderRadius: "16px",
+        //color: "#e44"
       },
 
       move: function (e, geo) {
@@ -40,7 +65,7 @@ $(function () {
         if (searchTerm) {
           // spatial query, geo has the cursor location as a map point
           // this will find appended tweets within 3 pixels
-          var features = map.geomap("find", geo, 3),
+          var features = $( "#h240" ).geomap("find", geo, 31),
               popupHtml = "",
               i = 0;
 
@@ -78,7 +103,24 @@ $(function () {
       }
     });
 
+    for ( i = 0; i < 11; i++ ) {
+      var hue = 240 - ( i * 24 ),
+          impact = ( hue + 16) / 2 - Math.floor( i / 2 );
+          //impact = hue + 16;
+      $( "#h" + hue ).geomap( "option", "shapeStyle", { 
+        color: "hsl(" + hue + ",100%,50%)",
+        width: impact,
+        height: impact,
+        borderRadius: impact,
+        fillOpacity: 1
+      } );
+    }
+
+    // set the zoom input the map's zoom
+    $( "#zoom input" ).val( map.geomap( "option", "zoom" ) ).css( "visibility", "visible" );
+
     if ( searchTerm && !searching ) {
+      // start searching if we have a search term
       autoSearch();
     }
   }
@@ -104,12 +146,36 @@ $(function () {
             "q=" + encodeURIComponent($("#twit input").val()) +
             "&l=" + encodeURIComponent($("#loc input").val()) +
             "&center=" + results[0].lon + "," + results[0].lat +
-            "&zoom=" + map.geomap("option", "zoom");
+            "&zoom=" + ( map.geomap("option", "zoom") );
         }
       }
     });
     return false;
   });
+
+  $( "#zoomout" ).click( function( e ) {
+    $( "#zoom input" ).css( "visibility", "hidden" );
+    var zoom = map.geomap( "option", "zoom" );
+    if ( zoom > 5 ) {
+      window.location.search = 
+        "q=" + encodeURIComponent($("#twit input").val()) +
+        "&l=" + encodeURIComponent($("#loc input").val()) +
+        "&center=" + map.geomap( "option", "center" ) +
+        "&zoom=" + ( map.geomap( "option", "zoom" ) - 1 );
+    }
+  } );
+
+  $( "#zoomin" ).click( function( e ) {
+    $( "#zoom input" ).css( "visibility", "hidden" );
+    var zoom = map.geomap( "option", "zoom" );
+    if ( zoom  < 16 ) {
+      window.location.search = 
+        "q=" + encodeURIComponent($("#twit input").val()) +
+        "&l=" + encodeURIComponent($("#loc input").val()) +
+        "&center=" + map.geomap( "option", "center" ) +
+        "&zoom=" + ( map.geomap( "option", "zoom" ) + 1 );
+    }
+  } );
 
   $("#twit").submit(function (e) {
     e.preventDefault();
@@ -135,14 +201,11 @@ $(function () {
         "q=" + encodeURIComponent(searchTerm) +
         "&l=" + encodeURIComponent($("#loc input").val()) +
         "&center=" + map.geomap("option", "center").toString() +
-        "&zoom=" + map.geomap("option", "zoom");
+        "&zoom=" + ( map.geomap("option", "zoom") );
     }
 
     return false;
   });
-
-  // jQueryUI for pretty buttons
-  $( "button" ).button();
 
   function search() {
     // called by autoSearch, this function actually searches Twitter for geo-enabled tweets
@@ -180,8 +243,6 @@ $(function () {
               appendTweet( this );
 
             });
-
-            $("#appendedCount").text(appendedCount + " tweets mapped!");
           }
         }
       });
@@ -218,8 +279,7 @@ $(function () {
         tweet.geo.coordinates[0]
       ];
 
-      map.geomap("append", feature);
-      appendedCount++;
+      appendTweetShape( feature );
     } else if ( tweet.location ) {
       // otherwise, attempt to geocode the location property
       $.ajax({
@@ -239,10 +299,7 @@ $(function () {
                 results[0].lat
               ];
 
-              // finally append the tweet
-              map.geomap( "append", feature );
-              appendedCount++;
-              $("#appendedCount").text(appendedCount + " tweets mapped!");
+              appendTweetShape( feature );
             }
           }
         }
@@ -250,11 +307,42 @@ $(function () {
     }
   }
 
+  function appendTweetShape( feature ) {
+    if ( timeoutRefresh ) {
+      clearTimeout( timeoutRefresh );
+      timeoutRefresh = null;
+    }
+
+    var searchService = $( "#h240" );
+
+    for ( var i = 0; i < 11; i++ ) {
+      var hue = 240 - ( i * 24 ),
+          hueService = $( "#h" + hue ),
+          impact = ( hue + 16) / 2 - Math.floor( i / 2 ), //hue + 16 - i,
+          radius = impact, //( hue + 16) / 2 - Math.floor( i / 2 ),
+          existing = searchService.geomap( "find", feature.geometry, radius );
+      
+      hueService.geomap( "append", feature, false );
+
+      if ( existing.length <= i ) {
+        break;
+      }
+    }
+
+    appendedCount++;
+    $("#appendedCount").text(appendedCount + " tweets mapped!");
+
+    timeoutRefresh = setTimeout( function( ) {
+      timeoutRefresh = null;
+      map.geomap( "refresh" );
+    }, 1000 );
+  }
+
   function autoSearch() {
     searching = true;
     if ( searchTerm ) {
       search();
-      setTimeout(autoSearch, 5000);
+      setTimeout(autoSearch, 10000);
     }
   }
 
