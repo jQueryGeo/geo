@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0test - 2012-08-20
+/*! jQuery Geo - v1.0b1.1 - 2012-08-24
  * http://jquerygeo.com
  * Copyright (c) 2012 Ryan Westphal/Applied Geographics, Inc.; Licensed MIT, GPL */
 
@@ -5034,7 +5034,7 @@ $.Widget.prototype = {
       this._clearInteractiveTimeout( );
 
       value = Math.min( Math.max( value, this._options[ "zoomMin" ] ), this._options[ "zoomMax" ] );
-      this._setInteractiveCenterAndSize( this._center, this._getPixelSize( value ) );
+      this._setInteractiveCenterAndSize( this._centerInteractive, this._getPixelSize( value ) );
       this._interactiveTransform( );
 
       this._setInteractiveTimeout( trigger );

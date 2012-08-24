@@ -859,7 +859,7 @@
       this._clearInteractiveTimeout( );
 
       value = Math.min( Math.max( value, this._options[ "zoomMin" ] ), this._options[ "zoomMax" ] );
-      this._setInteractiveCenterAndSize( this._center, this._getPixelSize( value ) );
+      this._setInteractiveCenterAndSize( this._centerInteractive, this._getPixelSize( value ) );
       this._interactiveTransform( );
 
       this._setInteractiveTimeout( trigger );
