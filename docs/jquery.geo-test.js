@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0b1 - 2012-07-29
+/*! jQuery Geo - vtest - 2012-08-24
  * http://jquerygeo.com
  * Copyright (c) 2012 Ryan Westphal/Applied Geographics, Inc.; Licensed MIT, GPL */
 
@@ -3502,7 +3502,7 @@ $.Widget.prototype = {
             pointParts,
             i = 0;
 
-        if ( lineString.length > 1 ) {
+        if ( lineString && lineString.length > 1 ) {
           pointStrings = lineString[ 1 ].match( /[\d\.\-]+\s+[\d\.\-]+/g );
 
           for ( ; i < pointStrings.length; i++ ) {
@@ -3526,7 +3526,7 @@ $.Widget.prototype = {
             pointParts,
             i = 0;
 
-        if ( polygon.length > 1 ) {
+        if ( polygon && polygon.length > 1 ) {
           pointStrings = polygon[ 1 ].match( /[\d\.\-]+\s+[\d\.\-]+/g );
 
           for ( ; i < pointStrings.length; i++ ) {
@@ -3543,13 +3543,92 @@ $.Widget.prototype = {
         }
       }
 
+      function multiPointParseUntagged(wkt) {
+        var multiSomething;
+
+        if ( wkt.indexOf( "((" ) === -1 ) {
+          multiSomething = lineStringParseUntagged( wkt );
+        } else {
+          multiSomething = multiLineStringParseUntagged( wkt );
+          multiSomething.coordinates = $.geo._allCoordinates( multiSomething );
+        }
+
+        multiSomething.type = "MultiPoint";
+
+        return multiSomething;
+      }
+
+      function multiLineStringParseUntagged(wkt) {
+        var lineStringsWkt = wkt.substr( 1, wkt.length - 2 ),
+            lineStrings = lineStringsWkt.split( ")),((" ),
+            i = 0,
+            multiLineString = {
+              type: "MultiLineString",
+              coordinates: [ ]
+            };
+
+        for ( ; i < lineStrings.length; i++ ) {
+          multiLineString.coordinates.push( lineStringParseUntagged( lineStrings[ i ] ).coordinates );
+        }
+
+        return multiLineString;
+      }
+
+      function multiPolygonParseUntagged(wkt) {
+        var polygonsWkt = wkt.substr( 1, wkt.length - 2 ),
+            polygons = polygonsWkt.split( ")),((" ),
+            i = 0,
+            multiPolygon = {
+              type: "MultiPolygon",
+              coordinates: [ ]
+            };
+
+        for ( ; i < polygons.length; i++ ) {
+          multiPolygon.coordinates.push( polygonParseUntagged( polygons[ i ] ).coordinates );
+        }
+
+        return multiPolygon;
+      }
+
+      function geometryCollectionParseUntagged( wkt ) {
+        var geometriesWkt = wkt.substr( 1, wkt.length - 2 ),
+            geometries = geometriesWkt.match( /\),[a-zA-Z]/g ),
+            geometryCollection = {
+              type: "GeometryCollection",
+              geometries: [ ]
+            },
+            curGeom,
+            i = 0, curStart = 0, curLen;
+
+        if ( geometries && geometries.length > 0 ) {
+          for ( ; i < geometries.length; i++ ) {
+            curLen = geometriesWkt.indexOf( geometries[ i ], curStart ) - curStart + 1;
+            curGeom = parse( geometriesWkt.substr( curStart, curLen ) );
+            if ( curGeom ) {
+              geometryCollection.geometries.push( curGeom );
+            }
+            curStart += curLen + 1;
+          }
+
+          // one more
+          curGeom = parse( geometriesWkt.substr( curStart ) );
+          if ( curGeom ) {
+            geometryCollection.geometries.push( curGeom );
+          }
+
+          return geometryCollection;
+        } else {
+          return null;
+        }
+      }
+
       function parse(wkt) {
         wkt = $.trim(wkt);
 
-        var typeIndex = wkt.indexOf( " " ),
-            untagged = wkt.substr( typeIndex + 1 );
+        var typeIndex = wkt.indexOf( "(" ),
+            untagged = wkt.substr( typeIndex  );
 
-        switch (wkt.substr(0, typeIndex).toUpperCase()) {
+        switch ($.trim(wkt.substr(0, typeIndex)).toUpperCase()) {
           case "POINT":
             return pointParseUntagged( untagged );
 
@@ -3558,6 +3637,18 @@ $.Widget.prototype = {
 
           case "POLYGON":
             return polygonParseUntagged( untagged );
+
+          case "MULTIPOINT":
+            return multiPointParseUntagged( untagged );
+
+          case "MULTILINESTRING":
+            return multiLineStringParseUntagged( untagged );
+
+          case "MULTIPOLYGON":
+            return multiPolygonParseUntagged( untagged );
+
+          case "GEOMETRYCOLLECTION":
+            return geometryCollectionParseUntagged( untagged );
 
           default:
             return null;
@@ -3975,12 +4066,14 @@ $.Widget.prototype = {
           }
 
           // blit
-          pixelBbox[ 0 ] = Math.max( pixelBbox[ 0 ], 0 );
-          pixelBbox[ 1 ] = Math.max( pixelBbox[ 1 ], 0 );
-          pixelBbox[ 2 ] = Math.min( pixelBbox[ 2 ], this._width );
-          pixelBbox[ 3 ] = Math.min( pixelBbox[ 3 ], this._height );
+          pixelBbox[ 0 ] = Math.min( Math.max( pixelBbox[ 0 ], 0), this._width );
+          pixelBbox[ 1 ] = Math.min( Math.max( pixelBbox[ 1 ], 0), this._height );
+          pixelBbox[ 2 ] = Math.min( Math.max( pixelBbox[ 2 ], 0), this._width );
+          pixelBbox[ 3 ] = Math.min( Math.max( pixelBbox[ 3 ], 0), this._height );
 
-          this._context.drawImage(this._blitcanvas, pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ], pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ] );
+          if ( pixelBbox[ 0 ] !== pixelBbox[ 2 ] && pixelBbox[ 1 ] !== pixelBbox[ 3 ] ) {
+            this._context.drawImage(this._blitcanvas, pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ], pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ] );
+          }
         }
       }
     },
@@ -4443,7 +4536,7 @@ $.Widget.prototype = {
             this._setCenterAndSize( center, pixelSize, false, refresh );
           }
 
-          value = this._getBbox();
+          value = this._getBbox( center, pixelSize );
           break;
 
         case "bboxMax":
@@ -4941,7 +5034,7 @@ $.Widget.prototype = {
       this._clearInteractiveTimeout( );
 
       value = Math.min( Math.max( value, this._options[ "zoomMin" ] ), this._options[ "zoomMax" ] );
-      this._setInteractiveCenterAndSize( this._center, this._getPixelSize( value ) );
+      this._setInteractiveCenterAndSize( this._centerInteractive, this._getPixelSize( value ) );
       this._interactiveTransform( );
 
       this._setInteractiveTimeout( trigger );
@@ -6819,6 +6912,11 @@ $.Widget.prototype = {
         var serviceContainer = serviceState.serviceContainer;
 
         $img.load(function (e) {
+          if ( !$.contains(document.body, e.target.jquery ? e.target[0] : e.target) ) {
+            // this image has been canceled and removed from the DOM
+            return;
+          }
+
           if (opacity < 1) {
             $(e.target).fadeTo(0, opacity);
           } else {
@@ -6837,6 +6935,11 @@ $.Widget.prototype = {
             serviceState.loadCount = 0;
           }
         }).error(function (e) {
+          if ( !$.contains(document.body, e.target.jquery ? e.target[0] : e.target) ) {
+            // this image has been canceled and removed from the DOM
+            return;
+          }
+
           $(e.target).remove();
           serviceState.loadCount--;
           map._requestComplete();

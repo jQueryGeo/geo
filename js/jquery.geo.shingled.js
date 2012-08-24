@@ -221,6 +221,11 @@
         var serviceContainer = serviceState.serviceContainer;
 
         $img.load(function (e) {
+          if ( !$.contains(document.body, e.target.jquery ? e.target[0] : e.target) ) {
+            // this image has been canceled and removed from the DOM
+            return;
+          }
+
           if (opacity < 1) {
             $(e.target).fadeTo(0, opacity);
           } else {
@@ -239,6 +244,11 @@
             serviceState.loadCount = 0;
           }
         }).error(function (e) {
+          if ( !$.contains(document.body, e.target.jquery ? e.target[0] : e.target) ) {
+            // this image has been canceled and removed from the DOM
+            return;
+          }
+
           $(e.target).remove();
           serviceState.loadCount--;
           map._requestComplete();

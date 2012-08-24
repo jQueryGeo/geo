@@ -1,8 +1,21 @@
 ﻿== to do ==
 
+=== b2 ===
+* docs - geomap - .geo-labels CSS class
+* geographics - double buffer drawLineString & drawPoint
+* geographics - rename .geo-labels-container to .geo-labels
+* geomap - rename geo-measure-style style element to geo-style & include initial .geo-labels position style
+* geomap - delay refresh after append until some timeout; hook into interactiveTransform
+* geomap - [bug] mouse wheel & mac touchpads zoom too quickly
+* examples - drawing markers
+* geomap - [bug] setting zoom & then center on two lines does not zoom to the correct location
+** http://jsfiddle.net/dyTn9/11/
+
 === examples ===
 
 * examples - jQuery Mobile
+* examples - weather
+** http://openweathermap.org/example-json
 * examples - MBCR: http://www.mbta.com/rider_tools/developers/default.asp?id=21899
 * examples - drag shapes
 * examples - ie7 - [bug] floating info div doesn't show up, inputs are alone and on the left
@@ -22,6 +35,8 @@
 ** tiled maps only
 ** not as noticeable now that the refresh timeout is shorter
 * geomap - test changing shingled service URL to get updated images (in case of dynamic data)
+* geomap - [bug] touchmove events trigger geomap move events even when the event is on a div above the maps
+** makes other parts of the UI feel sluggish
 * geomap - stop using $.data to store bbox since it's only used for drawing; store on _graphicShapes instead
 * geomap - [bug] exception when calling destroy on uninitialized div
 * geomap - do not interactiveTransform non-tiled maps out past pixelSizeMax
@@ -107,6 +122,7 @@
 * geomap - allow template for properties on style argument to append
 * docs - geomap - shapeLabel property
 ** template for labels for all shapes added via append
+* geomap - tiled - retry failed requests once if status === 0 (failed)
 * geomap - shapeLabel property
 * docs - geomap - allow template for properties on shapeStyle option
 * geomap - allow template for properties on shapeStyle option
@@ -209,6 +225,105 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-08-24==
+===center/zoom options===
+Ishmael has found some errors with setting zoom & center options. Specifically, if you set the zoom first and then the center, the final image doesn't refresh properly.
+
+http://jsfiddle.net/dyTn9/11/
+
+==2012-08-22==
+===shapeStyle===
+Somethings wrong with setting shapeStyle at init. I'm not sure this is a problem. I think I was appending to a service and didn't set the service's shape style, was setting the map's shapeStyle. Phew!
+
+===default service===
+There really needs to be a way to get a copy of the default service object. Perhaps just the string: default?
+
+$("#map").geomap( {
+  services: [
+    "default",
+
+    {
+      id: "my-service",
+      type: "shingled",
+      src: ""
+    }
+  ]
+} );
+
+I kind of like that. Maybe I should go further and include other strings: "osm", "toposm", "mq-o", "mq-oa", "bing", "esri-wsm", "esri-demo-*"
+
+That's a lot of extra objects to have hanging around. I might not want to go that far. Also, with a string, there's no way to set opacity or visibility. I'll think further.
+
+===socrata===
+At Evergreen Apps Challenge in Spokane, WA. Socrata has some great data/APIs! I need a section in here on data/map endpoints.
+
+==2012-08-20==
+===drawPolygon===
+There's an error in my culling logic where I get a bbox that has xmax and ymax that are smaller than the minimum.
+
+I just noticed I don't double buffer drawLineString or drawPoint!
+
+===zoom class!===
+I had what I think is a great idea today. I can have a class on the map div that changes based on zoom, e.g., .geo-zoom-7. It won't help as much for non-tiled maps but it would be great to show/hide labels for tiled maps. Hide labels at world scale:
+
+.geo-zoom-0 .geo-label { display: none; }
+
+:)
+
+Although, maybe it should be a data selector: [data-zoom='0'] .geo-label
+
+That will be slower but looks nicer. I'm not sure.
+
+==2012-08-14==
+===Deferred===
+I fixed that issue. _cancelUnloaded was correctly removing image elments but the load event still fired and old images removed unloaded, but correct, images before they could be shown. Nice error!
+
+==2012-08-13==
+===Deferred===
+Here's a fiddle that shows the Deferred missing image on shingled service issue: http://fiddle.jshell.net/ryanttb/nZMEV/show/
+
+jQuery Geo gets the images but none are shown in the map frame after all is said & done.
+
+==2012-08-08==
+===image===
+There's a GigaPan of an Olymic Women's Volleyball tournament. It's a quadkey-based tile system and I can implement it in Geo. Here are some notes:
+
+      some gigapan tile ids
+http://tile111.gigapan.org/gigapans0/111225/tiles.83f6152eea5140f76880a283c3479288//rXX/rXXYYY.jpg
+http://tile111.gigapan.org/gigapans0/111225/tiles.83f6152eea5140f76880a283c3479288//rXX/YYY/rXXYYYZ.jpg
+
+level 0:
+r00/r000.jpg r00/r001.jpg r01/r010.jpg r01/r011.jpg r10/r100.jpg r10/r101.jpg
+r00/r002.jpg r00/r003.jpg r01/r012.jpg r01/r013.jpg r10/r102.jpg r10/r013.jpg
+
+level 1:
+r00/r0000.jpg r00/r0001.jpg r00/r0010.jpg r00/r0011.jpg 
+r00/r0002.jpg r00/r0003.jpg r00/r0010.jpg r00/r0011.jpg 
+
+==2012-08-07==
+===labelsContainer===
+Since this is always positioned relative to the graphics container, I think I can tell developers that it exists, has the class geo-labels-container and that they can offset it. That would be the best way to get image markers with an offset center. However, I think I'm going to rename it .geo-labels instead because it's shorter.
+
+.geo-map
+  .geo-service
+    .geo-labels
+      .geo-label
+  .geo-service
+  .geo-service
+  .geo-labels
+    .geo-label
+
+
+==2012-07-31==
+===beta===
+1.0b1 is out. I hope people like it.
+
+===wkt===
+I will need to test bad input later so that there aren't JavaScript errors even when I will be returning null.
+
+===b2===
+No rest.
 
 ==2012-07-28==
 ===multitouch status===

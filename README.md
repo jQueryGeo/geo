@@ -34,6 +34,13 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Release History
 
+### 1.0b2
+
+### 1.0b1.1 (2012-08-24)
+* geomap - [bug] shingled deferred services lose img elements when changing scales slowly
+* geomap - [bug] shapes don't render on smaller windows when zoomed in
+* geomap - [bug] changing the zoom & center options at the same time does not zoom to the correct location
+
 ### 1.0b1 (2012-07-30)
 * geographics - use canvas compositing for Polygons with holes
 * geographics - [bug] on polygons with holes, stroke draws a line from exterior ring to interior one
