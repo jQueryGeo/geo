@@ -226,6 +226,10 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2012-09-21==
+===gaming===
+A month break (well, a couple bug fixes & a b1.1 release between) to play some games. Also, I did get it running as a desktop (Store) app in Windows 8 & will post about that later.
+
 ==2012-08-24==
 ===center/zoom options===
 Ishmael has found some errors with setting zoom & center options. Specifically, if you set the zoom first and then the center, the final image doesn't refresh properly.
