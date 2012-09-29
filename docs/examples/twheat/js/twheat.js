@@ -23,6 +23,8 @@ $(function () {
         i;
       
     for ( i = 0; i < 11; i++ ) {
+      // for each hue breakpoint, create a new shingled service
+      // later, we will put tweets in these depending on how many other tweets around
       services.push( {
         id: "h" + ( 240 - ( i * 24 ) ),
         type: "shingled",
@@ -81,6 +83,7 @@ $(function () {
               top: e.pageY
             });
             
+            // try to reposition the popup inside the browser if it's too big
             var widthOver = $(window).width() - ( $popup.width() + e.pageX ),
                 heightOver = ($(window).height() - 32) - ( $popup.height() + e.pageY ),
                 left = e.pageX,
@@ -104,6 +107,9 @@ $(function () {
     });
 
     for ( i = 0; i < 11; i++ ) {
+      // for each hue service, set the shapeStyle based on
+      // the number of tweets required before a new level is reached
+      // for example, the "hot" layer is tiny and red
       var hue = 240 - ( i * 24 ),
           impact = ( hue + 16) / 2 - Math.floor( i / 2 );
           //impact = hue + 16;
@@ -117,6 +123,7 @@ $(function () {
     }
 
     if ( searchTerm && !searching ) {
+      // kick off an autoSearch if we have a search term
       autoSearch();
     }
   }
@@ -280,6 +287,10 @@ $(function () {
   }
 
   function appendTweetShape( feature ) {
+    // called for every tweet
+    // pick the appropriate hue service based on number of tweets around
+    // and add this tweet to EACH hue service up to that point
+    // this will add a bunch of bubbles per tweet as more tweets are found
     if ( timeoutRefresh ) {
       clearTimeout( timeoutRefresh );
       timeoutRefresh = null;
@@ -301,6 +312,8 @@ $(function () {
       }
     }
 
+    // even though we may have appended four shapes for a medium hotness
+    // tweet, we have only processed one actual tweet, update appendedCount & UI
     appendedCount++;
     $("#appendedCount").text(appendedCount + " tweets mapped!");
 
