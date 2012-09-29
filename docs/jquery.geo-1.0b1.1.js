@@ -1,4 +1,4 @@
-/*! jQuery Geo - vtest - 2012-08-24
+/*! jQuery Geo - v1.0b1.1 - 2012-08-24
  * http://jquerygeo.com
  * Copyright (c) 2012 Ryan Westphal/Applied Geographics, Inc.; Licensed MIT, GPL */
 

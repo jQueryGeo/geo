@@ -67,7 +67,7 @@ $(function () {
         if (searchTerm) {
           // spatial query, geo has the cursor location as a map point
           // this will find appended tweets within 3 pixels
-          var features = $( "#h240" ).geomap("find", geo, 63),
+          var features = $( "#h240" ).geomap("find", geo, 31),
               popupHtml = "",
               i = 0;
 
@@ -122,6 +122,9 @@ $(function () {
       } );
     }
 
+    // set the zoom input the map's zoom
+    $( "#zoom input" ).val( map.geomap( "option", "zoom" ) ).css( "visibility", "visible" );
+
     if ( searchTerm && !searching ) {
       // kick off an autoSearch if we have a search term
       autoSearch();
@@ -149,12 +152,36 @@ $(function () {
             "q=" + encodeURIComponent($("#twit input").val()) +
             "&l=" + encodeURIComponent($("#loc input").val()) +
             "&center=" + results[0].lon + "," + results[0].lat +
-            "&zoom=" + map.geomap("option", "zoom");
+            "&zoom=" + ( map.geomap("option", "zoom") );
         }
       }
     });
     return false;
   });
+
+  $( "#zoomout" ).click( function( e ) {
+    $( "#zoom input" ).css( "visibility", "hidden" );
+    var zoom = map.geomap( "option", "zoom" );
+    if ( zoom > 5 ) {
+      window.location.search = 
+        "q=" + encodeURIComponent($("#twit input").val()) +
+        "&l=" + encodeURIComponent($("#loc input").val()) +
+        "&center=" + map.geomap( "option", "center" ) +
+        "&zoom=" + ( map.geomap( "option", "zoom" ) - 1 );
+    }
+  } );
+
+  $( "#zoomin" ).click( function( e ) {
+    $( "#zoom input" ).css( "visibility", "hidden" );
+    var zoom = map.geomap( "option", "zoom" );
+    if ( zoom  < 16 ) {
+      window.location.search = 
+        "q=" + encodeURIComponent($("#twit input").val()) +
+        "&l=" + encodeURIComponent($("#loc input").val()) +
+        "&center=" + map.geomap( "option", "center" ) +
+        "&zoom=" + ( map.geomap( "option", "zoom" ) + 1 );
+    }
+  } );
 
   $("#twit").submit(function (e) {
     e.preventDefault();
@@ -180,7 +207,7 @@ $(function () {
         "q=" + encodeURIComponent(searchTerm) +
         "&l=" + encodeURIComponent($("#loc input").val()) +
         "&center=" + map.geomap("option", "center").toString() +
-        "&zoom=" + map.geomap("option", "zoom");
+        "&zoom=" + ( map.geomap("option", "zoom") );
     }
 
     return false;

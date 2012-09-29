@@ -2,13 +2,20 @@
 
 === b2 ===
 * docs - geomap - .geo-labels CSS class
+* geographics - double buffer drawLineString & drawPoint
 * geographics - rename .geo-labels-container to .geo-labels
 * geomap - rename geo-measure-style style element to geo-style & include initial .geo-labels position style
 * geomap - delay refresh after append until some timeout; hook into interactiveTransform
+* geomap - [bug] mouse wheel & mac touchpads zoom too quickly
+* examples - drawing markers
+* geomap - [bug] setting zoom & then center on two lines does not zoom to the correct location
+** http://jsfiddle.net/dyTn9/11/
 
 === examples ===
 
 * examples - jQuery Mobile
+* examples - weather
+** http://openweathermap.org/example-json
 * examples - MBCR: http://www.mbta.com/rider_tools/developers/default.asp?id=21899
 * examples - drag shapes
 * examples - ie7 - [bug] floating info div doesn't show up, inputs are alone and on the left
@@ -218,6 +225,69 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-09-21==
+===gaming===
+A month break (well, a couple bug fixes & a b1.1 release between) to play some games. Also, I did get it running as a desktop (Store) app in Windows 8 & will post about that later.
+
+==2012-08-24==
+===center/zoom options===
+Ishmael has found some errors with setting zoom & center options. Specifically, if you set the zoom first and then the center, the final image doesn't refresh properly.
+
+http://jsfiddle.net/dyTn9/11/
+
+==2012-08-22==
+===shapeStyle===
+Somethings wrong with setting shapeStyle at init. I'm not sure this is a problem. I think I was appending to a service and didn't set the service's shape style, was setting the map's shapeStyle. Phew!
+
+===default service===
+There really needs to be a way to get a copy of the default service object. Perhaps just the string: default?
+
+$("#map").geomap( {
+  services: [
+    "default",
+
+    {
+      id: "my-service",
+      type: "shingled",
+      src: ""
+    }
+  ]
+} );
+
+I kind of like that. Maybe I should go further and include other strings: "osm", "toposm", "mq-o", "mq-oa", "bing", "esri-wsm", "esri-demo-*"
+
+That's a lot of extra objects to have hanging around. I might not want to go that far. Also, with a string, there's no way to set opacity or visibility. I'll think further.
+
+===socrata===
+At Evergreen Apps Challenge in Spokane, WA. Socrata has some great data/APIs! I need a section in here on data/map endpoints.
+
+==2012-08-20==
+===drawPolygon===
+There's an error in my culling logic where I get a bbox that has xmax and ymax that are smaller than the minimum.
+
+I just noticed I don't double buffer drawLineString or drawPoint!
+
+===zoom class!===
+I had what I think is a great idea today. I can have a class on the map div that changes based on zoom, e.g., .geo-zoom-7. It won't help as much for non-tiled maps but it would be great to show/hide labels for tiled maps. Hide labels at world scale:
+
+.geo-zoom-0 .geo-label { display: none; }
+
+:)
+
+Although, maybe it should be a data selector: [data-zoom='0'] .geo-label
+
+That will be slower but looks nicer. I'm not sure.
+
+==2012-08-14==
+===Deferred===
+I fixed that issue. _cancelUnloaded was correctly removing image elments but the load event still fired and old images removed unloaded, but correct, images before they could be shown. Nice error!
+
+==2012-08-13==
+===Deferred===
+Here's a fiddle that shows the Deferred missing image on shingled service issue: http://fiddle.jshell.net/ryanttb/nZMEV/show/
+
+jQuery Geo gets the images but none are shown in the map frame after all is said & done.
 
 ==2012-08-08==
 ===image===

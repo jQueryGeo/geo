@@ -25,7 +25,7 @@ module.exports = function(grunt) {
           'js/jquery.geo.tiled.js',
           'js/jquery.geo.shingled.js'
         ],
-        dest: 'docs/<%= pkg.name %>-test.js'
+        dest: 'docs/<%= pkg.name %>-<%= pkg.version %>.js'
       }
     },
     min: {
@@ -43,7 +43,7 @@ module.exports = function(grunt) {
       },
       dist: {
         src: ['<banner>', '<config:concat.dist.dest>'],
-        dest: 'docs/<%= pkg.name %>-test.min.js'
+        dest: 'docs/<%= pkg.name %>-<%= pkg.version %>.min.js'
       }
     },
     qunit: {

@@ -77,7 +77,7 @@
           $( ".osm" ).geomap( "empty", false ).geomap( "append", geo, "", false );
 
           // set the map's center, this will refresh the service too
-          map.geomap( "center", center );
+          map.geomap( "option", "center", center );
         }
       }
 

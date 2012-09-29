@@ -58,9 +58,18 @@
         <a href="../" class="docLink">&lt; docs</a>
         <a href="http://jsfiddle.net/ryanttb/wQ86c/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
       </div>
-      <h1>
-        bbox</h1>
+      <h1> bbox</h1>
       <p class="not-mobile">This example tests getting and setting the bbox property on the geomap widget as well as calling various $.geo bbox functions.</p>
+
+      <form id="loc">
+        <label>
+          Search OSM for
+          <input type="text" name="l" />
+        </label>
+        <button type="submit">
+          Go</button>
+      </form>
+
       <form action="bbox.html" class="bbox">
         <table>
           <tr class="bbox-prop">
@@ -141,6 +150,43 @@
               updateBboxDisplay(geo.bbox);
             }
           });
+
+      $("#loc").submit(function () {
+        // when the user clicks the location search button,
+        // send a request to nominatim for an OpenStreatMap data search
+        $.ajax({
+          url: "http://open.mapquestapi.com/nominatim/v1/search",
+          data: {
+            format: "json",
+            q: $("#loc input").val()
+          },
+          dataType: "jsonp",
+          jsonp: "json_callback",
+          success: function (results) {            
+            if (results && results.length > 0) {
+              // if we a result, set the map's extent
+              // unfortunately, the nominatim search spec returns a bbox
+              // that is not properly GeoJSON formatted so we need to reorder
+              var nbbox = results[0].boundingbox;
+              $bboxInput.val( "[ " + [
+                nbbox[2], /* min longitude*/
+                nbbox[0], /* min latitude */
+                nbbox[3], /* max longitude */
+                nbbox[1]  /* max latitude */
+              ].join( ", " ) + " ]" );
+
+              $("form.bbox").submit( );
+            } else {
+              alert( "sorry, we could not find that" );
+            }
+          },
+          error: function ( xhr ) {
+            alert( "there was an error searching OSM" );
+          }
+        });
+        return false;
+      });
+
 
       $("form.bbox").submit(function () {
         // a new bbox is submitted, update the bbox option
