@@ -31,6 +31,7 @@
 
 === future ===
 
+* geomap - [bug] map interferes with Chrome's input type=range widget
 * geomap - [bug] using shift-zoom during interactiveTransform doesn't zoom to correct location
 ** tiled maps only
 ** not as noticeable now that the refresh timeout is shorter
@@ -225,6 +226,13 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-09-29==
+===twheat===
+I'm going to release the new version to Twheat! tonight, Twheat! 2.
+
+===range===
+There's an issue with jQuery Geo and Chrome's handling of the range input. Chrome doesn't stop tracking the mouse, likely because we're cancelling the mouseup event.
 
 ==2012-09-21==
 ===gaming===

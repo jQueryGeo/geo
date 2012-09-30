@@ -23,10 +23,10 @@
         <button type="submit">center</button>
       </form>
       <form id="zoom">
-        <label>
+        <!--<label>
           <span>zoom</span>
           <input type="range" name="zoom" min="5" max="16" value="10" style="visibility: hidden;" />
-        </label>
+        </label>-->
         <button id="zoomout" type="button">zoom out</button>
         <button id="zoomin" type="button">zoom in</button>
       </form>
@@ -37,14 +37,17 @@
         </label>
         <button type="submit">search</button>
       </form>
-      <div id="appendedCount">no tweets mapped yet :(</div>
+      <div class="tweet-search-info">
+        <img id="ajaxIndicator" src="img/ajax-loader.gif" style="visibility: hidden;">
+        <span id="appendedCount">no tweets mapped yet :(</span>
+      </div>
       <div id="tweetButton"></div>
     </div>
     <div class="info not-mobile">
       <div class="links">
         <a href="http://jquerygeo.com/" class="docLink">jQuery Geo &gt;</a>
       </div>
-      <h1>Twheat!</h1>
+      <h1>Twheat! <span class="two">2</span></h1>
       <h2>A Twitter Heat Map</h2>
     </div>
   </div>

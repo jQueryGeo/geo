@@ -49,6 +49,11 @@ h1
   margin-right: 256px;
 }
 
+.two
+{
+  color: #7f0000;
+}
+
 h2
 {
   font-style: italic;
@@ -72,7 +77,7 @@ h2
   max-height: 80%;
   padding: 4px;
   position: absolute;
-  opacity: .6;
+  opacity: .8;
   overflow: hidden;
   width: 30%;
 }
@@ -116,8 +121,13 @@ h2
   display: inline-block;
 }
 
-#appendedCount
+.tweet-search-info
 {
   float: right;
   margin-top: 1rem;
+}
+
+.tweet-search-info img
+{
+  vertical-align: middle;
 }
