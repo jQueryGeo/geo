@@ -1,0 +1,191 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>TIGER polygon example</title>
+  <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+  <meta name="description" content="An example of TIGER polygons in WMS or JSON">
+  <meta name="author" content="Ryan Westphal">
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+  <style type="text/css">
+    #map
+    {
+      position: fixed;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <div id="map">
+    </div>
+    <div class="info not-mobile">
+      <div class="links">
+        <a href="../" class="docLink">&lt; docs</a>
+        <a href="http://jsfiddle.net/ryanttb/==JSFIDDLE==/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
+      </div>
+      <h1>TIGER polygons</h1>
+      <p>
+        <label><input type="radio" name="poly-type" value="ags" checked /> <span>ArcGIS MapServer</span></label>
+        <label><input type="radio" name="poly-type" value="json" /> <span>ArcGIS JSON (<span id="lblPolyType">Counties</span>)</span></label>
+      </p>
+    </div>
+  </div>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+  <script src="../../js/excanvas.js"></script>
+  <script src="../../js/jsrender.js"></script>
+  <script src="../../js/jquery.mousewheel.js"></script>
+  <script src="../../js/jquery.ui.widget.js"></script>
+  <script src="../../js/jquery.geo.core.js"></script>
+  <script src="../../js/jquery.geo.geographics.js"></script>
+  <script src="../../js/jquery.geo.geomap.js"></script>
+  <script src="../../js/jquery.geo.tiled.js"></script>
+  <script src="../../js/jquery.geo.shingled.js"></script>
+  <!--<script src="../jquery.geo-test.min.js"></script>-->
+  <script>
+    $( function ( ) {
+      var jsonXhr = null, // json request for tiger data, so we can cancel it
+          polyType = "ags",
+
+          // so we can let the user know what they're seeing
+          polyTypeNames = {
+            "74": "States",
+            "76": "Counties",
+            "6": "Census Tracts",
+            "8": "Census Block Groups",
+            "10": "Census Blocks"
+          },
+
+          // we only want to query one layer depending on the zoom level
+          // this array maps zoom levels to census layers
+          jsonLayerMap = [ 74, 74, 74, 74, 74, 74, 74, 74, 76, 76, 76, 6, 6, 6, 8, 8, 10, 10 ];
+            
+
+      // create a map
+      var map = $( "#map" ).geomap( {
+        center: [ -71.0595678, 42.3604823 ],
+        zoom: 8,
+        bboxchange: function( ) {
+          if ( polyType === "json" ) {
+            // only update the JSON layer if we're rendering with JSON
+            updateTigerJson( );
+          }
+
+          // update the poly type label
+          $( "#lblPolyType" ).text( polyTypeNames[ jsonLayerMap[ map.geomap( "option", "zoom" ) ] ] );
+        },
+        services: [
+          // MapQuest basemap
+          {
+            type: "tiled",
+            src: function( view ) {
+              return "http://otile" + ((view.index % 4) + 1) + ".mqcdn.com/tiles/1.0.0/osm/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
+            },
+            attr: "<p>Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='http://developer.mapquest.com/content/osm/mq_logo.png'></p>"
+          },
+
+          // TIGER data as map images from an ArcGIS Server
+          {
+            id: "tiger-ags",
+            "class": "tiger",
+            type: "shingled",
+            src: "http://tigerweb.geo.census.gov/ArcGIS/rest/services/tigerWMS_Current/MapServer/export?bbox={{:bbox}}&layers=show:6,8,10,20,74,75,76,77&size={{:width}},{{:height}}&format=png&transparent=true&f=image"
+          },
+
+          // TIGER data as map images from ArcGIS's WMS Server
+          // I would love to use this so I can test the SLD_BODY argument to change the colors
+          // but it just isn't working for me
+          /*
+          {
+            id: "tiger-wms",
+            type: "shingled",
+            src: "http://tigerweb.geo.census.gov/ArcGIS/rest/services/tigerWMS_Current/MapServer/WMSServer?VERSION=1.3.0&REQUEST=GetMap&CRS=EPSG:3857&BBOX={{:bbox}}&LAYERS=States&STYLES=default&WIDTH={{:width}}&HEIGHT={{:height}}&FORMAT=image/png&TRANSPARENT=TRUE&EXCEPTIONS=application/vnd.ogc.se_xml" //&SLD_BODY=" + encodeURIComponent('<sld:StyledLayerDescriptor xmlns:sld="http://www.opengis.net/sld" version="1.0.0" xsi:schemaLocation="http://www.opengis.net/sld http://schemas.opengis.net/sld/1.0.0/StyledLayerDescriptor.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml"><sld:NamedLayer><sld:Name>74</sld:Name><sld:NamedStyle><sld:Name/></sld:NamedStyle><sld:UserStyle><sld:Name>redStates</sld:Name><sld:Title>redStates</sld:Title><sld:FeatureTypeStyle><sld:Rule><sld:LineSymbolizer><sld:Stroke><sld:CssParameter name="stroke">#FF0000</sld:CssParameter></sld:Stroke></sld:LineSymbolizer></sld:Rule></sld:FeatureTypeStyle></sld:UserStyle></sld:NamedLayer></sld:StyledLayerDescriptor>')
+          },
+          */
+
+          // TIGER data drawn dynamically as shapes from JSON data
+          {
+            id: "tiger-json",
+            "class": "tiger",
+            type: "shingled",
+            src: "",
+            style: { visibility: "hidden" }
+          }
+        ]
+      } );
+
+      // don't fill the json layer's shapes
+      var tigerJson = $( "#tiger-json" ).geomap( "option", "shapeStyle", { fillOpacity: 0 } );
+
+      $( "input[name='poly-type']" ).click( function( ) {
+        // when the type of render changes, update the visible service
+        $( ".tiger" ).geomap( "toggle", false );
+
+        polyType = $( "input[name='poly-type']:checked" ).val( );
+
+        switch ( polyType ) {
+          case "json":
+            updateTigerJson();
+            break;
+        }
+
+        $( "#tiger-" + polyType ).geomap( "toggle", true );
+      } );
+
+      function updateTigerJson() {
+        if ( jsonXhr ) {
+          // stop any previous ajax requests
+          jsonXhr.abort( );
+        }
+
+        // request JSON data from TIGER
+        jsonXhr = $.ajax({
+          url: "http://tigerweb.geo.census.gov/ArcGIS/rest/services/tigerWMS_Current/MapServer/" + jsonLayerMap[ map.geomap( "option", "zoom" ) ] + "/query",
+          data: {
+            geometry: $.geo.proj.fromGeodetic( map.geomap( "option", "bbox" ) ).join( "," ),
+            geometryType: "esriGeometryEnvelope",
+            spatialRel: "esriSpatialRelIntersects",
+            where: "1=1",
+            returnGeometry: "true",
+            outFields: "OBJECTID",
+            f: "json"
+          },
+          dataType: "jsonp",
+          complete: function( ) {
+            jsonXhr = null;
+          },
+          success: function( result ) {
+            // remove any previous shapes
+            tigerJson.geomap( "empty" );
+
+            // draw the new ones
+            $.each( result.features, function( i ) {
+              // Esri REST Polygon results are only off from GeoJSON by one word
+              tigerJson.geomap( "append", {
+                type: "Polygon",
+                coordinates: this.geometry.rings
+              }, i == result.features.length - 1 );
+            } );
+          },
+          error: function(xhr) {
+            // something's wrong but we're just showing shapes so don't bother
+            // the user, who will likely pan or refresh to try again
+          }
+        });
+      }
+    } );  
+  </script>
+
+  <script>
+    var _gaq = [['_setAccount', 'UA-26084853-1'], ['_trackPageview']];
+    (function (d, t) {
+      var g = d.createElement(t), s = d.getElementsByTagName(t)[0]; g.async = 1;
+      g.src = ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+      s.parentNode.insertBefore(g, s);
+    } (document, 'script'));
+  </script>
+</body>
+</html>
