@@ -62,7 +62,6 @@
           // we only want to query one layer depending on the zoom level
           // this array maps zoom levels to census layers
           jsonLayerMap = [ 74, 74, 74, 74, 74, 74, 74, 74, 76, 76, 76, 6, 6, 6, 8, 8, 10, 10 ];
-            
 
       // create a map
       var map = $( "#map" ).geomap( {
@@ -71,7 +70,15 @@
         bboxchange: function( ) {
           if ( polyType === "json" ) {
             // only update the JSON layer if we're rendering with JSON
-            updateTigerJson( );
+
+            var layer = jsonLayerMap[ map.geomap( "option", "zoom" ) ];
+
+            if ( layer == 74 ) {
+              // remove any non-state shapes
+              tigerJson.geomap( "empty" );
+            } else {
+              updateTigerJson( layer, map.geomap( "option", "bbox" ), tigerJson );
+            }
           }
 
           // update the poly type label
@@ -113,12 +120,25 @@
             type: "shingled",
             src: "",
             style: { visibility: "hidden" }
+          },
+
+          // TIGER states drawn dynamically from JSON data
+          // we put states in their own service to cache them
+          // because they will likely be requested more than other layers
+          // and they're lower polygon count
+          {
+            id: "tiger-json-states",
+            "class": "tiger",
+            type: "shingled",
+            src: "",
+            style: { visibility: "hidden" }
           }
         ]
       } );
 
       // don't fill the json layer's shapes
       var tigerJson = $( "#tiger-json" ).geomap( "option", "shapeStyle", { fillOpacity: 0 } );
+      var tigerJsonStates = $( "#tiger-json-states" ).geomap( "option", "shapeStyle", { fillOpacity: 0, strokeWidth: 3 } );
 
       $( "input[name='poly-type']" ).click( function( ) {
         // when the type of render changes, update the visible service
@@ -128,14 +148,27 @@
 
         switch ( polyType ) {
           case "json":
-            updateTigerJson();
+            // always show the states
+            tigerJsonStates.geomap( "toggle", true );
+
+            var layer = jsonLayerMap[ map.geomap( "option", "zoom" ) ];
+
+            if ( layer == 74 ) {
+              // remove any non-state shapes
+              tigerJson.geomap( "empty" );
+            } else {
+              updateTigerJson( layer, map.geomap( "option", "bbox" ), tigerJson );
+            }
             break;
         }
 
         $( "#tiger-" + polyType ).geomap( "toggle", true );
       } );
 
-      function updateTigerJson() {
+      // get all of the states because we will likely see them soon
+      updateTigerJson( "74", null, tigerJsonStates );
+
+      function updateTigerJson( layer, bbox, service ) {
         if ( jsonXhr ) {
           // stop any previous ajax requests
           jsonXhr.abort( );
@@ -143,11 +176,11 @@
 
         // request JSON data from TIGER
         jsonXhr = $.ajax({
-          url: "http://tigerweb.geo.census.gov/ArcGIS/rest/services/tigerWMS_Current/MapServer/" + jsonLayerMap[ map.geomap( "option", "zoom" ) ] + "/query",
+          url: "http://tigerweb.geo.census.gov/ArcGIS/rest/services/tigerWMS_Current/MapServer/" + layer + "/query",
           data: {
-            geometry: $.geo.proj.fromGeodetic( map.geomap( "option", "bbox" ) ).join( "," ),
-            geometryType: "esriGeometryEnvelope",
-            spatialRel: "esriSpatialRelIntersects",
+            geometry: bbox ? $.geo.proj.fromGeodetic( bbox ).join( "," ) : "",
+            geometryType: bbox ? "esriGeometryEnvelope" : "",
+            spatialRel: bbox ? "esriSpatialRelIntersects" : "",
             where: "1=1",
             returnGeometry: "true",
             outFields: "OBJECTID",
@@ -159,12 +192,12 @@
           },
           success: function( result ) {
             // remove any previous shapes
-            tigerJson.geomap( "empty" );
+            service.geomap( "empty" );
 
             // draw the new ones
             $.each( result.features, function( i ) {
               // Esri REST Polygon results are only off from GeoJSON by one word
-              tigerJson.geomap( "append", {
+              service.geomap( "append", {
                 type: "Polygon",
                 coordinates: this.geometry.rings
               }, i == result.features.length - 1 );
