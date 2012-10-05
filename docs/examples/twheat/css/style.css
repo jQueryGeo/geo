@@ -10,7 +10,7 @@ html
 
 .docLink 
 {
-  background: url(img/$.geo-logo-small.png) left no-repeat;
+  background: url(../img/$.geo-logo-small.png) left no-repeat;
   color: #7f0000;
   display: block;
   font-size: 24px;

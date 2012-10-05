@@ -240,6 +240,32 @@ In my canvas version of my marker demo, I think the image is taking too long to 
 ===click mode===
 Peter wins. I'm going to add a click mode to the official list. It will be identical to drawPoint but trigger the click event instead of the shape event.
 
+==2012-09-30==
+===helping brazil===
+I got a question from a student in brazil about jQuery Geo not rendering graphics. Here are some tips I told him:
+
+There are no built-in limits in jQuery Geo. However, I can think of a few potential reasons why nothing is showing up.
+
+1.  I don't usually have trouble with the number of coordinates in a polygon but the total amount of polygons. Too many polygons can cause browsers to stop responding. A combination of both (many coordinates and many polygons) will be even worse so it's always a good idea to generalize your data when you don't need it to be so accurate.
+2.  When you append a lot of features with the append function, add a ", false" at the end to delay refreshing the map until all the features are in. You can call "refresh" on the map when you're done. Something like this: $.each(polygons, function() { map.geomap("append", this, false); }); map.geomap("refresh");
+3.  Be sure that if your data is in lat/long, that you put the longitude first in any coordinates. Despite how they are generally spoken, longitude is an X coordinate and should come first in jQuery geo: center: [ -71 /*lon*/, 40 /*lat*/ ],
+4.  When possible, store and draw your shapes in web mercator meters instead of lon, lat coordinates so jQuery Geo doesn't have to process them.
+5.  When you are trying to draw a LOT of data, it's best to use a map server and render it as a shingled service in jQuery Geo. I recommend GeoServer for PostGIS.
+6.  Lastly, try to get one polygon to render as a test first before attempting to render your whole country.
+
+I think it's good advice.
+
+===tiger===
+tiger has map services now, so, that's cool. They are running ArcGIS Server. I forget how to restyle layers in AGS. At least it's AGS 10 so we *can* change it. No we can't, that just determines a definition query. The layers do have a WMS service but it's an Esri one. I'm not sure if you can change the style in a URL. Each layer only has one style named: default. Maybe you can, with the SLD_BODY argument!
+
+Here's an example, encodeURIComponent on something like this:
+
+<sld:StyledLayerDescriptor xmlns:sld="http://www.opengis.net/sld" version="1.0.0" xsi:schemaLocation="http://www.opengis.net/sld http://schemas.opengis.net/sld/1.0.0/StyledLayerDescriptor.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml"><sld:NamedLayer><sld:Name>74</sld:Name><sld:NamedStyle><sld:Name/></sld:NamedStyle><sld:UserStyle><sld:Name>redStates</sld:Name><sld:Title>redStates</sld:Title><sld:FeatureTypeStyle><sld:Rule><sld:LineSymbolizer><sld:Stroke><sld:CssParameter name="stroke">#FF0000</sld:CssParameter></sld:Stroke></sld:LineSymbolizer></sld:Rule></sld:FeatureTypeStyle></sld:UserStyle></sld:NamedLayer></sld:StyledLayerDescriptor>
+
+Good luck getting that to look nice in code :/
+
+I made it smaller. Oh, and you can't send that to Esri's REST API because it's a WMS parameter. Ignoring it for now. That's too bad, it would really add to my TIGER demo.
+
 ==2012-09-29==
 ===twheat===
 I'm going to release the new version to Twheat! tonight, Twheat! 2.
