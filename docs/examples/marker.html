@@ -17,19 +17,14 @@
       bottom: 0;
     }
 
-    /* offset the container for labels on the .osm service b/c they'll all be image markers */
-    .osm .geo-labels-container
-    {
-      left: -16px !important;
-      top: -37px !important;
-    }
-
-    /* set all labels on the .osm service to have an image background */
+    /* set all labels on the .osm service to have an image background, with negative margins */
     .osm .geo-label
     {
       width: 32px;
       height: 37px;
       background: url(img/marker.png);
+      margin-left: -16px !important;
+      margin-top: -37px !important;
     }
   </style>
 </head>

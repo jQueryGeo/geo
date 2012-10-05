@@ -1,15 +1,18 @@
 ﻿== to do ==
 
 === b2 ===
-* docs - geomap - .geo-labels CSS class
+* examples - drawing markers
 * geographics - double buffer drawLineString & drawPoint
-* geographics - rename .geo-labels-container to .geo-labels
 * geomap - rename geo-measure-style style element to geo-style & include initial .geo-labels position style
 * geomap - delay refresh after append until some timeout; hook into interactiveTransform
+* geographics - draw all labels to a string or document fragment and append to DOM once
+* geographics - reuse shape label divs during refresh
+** move them instead of creating new labels
 * geomap - [bug] mouse wheel & mac touchpads zoom too quickly
-* examples - drawing markers
 * geomap - [bug] setting zoom & then center on two lines does not zoom to the correct location
 ** http://jsfiddle.net/dyTn9/11/
+* docs - geomap - click mode
+* geomap - click mode
 
 === examples ===
 
@@ -109,7 +112,6 @@
 * docs - geomap - describe "graphic service" as shingled with src set to empty string or null
 * docs - warn users about potential CSS/JavaScript issues relating to generated elements
 ** ul, li, div, span, img
-* geographics - draw all labels to a string or document fragment and append to DOM once
 * geomap - compile shingled & tiled string src templates for re-use
 ** be sure their template names are unique so they don't overwrite each other
 * geomap - don't redraw graphics if the map doesn't move during pan
@@ -226,6 +228,17 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-10-04==
+===marker===
+Twheat! 2 is out. Time to get back to making that marker demo people have been asking for. What to use for data? Maybe WA state boat launches, like in my other demo. That sounds fine.
+
+I'm not going to add docs or rename .geo-labels-container. It's not needed if you use negative margins on the .geo-label CSS class.
+
+In my canvas version of my marker demo, I think the image is taking too long to load, or rather the service is made visible too quickly. It's the right time for a jQuery Promise I think. Nah, I'll just refresh after the image loads.
+
+===click mode===
+Peter wins. I'm going to add a click mode to the official list. It will be identical to drawPoint but trigger the click event instead of the shape event.
 
 ==2012-09-29==
 ===twheat===
