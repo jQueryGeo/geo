@@ -229,6 +229,10 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2012-10-05==
+===point shape labels===
+The width/height of the point shape style seems to change the position of the label. It shouldn't do that. Or, maybe it should. Why would a user want the label to be drawn over the shape when the shape is larger. If you're using point markers, you should know to use 0,0 width/height.
+
 ==2012-10-04==
 ===marker===
 Twheat! 2 is out. Time to get back to making that marker demo people have been asking for. What to use for data? Maybe WA state boat launches, like in my other demo. That sounds fine.
