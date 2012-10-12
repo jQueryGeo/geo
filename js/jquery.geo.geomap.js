@@ -1273,9 +1273,11 @@
     },
 
     _interactiveTransform: function( ) {
+      /*                       
       if ( this._$shapesContainers ) {
         this._$shapesContainers.geographics("clear");
       }
+      */
 
       for ( var i = 0; i < this._currentServices.length; i++ ) {
         service = this._currentServices[ i ];

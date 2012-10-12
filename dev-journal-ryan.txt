@@ -1,8 +1,8 @@
 ﻿== to do ==
 
 === b2 ===
-* examples - drawing markers
-* geographics - double buffer drawLineString & drawPoint
+* geomap - don't empty graphics on map interaction
+* geographics - double buffer drawLineString & drawPoint if true canvas
 * geomap - rename geo-measure-style style element to geo-style & include initial .geo-labels position style
 * geomap - delay refresh after append until some timeout; hook into interactiveTransform
 * geographics - draw all labels to a string or document fragment and append to DOM once
@@ -14,6 +14,8 @@
 * docs - geomap - click mode
 * geomap - click mode
 * geomap - [bug] chrome inputs get locked onto mouse when used on a page with a map
+* geomap - [bug] map interferes with Chrome's input type=range widget
+* geomap - [bug] removing a shape from one service that has been appended to two services causes an error in the second service
 
 === examples ===
 
@@ -35,7 +37,6 @@
 
 === future ===
 
-* geomap - [bug] map interferes with Chrome's input type=range widget
 * geomap - [bug] using shift-zoom during interactiveTransform doesn't zoom to correct location
 ** tiled maps only
 ** not as noticeable now that the refresh timeout is shorter
