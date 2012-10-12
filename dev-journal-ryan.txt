@@ -13,6 +13,7 @@
 ** http://jsfiddle.net/dyTn9/11/
 * docs - geomap - click mode
 * geomap - click mode
+* geomap - [bug] chrome inputs get locked onto mouse when used on a page with a map
 
 === examples ===
 
@@ -83,6 +84,8 @@
 * geomap - [bug] cannot wheel zoom in dragBbox mode
 * geomap - users should be able to escape out of dragBbox
 * geomap - remove "px" from .css calls
+* docs - geomap - bboxTiles option (the currently bounding tiles)
+* geomap - bboxTiles option
 * geo - use Array.push instead of $.merge where needed
 * docs - upgrade to jQuery Mobile 1.1.0
 * docs - non-mobile version via adaptive check
@@ -228,6 +231,17 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-10-11==
+===markers===
+I need to release this demo tonight. It's been too long. It's finally done. What's next? b2 issues I suppose.
+
+===b2===
+There are a few major issues I need to clean up. First, don't clear shapes while moving the map.
+
+==2012-10-09==
+===tiles===
+Chris asked if geo provides the current tiles in view. That's not part of the design but I might add it in the future. A counter part to tilingScheme and zoom options. Maybe named bboxTiles.
 
 ==2012-10-05==
 ===point shape labels===

@@ -36,7 +36,7 @@
      * so that a label gets generated, even though the label has no text
      */
     #boat-launch-css .geo-label {
-      background: url(img/boat.png);
+      background-image: url(img/boat.png);
       width: 32px;
       height: 37px;
       margin-left: -16px;
@@ -51,7 +51,7 @@
   <div class="info">
     <div class="links">
       <a href="../" class="docLink">&lt; docs</a>
-      <a href="http://jsfiddle.net/ryanttb/==JSFIDDLE==/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
+      <a href="http://jsfiddle.net/ryanttb/uxEVX/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
     </div>
     <h1>Marker drawing techniques</h1>
     <p>There are two reasonable ways to draw point markers. This example demos them. Check out the jsFiddle for docs.</p>
@@ -74,7 +74,7 @@
   <script>
     $(function() {
       var canvas = document.createElement("canvas"), //< a canvas where we draw markers for the second service in the canvas service's src function
-          boatImage = $( '<img src="img/boat-canvas.png" />' ).load( function( ) {
+          boatImage = $( '<img src="img/boat.png" />' ).load( function( ) {
             // the image doesn't always load fast enough
             // we could cache it but this is just as easy
             // refresh the canvas-based service once when the image it needs is ready
@@ -175,8 +175,23 @@
         ]
       });
 
-      // handle technique change clicks on the input buttons
       $( "input" ).click( function( ) {
+        // handle technique change clicks on the input buttons
+        // hide the service that is not the checked technique
+        // show the service that is
+        var technique = $("input:checked").val();
+
+        switch ( technique ) {
+          case "css":
+            boatLaunchCanvas.geomap( "toggle", false );
+            boatLaunchCss.geomap( "toggle", true );
+            break;
+
+          case "canvas":
+            boatLaunchCss.geomap( "toggle", false );
+            boatLaunchCanvas.geomap( "toggle", true );
+            break;
+        }
       } );
 
       // keep references to services we interact with
