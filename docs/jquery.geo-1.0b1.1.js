@@ -4554,7 +4554,8 @@ $.Widget.prototype = {
           }
 
           if ( this._created ) {
-            this._setInteractiveCenterAndSize( value, this._pixelSize );
+            this._setInteractiveCenterAndSize( value, this._pixelSizeInteractive );
+            this._interactiveTransform( );
             this._setInteractiveTimeout( false );
           } else {
             this._setCenterAndSize( value, this._pixelSize, false, refresh );

@@ -1,15 +1,19 @@
 ﻿== to do ==
 
 === b2 ===
-* docs - geomap - .geo-labels CSS class
+* examples - drawing markers
 * geographics - double buffer drawLineString & drawPoint
-* geographics - rename .geo-labels-container to .geo-labels
 * geomap - rename geo-measure-style style element to geo-style & include initial .geo-labels position style
 * geomap - delay refresh after append until some timeout; hook into interactiveTransform
+* geographics - draw all labels to a string or document fragment and append to DOM once
+* geographics - reuse shape label divs during refresh
+** move them instead of creating new labels
 * geomap - [bug] mouse wheel & mac touchpads zoom too quickly
-* examples - drawing markers
 * geomap - [bug] setting zoom & then center on two lines does not zoom to the correct location
 ** http://jsfiddle.net/dyTn9/11/
+* docs - geomap - click mode
+* geomap - click mode
+* geomap - [bug] chrome inputs get locked onto mouse when used on a page with a map
 
 === examples ===
 
@@ -31,6 +35,7 @@
 
 === future ===
 
+* geomap - [bug] map interferes with Chrome's input type=range widget
 * geomap - [bug] using shift-zoom during interactiveTransform doesn't zoom to correct location
 ** tiled maps only
 ** not as noticeable now that the refresh timeout is shorter
@@ -79,6 +84,8 @@
 * geomap - [bug] cannot wheel zoom in dragBbox mode
 * geomap - users should be able to escape out of dragBbox
 * geomap - remove "px" from .css calls
+* docs - geomap - bboxTiles option (the currently bounding tiles)
+* geomap - bboxTiles option
 * geo - use Array.push instead of $.merge where needed
 * docs - upgrade to jQuery Mobile 1.1.0
 * docs - non-mobile version via adaptive check
@@ -108,7 +115,6 @@
 * docs - geomap - describe "graphic service" as shingled with src set to empty string or null
 * docs - warn users about potential CSS/JavaScript issues relating to generated elements
 ** ul, li, div, span, img
-* geographics - draw all labels to a string or document fragment and append to DOM once
 * geomap - compile shingled & tiled string src templates for re-use
 ** be sure their template names are unique so they don't overwrite each other
 * geomap - don't redraw graphics if the map doesn't move during pan
@@ -225,6 +231,69 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-10-11==
+===markers===
+I need to release this demo tonight. It's been too long. It's finally done. What's next? b2 issues I suppose.
+
+===b2===
+There are a few major issues I need to clean up. First, don't clear shapes while moving the map.
+
+==2012-10-09==
+===tiles===
+Chris asked if geo provides the current tiles in view. That's not part of the design but I might add it in the future. A counter part to tilingScheme and zoom options. Maybe named bboxTiles.
+
+==2012-10-05==
+===point shape labels===
+The width/height of the point shape style seems to change the position of the label. It shouldn't do that. Or, maybe it should. Why would a user want the label to be drawn over the shape when the shape is larger. If you're using point markers, you should know to use 0,0 width/height.
+
+==2012-10-04==
+===marker===
+Twheat! 2 is out. Time to get back to making that marker demo people have been asking for. What to use for data? Maybe WA state boat launches, like in my other demo. That sounds fine.
+
+I'm not going to add docs or rename .geo-labels-container. It's not needed if you use negative margins on the .geo-label CSS class.
+
+In my canvas version of my marker demo, I think the image is taking too long to load, or rather the service is made visible too quickly. It's the right time for a jQuery Promise I think. Nah, I'll just refresh after the image loads.
+
+===click mode===
+Peter wins. I'm going to add a click mode to the official list. It will be identical to drawPoint but trigger the click event instead of the shape event.
+
+==2012-09-30==
+===helping brazil===
+I got a question from a student in brazil about jQuery Geo not rendering graphics. Here are some tips I told him:
+
+There are no built-in limits in jQuery Geo. However, I can think of a few potential reasons why nothing is showing up.
+
+1.  I don't usually have trouble with the number of coordinates in a polygon but the total amount of polygons. Too many polygons can cause browsers to stop responding. A combination of both (many coordinates and many polygons) will be even worse so it's always a good idea to generalize your data when you don't need it to be so accurate.
+2.  When you append a lot of features with the append function, add a ", false" at the end to delay refreshing the map until all the features are in. You can call "refresh" on the map when you're done. Something like this: $.each(polygons, function() { map.geomap("append", this, false); }); map.geomap("refresh");
+3.  Be sure that if your data is in lat/long, that you put the longitude first in any coordinates. Despite how they are generally spoken, longitude is an X coordinate and should come first in jQuery geo: center: [ -71 /*lon*/, 40 /*lat*/ ],
+4.  When possible, store and draw your shapes in web mercator meters instead of lon, lat coordinates so jQuery Geo doesn't have to process them.
+5.  When you are trying to draw a LOT of data, it's best to use a map server and render it as a shingled service in jQuery Geo. I recommend GeoServer for PostGIS.
+6.  Lastly, try to get one polygon to render as a test first before attempting to render your whole country.
+
+I think it's good advice.
+
+===tiger===
+tiger has map services now, so, that's cool. They are running ArcGIS Server. I forget how to restyle layers in AGS. At least it's AGS 10 so we *can* change it. No we can't, that just determines a definition query. The layers do have a WMS service but it's an Esri one. I'm not sure if you can change the style in a URL. Each layer only has one style named: default. Maybe you can, with the SLD_BODY argument!
+
+Here's an example, encodeURIComponent on something like this:
+
+<sld:StyledLayerDescriptor xmlns:sld="http://www.opengis.net/sld" version="1.0.0" xsi:schemaLocation="http://www.opengis.net/sld http://schemas.opengis.net/sld/1.0.0/StyledLayerDescriptor.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ogc="http://www.opengis.net/ogc" xmlns:gml="http://www.opengis.net/gml"><sld:NamedLayer><sld:Name>74</sld:Name><sld:NamedStyle><sld:Name/></sld:NamedStyle><sld:UserStyle><sld:Name>redStates</sld:Name><sld:Title>redStates</sld:Title><sld:FeatureTypeStyle><sld:Rule><sld:LineSymbolizer><sld:Stroke><sld:CssParameter name="stroke">#FF0000</sld:CssParameter></sld:Stroke></sld:LineSymbolizer></sld:Rule></sld:FeatureTypeStyle></sld:UserStyle></sld:NamedLayer></sld:StyledLayerDescriptor>
+
+Good luck getting that to look nice in code :/
+
+I made it smaller. Oh, and you can't send that to Esri's REST API because it's a WMS parameter. Ignoring it for now. That's too bad, it would really add to my TIGER demo.
+
+==2012-09-29==
+===twheat===
+I'm going to release the new version to Twheat! tonight, Twheat! 2.
+
+===range===
+There's an issue with jQuery Geo and Chrome's handling of the range input. Chrome doesn't stop tracking the mouse, likely because we're cancelling the mouseup event.
+
+==2012-09-21==
+===gaming===
+A month break (well, a couple bug fixes & a b1.1 release between) to play some games. Also, I did get it running as a desktop (Store) app in Windows 8 & will post about that later.
 
 ==2012-08-24==
 ===center/zoom options===

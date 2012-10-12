@@ -7,10 +7,13 @@ $(function () {
       currentXhr = null, //< an ajax request reference if we need to cancel
       
       twitterButtonHtml = '<a href="https://twitter.com/share" class="twitter-share-button" data-count="vertical" data-via="ryanttb">Tweet</a><script src="//platform.twitter.com/widgets.js">\x3C/script>',
-      timeoutRefresh = null;
+      timeoutRefresh = null,
+      timeoutTweetsMapped = null,
+      i; // a generic counter
 
   function initMap(center, zoom) {
     // create a map using an optional center and zoom
+    // we're re-adding the default basemap because we're adding extra services on top of it
     var services = [
           {
             type: "tiled",
@@ -19,10 +22,11 @@ $(function () {
             },
             attr: "<p>Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='http://developer.mapquest.com/content/osm/mq_logo.png'></p>"
           }
-        ],
-        i;
+        ];
       
     for ( i = 0; i < 11; i++ ) {
+      // for each hue breakpoint, create a new shingled service
+      // later, we will put tweets in these depending on how many other tweets around
       services.push( {
         id: "h" + ( 240 - ( i * 24 ) ),
         type: "shingled",
@@ -42,6 +46,21 @@ $(function () {
       scroll: "off",
       cursors: {
         point: "default"
+      },
+
+      dblclick: function( e, geo ) { 
+        // prevent the default dblclick zoom behavior,
+        // we want to change the URL so it can be tweeted
+        e.preventDefault( );
+
+        var zoom = map.geomap( "option", "zoom" );
+        if ( zoom < 16 ) {
+          window.location.search = 
+            "q=" + encodeURIComponent($("#twit input").val()) +
+            "&l=" + encodeURIComponent($("#loc input").val()) +
+            "&center=" + $.geo.proj.toGeodetic( geo.coordinates ) +
+            "&zoom=" + ( map.geomap( "option", "zoom" ) + 1 );
+        }
       },
 
       // set the shapeStyle to a largish solid but translucent circle
@@ -81,6 +100,7 @@ $(function () {
               top: e.pageY
             });
             
+            // try to reposition the popup inside the browser if it's too big
             var widthOver = $(window).width() - ( $popup.width() + e.pageX ),
                 heightOver = ($(window).height() - 32) - ( $popup.height() + e.pageY ),
                 left = e.pageX,
@@ -104,6 +124,9 @@ $(function () {
     });
 
     for ( i = 0; i < 11; i++ ) {
+      // for each hue service, set the shapeStyle based on
+      // the number of tweets required before a new level is reached
+      // for example, the "hot" layer is tiny and red
       var hue = 240 - ( i * 24 ),
           impact = ( hue + 16) / 2 - Math.floor( i / 2 );
           //impact = hue + 16;
@@ -117,16 +140,18 @@ $(function () {
     }
 
     // set the zoom input the map's zoom
-    $( "#zoom input" ).val( map.geomap( "option", "zoom" ) ).css( "visibility", "visible" );
+    //$( "#zoom input" ).val( map.geomap( "option", "zoom" ) ).css( "visibility", "visible" );
 
     if ( searchTerm && !searching ) {
-      // start searching if we have a search term
+      // kick off an autoSearch if we have a search term
       autoSearch();
     }
   }
 
   $("#loc").submit(function (e) {
     e.preventDefault();
+
+    $("#ajaxIndicator").css("visibility", "visible");
 
     // when the user clicks the location search button,
     // send a request to nominatim for an OpenStreatMap data search
@@ -138,6 +163,9 @@ $(function () {
       },
       dataType: "jsonp",
       jsonp: "json_callback",
+      complete: function( ) {
+        $("#ajaxIndicator").css("visibility", "hidden");
+      },
       success: function (results) {            
         if (results && results.length > 0) {
           // if we get a result, relaunch the app to the new location with the old search
@@ -154,7 +182,7 @@ $(function () {
   });
 
   $( "#zoomout" ).click( function( e ) {
-    $( "#zoom input" ).css( "visibility", "hidden" );
+    //$( "#zoom input" ).css( "visibility", "hidden" );
     var zoom = map.geomap( "option", "zoom" );
     if ( zoom > 5 ) {
       window.location.search = 
@@ -166,7 +194,7 @@ $(function () {
   } );
 
   $( "#zoomin" ).click( function( e ) {
-    $( "#zoom input" ).css( "visibility", "hidden" );
+    //$( "#zoom input" ).css( "visibility", "hidden" );
     var zoom = map.geomap( "option", "zoom" );
     if ( zoom  < 16 ) {
       window.location.search = 
@@ -224,6 +252,9 @@ $(function () {
           ],
           lastSearchTerm = searchTerm;
 
+      clearTimeout( timeoutTweetsMapped );
+      $("#ajaxIndicator").css("visibility", "visible");
+
       // actually send the request to Twitter
       currentXhr = $.ajax({
         url: "http://search.twitter.com/search.json",
@@ -241,9 +272,16 @@ $(function () {
             // if we have results, search each of them for the geo or location property
             $.each(tweets.results, function () {
               appendTweet( this );
-
             });
           }
+
+          timeoutTweetsMapped = setTimeout( function() {
+            $("#ajaxIndicator").css("visibility", "hidden");
+          }, 1000 );
+        },
+        error: function() {
+          // oops, Twitter search failed
+          $("#ajaxIndicator").css("visibility", "hidden");
         }
       });
     }
@@ -302,12 +340,22 @@ $(function () {
               appendTweetShape( feature );
             }
           }
+
+          // delay hiding the ajax indicator for another second
+          clearTimeout( timeoutTweetsMapped );
+          timeoutTweetsMapped = setTimeout( function() {
+            $("#ajaxIndicator").css("visibility", "hidden");
+          }, 1000 );
         }
       });
     }
   }
 
   function appendTweetShape( feature ) {
+    // called for every tweet
+    // pick the appropriate hue service based on number of tweets around
+    // and add this tweet to EACH hue service up to that point
+    // this will add a bunch of bubbles per tweet as more tweets are found
     if ( timeoutRefresh ) {
       clearTimeout( timeoutRefresh );
       timeoutRefresh = null;
@@ -329,6 +377,8 @@ $(function () {
       }
     }
 
+    // even though we may have appended four shapes for a medium hotness
+    // tweet, we have only processed one actual tweet, update appendedCount & UI
     appendedCount++;
     $("#appendedCount").text(appendedCount + " tweets mapped!");
 
