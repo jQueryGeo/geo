@@ -1273,11 +1273,9 @@
     },
 
     _interactiveTransform: function( ) {
-      /*                       
       if ( this._$shapesContainers ) {
         this._$shapesContainers.geographics("clear");
       }
-      */
 
       for ( var i = 0; i < this._currentServices.length; i++ ) {
         service = this._currentServices[ i ];
@@ -1823,9 +1821,16 @@
       }
 
       var shift = this._options[ "shift" ],
-          mode = this._shiftDown ? ( shift === "default" ? "zoom" : shift ) : this._options["mode"],
+          mode = this._options["mode"],
           dx, dy, circleSize;
 
+      if ( this._shiftDown ) {
+        if ( shift === "default" ) {
+          mode = ( mode === "dragBox" ? "dragBox" : "zoom" );
+        } else if ( shift !== "off" ) {
+          mode = shift;
+        }
+      }
       switch (mode) {
         case "zoom":
         case "dragBox":

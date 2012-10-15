@@ -1,6 +1,8 @@
 ﻿== to do ==
 
 === b2 ===
+* docs - geomap - default action for shift option should be dragBox in dragBox mode
+* geomap - default action for shift option should be dragBox in dragBox mode
 * geomap - don't empty graphics on map interaction
 * geographics - double buffer drawLineString & drawPoint if true canvas
 * geomap - rename geo-measure-style style element to geo-style & include initial .geo-labels position style
@@ -236,6 +238,9 @@
 ==2012-10-15==
 ===ie8 graphics===
 A client noticed our graphics don't resize with the window on IE8. Not a suprise.
+
+===shift option===
+It's silly to have mode change to zoom when the shift option is default and the mode is dragBox. It should stay on dragBbox unless the use purposefully sets the shift option to "zoom".
 
 ==2012-10-11==
 ===markers===
