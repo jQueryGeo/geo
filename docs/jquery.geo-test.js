@@ -1,4 +1,4 @@
-/*! jQuery Geo - vtest - 2012-08-24
+/*! jQuery Geo - vtest - 2012-10-15
  * http://jquerygeo.com
  * Copyright (c) 2012 Ryan Westphal/Applied Geographics, Inc.; Licensed MIT, GPL */
 
@@ -4105,6 +4105,10 @@ $.Widget.prototype = {
         this._$canvas[0].width = this._width;
         this._$canvas[0].height = this._height;
       } else {
+        this._$canvas.css( {
+          width: this._width,
+          height: this._height
+        } );
       }
 
       this._$labelsContainer.css( {

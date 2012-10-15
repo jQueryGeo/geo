@@ -233,6 +233,10 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2012-10-15==
+===ie8 graphics===
+A client noticed our graphics don't resize with the window on IE8. Not a suprise.
+
 ==2012-10-11==
 ===markers===
 I need to release this demo tonight. It's been too long. It's finally done. What's next? b2 issues I suppose.

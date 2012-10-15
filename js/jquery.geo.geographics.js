@@ -317,6 +317,10 @@
         this._$canvas[0].width = this._width;
         this._$canvas[0].height = this._height;
       } else {
+        this._$canvas.css( {
+          width: this._width,
+          height: this._height
+        } );
       }
 
       this._$labelsContainer.css( {
