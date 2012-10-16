@@ -1602,7 +1602,8 @@
 
     _eventTarget_touchstart: function (e) {
       var mode = this._options[ "mode" ],
-          shift = this._options[ "shift" ];
+          shift = this._options[ "shift" ],
+          defaultShift = ( mode === "dragBox" ? "dragBox" : "zoom" );
 
       if ( mode === "static" ) {
         return;
@@ -1678,7 +1679,7 @@
 
       if (!this._inOp && e.shiftKey && shift !== "off") {
         this._shiftDown = true;
-        this._$eventTarget.css( "cursor", this._options[ "cursors" ][ shift === "default" ? "zoom" : shift ] );
+        this._$eventTarget.css( "cursor", this._options[ "cursors" ][ shift === "default" ? defaultShift : shift ] );
       } else if ( !this._isMultiTouch && ( this._options[ "pannable" ] || mode === "dragBox" || mode === "dragCircle" ) ) {
         this._inOp = true;
 
@@ -1820,17 +1821,15 @@
         return false;
       }
 
-      var shift = this._options[ "shift" ],
-          mode = this._options["mode"],
+      var mode = this._options["mode"],
+          shift = this._options[ "shift" ],
+          defaultShift = ( mode === "dragBox" ? "dragBox" : "zoom" ),
           dx, dy, circleSize;
 
       if ( this._shiftDown ) {
-        if ( shift === "default" ) {
-          mode = ( mode === "dragBox" ? "dragBox" : "zoom" );
-        } else if ( shift !== "off" ) {
-          mode = shift;
-        }
+        mode = ( shift === "default" ? defaultShift : shift );
       }
+
       switch (mode) {
         case "zoom":
         case "dragBox":
@@ -1928,13 +1927,17 @@
       var mouseWasDown = this._mouseDown,
           wasToolPan = this._toolPan,
           offset = this._$eventTarget.offset(),
+          mode = this._options[ "mode" ],
           shift = this._options[ "shift" ],
-          mode = this._shiftDown ? ( shift === "default" ? "zoom" : shift ) : this._options["mode"],
+          defaultShift = ( mode === "dragBox" ? "dragBox" : "zoom" ),
           current, i, clickDate,
           dx, dy,
           coordBuffer,
           triggerShape;
 
+      if ( this._shiftDown ) {
+        mode = ( shift === "default" ? defaultShift : shift );
+      }
 
       if (this._supportTouch) {
         current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];

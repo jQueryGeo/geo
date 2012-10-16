@@ -38,6 +38,8 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * examples - drawing markers
 * geomap - ie8 - [bug] graphics do not resize with window
 * examples - kml points
+* docs - geomap - default action for shift option should be dragBox in dragBox mode
+* geomap - default action for shift option should be dragBox in dragBox mode
 
 ### 1.0b1.1 (2012-08-24)
 * geomap - [bug] shingled deferred services lose img elements when changing scales slowly

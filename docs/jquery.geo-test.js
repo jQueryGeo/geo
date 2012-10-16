@@ -1,4 +1,4 @@
-/*! jQuery Geo - vtest - 2012-10-15
+/*! jQuery Geo - vtest - 2012-10-16
  * http://jquerygeo.com
  * Copyright (c) 2012 Ryan Westphal/Applied Geographics, Inc.; Licensed MIT, GPL */
 
@@ -6000,9 +6000,16 @@ $.Widget.prototype = {
       }
 
       var shift = this._options[ "shift" ],
-          mode = this._shiftDown ? ( shift === "default" ? "zoom" : shift ) : this._options["mode"],
+          mode = this._options["mode"],
           dx, dy, circleSize;
 
+      if ( this._shiftDown ) {
+        if ( shift === "default" ) {
+          mode = ( mode === "dragBox" ? "dragBox" : "zoom" );
+        } else if ( shift !== "off" ) {
+          mode = shift;
+        }
+      }
       switch (mode) {
         case "zoom":
         case "dragBox":
