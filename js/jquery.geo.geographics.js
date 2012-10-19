@@ -18,6 +18,9 @@
     _$canvas: undefined,
     _context: undefined,
 
+    _$canvasScene: undefined, //< if _trueCanvas, where canvas images get written on end
+    _timeoutEnd:  null,
+
     _blitcanvas: undefined,
     _blitcontext: undefined,
 
@@ -63,12 +66,16 @@
           sizeCss = 'width:' + this._width + 'px;height:' + this._height + 'px;',
           sizeAttr = 'width="' + this._width + '" height="' + this._height + '"';
 
-      if (document.createElement('canvas').getContext) {
-        this._$elem.append('<canvas ' + sizeAttr + ' style="-webkit-transform:translateZ(0);' + posCss + '"></canvas>');
-        this._$canvas = this._$elem.children(':last');
+      this._blitcanvas = document.createElement( "canvas" );
+
+      if ( this._blitcanvas.getContext ) {
+        //this._$elem.append('<canvas ' + sizeAttr + ' style="-webkit-transform:translateZ(0);' + posCss + '"></canvas>');
+        //this._$canvas = this._$elem.children(':last');
+        this._$canvas = $('<canvas ' + sizeAttr + '></canvas>');
+
         this._context = this._$canvas[0].getContext("2d");
 
-        this._blitcanvas = document.createElement( "canvas" );
+        //this._blitcanvas = document.createElement( "canvas" );
         this._blitcanvas.width = this._width;
         this._blitcanvas.height = this._height;
         this._blitcontext = this._blitcanvas.getContext("2d");
@@ -102,6 +109,8 @@
     clear: function () {
       this._context.clearRect(0, 0, this._width, this._height);
       this._$labelsContainer.html("");
+
+      this._end( );
     },
 
     drawArc: function (coordinates, startAngle, sweepAngle, style) {
@@ -147,6 +156,8 @@
           this._context.restore();
         }
       }
+
+      this._end( );
     },
 
     drawPoint: function (coordinates, style) {
@@ -184,6 +195,8 @@
 
           this._context.stroke();
         }
+
+        this._end( );
       }
     },
 
@@ -285,6 +298,8 @@
 
           if ( pixelBbox[ 0 ] !== pixelBbox[ 2 ] && pixelBbox[ 1 ] !== pixelBbox[ 3 ] ) {
             this._context.drawImage(this._blitcanvas, pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ], pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ] );
+
+            this._end( );
           }
         }
       }
@@ -327,6 +342,37 @@
         width: this._width,
         height: this._height
       } );
+    },
+
+    interactiveTransform: function( x, y, scale ) {
+      // transform a finished scene, can assume no drawing during these calls
+    },
+
+    _end: function( ) {
+      // end/finalize a scene
+      if ( this._timeoutEnd ) {
+        clearTimeout( this._timeoutEnd );
+      }
+
+      if ( this._trueCanvas ) {
+        var geographics = this;
+
+        var posCss = 'position:absolute;left:0;top:0;margin:0;padding:0;',
+            sizeCss = 'width:' + this._width + 'px;height:' + this._height + 'px;';
+
+        function endCallback( ) {
+          if ( geographics._$canvasScene ) {
+            geographics._$canvasScene.remove( );
+          }
+
+          geographics._$elem.prepend('<img style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" src="' + geographics._$canvas[ 0 ].toDataURL( ) + '" />');
+          geographics._$canvasScene = geographics._$elem.children(':first');
+
+          //geographics._$canvasScene.prop( "src", geographics._$canvas[ 0 ].toDataURL( ) );
+        }
+
+        geographics._timeoutEnd = setTimeout( endCallback, 20 );
+      }
     },
 
     _getGraphicStyle: function (style) {

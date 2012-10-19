@@ -2,7 +2,7 @@
 
 === b2 ===
 * geomap - don't empty graphics on map interaction
-* geographics - double buffer drawLineString & drawPoint if true canvas
+* geographics - add begin/end functions for drawing scenes that can be transformed with interactiveTransform
 * geomap - rename geo-measure-style style element to geo-style & include initial .geo-labels position style
 * geomap - delay refresh after append until some timeout; hook into interactiveTransform
 * geographics - draw all labels to a string or document fragment and append to DOM once
@@ -233,11 +233,25 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2012-10-18==
+===graphics===
+I'm drawing graphics to the canvas internally now and copying to an image tag for later transform. That second part is going to be hard.
+
 ==2012-10-16==
 ===shift===
 There is still something wrong with the first "shift" drag. It's noticeable with the measure tools. If you set mode to "measureLength" and start measuring, your first shift-drag will pan instead. Your second shift-drag will create a marquee zoom box.
 
 And what about dragCircle? That always seems to dragCircle no matter what shift is. It must follow a different path.
+
+===graphics===
+I have to re-enable moving shapes and have two thoughts on how to change the graphics widget.
+
+1.
+
+- add public begin/end functions and leave it to geomap (or later, the developer) to call them
+- end will copy the current canvas data to an img which ...
+
+this is silly, I don't want to add more public methods than I have to. I need interactiveTransform but I think I want begin/end methods, but they should be private and happen behind the scenes. This leads me to my second option, internally calling end via a timer if we don't get another draw call within a requestAnimationFrame/timeout. It will call its internal end function. It will also call it if there's not image and the user calls interactiveTransform.
 
 ==2012-10-15==
 ===ie8 graphics===
