@@ -1281,6 +1281,59 @@
       }
       */
 
+
+
+
+      var mapWidth = this._contentBounds[ "width" ],
+          mapHeight = this._contentBounds[ "height" ],
+
+          halfWidth = mapWidth / 2,
+          halfHeight = mapHeight / 2,
+
+          bbox = [ this._centerInteractive[ 0 ] - halfWidth, this._centerInteractive[ 1 ] - halfHeight, this._centerInteractive[ 0 ] + halfWidth, this._centerInteractive[ 1 ] + halfHeight ];
+
+      var scalePixelSize = this._pixelSize,
+          scaleRatio = scalePixelSize / this._pixelSizeInteractive;
+          
+      if ( scalePixelSize > 0 ) {
+        scaleRatio = Math.round(scaleRatio * 1000) / 1000;
+
+        var oldMapOrigin = this._toMap( [ 0, 0 ] ),
+            newPixelPoint = this._toPixel( oldMapOrigin, this._centerInteractive, this._pixelSizeInteractive );
+
+
+        this._$shapesContainers.geographics("interactiveTransform", newPixelPoint, scaleRatio);
+
+        /*
+        $scaleContainer.css( {
+          left: Math.round( newPixelPoint[ 0 ] ),
+          top: Math.round( newPixelPoint[ 1 ] ),
+          width: mapWidth * scaleRatio,
+          height: mapHeight * scaleRatio
+        } );
+        */
+        
+      }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       for ( var i = 0; i < this._currentServices.length; i++ ) {
         service = this._currentServices[ i ];
         $.geo[ "_serviceTypes" ][ service.type ].interactiveTransform( this, service, this._centerInteractive, this._pixelSizeInteractive );

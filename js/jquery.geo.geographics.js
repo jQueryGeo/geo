@@ -9,6 +9,7 @@
 
   $.widget("geo.geographics", {
     _$elem: undefined,
+    _$graphicsContainer = undefined,
     _options: {},
     _trueCanvas: true,
 
@@ -344,8 +345,14 @@
       } );
     },
 
-    interactiveTransform: function( x, y, scale ) {
+    interactiveTransform: function( origin, scale ) {
       // transform a finished scene, can assume no drawing during these calls
+      this._$elem.css( {
+        left: Math.round( origin[ 0 ] ),
+        top: Math.round( origin[ 1 ] ) //,
+        //width: mapWidth * scaleRatio,
+        //height: mapHeight * scaleRatio
+      } );
     },
 
     _end: function( ) {
@@ -355,18 +362,27 @@
       }
 
       if ( this._trueCanvas ) {
-        var geographics = this;
+        var geographics = this,
+            oldCanvasScene;
 
         var posCss = 'position:absolute;left:0;top:0;margin:0;padding:0;',
-            sizeCss = 'width:' + this._width + 'px;height:' + this._height + 'px;';
+            sizeCss = 'width:100%;height:100%;'; // 'width:' + this._width + 'px;height:' + this._height + 'px;';
 
         function endCallback( ) {
-          if ( geographics._$canvasScene ) {
-            geographics._$canvasScene.remove( );
-          }
+          oldCanvasScene = geographics._$canvasScene;
+
+          geographics._$elem.css( {
+            left: 0,
+            top: 0
+          } );
 
           geographics._$elem.prepend('<img style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" src="' + geographics._$canvas[ 0 ].toDataURL( ) + '" />');
           geographics._$canvasScene = geographics._$elem.children(':first');
+
+
+          if ( oldCanvasScene ) {
+            oldCanvasScene.remove( );
+          }
 
           //geographics._$canvasScene.prop( "src", geographics._$canvas[ 0 ].toDataURL( ) );
         }
