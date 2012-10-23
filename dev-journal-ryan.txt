@@ -233,6 +233,38 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2012-10-23==
+===touchstop===
+There is a serious issue with jQuery Geo and either iOS 6 and Android 4. I like to be the first one to say that jQuery Geo is far from perfect. But first, finish:
+
+===graphics===
+I'm close, I think in light of more serious issues, once I get graphics drawing working as planned, I'm going to ignore label updates until I fix the touchstop bug. So, shapes will remain during interactive movement but labels will disappear.
+
+===graphics jump===
+Similar to shingled, my graphics jump when I draw the new scene. I need to have an original /interactive/ image and a new final image. Currently, geographics DOM layout (in true canvas mode) is:
+
+div.geo-graphics
+ |- img
+ \- div.geo-labels-container
+
+Needs to be:
+
+div.geo-graphics
+ |- div.geo-graphics-scene-container
+ |   |- img (ref current)
+ |   \- img (ref next)
+ \- div.geo-labels-container
+
+And later it will finally be:
+
+div.geo-graphics
+ |- div (ref current)
+ |   |- img
+ |   \- div.geo-labels-container
+ \- div (ref next)
+     |- img
+     \- div.geo-labels-container
+
 ==2012-10-18==
 ===graphics===
 I'm drawing graphics to the canvas internally now and copying to an image tag for later transform. That second part is going to be hard.

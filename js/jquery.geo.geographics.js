@@ -9,9 +9,10 @@
 
   $.widget("geo.geographics", {
     _$elem: undefined,
-    _$graphicsContainer = undefined,
     _options: {},
     _trueCanvas: true,
+    _$trueSceneCurrent: undefined,
+    _$trueSceneNext: undefined,
 
     _width: 0,
     _height: 0,
