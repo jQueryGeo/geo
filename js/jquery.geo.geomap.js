@@ -1975,7 +1975,7 @@
         } else {
           // Chrome & Firefox trigger a rogue mouseup event when doing a dblclick maximize in Windows(/Linux?)
           // ignore it
-          return false;
+          return;
         }
       }
 
