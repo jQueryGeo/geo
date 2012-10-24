@@ -1,20 +1,19 @@
 ﻿== to do ==
 
 === b2 ===
-* geomap - [bug] chrome inputs get locked onto mouse when used on a page with a map
-** e.g., map interferes with Chrome's input type=range widget
 * geographics - don't empty labels on map interaction
 * geomap - rename geo-measure-style style element to geo-style & include initial .geo-labels position style
 * geomap - delay refresh after append until some timeout; hook into interactiveTransform
-* geographics - draw all labels to a string or document fragment and append to DOM once
-* geographics - reuse shape label divs during refresh
-** move them instead of creating new labels
 * geomap - [bug] mouse wheel & mac touchpads zoom too quickly
 * geomap - [bug] setting zoom & then center on two lines does not zoom to the correct location
 ** http://jsfiddle.net/dyTn9/11/
 * docs - geomap - click mode
 * geomap - click mode
 * geomap - [bug] removing a shape from one service that has been appended to two services causes an error in the second service
+* docs - geo - audit in-place geo calls, e.g., fromGeodetic
+* geo - audit in-place geo calls, e.g., fromGeodetic
+* geomap - convert MapQuest icon to data URI so we don't have to resolve developer.mapquest.com every time
+* geographics - add doubleBuffer option
 
 === examples ===
 
@@ -59,8 +58,6 @@
 * geomap - [bug] iPad 2 measureLength puts current length on second to last coord instead of last coord
 * geomap - iPad 2 - [bug] pointAlong doesn't take last point into account in all browsers
 ** cannot reproduce; possibly axisLayout image only
-* docs - geo - audit in-place geo calls, e.g., fromGeodetic
-* geo - audit in-place geo calls, e.g., fromGeodetic
 * geomap - include bboxMax in interactiveTransform engine
 * docs - geomap - add indexMax property to service object to limit the view.index number so it can be used in template src
 * geomap - add indexMax property to service object to limit the view.index number so it can be used in template src
@@ -242,6 +239,9 @@ The timeout is going to be part of all graphics drawing, even non-true canvas. I
 
 ===labels===
 I should build HTML apart from the labelsContainer and set the container's html once during _end. Wow. That's a lot faster. I can't believe I wasn't doing that before. I feel less worried about copying existing label elements at the moment.
+
+===flicker===
+There's now too much flicker, especially with measure & drawing tools. I do need some kind of immediate mode...doubleBuffer option?
 
 ==2012-10-23==
 ===touchstop===

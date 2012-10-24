@@ -264,7 +264,7 @@
 
       $(window).resize(this._windowHandler);
 
-      this._$drawContainer.geographics({ style: this._initOptions.drawStyle || {} });
+      this._$drawContainer.geographics({ style: this._initOptions.drawStyle || {}, doubleBuffer: false });
       this._options["drawStyle"] = this._$drawContainer.geographics("option", "style");
 
       this._$shapesContainer.geographics( { style: this._initOptions.shapeStyle || { } } );
@@ -860,9 +860,9 @@
       this._clearInteractiveTimeout( );
 
       value = Math.min( Math.max( value, this._options[ "zoomMin" ] ), this._options[ "zoomMax" ] );
+
       this._setInteractiveCenterAndSize( this._centerInteractive, this._getPixelSize( value ) );
       this._interactiveTransform( );
-
       this._setInteractiveTimeout( trigger );
     },
 
@@ -1058,6 +1058,9 @@
           labelPixel,
           bbox = this._map._getBbox(center, pixelSize);
 
+      if ( shapes.length > 0 ) {
+        console.log( "_refreshShapes " + $.now() );
+      }
       for (i = 0; i < shapes.length; i++) {
         shape = shapes[i].shape || shapes[i];
         shape = shape.geometry || shape;
@@ -1123,8 +1126,6 @@
           this._$shapesContainer.geographics( "drawLabel", labelPixel, label );
         }
       }
-
-      //this._$shapesContainer.geographics( "end" );
     },
 
     _findMapSize: function () {
@@ -1275,15 +1276,6 @@
     },
 
     _interactiveTransform: function( ) {
-      /*
-      if ( this._$shapesContainers ) {
-        this._$shapesContainers.geographics("clear");
-      }
-      */
-
-
-
-
       var mapWidth = this._contentBounds[ "width" ],
           mapHeight = this._contentBounds[ "height" ],
 

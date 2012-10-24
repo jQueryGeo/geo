@@ -60,19 +60,6 @@
                 width: mapWidth * scaleRatio,
                 height: mapHeight * scaleRatio
               } );
-              
-              
-              // #newpanzoom
-              /*
-             .children("img").each(function (i) {
-                var $img = $(this),
-                    imgCenter = $img.data("center"),
-                    x = (Math.round((imgCenter[0] - center[0]) / scalePixelSize) - halfWidth) * scaleRatio,
-                    y = (Math.round((center[1] - imgCenter[1]) / scalePixelSize) - halfHeight) * scaleRatio;
-
-                $img.css({ left: x + "px", top: y + "px" });
-              });
-              */
             }
           });
         }

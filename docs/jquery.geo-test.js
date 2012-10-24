@@ -1,4 +1,4 @@
-/*! jQuery Geo - vtest - 2012-10-16
+/*! jQuery Geo - vtest - 2012-10-24
  * http://jquerygeo.com
  * Copyright (c) 2012 Ryan Westphal/Applied Geographics, Inc.; Licensed MIT, GPL */
 
@@ -3799,6 +3799,8 @@ $.Widget.prototype = {
     _$elem: undefined,
     _options: {},
     _trueCanvas: true,
+    _$trueSceneCurrent: undefined,
+    _$trueSceneNext: undefined,
 
     _width: 0,
     _height: 0,
@@ -3806,10 +3808,15 @@ $.Widget.prototype = {
     _$canvas: undefined,
     _context: undefined,
 
+    _$canvasSceneFront: undefined, //< if _trueCanvas, where canvas images get written (front buffer)
+    _$canvasSceneBack: undefined, //< if _trueCanvas, where canvas images get written (back buffer)
+    _timeoutEnd:  null,
+
     _blitcanvas: undefined,
     _blitcontext: undefined,
 
     _$labelsContainer: undefined,
+    _labelsHtml: "",
 
     options: {
       style: {
@@ -3824,7 +3831,9 @@ $.Widget.prototype = {
         strokeWidth: "2px",
         visibility: "visible",
         width: "8px"
-      }
+      },
+
+      doubleBuffer: true
     },
 
     _create: function () {
@@ -3851,15 +3860,23 @@ $.Widget.prototype = {
           sizeCss = 'width:' + this._width + 'px;height:' + this._height + 'px;',
           sizeAttr = 'width="' + this._width + '" height="' + this._height + '"';
 
-      if (document.createElement('canvas').getContext) {
-        this._$elem.append('<canvas ' + sizeAttr + ' style="-webkit-transform:translateZ(0);' + posCss + '"></canvas>');
-        this._$canvas = this._$elem.children(':last');
+      this._blitcanvas = document.createElement( "canvas" );
+
+      if ( this._blitcanvas.getContext ) {
+        //this._$elem.append('<canvas ' + sizeAttr + ' style="-webkit-transform:translateZ(0);' + posCss + '"></canvas>');
+        //this._$canvas = this._$elem.children(':last');
+        this._$canvas = $('<canvas ' + sizeAttr + '></canvas>');
+
         this._context = this._$canvas[0].getContext("2d");
 
-        this._blitcanvas = document.createElement( "canvas" );
+        //this._blitcanvas = document.createElement( "canvas" );
         this._blitcanvas.width = this._width;
         this._blitcanvas.height = this._height;
         this._blitcontext = this._blitcanvas.getContext("2d");
+
+        // create our front & back buffers
+        this._$canvasSceneFront = $('<img style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />');
+        this._$canvasSceneBack = $('<img style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />');
       } else if (_ieVersion <= 8) {
         this._trueCanvas = false;
         this._$elem.append( '<div ' + sizeAttr + ' style="' + posCss + sizeCss + '"></div>');
@@ -3889,7 +3906,9 @@ $.Widget.prototype = {
 
     clear: function () {
       this._context.clearRect(0, 0, this._width, this._height);
-      this._$labelsContainer.html("");
+      this._labelsHtml = "";
+
+      this._end( );
     },
 
     drawArc: function (coordinates, startAngle, sweepAngle, style) {
@@ -3935,6 +3954,8 @@ $.Widget.prototype = {
           this._context.restore();
         }
       }
+
+      this._end( );
     },
 
     drawPoint: function (coordinates, style) {
@@ -3972,6 +3993,8 @@ $.Widget.prototype = {
 
           this._context.stroke();
         }
+
+        this._end( );
       }
     },
 
@@ -4073,6 +4096,8 @@ $.Widget.prototype = {
 
           if ( pixelBbox[ 0 ] !== pixelBbox[ 2 ] && pixelBbox[ 1 ] !== pixelBbox[ 3 ] ) {
             this._context.drawImage(this._blitcanvas, pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ], pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ] );
+
+            this._end( );
           }
         }
       }
@@ -4089,7 +4114,7 @@ $.Widget.prototype = {
     },
 
     drawLabel: function( coordinates, label ) {
-      this._$labelsContainer.append( '<div class="geo-label" style="-webkit-transform:translateZ(0);position:absolute; left:' + coordinates[ 0 ] + 'px; top:' + coordinates[ 1 ] + 'px;">' + label + '</div>');
+      this._labelsHtml += '<div class="geo-label" style="-webkit-transform:translateZ(0);position:absolute; left:' + coordinates[ 0 ] + 'px; top:' + coordinates[ 1 ] + 'px;">' + label + '</div>';
     },
 
     resize: function( ) {
@@ -4104,6 +4129,16 @@ $.Widget.prototype = {
       if ( this._trueCanvas ) {
         this._$canvas[0].width = this._width;
         this._$canvas[0].height = this._height;
+
+        this._$canvasSceneFront.css( {
+          width: this._width,
+          height: this._height
+        } );
+
+        this._$canvasSceneBack.css( {
+          width: this._width,
+          height: this._height
+        } );
       } else {
         this._$canvas.css( {
           width: this._width,
@@ -4115,6 +4150,62 @@ $.Widget.prototype = {
         width: this._width,
         height: this._height
       } );
+    },
+
+    interactiveTransform: function( origin, scale ) {
+      if ( this._timeoutEnd ) {
+        clearTimeout( this._timeoutEnd );
+        this._timeoutEnd = null;
+      }
+
+      // hide labels for now until they are on the interactive div 
+      this._$labelsContainer.html("");
+
+      if ( this._trueCanvas ) {
+        // transform a finished scene, can assume no drawing during these calls
+        this._$canvasSceneFront.css( {
+          left: Math.round( origin[ 0 ] ),
+          top: Math.round( origin[ 1 ] ),
+          width: this._width * scale,
+          height: this._height * scale
+        } );
+      } else {
+      }
+    },
+
+    _end: function( ) {
+      // end/finalize a scene
+      if ( this._timeoutEnd ) {
+        clearTimeout( this._timeoutEnd );
+        this._timeoutEnd = null;
+      }
+
+      var geographics = this,
+          oldCanvasScene;
+
+      function endCallback( ) {
+        if ( geographics._trueCanvas ) {
+          oldCanvasScene = geographics._$canvasSceneFront;
+
+          geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
+            left: 0,
+            top: 0,
+            width: geographics._width,
+            height: geographics._height
+          } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) ).prependTo( geographics._$elem ).one( function( ) {
+            geographics._$canvasSceneBack = oldCanvasScene.detach();
+          } );
+        }
+
+        geographics._$labelsContainer.html( geographics._labelsHtml );
+        geographics._timeoutEnd = null;
+      }
+
+      if ( this._options.doubleBuffer ) {
+        this._timeoutEnd = setTimeout( endCallback, 20 );
+      } else {
+        endCallback( );
+      }
     },
 
     _getGraphicStyle: function (style) {
@@ -4171,6 +4262,8 @@ $.Widget.prototype = {
           this._context.globalAlpha = style.opacity * style.strokeOpacity;
           this._context.stroke();
         }
+
+        this._end( );
       }
     }
   });
@@ -4443,10 +4536,10 @@ $.Widget.prototype = {
 
       $(window).resize(this._windowHandler);
 
-      this._$drawContainer.geographics({ style: this._initOptions.drawStyle || {} });
+      this._$drawContainer.geographics({ style: this._initOptions.drawStyle || {}, doubleBuffer: false });
       this._options["drawStyle"] = this._$drawContainer.geographics("option", "style");
 
-      this._$shapesContainer.geographics( { style: this._initOptions.shapeStyle || { } } );
+      this._$shapesContainer.geographics( { style: this._initOptions.shapeStyle || { }, doubleBuffer: false } );
       this._createdGraphics = true;
 
       this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
@@ -5302,6 +5395,8 @@ $.Widget.prototype = {
           this._$shapesContainer.geographics( "drawLabel", labelPixel, label );
         }
       }
+
+      //this._$shapesContainer.geographics( "end" );
     },
 
     _findMapSize: function () {
@@ -5452,9 +5547,64 @@ $.Widget.prototype = {
     },
 
     _interactiveTransform: function( ) {
+      /*
       if ( this._$shapesContainers ) {
         this._$shapesContainers.geographics("clear");
       }
+      */
+
+
+
+
+      var mapWidth = this._contentBounds[ "width" ],
+          mapHeight = this._contentBounds[ "height" ],
+
+          halfWidth = mapWidth / 2,
+          halfHeight = mapHeight / 2,
+
+          bbox = [ this._centerInteractive[ 0 ] - halfWidth, this._centerInteractive[ 1 ] - halfHeight, this._centerInteractive[ 0 ] + halfWidth, this._centerInteractive[ 1 ] + halfHeight ];
+
+      var scalePixelSize = this._pixelSize,
+          scaleRatio = scalePixelSize / this._pixelSizeInteractive;
+          
+      if ( scalePixelSize > 0 ) {
+        scaleRatio = Math.round(scaleRatio * 1000) / 1000;
+
+        var oldMapOrigin = this._toMap( [ 0, 0 ] ),
+            newPixelPoint = this._toPixel( oldMapOrigin, this._centerInteractive, this._pixelSizeInteractive );
+
+
+        this._$shapesContainers.geographics("interactiveTransform", newPixelPoint, scaleRatio);
+
+        /*
+        $scaleContainer.css( {
+          left: Math.round( newPixelPoint[ 0 ] ),
+          top: Math.round( newPixelPoint[ 1 ] ),
+          width: mapWidth * scaleRatio,
+          height: mapHeight * scaleRatio
+        } );
+        */
+        
+      }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
       for ( var i = 0; i < this._currentServices.length; i++ ) {
         service = this._currentServices[ i ];
@@ -5781,7 +5931,8 @@ $.Widget.prototype = {
 
     _eventTarget_touchstart: function (e) {
       var mode = this._options[ "mode" ],
-          shift = this._options[ "shift" ];
+          shift = this._options[ "shift" ],
+          defaultShift = ( mode === "dragBox" ? "dragBox" : "zoom" );
 
       if ( mode === "static" ) {
         return;
@@ -5857,7 +6008,7 @@ $.Widget.prototype = {
 
       if (!this._inOp && e.shiftKey && shift !== "off") {
         this._shiftDown = true;
-        this._$eventTarget.css( "cursor", this._options[ "cursors" ][ shift === "default" ? "zoom" : shift ] );
+        this._$eventTarget.css( "cursor", this._options[ "cursors" ][ shift === "default" ? defaultShift : shift ] );
       } else if ( !this._isMultiTouch && ( this._options[ "pannable" ] || mode === "dragBox" || mode === "dragCircle" ) ) {
         this._inOp = true;
 
@@ -5999,17 +6150,15 @@ $.Widget.prototype = {
         return false;
       }
 
-      var shift = this._options[ "shift" ],
-          mode = this._options["mode"],
+      var mode = this._options["mode"],
+          shift = this._options[ "shift" ],
+          defaultShift = ( mode === "dragBox" ? "dragBox" : "zoom" ),
           dx, dy, circleSize;
 
       if ( this._shiftDown ) {
-        if ( shift === "default" ) {
-          mode = ( mode === "dragBox" ? "dragBox" : "zoom" );
-        } else if ( shift !== "off" ) {
-          mode = shift;
-        }
+        mode = ( shift === "default" ? defaultShift : shift );
       }
+
       switch (mode) {
         case "zoom":
         case "dragBox":
@@ -6098,7 +6247,7 @@ $.Widget.prototype = {
         } else {
           // Chrome & Firefox trigger a rogue mouseup event when doing a dblclick maximize in Windows(/Linux?)
           // ignore it
-          return false;
+          return;
         }
       }
 
@@ -6107,13 +6256,17 @@ $.Widget.prototype = {
       var mouseWasDown = this._mouseDown,
           wasToolPan = this._toolPan,
           offset = this._$eventTarget.offset(),
+          mode = this._options[ "mode" ],
           shift = this._options[ "shift" ],
-          mode = this._shiftDown ? ( shift === "default" ? "zoom" : shift ) : this._options["mode"],
+          defaultShift = ( mode === "dragBox" ? "dragBox" : "zoom" ),
           current, i, clickDate,
           dx, dy,
           coordBuffer,
           triggerShape;
 
+      if ( this._shiftDown ) {
+        mode = ( shift === "default" ? defaultShift : shift );
+      }
 
       if (this._supportTouch) {
         current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
@@ -6763,19 +6916,6 @@ $.Widget.prototype = {
                 width: mapWidth * scaleRatio,
                 height: mapHeight * scaleRatio
               } );
-              
-              
-              // #newpanzoom
-              /*
-             .children("img").each(function (i) {
-                var $img = $(this),
-                    imgCenter = $img.data("center"),
-                    x = (Math.round((imgCenter[0] - center[0]) / scalePixelSize) - halfWidth) * scaleRatio,
-                    y = (Math.round((center[1] - imgCenter[1]) / scalePixelSize) - halfHeight) * scaleRatio;
-
-                $img.css({ left: x + "px", top: y + "px" });
-              });
-              */
             }
           });
         }

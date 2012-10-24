@@ -11,8 +11,6 @@
     _$elem: undefined,
     _options: {},
     _trueCanvas: true,
-    _$trueSceneCurrent: undefined,
-    _$trueSceneNext: undefined,
 
     _width: 0,
     _height: 0,
@@ -43,7 +41,9 @@
         strokeWidth: "2px",
         visibility: "visible",
         width: "8px"
-      }
+      },
+
+      doubleBuffer: true
     },
 
     _create: function () {
@@ -75,7 +75,11 @@
       if ( this._blitcanvas.getContext ) {
         //this._$elem.append('<canvas ' + sizeAttr + ' style="-webkit-transform:translateZ(0);' + posCss + '"></canvas>');
         //this._$canvas = this._$elem.children(':last');
-        this._$canvas = $('<canvas ' + sizeAttr + '></canvas>');
+        this._$canvas = $('<canvas ' + sizeAttr + ' style="-webkit-transform:translateZ(0);' + posCss + '"></canvas>');
+
+        if ( !this._options.doubleBuffer ) {
+          this._$elem.append( this._$canvas );
+        }
 
         this._context = this._$canvas[0].getContext("2d");
 
@@ -85,8 +89,9 @@
         this._blitcontext = this._blitcanvas.getContext("2d");
 
         // create our front & back buffers
-        this._$canvasSceneFront = $('<img style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />');
-        this._$canvasSceneBack = $('<img style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />');
+        this._$canvasSceneFront = $('<img id="scene0" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />');
+        this._$canvasSceneBack = $('<img id="scene1" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />');
+
       } else if (_ieVersion <= 8) {
         this._trueCanvas = false;
         this._$elem.append( '<div ' + sizeAttr + ' style="' + posCss + sizeCss + '"></div>');
@@ -116,9 +121,9 @@
 
     clear: function () {
       this._context.clearRect(0, 0, this._width, this._height);
-      this._$labelsContainer.html("");
       this._labelsHtml = "";
 
+          if ( this._options.doubleBuffer ) console.log("clear:_end " + $.now());
       this._end( );
     },
 
@@ -166,6 +171,7 @@
         }
       }
 
+          if ( this._options.doubleBuffer ) console.log("drawArc:_end " + $.now());
       this._end( );
     },
 
@@ -205,6 +211,7 @@
           this._context.stroke();
         }
 
+          if ( this._options.doubleBuffer ) console.log("drawPoint:_end " + $.now());
         this._end( );
       }
     },
@@ -308,6 +315,7 @@
           if ( pixelBbox[ 0 ] !== pixelBbox[ 2 ] && pixelBbox[ 1 ] !== pixelBbox[ 3 ] ) {
             this._context.drawImage(this._blitcanvas, pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ], pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ] );
 
+          if ( this._options.doubleBuffer ) console.log("drawPolygon:_end " + $.now());
             this._end( );
           }
         }
@@ -373,13 +381,16 @@
       this._$labelsContainer.html("");
 
       if ( this._trueCanvas ) {
-        // transform a finished scene, can assume no drawing during these calls
-        this._$canvasSceneFront.css( {
-          left: Math.round( origin[ 0 ] ),
-          top: Math.round( origin[ 1 ] ),
-          width: this._width * scale,
-          height: this._height * scale
-        } );
+        if ( this._options.doubleBuffer ) {
+          console.log("interactiveTransform " + this._$canvasSceneFront.prop( "id" ));
+          // transform a finished scene, can assume no drawing during these calls
+          this._$canvasSceneFront.css( {
+            left: Math.round( origin[ 0 ] ),
+            top: Math.round( origin[ 1 ] ),
+            width: this._width * scale,
+            height: this._height * scale
+          } );
+        }
       } else {
       }
     },
@@ -391,28 +402,40 @@
         this._timeoutEnd = null;
       }
 
-      var geographics = this,
-          oldCanvasScene;
+      var geographics = this;
 
       function endCallback( ) {
-        if ( geographics._trueCanvas ) {
-          oldCanvasScene = geographics._$canvasSceneFront;
+        if ( !geographics._timeoutEnd ) {
+          // something has canceled the draw
+          return;
+        }
 
-          geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
+        if ( geographics._trueCanvas && geographics._options.doubleBuffer ) {
+          console.log("    endCallback...");
+
+          //geographics._$canvasSceneFront = 
+          geographics._$canvasSceneBack.prop( "src", "" ).one( "load", function( e ) {
+            console.log("    ...flip: show " + geographics._$canvasSceneBack.prop( "id" ) + ", hide " + geographics._$canvasSceneFront.prop("id"));
+            var oldCanvasScene = geographics._$canvasSceneFront;
+            geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
             left: 0,
             top: 0,
             width: geographics._width,
             height: geographics._height
-          } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) ).prependTo( geographics._$elem ).one( function( ) {
+          } ).prependTo( geographics._$elem );
             geographics._$canvasSceneBack = oldCanvasScene.detach();
-          } );
+          } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) );
         }
 
         geographics._$labelsContainer.html( geographics._labelsHtml );
         geographics._timeoutEnd = null;
       }
 
-      geographics._timeoutEnd = setTimeout( endCallback, 20 );
+      //if ( this._options.doubleBuffer ) {
+        this._timeoutEnd = setTimeout( endCallback, 20 );
+      //} else {
+        //geographics._$labelsContainer.html( geographics._labelsHtml );
+      //}
     },
 
     _getGraphicStyle: function (style) {
@@ -469,6 +492,9 @@
           this._context.globalAlpha = style.opacity * style.strokeOpacity;
           this._context.stroke();
         }
+
+          if ( this._options.doubleBuffer ) console.log("_drawLines:_end " + $.now());
+        this._end( );
       }
     }
   });
