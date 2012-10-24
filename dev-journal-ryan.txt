@@ -1,7 +1,9 @@
 ﻿== to do ==
 
 === b2 ===
-* geographics - build labels in background, replace html once
+* geomap - [bug] chrome inputs get locked onto mouse when used on a page with a map
+** e.g., map interferes with Chrome's input type=range widget
+* geographics - don't empty labels on map interaction
 * geomap - rename geo-measure-style style element to geo-style & include initial .geo-labels position style
 * geomap - delay refresh after append until some timeout; hook into interactiveTransform
 * geographics - draw all labels to a string or document fragment and append to DOM once
@@ -12,8 +14,6 @@
 ** http://jsfiddle.net/dyTn9/11/
 * docs - geomap - click mode
 * geomap - click mode
-* geomap - [bug] chrome inputs get locked onto mouse when used on a page with a map
-* geomap - [bug] map interferes with Chrome's input type=range widget
 * geomap - [bug] removing a shape from one service that has been appended to two services causes an error in the second service
 
 === examples ===
@@ -239,6 +239,9 @@ I'm going to hide labels during interactiveTransform but keep shapes for now.
 I don't have to keep removing & creating the scene images, I can reuse them and swap. Double buffer FTW.
 
 The timeout is going to be part of all graphics drawing, even non-true canvas. I might roll labels into the code as well.
+
+===labels===
+I should build HTML apart from the labelsContainer and set the container's html once during _end. Wow. That's a lot faster. I can't believe I wasn't doing that before. I feel less worried about copying existing label elements at the moment.
 
 ==2012-10-23==
 ===touchstop===

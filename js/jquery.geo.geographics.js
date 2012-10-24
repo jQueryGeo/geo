@@ -28,6 +28,7 @@
     _blitcontext: undefined,
 
     _$labelsContainer: undefined,
+    _labelsHtml: "",
 
     options: {
       style: {
@@ -116,6 +117,7 @@
     clear: function () {
       this._context.clearRect(0, 0, this._width, this._height);
       this._$labelsContainer.html("");
+      this._labelsHtml = "";
 
       this._end( );
     },
@@ -323,7 +325,7 @@
     },
 
     drawLabel: function( coordinates, label ) {
-      this._$labelsContainer.append( '<div class="geo-label" style="-webkit-transform:translateZ(0);position:absolute; left:' + coordinates[ 0 ] + 'px; top:' + coordinates[ 1 ] + 'px;">' + label + '</div>');
+      this._labelsHtml += '<div class="geo-label" style="-webkit-transform:translateZ(0);position:absolute; left:' + coordinates[ 0 ] + 'px; top:' + coordinates[ 1 ] + 'px;">' + label + '</div>';
     },
 
     resize: function( ) {
@@ -406,6 +408,7 @@
           } );
         }
 
+        geographics._$labelsContainer.html( geographics._labelsHtml );
         geographics._timeoutEnd = null;
       }
 
