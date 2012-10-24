@@ -1,8 +1,7 @@
 ﻿== to do ==
 
 === b2 ===
-* geomap - don't empty graphics on map interaction
-* geographics - add begin/end functions for drawing scenes that can be transformed with interactiveTransform
+* geographics - build labels in background, replace html once
 * geomap - rename geo-measure-style style element to geo-style & include initial .geo-labels position style
 * geomap - delay refresh after append until some timeout; hook into interactiveTransform
 * geographics - draw all labels to a string or document fragment and append to DOM once
@@ -233,6 +232,14 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2012-10-24==
+===graphics===
+I'm going to hide labels during interactiveTransform but keep shapes for now.
+
+I don't have to keep removing & creating the scene images, I can reuse them and swap. Double buffer FTW.
+
+The timeout is going to be part of all graphics drawing, even non-true canvas. I might roll labels into the code as well.
+
 ==2012-10-23==
 ===touchstop===
 There is a serious issue with jQuery Geo and either iOS 6 and Android 4. I like to be the first one to say that jQuery Geo is far from perfect. But first, finish:
@@ -250,18 +257,17 @@ div.geo-graphics
 Needs to be:
 
 div.geo-graphics
- |- div.geo-graphics-scene-container
- |   |- img (ref current)
- |   \- img (ref next)
+ |- img (back)
+ |- img (front)
  \- div.geo-labels-container
 
 And later it will finally be:
 
 div.geo-graphics
- |- div (ref current)
+ |- div.geo-graphics-scene-container (back)
  |   |- img
  |   \- div.geo-labels-container
- \- div (ref next)
+ \- div.geo-graphics-scene-container (front)
      |- img
      \- div.geo-labels-container
 

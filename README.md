@@ -40,6 +40,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * examples - kml points
 * docs - geomap - default action for shift option should be dragBox in dragBox mode
 * geomap - default action for shift option should be dragBox in dragBox mode
+* geomap - don't empty graphics on map interaction
 
 ### 1.0b1.1 (2012-08-24)
 * geomap - [bug] shingled deferred services lose img elements when changing scales slowly

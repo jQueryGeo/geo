@@ -20,7 +20,8 @@
     _$canvas: undefined,
     _context: undefined,
 
-    _$canvasScene: undefined, //< if _trueCanvas, where canvas images get written on end
+    _$canvasSceneFront: undefined, //< if _trueCanvas, where canvas images get written (front buffer)
+    _$canvasSceneBack: undefined, //< if _trueCanvas, where canvas images get written (back buffer)
     _timeoutEnd:  null,
 
     _blitcanvas: undefined,
@@ -81,6 +82,10 @@
         this._blitcanvas.width = this._width;
         this._blitcanvas.height = this._height;
         this._blitcontext = this._blitcanvas.getContext("2d");
+
+        // create our front & back buffers
+        this._$canvasSceneFront = $('<img style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />');
+        this._$canvasSceneBack = $('<img style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />');
       } else if (_ieVersion <= 8) {
         this._trueCanvas = false;
         this._$elem.append( '<div ' + sizeAttr + ' style="' + posCss + sizeCss + '"></div>');
@@ -333,6 +338,16 @@
       if ( this._trueCanvas ) {
         this._$canvas[0].width = this._width;
         this._$canvas[0].height = this._height;
+
+        this._$canvasSceneFront.css( {
+          width: this._width,
+          height: this._height
+        } );
+
+        this._$canvasSceneBack.css( {
+          width: this._width,
+          height: this._height
+        } );
       } else {
         this._$canvas.css( {
           width: this._width,
@@ -347,49 +362,54 @@
     },
 
     interactiveTransform: function( origin, scale ) {
-      // transform a finished scene, can assume no drawing during these calls
-      this._$elem.css( {
-        left: Math.round( origin[ 0 ] ),
-        top: Math.round( origin[ 1 ] ) //,
-        //width: mapWidth * scaleRatio,
-        //height: mapHeight * scaleRatio
-      } );
+      if ( this._timeoutEnd ) {
+        clearTimeout( this._timeoutEnd );
+        this._timeoutEnd = null;
+      }
+
+      // hide labels for now until they are on the interactive div 
+      this._$labelsContainer.html("");
+
+      if ( this._trueCanvas ) {
+        // transform a finished scene, can assume no drawing during these calls
+        this._$canvasSceneFront.css( {
+          left: Math.round( origin[ 0 ] ),
+          top: Math.round( origin[ 1 ] ),
+          width: this._width * scale,
+          height: this._height * scale
+        } );
+      } else {
+      }
     },
 
     _end: function( ) {
       // end/finalize a scene
       if ( this._timeoutEnd ) {
         clearTimeout( this._timeoutEnd );
+        this._timeoutEnd = null;
       }
 
-      if ( this._trueCanvas ) {
-        var geographics = this,
-            oldCanvasScene;
+      var geographics = this,
+          oldCanvasScene;
 
-        var posCss = 'position:absolute;left:0;top:0;margin:0;padding:0;',
-            sizeCss = 'width:100%;height:100%;'; // 'width:' + this._width + 'px;height:' + this._height + 'px;';
+      function endCallback( ) {
+        if ( geographics._trueCanvas ) {
+          oldCanvasScene = geographics._$canvasSceneFront;
 
-        function endCallback( ) {
-          oldCanvasScene = geographics._$canvasScene;
-
-          geographics._$elem.css( {
+          geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
             left: 0,
-            top: 0
+            top: 0,
+            width: geographics._width,
+            height: geographics._height
+          } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) ).prependTo( geographics._$elem ).one( function( ) {
+            geographics._$canvasSceneBack = oldCanvasScene.detach();
           } );
-
-          geographics._$elem.prepend('<img style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" src="' + geographics._$canvas[ 0 ].toDataURL( ) + '" />');
-          geographics._$canvasScene = geographics._$elem.children(':first');
-
-
-          if ( oldCanvasScene ) {
-            oldCanvasScene.remove( );
-          }
-
-          //geographics._$canvasScene.prop( "src", geographics._$canvas[ 0 ].toDataURL( ) );
         }
 
-        geographics._timeoutEnd = setTimeout( endCallback, 20 );
+        geographics._timeoutEnd = null;
       }
+
+      geographics._timeoutEnd = setTimeout( endCallback, 20 );
     },
 
     _getGraphicStyle: function (style) {
