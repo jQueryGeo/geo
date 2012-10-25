@@ -418,6 +418,7 @@
           } );
         }
       } else {
+        this._context.clearRect(0, 0, this._width, this._height);
       }
     },
 

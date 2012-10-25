@@ -1,4 +1,4 @@
-/*! jQuery Geo - vtest - 2012-10-24
+/*! jQuery Geo - vtest - 2012-10-25
  * http://jquerygeo.com
  * Copyright (c) 2012 Ryan Westphal/Applied Geographics, Inc.; Licensed MIT, GPL */
 
@@ -3799,8 +3799,6 @@ $.Widget.prototype = {
     _$elem: undefined,
     _options: {},
     _trueCanvas: true,
-    _$trueSceneCurrent: undefined,
-    _$trueSceneNext: undefined,
 
     _width: 0,
     _height: 0,
@@ -3811,6 +3809,7 @@ $.Widget.prototype = {
     _$canvasSceneFront: undefined, //< if _trueCanvas, where canvas images get written (front buffer)
     _$canvasSceneBack: undefined, //< if _trueCanvas, where canvas images get written (back buffer)
     _timeoutEnd:  null,
+    _requireFlip: false,
 
     _blitcanvas: undefined,
     _blitcontext: undefined,
@@ -3840,7 +3839,12 @@ $.Widget.prototype = {
       this._$elem = this.element;
       this._options = this.options;
 
-      this._$elem.css({ display: "inline-block", overflow: "hidden", textAlign: "left" });
+      this._$elem.css( {
+        webkitTransform: "translateZ(0)",
+        display: "inline-block",
+        overflow: "hidden",
+        textAlign: "left"
+      } );
 
       if (this._$elem.css("position") == "static") {
         this._$elem.css("position", "relative");
@@ -3865,7 +3869,11 @@ $.Widget.prototype = {
       if ( this._blitcanvas.getContext ) {
         //this._$elem.append('<canvas ' + sizeAttr + ' style="-webkit-transform:translateZ(0);' + posCss + '"></canvas>');
         //this._$canvas = this._$elem.children(':last');
-        this._$canvas = $('<canvas ' + sizeAttr + '></canvas>');
+        this._$canvas = $('<canvas ' + sizeAttr + ' style="-webkit-transform:translateZ(0);' + posCss + '"></canvas>');
+
+        if ( !this._options.doubleBuffer ) {
+          this._$elem.append( this._$canvas );
+        }
 
         this._context = this._$canvas[0].getContext("2d");
 
@@ -3875,8 +3883,9 @@ $.Widget.prototype = {
         this._blitcontext = this._blitcanvas.getContext("2d");
 
         // create our front & back buffers
-        this._$canvasSceneFront = $('<img style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />');
-        this._$canvasSceneBack = $('<img style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />');
+        this._$canvasSceneFront = $('<img id="scene0" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />');
+        this._$canvasSceneBack = $('<img id="scene1" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />');
+
       } else if (_ieVersion <= 8) {
         this._trueCanvas = false;
         this._$elem.append( '<div ' + sizeAttr + ' style="' + posCss + sizeCss + '"></div>');
@@ -3908,6 +3917,7 @@ $.Widget.prototype = {
       this._context.clearRect(0, 0, this._width, this._height);
       this._labelsHtml = "";
 
+          //if ( this._options.doubleBuffer ) console.log("clear:_end " + $.now());
       this._end( );
     },
 
@@ -3955,6 +3965,7 @@ $.Widget.prototype = {
         }
       }
 
+          //if ( this._options.doubleBuffer ) console.log("drawArc:_end " + $.now());
       this._end( );
     },
 
@@ -3994,6 +4005,7 @@ $.Widget.prototype = {
           this._context.stroke();
         }
 
+          //if ( this._options.doubleBuffer ) console.log("drawPoint:_end " + $.now());
         this._end( );
       }
     },
@@ -4097,6 +4109,7 @@ $.Widget.prototype = {
           if ( pixelBbox[ 0 ] !== pixelBbox[ 2 ] && pixelBbox[ 1 ] !== pixelBbox[ 3 ] ) {
             this._context.drawImage(this._blitcanvas, pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ], pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ] );
 
+          //if ( this._options.doubleBuffer ) console.log("drawPolygon:_end " + $.now());
             this._end( );
           }
         }
@@ -4162,14 +4175,38 @@ $.Widget.prototype = {
       this._$labelsContainer.html("");
 
       if ( this._trueCanvas ) {
-        // transform a finished scene, can assume no drawing during these calls
-        this._$canvasSceneFront.css( {
-          left: Math.round( origin[ 0 ] ),
-          top: Math.round( origin[ 1 ] ),
-          width: this._width * scale,
-          height: this._height * scale
-        } );
+        if ( this._options.doubleBuffer ) {
+
+
+          if ( this._requireFlip ) {
+            var geographics = this;
+
+            var oldCanvasScene = geographics._$canvasSceneFront;
+
+            geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
+              left: 0,
+              top: 0,
+              width: geographics._width,
+              height: geographics._height
+            } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) ).prependTo( geographics._$elem );
+
+            geographics._$canvasSceneBack = oldCanvasScene.detach();
+
+            geographics._requireFlip = false;
+          }
+
+
+          //console.log("geographics:interactiveTransform " + this._$canvasSceneFront.prop( "id" ) + ": origin: " + origin.toString() + ", scale: " + scale);
+          // transform a finished scene, can assume no drawing during these calls
+          this._$canvasSceneFront.css( {
+            left: Math.round( origin[ 0 ] ),
+            top: Math.round( origin[ 1 ] ),
+            width: this._width * scale,
+            height: this._height * scale
+          } );
+        }
       } else {
+        this._context.clearRect(0, 0, this._width, this._height);
       }
     },
 
@@ -4180,32 +4217,45 @@ $.Widget.prototype = {
         this._timeoutEnd = null;
       }
 
-      var geographics = this,
-          oldCanvasScene;
+      this._requireFlip = true;
+
+      var geographics = this;
 
       function endCallback( ) {
-        if ( geographics._trueCanvas ) {
-          oldCanvasScene = geographics._$canvasSceneFront;
+        if ( !geographics._timeoutEnd ) {
+          // something has canceled the draw
+          return;
+        }
 
-          geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
-            left: 0,
-            top: 0,
-            width: geographics._width,
-            height: geographics._height
-          } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) ).prependTo( geographics._$elem ).one( function( ) {
+        if ( geographics._trueCanvas && geographics._options.doubleBuffer ) {
+          //console.log("    endCallback...");
+
+          //geographics._$canvasSceneFront = 
+          geographics._$canvasSceneBack.prop( "src", "" ).one( "load", function( e ) {
+            //console.log("    ...flip: show " + geographics._$canvasSceneBack.prop( "id" ) + ", hide " + geographics._$canvasSceneFront.prop("id"));
+            geographics._requireFlip = false;
+            var oldCanvasScene = geographics._$canvasSceneFront;
+
+            geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
+              left: 0,
+              top: 0,
+              width: geographics._width,
+              height: geographics._height
+            } ).prependTo( geographics._$elem );
+
             geographics._$canvasSceneBack = oldCanvasScene.detach();
-          } );
+          } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) );
         }
 
         geographics._$labelsContainer.html( geographics._labelsHtml );
         geographics._timeoutEnd = null;
       }
 
-      if ( this._options.doubleBuffer ) {
+      //if ( this._options.doubleBuffer ) {
         this._timeoutEnd = setTimeout( endCallback, 20 );
-      } else {
-        endCallback( );
-      }
+      //} else {
+        //geographics._$labelsContainer.html( geographics._labelsHtml );
+      //}
     },
 
     _getGraphicStyle: function (style) {
@@ -4263,6 +4313,7 @@ $.Widget.prototype = {
           this._context.stroke();
         }
 
+          //if ( this._options.doubleBuffer ) console.log("_drawLines:_end " + $.now());
         this._end( );
       }
     }
@@ -4539,7 +4590,7 @@ $.Widget.prototype = {
       this._$drawContainer.geographics({ style: this._initOptions.drawStyle || {}, doubleBuffer: false });
       this._options["drawStyle"] = this._$drawContainer.geographics("option", "style");
 
-      this._$shapesContainer.geographics( { style: this._initOptions.shapeStyle || { }, doubleBuffer: false } );
+      this._$shapesContainer.geographics( { style: this._initOptions.shapeStyle || { } } );
       this._createdGraphics = true;
 
       this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
@@ -5132,9 +5183,9 @@ $.Widget.prototype = {
       this._clearInteractiveTimeout( );
 
       value = Math.min( Math.max( value, this._options[ "zoomMin" ] ), this._options[ "zoomMax" ] );
+
       this._setInteractiveCenterAndSize( this._centerInteractive, this._getPixelSize( value ) );
       this._interactiveTransform( );
-
       this._setInteractiveTimeout( trigger );
     },
 
@@ -5330,6 +5381,11 @@ $.Widget.prototype = {
           labelPixel,
           bbox = this._map._getBbox(center, pixelSize);
 
+      /*
+      if ( shapes.length > 0 ) {
+        console.log( "_refreshShapes " + $.now() );
+      }
+      */
       for (i = 0; i < shapes.length; i++) {
         shape = shapes[i].shape || shapes[i];
         shape = shape.geometry || shape;
@@ -5395,8 +5451,6 @@ $.Widget.prototype = {
           this._$shapesContainer.geographics( "drawLabel", labelPixel, label );
         }
       }
-
-      //this._$shapesContainer.geographics( "end" );
     },
 
     _findMapSize: function () {
@@ -5547,15 +5601,6 @@ $.Widget.prototype = {
     },
 
     _interactiveTransform: function( ) {
-      /*
-      if ( this._$shapesContainers ) {
-        this._$shapesContainers.geographics("clear");
-      }
-      */
-
-
-
-
       var mapWidth = this._contentBounds[ "width" ],
           mapHeight = this._contentBounds[ "height" ],
 
