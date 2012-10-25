@@ -21,6 +21,7 @@
     _$canvasSceneFront: undefined, //< if _trueCanvas, where canvas images get written (front buffer)
     _$canvasSceneBack: undefined, //< if _trueCanvas, where canvas images get written (back buffer)
     _timeoutEnd:  null,
+    _requireFlip: false,
 
     _blitcanvas: undefined,
     _blitcontext: undefined,
@@ -50,7 +51,12 @@
       this._$elem = this.element;
       this._options = this.options;
 
-      this._$elem.css({ display: "inline-block", overflow: "hidden", textAlign: "left" });
+      this._$elem.css( {
+        webkitTransform: "translateZ(0)",
+        display: "inline-block",
+        overflow: "hidden",
+        textAlign: "left"
+      } );
 
       if (this._$elem.css("position") == "static") {
         this._$elem.css("position", "relative");
@@ -123,7 +129,7 @@
       this._context.clearRect(0, 0, this._width, this._height);
       this._labelsHtml = "";
 
-          if ( this._options.doubleBuffer ) console.log("clear:_end " + $.now());
+          //if ( this._options.doubleBuffer ) console.log("clear:_end " + $.now());
       this._end( );
     },
 
@@ -171,7 +177,7 @@
         }
       }
 
-          if ( this._options.doubleBuffer ) console.log("drawArc:_end " + $.now());
+          //if ( this._options.doubleBuffer ) console.log("drawArc:_end " + $.now());
       this._end( );
     },
 
@@ -211,7 +217,7 @@
           this._context.stroke();
         }
 
-          if ( this._options.doubleBuffer ) console.log("drawPoint:_end " + $.now());
+          //if ( this._options.doubleBuffer ) console.log("drawPoint:_end " + $.now());
         this._end( );
       }
     },
@@ -315,7 +321,7 @@
           if ( pixelBbox[ 0 ] !== pixelBbox[ 2 ] && pixelBbox[ 1 ] !== pixelBbox[ 3 ] ) {
             this._context.drawImage(this._blitcanvas, pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ], pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ] );
 
-          if ( this._options.doubleBuffer ) console.log("drawPolygon:_end " + $.now());
+          //if ( this._options.doubleBuffer ) console.log("drawPolygon:_end " + $.now());
             this._end( );
           }
         }
@@ -382,7 +388,27 @@
 
       if ( this._trueCanvas ) {
         if ( this._options.doubleBuffer ) {
-          console.log("interactiveTransform " + this._$canvasSceneFront.prop( "id" ));
+
+
+          if ( this._requireFlip ) {
+            var geographics = this;
+
+            var oldCanvasScene = geographics._$canvasSceneFront;
+
+            geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
+              left: 0,
+              top: 0,
+              width: geographics._width,
+              height: geographics._height
+            } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) ).prependTo( geographics._$elem );
+
+            geographics._$canvasSceneBack = oldCanvasScene.detach();
+
+            geographics._requireFlip = false;
+          }
+
+
+          //console.log("geographics:interactiveTransform " + this._$canvasSceneFront.prop( "id" ) + ": origin: " + origin.toString() + ", scale: " + scale);
           // transform a finished scene, can assume no drawing during these calls
           this._$canvasSceneFront.css( {
             left: Math.round( origin[ 0 ] ),
@@ -402,6 +428,8 @@
         this._timeoutEnd = null;
       }
 
+      this._requireFlip = true;
+
       var geographics = this;
 
       function endCallback( ) {
@@ -411,18 +439,21 @@
         }
 
         if ( geographics._trueCanvas && geographics._options.doubleBuffer ) {
-          console.log("    endCallback...");
+          //console.log("    endCallback...");
 
           //geographics._$canvasSceneFront = 
           geographics._$canvasSceneBack.prop( "src", "" ).one( "load", function( e ) {
-            console.log("    ...flip: show " + geographics._$canvasSceneBack.prop( "id" ) + ", hide " + geographics._$canvasSceneFront.prop("id"));
+            //console.log("    ...flip: show " + geographics._$canvasSceneBack.prop( "id" ) + ", hide " + geographics._$canvasSceneFront.prop("id"));
+            geographics._requireFlip = false;
             var oldCanvasScene = geographics._$canvasSceneFront;
+
             geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
-            left: 0,
-            top: 0,
-            width: geographics._width,
-            height: geographics._height
-          } ).prependTo( geographics._$elem );
+              left: 0,
+              top: 0,
+              width: geographics._width,
+              height: geographics._height
+            } ).prependTo( geographics._$elem );
+
             geographics._$canvasSceneBack = oldCanvasScene.detach();
           } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) );
         }
@@ -493,7 +524,7 @@
           this._context.stroke();
         }
 
-          if ( this._options.doubleBuffer ) console.log("_drawLines:_end " + $.now());
+          //if ( this._options.doubleBuffer ) console.log("_drawLines:_end " + $.now());
         this._end( );
       }
     }

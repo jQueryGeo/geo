@@ -229,6 +229,12 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2012-10-25==
+===geographics flicker===
+I am swapping buffers a little better now and I also have to force a swap if we get an interactiveTransform call after we've begun drawing the next scene.
+
+This is not quite ready for production but it's a lot better than it was before yesterday.
+
 ==2012-10-24==
 ===graphics===
 I'm going to hide labels during interactiveTransform but keep shapes for now.

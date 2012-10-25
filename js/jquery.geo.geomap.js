@@ -1058,9 +1058,11 @@
           labelPixel,
           bbox = this._map._getBbox(center, pixelSize);
 
+      /*
       if ( shapes.length > 0 ) {
         console.log( "_refreshShapes " + $.now() );
       }
+      */
       for (i = 0; i < shapes.length; i++) {
         shape = shapes[i].shape || shapes[i];
         shape = shape.geometry || shape;
