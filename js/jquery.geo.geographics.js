@@ -11,6 +11,7 @@
     _$elem: undefined,
     _options: {},
     _trueCanvas: true,
+    _trueDoubleBuffer: true,
 
     _width: 0,
     _height: 0,
@@ -83,7 +84,12 @@
         //this._$canvas = this._$elem.children(':last');
         this._$canvas = $('<canvas ' + sizeAttr + ' style="-webkit-transform:translateZ(0);' + posCss + '"></canvas>');
 
-        if ( !this._options.doubleBuffer ) {
+        // test _trueDoubleBuffer
+        this._blitcanvas.width = 1;
+        this._blitcanvas.height = 1;
+        this._trueDoubleBuffer = this._blitcanvas.toDataURL().length > 6;
+
+        if ( !(this._options.doubleBuffer && this._trueDoubleBuffer) ) {
           this._$elem.append( this._$canvas );
         }
 
@@ -387,7 +393,7 @@
       this._$labelsContainer.html("");
 
       if ( this._trueCanvas ) {
-        if ( this._options.doubleBuffer ) {
+        if ( this._options.doubleBuffer && this._trueDoubleBuffer ) {
 
 
           if ( this._requireFlip ) {
@@ -416,6 +422,8 @@
             width: this._width * scale,
             height: this._height * scale
           } );
+        } else {
+          this._context.clearRect(0, 0, this._width, this._height);
         }
       } else {
         this._context.clearRect(0, 0, this._width, this._height);
@@ -439,7 +447,7 @@
           return;
         }
 
-        if ( geographics._trueCanvas && geographics._options.doubleBuffer ) {
+        if ( geographics._trueCanvas && geographics._options.doubleBuffer && geographics._trueDoubleBuffer ) {
           //console.log("    endCallback...");
 
           //geographics._$canvasSceneFront = 

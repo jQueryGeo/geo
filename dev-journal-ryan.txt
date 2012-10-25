@@ -235,6 +235,9 @@ I am swapping buffers a little better now and I also have to force a swap if we 
 
 This is not quite ready for production but it's a lot better than it was before yesterday.
 
+===android browser===
+Android 2 doesn't have toDataURL so I have to disable doubleBuffer even if the option is set to true. I'm now feature testing for toDataURL.
+
 ==2012-10-24==
 ===graphics===
 I'm going to hide labels during interactiveTransform but keep shapes for now.
