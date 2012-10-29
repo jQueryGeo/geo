@@ -12,6 +12,7 @@
 * docs - geo - audit in-place geo calls, e.g., fromGeodetic
 * geo - audit in-place geo calls, e.g., fromGeodetic
 * geomap - convert MapQuest icon to data URI so we don't have to resolve developer.mapquest.com every time
+* geomap - support Windows 8 Store apps
 
 === examples ===
 
@@ -226,6 +227,34 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-10-30==
+===jster===
+I added this project to jster.net. I think it looks nice on the list.
+
+==2012-10-29==
+===graphics===
+I'm going to change how service type objects and refreshShapes works. Service types will need to draw their own shapes. Here are some notes:
+
+  The refresh method of the service type objects will get an array of all the shapes.
+  
+  The service types will initialize their own geographics if they wish and draw the shapes themselves.
+  
+  This will duplicate some code in tiled & shingled but better allow for custom service types.
+  
+  Might want to have the service type objects allow for some sort of inheritance.
+  
+  When refreshing shapes, current services should wait for all pending images to avoid graphics swap errors. However, there should be a long timeout in case the images or a tile takes way too long.
+  
+  On interactive transform, they will call the same method on their geographic widget.
+
+I originally considered sending only view-relevent shapes to each service type but who is the map widget to decide?
+
+I would like to further note that the shapes array sent to each service type's refresh method is not just an array of GeoJSON objects, it's contains all the internal stuff we track like shape-specific style. If the service type want's the layer's shapeStyle, it will have to ask for it, I think. Maybe that will change later.
+
+This may or may not fix the flip issue. The map itself will have a special, fake shingled service (src is ""), that has all the map's graphics. They will not refresh until all images have completed downloading, user interaction is mostly done (time for a flip!) or a long timeout has been reached.
+
+All of this will need to be WELL-documented before I release info about adding custom service types.
 
 ==2012-10-25==
 ===geographics flicker===
