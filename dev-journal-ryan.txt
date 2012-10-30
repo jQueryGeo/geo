@@ -13,6 +13,7 @@
 * geo - audit in-place geo calls, e.g., fromGeodetic
 * geomap - convert MapQuest icon to data URI so we don't have to resolve developer.mapquest.com every time
 * geomap - support Windows 8 Store apps
+* test with zepto
 
 === examples ===
 
