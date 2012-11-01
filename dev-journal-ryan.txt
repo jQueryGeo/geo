@@ -1,6 +1,7 @@
 ﻿== to do ==
 
 === b2 ===
+* geomap - map services type objects should refresh their own shapes after the map image (or tiles) has downloaded or after some timout
 * geographics - don't empty labels on map interaction
 * geomap - delay refresh after append until some timeout; hook into interactiveTransform
 * geomap - [bug] mouse wheel & mac touchpads zoom too quickly
@@ -14,6 +15,7 @@
 * geomap - convert MapQuest icon to data URI so we don't have to resolve developer.mapquest.com every time
 * geomap - support Windows 8 Store apps
 * test with zepto
+** not sure zepto has Deferred, but we can just not support Deferred services in zepto mode
 
 === examples ===
 
@@ -229,11 +231,27 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2012-11-01==
+===graphics===
+It feels very slow without the timeout in place. Also, I still get a graphics jump if I pan after the services refresh but before all images come in. Most likely due to the service div resetting position and the graphics div not.
+
+This isn't ready yet. I don't think attaching to the global "all images are done" is working how I wanted. I'm going to abandon it for now.
+
+===service type graphics===
+I need to better design more specifically how this will work.
+
+* Each service type's refresh method will get an array of graphics to draw.
+* The service objects will maintain their own geographics widget.
+
 ==2012-10-30==
+===graphics===
+Yes, more graphics talk. It might be too much to move refreshShapes to the service objects. I would want more planning. The most I can do now is not call _refreshShapes until all services have finished or some timeout has occurred.
+
+==2012-10-29==
 ===jster===
 I added this project to jster.net. I think it looks nice on the list.
 
-==2012-10-29==
+==2012-10-28==
 ===graphics===
 I'm going to change how service type objects and refreshShapes works. Service types will need to draw their own shapes. Here are some notes:
 
