@@ -1,19 +1,20 @@
 ﻿== to do ==
 
 === b2 ===
-* examples - drawing markers
-* geographics - double buffer drawLineString & drawPoint
-* geomap - rename geo-measure-style style element to geo-style & include initial .geo-labels position style
 * geomap - delay refresh after append until some timeout; hook into interactiveTransform
-* geographics - draw all labels to a string or document fragment and append to DOM once
-* geographics - reuse shape label divs during refresh
-** move them instead of creating new labels
 * geomap - [bug] mouse wheel & mac touchpads zoom too quickly
 * geomap - [bug] setting zoom & then center on two lines does not zoom to the correct location
 ** http://jsfiddle.net/dyTn9/11/
 * docs - geomap - click mode
 * geomap - click mode
-* geomap - [bug] chrome inputs get locked onto mouse when used on a page with a map
+* geomap - [bug] removing a shape from one service that has been appended to two services causes an error in the second service
+* docs - geo - audit in-place geo calls, e.g., fromGeodetic
+* geo - audit in-place geo calls, e.g., fromGeodetic
+* geomap - convert MapQuest icon to data URI so we don't have to resolve developer.mapquest.com every time
+* geomap - support Windows 8 Store apps
+* test with zepto
+** not sure zepto has Deferred, but we can just not support Deferred services in zepto mode
+* geographics - ie8 - append vml to text and set innerHTML once during refresh
 
 === examples ===
 
@@ -35,7 +36,8 @@
 
 === future ===
 
-* geomap - [bug] map interferes with Chrome's input type=range widget
+* geomap - map & map services type objects should refresh their own shapes after the map image (or tiles) has downloaded or after some timout
+** this could increase responsiveness in case the user interacts just slightly after it's time to refresh
 * geomap - [bug] using shift-zoom during interactiveTransform doesn't zoom to correct location
 ** tiled maps only
 ** not as noticeable now that the refresh timeout is shorter
@@ -59,8 +61,6 @@
 * geomap - [bug] iPad 2 measureLength puts current length on second to last coord instead of last coord
 * geomap - iPad 2 - [bug] pointAlong doesn't take last point into account in all browsers
 ** cannot reproduce; possibly axisLayout image only
-* docs - geo - audit in-place geo calls, e.g., fromGeodetic
-* geo - audit in-place geo calls, e.g., fromGeodetic
 * geomap - include bboxMax in interactiveTransform engine
 * docs - geomap - add indexMax property to service object to limit the view.index number so it can be used in template src
 * geomap - add indexMax property to service object to limit the view.index number so it can be used in template src
@@ -231,6 +231,135 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-11-01==
+===graphics===
+It feels very slow without the timeout in place. Also, I still get a graphics jump if I pan after the services refresh but before all images come in. Most likely due to the service div resetting position and the graphics div not.
+
+This isn't ready yet. I don't think attaching to the global "all images are done" is working how I wanted. I'm going to abandon it for now.
+
+===service type graphics===
+I need to better design more specifically how this will work.
+
+* Each service type's refresh method will get an array of graphics to draw.
+* The service objects will maintain their own geographics widget.
+
+I don't know, it's keeping up pretty well the way it was. I'm sure i can make the graphics rendering errors happen but I might be able to release this as b2.
+
+Also, it could have been worse because of all the console writing I was doing, and having the debugger open.
+
+==2012-10-30==
+===graphics===
+Yes, more graphics talk. It might be too much to move refreshShapes to the service objects. I would want more planning. The most I can do now is not call _refreshShapes until all services have finished or some timeout has occurred.
+
+==2012-10-29==
+===jster===
+I added this project to jster.net. I think it looks nice on the list.
+
+==2012-10-28==
+===graphics===
+I'm going to change how service type objects and refreshShapes works. Service types will need to draw their own shapes. Here are some notes:
+
+  The refresh method of the service type objects will get an array of all the shapes.
+  
+  The service types will initialize their own geographics if they wish and draw the shapes themselves.
+  
+  This will duplicate some code in tiled & shingled but better allow for custom service types.
+  
+  Might want to have the service type objects allow for some sort of inheritance.
+  
+  When refreshing shapes, current services should wait for all pending images to avoid graphics swap errors. However, there should be a long timeout in case the images or a tile takes way too long.
+  
+  On interactive transform, they will call the same method on their geographic widget.
+
+I originally considered sending only view-relevent shapes to each service type but who is the map widget to decide?
+
+I would like to further note that the shapes array sent to each service type's refresh method is not just an array of GeoJSON objects, it's contains all the internal stuff we track like shape-specific style. If the service type want's the layer's shapeStyle, it will have to ask for it, I think. Maybe that will change later.
+
+This may or may not fix the flip issue. The map itself will have a special, fake shingled service (src is ""), that has all the map's graphics. They will not refresh until all images have completed downloading, user interaction is mostly done (time for a flip!) or a long timeout has been reached.
+
+All of this will need to be WELL-documented before I release info about adding custom service types.
+
+==2012-10-25==
+===geographics flicker===
+I am swapping buffers a little better now and I also have to force a swap if we get an interactiveTransform call after we've begun drawing the next scene.
+
+This is not quite ready for production but it's a lot better than it was before yesterday.
+
+===android browser===
+Android 2 doesn't have toDataURL so I have to disable doubleBuffer even if the option is set to true. I'm now feature testing for toDataURL.
+
+==2012-10-24==
+===graphics===
+I'm going to hide labels during interactiveTransform but keep shapes for now.
+
+I don't have to keep removing & creating the scene images, I can reuse them and swap. Double buffer FTW.
+
+The timeout is going to be part of all graphics drawing, even non-true canvas. I might roll labels into the code as well.
+
+===labels===
+I should build HTML apart from the labelsContainer and set the container's html once during _end. Wow. That's a lot faster. I can't believe I wasn't doing that before. I feel less worried about copying existing label elements at the moment.
+
+===flicker===
+There's now too much flicker, especially with measure & drawing tools. I do need some kind of immediate mode...doubleBuffer option?
+
+==2012-10-23==
+===touchstop===
+There is a serious issue with jQuery Geo and either iOS 6 and Android 4. I like to be the first one to say that jQuery Geo is far from perfect. But first, finish:
+
+===graphics===
+I'm close, I think in light of more serious issues, once I get graphics drawing working as planned, I'm going to ignore label updates until I fix the touchstop bug. So, shapes will remain during interactive movement but labels will disappear.
+
+===graphics jump===
+Similar to shingled, my graphics jump when I draw the new scene. I need to have an original /interactive/ image and a new final image. Currently, geographics DOM layout (in true canvas mode) is:
+
+div.geo-graphics
+ |- img
+ \- div.geo-labels-container
+
+Needs to be:
+
+div.geo-graphics
+ |- img (back)
+ |- img (front)
+ \- div.geo-labels-container
+
+And later it will finally be:
+
+div.geo-graphics
+ |- div.geo-graphics-scene-container (back)
+ |   |- img
+ |   \- div.geo-labels-container
+ \- div.geo-graphics-scene-container (front)
+     |- img
+     \- div.geo-labels-container
+
+==2012-10-18==
+===graphics===
+I'm drawing graphics to the canvas internally now and copying to an image tag for later transform. That second part is going to be hard.
+
+==2012-10-16==
+===shift===
+There is still something wrong with the first "shift" drag. It's noticeable with the measure tools. If you set mode to "measureLength" and start measuring, your first shift-drag will pan instead. Your second shift-drag will create a marquee zoom box.
+
+And what about dragCircle? That always seems to dragCircle no matter what shift is. It must follow a different path.
+
+===graphics===
+I have to re-enable moving shapes and have two thoughts on how to change the graphics widget.
+
+1.
+
+- add public begin/end functions and leave it to geomap (or later, the developer) to call them
+- end will copy the current canvas data to an img which ...
+
+this is silly, I don't want to add more public methods than I have to. I need interactiveTransform but I think I want begin/end methods, but they should be private and happen behind the scenes. This leads me to my second option, internally calling end via a timer if we don't get another draw call within a requestAnimationFrame/timeout. It will call its internal end function. It will also call it if there's not image and the user calls interactiveTransform.
+
+==2012-10-15==
+===ie8 graphics===
+A client noticed our graphics don't resize with the window on IE8. Not a suprise.
+
+===shift option===
+It's silly to have mode change to zoom when the shift option is default and the mode is dragBox. It should stay on dragBbox unless the use purposefully sets the shift option to "zoom".
 
 ==2012-10-11==
 ===markers===

@@ -23,7 +23,7 @@ You can also download the latest release as a [minified JavaScript file][min] or
 
 
 ## Documentation
-The latest docs are hosted at: http://jquerygeo.com
+The latest docs are hosted at: http://docs.jquerygeo.com
 
 Release and other announcements via @jQueryGeo on Twitter: https://twitter.com/jQueryGeo
 
@@ -35,6 +35,15 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 ## Release History
 
 ### 1.0b2
+* examples - drawing markers
+* geomap - ie8 - [bug] graphics do not resize with window
+* examples - kml points
+* docs - geomap - default action for shift option should be dragBox in dragBox mode
+* geomap - default action for shift option should be dragBox in dragBox mode
+* geomap - don't empty graphics on map interaction
+* geographics - build labels in background, replace html once
+* geomap - [bug] sometimes interaction with other elements doesn't work right on a page with a map
+* geographics - don't empty labels on map interaction
 
 ### 1.0b1.1 (2012-08-24)
 * geomap - [bug] shingled deferred services lose img elements when changing scales slowly

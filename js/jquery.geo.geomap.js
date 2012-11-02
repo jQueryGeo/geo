@@ -264,7 +264,7 @@
 
       $(window).resize(this._windowHandler);
 
-      this._$drawContainer.geographics({ style: this._initOptions.drawStyle || {} });
+      this._$drawContainer.geographics({ style: this._initOptions.drawStyle || {}, doubleBuffer: false });
       this._options["drawStyle"] = this._$drawContainer.geographics("option", "style");
 
       this._$shapesContainer.geographics( { style: this._initOptions.shapeStyle || { } } );
@@ -860,9 +860,9 @@
       this._clearInteractiveTimeout( );
 
       value = Math.min( Math.max( value, this._options[ "zoomMin" ] ), this._options[ "zoomMax" ] );
+
       this._setInteractiveCenterAndSize( this._centerInteractive, this._getPixelSize( value ) );
       this._interactiveTransform( );
-
       this._setInteractiveTimeout( trigger );
     },
 
@@ -1058,6 +1058,11 @@
           labelPixel,
           bbox = this._map._getBbox(center, pixelSize);
 
+      /*
+      if ( shapes.length > 0 ) {
+        console.log( "_refreshShapes " + $.now() );
+      }
+      */
       for (i = 0; i < shapes.length; i++) {
         shape = shapes[i].shape || shapes[i];
         shape = shape.geometry || shape;
@@ -1273,9 +1278,55 @@
     },
 
     _interactiveTransform: function( ) {
-      if ( this._$shapesContainers ) {
-        this._$shapesContainers.geographics("clear");
+      var mapWidth = this._contentBounds[ "width" ],
+          mapHeight = this._contentBounds[ "height" ],
+
+          halfWidth = mapWidth / 2,
+          halfHeight = mapHeight / 2,
+
+          bbox = [ this._centerInteractive[ 0 ] - halfWidth, this._centerInteractive[ 1 ] - halfHeight, this._centerInteractive[ 0 ] + halfWidth, this._centerInteractive[ 1 ] + halfHeight ];
+
+      var scalePixelSize = this._pixelSize,
+          scaleRatio = scalePixelSize / this._pixelSizeInteractive;
+          
+      if ( scalePixelSize > 0 ) {
+        scaleRatio = Math.round(scaleRatio * 1000) / 1000;
+
+        var oldMapOrigin = this._toMap( [ 0, 0 ] ),
+            newPixelPoint = this._toPixel( oldMapOrigin, this._centerInteractive, this._pixelSizeInteractive );
+
+
+        this._$shapesContainers.geographics("interactiveTransform", newPixelPoint, scaleRatio);
+
+        /*
+        $scaleContainer.css( {
+          left: Math.round( newPixelPoint[ 0 ] ),
+          top: Math.round( newPixelPoint[ 1 ] ),
+          width: mapWidth * scaleRatio,
+          height: mapHeight * scaleRatio
+        } );
+        */
+        
       }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
       for ( var i = 0; i < this._currentServices.length; i++ ) {
         service = this._currentServices[ i ];
@@ -1602,7 +1653,8 @@
 
     _eventTarget_touchstart: function (e) {
       var mode = this._options[ "mode" ],
-          shift = this._options[ "shift" ];
+          shift = this._options[ "shift" ],
+          defaultShift = ( mode === "dragBox" ? "dragBox" : "zoom" );
 
       if ( mode === "static" ) {
         return;
@@ -1678,7 +1730,7 @@
 
       if (!this._inOp && e.shiftKey && shift !== "off") {
         this._shiftDown = true;
-        this._$eventTarget.css( "cursor", this._options[ "cursors" ][ shift === "default" ? "zoom" : shift ] );
+        this._$eventTarget.css( "cursor", this._options[ "cursors" ][ shift === "default" ? defaultShift : shift ] );
       } else if ( !this._isMultiTouch && ( this._options[ "pannable" ] || mode === "dragBox" || mode === "dragCircle" ) ) {
         this._inOp = true;
 
@@ -1820,9 +1872,14 @@
         return false;
       }
 
-      var shift = this._options[ "shift" ],
-          mode = this._shiftDown ? ( shift === "default" ? "zoom" : shift ) : this._options["mode"],
+      var mode = this._options["mode"],
+          shift = this._options[ "shift" ],
+          defaultShift = ( mode === "dragBox" ? "dragBox" : "zoom" ),
           dx, dy, circleSize;
+
+      if ( this._shiftDown ) {
+        mode = ( shift === "default" ? defaultShift : shift );
+      }
 
       switch (mode) {
         case "zoom":
@@ -1912,7 +1969,7 @@
         } else {
           // Chrome & Firefox trigger a rogue mouseup event when doing a dblclick maximize in Windows(/Linux?)
           // ignore it
-          return false;
+          return;
         }
       }
 
@@ -1921,13 +1978,17 @@
       var mouseWasDown = this._mouseDown,
           wasToolPan = this._toolPan,
           offset = this._$eventTarget.offset(),
+          mode = this._options[ "mode" ],
           shift = this._options[ "shift" ],
-          mode = this._shiftDown ? ( shift === "default" ? "zoom" : shift ) : this._options["mode"],
+          defaultShift = ( mode === "dragBox" ? "dragBox" : "zoom" ),
           current, i, clickDate,
           dx, dy,
           coordBuffer,
           triggerShape;
 
+      if ( this._shiftDown ) {
+        mode = ( shift === "default" ? defaultShift : shift );
+      }
 
       if (this._supportTouch) {
         current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
