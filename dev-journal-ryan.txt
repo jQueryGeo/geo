@@ -13,8 +13,9 @@
 * geomap - convert MapQuest icon to data URI so we don't have to resolve developer.mapquest.com every time
 * geomap - support Windows 8 Store apps
 * test with zepto
-** not sure zepto has Deferred, but we can just not support Deferred services in zepto mode
+** zepto doesn't have Deferred, but we can drop support for Deferred services in zepto mode
 * geographics - ie8 - append vml to text and set innerHTML once during refresh
+* geomap - audit mousewheel timing & behavior vs. interactiveTransform
 
 === examples ===
 
@@ -38,6 +39,7 @@
 
 * geomap - map & map services type objects should refresh their own shapes after the map image (or tiles) has downloaded or after some timout
 ** this could increase responsiveness in case the user interacts just slightly after it's time to refresh
+** it will also be required for plugin service objects
 * geomap - [bug] using shift-zoom during interactiveTransform doesn't zoom to correct location
 ** tiled maps only
 ** not as noticeable now that the refresh timeout is shorter
@@ -247,6 +249,19 @@ I need to better design more specifically how this will work.
 I don't know, it's keeping up pretty well the way it was. I'm sure i can make the graphics rendering errors happen but I might be able to release this as b2.
 
 Also, it could have been worse because of all the console writing I was doing, and having the debugger open.
+
+===labels===
+It wasn't too hard to get labels moving again. % placement works well.
+
+===shape refresh===
+I would still like to fix the timing of refreshShapes so that it's not so jumpy with wheel zoom. I wonder what it's like during pinch zoom though.
+
+I could potentially do the refreshShapes inside the base interactive timeout. Then it can be canceled by more interaction.
+
+That works quite well. That's exactly what I've been trying to do.
+
+===mouseWheelFinish===
+It this function even used anymore? If so, why isn't it part of interactiveTransform?
 
 ==2012-10-30==
 ===graphics===
