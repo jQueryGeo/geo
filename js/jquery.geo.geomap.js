@@ -1339,20 +1339,18 @@
       }
     },
 
-    _setInteractiveTimeout: function( trigger ) {
-      var geomap = this;
-
-      function interactiveTimeoutCallback( ) {
-        if ( geomap._isMultiTouch ) {
-          geomap._timeoutInteractive = setTimeout( interactiveTimeoutCallback, 128 );
-        } else if ( geomap._created && geomap._timeoutInteractive ) {
-          geomap._setCenterAndSize( geomap._centerInteractive, geomap._pixelSizeInteractive, geomap._triggerInteractive, true );
-          geomap._timeoutInteractive = null;
-          geomap._triggerInteractive = false;
-        }
+    _interactiveTimeout: function( ) {
+      if ( this._isMultiTouch ) {
+        this._timeoutInteractive = setTimeout( $.proxy( interactiveTimeout, this ), 128 );
+      } else if ( this._created && this._timeoutInteractive ) {
+        this._setCenterAndSize( this._centerInteractive, this._pixelSizeInteractive, this._triggerInteractive, true );
+        this._timeoutInteractive = null;
+        this._triggerInteractive = false;
       }
+    },
 
-      this._timeoutInteractive = setTimeout( interactiveTimeoutCallback, 128 );
+    _setInteractiveTimeout: function( trigger ) {
+      this._timeoutInteractive = setTimeout( $.proxy( this._interactiveTimeout, this ), 128 );
       this._triggerInteractive |= trigger;
     },
 
