@@ -1,0 +1,116 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>basemap switcher example</title>
+  <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+  <meta name="description" content="An example of a bassemap switcher">
+  <meta name="author" content="Ryan Westphal">
+  <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.24/themes/blitzer/jquery-ui.css" />
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+  <style type="text/css">
+    #map
+    {
+      position: fixed;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <div id="map">
+    </div>
+    <div class="info">
+      <div class="links">
+        <a href="../" class="docLink">&lt; docs</a>
+        <a href="http://jsfiddle.net/ryanttb/58D64/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
+      </div>
+
+      <h1>bassemap switcher</h1>
+
+      <div class="basemap-inputs">
+        <input type="radio" id="basemap-street" name="basemap" value="street" checked="checked" /><label for="basemap-street">Street</label>
+        <input type="radio" id="basemap-aerial" name="basemap" value="aerial" /><label for="basemap-aerial">aerial</label>
+      </div>
+      
+    </div>
+  </div>
+  <script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+  <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.24/jquery-ui.min.js"></script>
+  <!--<script src="../../js/excanvas.js"></script>
+  <script src="../../js/jsrender.js"></script>
+  <script src="../../js/jquery.mousewheel.js"></script>
+  <script src="../../js/jquery.ui.widget.js"></script>
+  <script src="../../js/jquery.geo.core.js"></script>
+  <script src="../../js/jquery.geo.geographics.js"></script>
+  <script src="../../js/jquery.geo.geomap.js"></script>
+  <script src="../../js/jquery.geo.tiled.js"></script>
+  <script src="../../js/jquery.geo.shingled.js"></script>-->
+  <script src="../jquery.geo-test.min.js"></script>
+  <script>
+    $( function ( ) {
+      // create a map with two basemap services, the aerial service is hidden
+
+      // note that the space in the "class" properties below means both services
+      // have the basemap class but each one has a second class that we use to show/hide them
+      var map = $( "#map" ).geomap( {
+        center: [ -71.0595678, 42.3604823 ],
+        zoom: 8,
+
+        services: [
+          {
+            "class": "basemap street",
+            type: "tiled",
+            src: function( view ) {
+              return "http://otile" + ((view.index % 4) + 1) + ".mqcdn.com/tiles/1.0.0/osm/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
+            },
+            attr: "Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='http://developer.mapquest.com/content/osm/mq_logo.png'>"
+          },
+
+          {
+            "class": "basemap aerial",
+            type: "tiled",
+            src: function( view ) {
+              return "http://oatile" + ((view.index % 4) + 1) + ".mqcdn.com/tiles/1.0.0/sat/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
+            },
+            style: {
+              visibility: "hidden"
+            },
+            attr: "Portions Courtesy NASA/JPL-Caltech and U.S. Depart. of Agriculture, Farm Service Agency"
+          }
+        ]
+      } );
+
+      // jQuery UI for pretty buttons
+
+      $( ".basemap-inputs" ).buttonset( );
+
+      // hook into when user clicks one of the basemap buttons
+      $( 'input[name="basemap"]' ).click( function( e ) {
+        // the value of the checked basemap input matches the class of the
+        // jQuery Geo service we want to show
+
+        var basemapServiceClass = $( 'input[name="basemap"]:checked' ).val();
+
+        // hide all basemap services
+        $( ".basemap" ).geomap( "toggle", false );
+
+        // show the selected one
+        $( "." + basemapServiceClass ).geomap( "toggle", true );
+      } );
+    } );  
+  </script>
+
+  <script>
+    var _gaq = [['_setAccount', 'UA-26084853-1'], ['_trackPageview']];
+    (function (d, t) {
+      var g = d.createElement(t), s = d.getElementsByTagName(t)[0]; g.async = 1;
+      g.src = ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+      s.parentNode.insertBefore(g, s);
+    } (document, 'script'));
+  </script>
+</body>
+</html>
