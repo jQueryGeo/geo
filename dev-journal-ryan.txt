@@ -1,8 +1,6 @@
 ﻿== to do ==
 
 === b2 ===
-* geomap - map services type objects should refresh their own shapes after the map image (or tiles) has downloaded or after some timout
-* geographics - don't empty labels on map interaction
 * geomap - delay refresh after append until some timeout; hook into interactiveTransform
 * geomap - [bug] mouse wheel & mac touchpads zoom too quickly
 * geomap - [bug] setting zoom & then center on two lines does not zoom to the correct location
@@ -16,6 +14,7 @@
 * geomap - support Windows 8 Store apps
 * test with zepto
 ** not sure zepto has Deferred, but we can just not support Deferred services in zepto mode
+* geographics - ie8 - append vml to text and set innerHTML once during refresh
 
 === examples ===
 
@@ -37,6 +36,8 @@
 
 === future ===
 
+* geomap - map & map services type objects should refresh their own shapes after the map image (or tiles) has downloaded or after some timout
+** this could increase responsiveness in case the user interacts just slightly after it's time to refresh
 * geomap - [bug] using shift-zoom during interactiveTransform doesn't zoom to correct location
 ** tiled maps only
 ** not as noticeable now that the refresh timeout is shorter
@@ -242,6 +243,10 @@ I need to better design more specifically how this will work.
 
 * Each service type's refresh method will get an array of graphics to draw.
 * The service objects will maintain their own geographics widget.
+
+I don't know, it's keeping up pretty well the way it was. I'm sure i can make the graphics rendering errors happen but I might be able to release this as b2.
+
+Also, it could have been worse because of all the console writing I was doing, and having the debugger open.
 
 ==2012-10-30==
 ===graphics===

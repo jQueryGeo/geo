@@ -27,7 +27,8 @@
     _blitcanvas: undefined,
     _blitcontext: undefined,
 
-    _$labelsContainer: undefined,
+    _$labelsContainerFront: undefined,
+    _$labelsContainerBack: undefined,
     _labelsHtml: "",
 
     options: {
@@ -114,8 +115,9 @@
         this._$canvas.children().css({ backgroundColor: "transparent", width: this._width, height: this._height });
       }
 
-      this._$elem.append('<div class="geo-labels-container" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '"></div>');
-      this._$labelsContainer = this._$elem.children(':last');
+      // create our front & back label containers
+      this._$labelsContainerFront = $('<div class="geo-labels-container" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '"></div>');
+      this._$labelsContainerBack = $('<div class="geo-labels-container" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '"></div>');
     },
 
     _setOption: function (key, value) {
@@ -345,7 +347,7 @@
     },
 
     drawLabel: function( coordinates, label ) {
-      this._labelsHtml += '<div class="geo-label" style="-webkit-transform:translateZ(0);position:absolute; left:' + coordinates[ 0 ] + 'px; top:' + coordinates[ 1 ] + 'px;">' + label + '</div>';
+      this._labelsHtml += '<div class="geo-label" style="-webkit-transform:translateZ(0);position:absolute; left:' + ( coordinates[ 0 ] / this._width * 100 ) + '%; top:' + ( coordinates[ 1 ] / this._height * 100 ) + '%;">' + label + '</div>';
     },
 
     resize: function( ) {
@@ -377,7 +379,12 @@
         } );
       }
 
-      this._$labelsContainer.css( {
+      this._$labelsContainerFront.css( {
+        width: this._width,
+        height: this._height
+      } );
+
+      this._$labelsContainerBack.css( {
         width: this._width,
         height: this._height
       } );
@@ -390,7 +397,7 @@
       }
 
       // hide labels for now until they are on the interactive div 
-      this._$labelsContainer.html("");
+      //this._$labelsContainerFront.html("");
 
       if ( this._trueCanvas ) {
         if ( this._options.doubleBuffer && this._trueDoubleBuffer ) {
@@ -428,6 +435,14 @@
       } else {
         this._context.clearRect(0, 0, this._width, this._height);
       }
+
+      // transform labels
+      this._$labelsContainerFront.css( {
+        left: Math.round( origin[ 0 ] ),
+        top: Math.round( origin[ 1 ] ),
+        width: this._width * scale,
+        height: this._height * scale
+      } );
     },
 
     _end: function( ) {
@@ -467,14 +482,28 @@
           } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) );
         }
 
-        geographics._$labelsContainer.html( geographics._labelsHtml );
+
+        geographics._$labelsContainerBack.html( geographics._labelsHtml );
+
+        var oldLabelsContainer = geographics._$labelsContainerFront;
+
+        geographics._$labelsContainerFront = geographics._$labelsContainerBack.css( {
+          left: 0,
+          top: 0,
+          width: geographics._width,
+          height: geographics._height
+        } ).prependTo( geographics._$elem );
+
+        geographics._$labelsContainerBack = oldLabelsContainer.detach();
+
+
         geographics._timeoutEnd = null;
       }
 
       //if ( this._options.doubleBuffer ) {
         this._timeoutEnd = setTimeout( endCallback, 20 );
       //} else {
-        //geographics._$labelsContainer.html( geographics._labelsHtml );
+        //geographics._$labelsContainerFront.html( geographics._labelsHtml );
       //}
     },
 
