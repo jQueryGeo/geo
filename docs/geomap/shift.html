@@ -45,17 +45,19 @@
         </tr>
       </table>
 
-      <p>The shift option determines how the shift key affects the map during drag operations in different modes. There are currently four values: default, zoom, dragBox, and off. However, default is currently the same as zoom.</p>
+      <p>The shift option determines how the shift key affects the map during drag operations in different modes. There are currently four values: zoom, dragBox, default, and off.</p>
       
-      <h2>default and zoom</h2>
+      <h2>zoom</h2>
 
-      <p>When shift is set to default or zoom and a user holds the shift key before holding the mouse button down, the map temporarilly switches to zoom mode. In this state the user can perform a marquee zoom by clicking and holding one point and dragging the mouse cursor. A box will form. When the user lets go of the mouse, the map will zoom to the closest approximation of the bbox of the drawn shape.</p>
-
-      <p>When mode is dragBox, the shift key will still switch to zoom mode. Dragging will form a box either way but if the shift key was down when the user started, the map will zoom.</p>
+      <p>When shift is set to zoom and a user holds the shift key before holding the mouse button down, the map temporarily switches to zoom mode. In this state the user can perform a marquee zoom by clicking and holding one point and dragging the mouse cursor. A box will form. When the user lets go of the mouse, the map will zoom to the closest approximation of the bbox of the drawn shape.</p>
 
       <h2>dragBox</h2>
 
-      <p>When shift is set to dragBox and a user holds the shift key before holding the mouse button down, the map temporarilly switches to dragBox mode. In this state the user can click and hold one point and then drag the mouse cursor. A box will form. When the user lets go of the mouse, jQuery Geo will trigger a shape event passing a GeoJSON Polygon representation of the dragged bbox as the geo argument. The Polygon object also has the GeoJSON the bbox property.</p>
+      <p>When shift is set to dragBox and a user holds the shift key before holding the mouse button down, the map temporarily switches to dragBox mode. In this state the user can click and hold one point and then drag the mouse cursor. A box will form. When the user lets go of the mouse, jQuery Geo will trigger a shape event passing a GeoJSON Polygon representation of the dragged bbox as the geo argument. The Polygon object also has the GeoJSON the bbox property.</p>
+
+      <h2>default</h2>
+
+      <p>When shift is set to default, it behaves like dragBox when the mode option is dragBox and behaves like zoom in all other modes. For example, a shift-drag in pan mode will temporarily switch the map to zoom mode (thus zooming the map and triggering a bboxchange event) while a shift-drag in dragBox mode will stay in dragBox mode (thus triggering a shape event).</p>
 
       <h2>off</h2>
 

@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>KML example</title>
+  <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+  <meta name="description" content="An example of rendering KML points">
+  <meta name="author" content="Ryan Westphal">
+  <link rel="stylesheet" type="text/css" href="css/style.css" />
+  <style type="text/css">
+    #map
+    {
+      position: fixed;
+      left: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <div id="map">
+    </div>
+    <div class="info">
+      <div class="links">
+        <a href="../" class="docLink">&lt; docs</a>
+        <a href="http://jsfiddle.net/ryanttb/NCUK7/embedded/" class="fiddleLink"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
+      </div>
+      <h1>KML</h1>
+      <p>Example of parsing a simple KML file as GeoJSON points to append.</p>
+    </div>
+  </div>
+  <script src="http://code.jquery.com/jquery-1.8.1.min.js"></script>
+  <script src="../jquery.geo-test.min.js"></script>
+  <script>
+    $( function ( ) {
+      // start with xml text
+      var kml = '<?xml version="1.0" encoding="utf-8"?> <kml xmlns="http://www.opengis.net/kml/2.2"> <Placemark> <name>My office</name> <description>This is the location of my office.</description> <Point> <coordinates>-71.0595678,42.3604823</coordinates> </Point> </Placemark> </kml>',
+
+          kmlDoc = $.parseXML( kml ), //< parsed xml document
+          
+          // create a map
+          map = $( "#map" ).geomap( {
+            center: [ -71.0595678, 42.3604823 ],
+            zoom: 8
+          } ),
+          
+          cEl, //< storage for our parsed coordinate element
+          c; //< storage for our parsed coordinate values
+
+      // find & iterate over Point features
+      $(kmlDoc).find("Point").each(function() {
+        // find the coordinates element on this Point element
+        cEl = $(this).find("coordinates");
+
+        // extract and split the coordinate's values
+        c = $(cEl).text().split(",");
+
+        // append the coordinate to the map
+        map.geomap( "append", {
+          type: "Point",
+          coordinates:[ parseFloat( c[0] ), parseFloat( c[1] ) ]
+        }, {
+          fillOpacity: 1
+        });
+      });
+
+    } );  
+  </script>
+
+  <script>
+    var _gaq = [['_setAccount', 'UA-26084853-1'], ['_trackPageview']];
+    (function (d, t) {
+      var g = d.createElement(t), s = d.getElementsByTagName(t)[0]; g.async = 1;
+      g.src = ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js';
+      s.parentNode.insertBefore(g, s);
+    } (document, 'script'));
+  </script>
+</body>
+</html>
