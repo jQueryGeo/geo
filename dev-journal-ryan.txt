@@ -16,6 +16,8 @@
 ** zepto doesn't have Deferred, but we can drop support for Deferred services in zepto mode
 * geographics - ie8 - append vml to text and set innerHTML once during refresh
 * geomap - audit mousewheel timing & behavior vs. interactiveTransform
+* docs - geomap - geo-attr class
+* geomap - geo-attr class
 
 === examples ===
 
