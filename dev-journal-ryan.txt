@@ -238,6 +238,33 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2012-11-13==
+===jQuery Mobile===
+I probably wrote this before but have since forgotten myself. When using jQuery Geo with jQuery Mobile:
+
+* create your map during the pagechange event because it happens after all layout updates
+* you can absolutely position your map div using right & bottom properties
+* the map div can be inside the page content
+* destroy the map widget on pagebeforehide
+
+I recommend (unfortunately) destroying the map widget on beforepagehide of the page that contains your map. The reasoning is that jQuery Mobile's DOM manip can unload divs behind the scenes (or they can be unloaded forcefully in the case of directly typing in a new URL in the app). In this situation, your map div has no content but your map widget reference is still around. Since I can't guarantee that the map will exist during any given page change, I like to be explicit & destroy it each time. It frees up resources as well and it's good to do this before the transitions start for performance reasons.
+
+Here's testing for the map during pagechange if your map page is #home-map and your map div is #map:
+
+var map = null; // elsewhere
+
+$("body").on("pagechange", function (e, mobile) {
+  if ($(mobile.toPage).is("#home-map")) {
+    map = $("#map").geomap( );
+  }
+}
+
+$("body").on("pagebeforehide", "#home-map", function() {
+  map.geomap("destroy");
+  map = null; // not required but nice to do
+});
+
+
 ==2012-11-09==
 ===single cut up image===
 I responded on a GitHub image on ways to display a cut up image as tiles. I hope it works. I should make an example for it.
