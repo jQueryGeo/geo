@@ -22,6 +22,8 @@
 === examples ===
 
 * examples - jQuery Mobile
+* examples - pan cursor
+* examples - shape click pointer cursor
 * examples - weather
 ** http://openweathermap.org/example-json
 * examples - MBCR: http://www.mbta.com/rider_tools/developers/default.asp?id=21899
@@ -69,6 +71,9 @@
 ** cannot reproduce; possibly axisLayout image only
 * geomap - include bboxMax in interactiveTransform engine
 * docs - geomap - add indexMax property to service object to limit the view.index number so it can be used in template src
+* geomap - create node module, add to npm
+* geomap - add to nodetoolbox
+** http://nodetoolbox.com/?utm_source=javascriptweekly&utm_medium=email
 * geomap - add indexMax property to service object to limit the view.index number so it can be used in template src
 * geomap - [bug] page scroll effects zoom center on fixed position maps
 * geomap - clean up touch tracking
