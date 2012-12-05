@@ -915,28 +915,46 @@
         if ( wkt.indexOf( "((" ) === -1 ) {
           multiSomething = lineStringParseUntagged( wkt );
         } else {
-          multiSomething = multiLineStringParseUntagged( wkt );
-          multiSomething.coordinates = $.geo._allCoordinates( multiSomething );
-        }
+         //Edited to accomodate changes made to multiLineStringParseUntagged                   
+                    var lineStringsWkt = wkt.substr( 1, wkt.length - 2 ),
+                        lineStrings = lineStringsWkt.split( ")),((" ),
+                        i = 0,
+                        multiLineString = {
+                          type: "MultiLineString",
+                          coordinates: [ ]
+                        };
 
-        multiSomething.type = "MultiPoint";
+                    for ( ; i < lineStrings.length; i++ ) {
+                        multiLineString.coordinates.push( lineStringParseUntagged( lineStrings[ i ] ).coordinates );
+                    }
+                    //multiSomething = multiLineStringParseUntagged(wkt);
+                    multiSomething = multiLineString;
+                    //End Ali's Edits
+                    multiSomething.coordinates = $.geo._allCoordinates(multiSomething);
+                }
+
+                multiSomething.type = "MultiPoint";
 
         return multiSomething;
       }
 
       function multiLineStringParseUntagged(wkt) {
-        var lineStringsWkt = wkt.substr( 1, wkt.length - 2 ),
-            lineStrings = lineStringsWkt.split( ")),((" ),
+        //edited to improve parseing of multilinestring geometry
+       var lineStringsWkt = wkt.substr(2, wkt.length - 4),
+            lineStrings = lineStringsWkt.split("), ("),
             i = 0,
             multiLineString = {
-              type: "MultiLineString",
-              coordinates: [ ]
+                type: "MultiLineString",
+                paths:[
+                        { type: "LineString",
+                          coordinates: []
+                        }
+                      ]               
             };
 
-        for ( ; i < lineStrings.length; i++ ) {
-          multiLineString.coordinates.push( lineStringParseUntagged( lineStrings[ i ] ).coordinates );
-        }
-
+                for (; i < lineStrings.length; i++) {                  
+                      multiLineString.paths[i] = (lineStringParseUntagged("(" + (lineStrings[i])+ ")"));
+                }
         return multiLineString;
       }
 
