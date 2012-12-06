@@ -43,6 +43,8 @@
 
 === future ===
 
+* docs - geomap - layers template argument/service object property
+* geomap - layers template argument/service object property
 * geomap - map & map services type objects should refresh their own shapes after the map image (or tiles) has downloaded or after some timout
 ** this could increase responsiveness in case the user interacts just slightly after it's time to refresh
 ** it will also be required for plugin service objects
