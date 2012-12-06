@@ -1,0 +1,83 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <title>shingled example</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+        <meta name="description" content="An example of shingled service with labels">
+        <meta name="author" content="Ryan Westphal">
+        <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/blitzer/jquery-ui.css" />
+        <link rel="stylesheet" type="text/css" href="css/style.css" />
+        <style type="text/css">
+            #map
+            {
+                position: fixed;
+                left: 0;
+                top: 0;
+                right: 0;
+                bottom: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div>
+            <div id="map">
+            </div>
+            <div class="info">
+                <div class="links">
+                    <a href="../" class="docLink">&lt; docs</a>
+                    <a href="http://jsfiddle.net/ryanttb/WmqDx/embedded/" class="fiddleLink not-mobile"><img src="img/jsfiddle.png" alt="" /> jsFiddle &gt;</a>
+                </div>
+                <h1>shingled with labels</h1>
+                <p class="not-mobile">This page tests geomap with shingled service with labels.</p>
+
+            </div>
+        </div>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js"></script>
+
+        <script type="text/javascript" src="../../js/excanvas.js"></script>
+        <script type="text/javascript" src="../../js/jsrender.js"></script>
+        <script type="text/javascript" src="../../js/jquery.mousewheel.js"></script>
+        <script type="text/javascript" src="../../js/jquery.geo.core.js"></script>
+        <script type="text/javascript" src="../../js/jquery.geo.geographics.js"></script>
+        <script type="text/javascript" src="../../js/jquery.geo.tiled.js"></script>
+        <script type="text/javascript" src="../../js/jquery.geo.shingled.js"></script>
+        <script type="text/javascript" src="../../js/jquery.geo.geomap.js"></script>
+
+        <script>
+            $(function () {
+                // Set proj to null because we are working a different projection &
+                // entirely in map units
+                //
+                // Note: this is still valid in a4
+                // Though not required because we're working entirely in map units,
+                // i.e., jQuery Geo will not need to project anything,
+                // it makes sense because we are not working in the default projection of web mercator
+
+                $.geo.proj = null;
+
+                var map = $("#map").geomap({
+                    services: [
+                        {
+                            id: "arcgis",
+                            type: "shingled",
+                            src: "http://mpp.praha.eu/ArcGIS/rest/services/APP_Vyhledavani/vyhledavani/MapServer/export?dpi=96&transparent=true&format=png8&bbox={{:bbox}}&bboxSR=102067&imageSR=102067&size={{:width}},{{:height}}&f=image",
+                            attr: "&copy; 2012 Útvar rozvoje hl. m. Prahy"
+                        }
+                    ],
+
+                    // you must set bboxMax for shingled services for the zoom property to mean anything
+                    bboxMax: [-904585.724333333, -1227299.61, -431680.59375, -935232.3125],
+                    // shingled services do not have a tilingScheme
+                    tilingScheme: null,
+
+                    center: [ -740321, -1044095 ],
+                    zoom: 5
+                });
+
+            });  
+        </script>
+    </body>
+</html>
+
