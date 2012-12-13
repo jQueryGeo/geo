@@ -245,6 +245,12 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2012-12-13==
+===saucelabs===
+I created a sauce labs account to test jQuery Geo. They are now free for open source projects as long as all of my testing sessions are public. That's fine!
+
+https://saucelabs.com/account
+
 ==2012-11-13==
 ===jQuery Mobile===
 I probably wrote this before but have since forgotten myself. When using jQuery Geo with jQuery Mobile:
