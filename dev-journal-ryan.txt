@@ -22,10 +22,14 @@
 === examples ===
 
 * examples - jQuery Mobile
+* examples - pan cursor
+* examples - shape click pointer cursor
 * examples - weather
 ** http://openweathermap.org/example-json
 * examples - MBCR: http://www.mbta.com/rider_tools/developers/default.asp?id=21899
 * examples - drag shapes
+* examples - tiled image w/o zoom
+** https://github.com/AppGeo/geo/issues/105
 * examples - ie7 - [bug] floating info div doesn't show up, inputs are alone and on the left
 * examples - redo the jVectorMap demo page using jQuery Geo
 * examples - make OSM editing simple
@@ -39,6 +43,8 @@
 
 === future ===
 
+* docs - geomap - layers template argument/service object property
+* geomap - layers template argument/service object property
 * geomap - map & map services type objects should refresh their own shapes after the map image (or tiles) has downloaded or after some timout
 ** this could increase responsiveness in case the user interacts just slightly after it's time to refresh
 ** it will also be required for plugin service objects
@@ -67,6 +73,9 @@
 ** cannot reproduce; possibly axisLayout image only
 * geomap - include bboxMax in interactiveTransform engine
 * docs - geomap - add indexMax property to service object to limit the view.index number so it can be used in template src
+* geomap - create node module, add to npm
+* geomap - add to nodetoolbox
+** http://nodetoolbox.com/?utm_source=javascriptweekly&utm_medium=email
 * geomap - add indexMax property to service object to limit the view.index number so it can be used in template src
 * geomap - [bug] page scroll effects zoom center on fixed position maps
 * geomap - clean up touch tracking
@@ -235,6 +244,49 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-12-15==
+===pul requests===
+I have some pull requests I haven't had a chance to get to. Time to check them out.
+
+==2012-12-13==
+===saucelabs===
+I created a sauce labs account to test jQuery Geo. They are now free for open source projects as long as all of my testing sessions are public. That's fine!
+
+https://saucelabs.com/account
+
+==2012-11-13==
+===jQuery Mobile===
+I probably wrote this before but have since forgotten myself. When using jQuery Geo with jQuery Mobile:
+
+* create your map during the pagechange event because it happens after all layout updates
+* you can absolutely position your map div using right & bottom properties
+* the map div can be inside the page content
+* destroy the map widget on pagebeforehide
+
+I recommend (unfortunately) destroying the map widget on beforepagehide of the page that contains your map. The reasoning is that jQuery Mobile's DOM manip can unload divs behind the scenes (or they can be unloaded forcefully in the case of directly typing in a new URL in the app). In this situation, your map div has no content but your map widget reference is still around. Since I can't guarantee that the map will exist during any given page change, I like to be explicit & destroy it each time. It frees up resources as well and it's good to do this before the transitions start for performance reasons.
+
+Here's testing for the map during pagechange if your map page is #home-map and your map div is #map:
+
+var map = null; // elsewhere
+
+$("body").on("pagechange", function (e, mobile) {
+  if ($(mobile.toPage).is("#home-map")) {
+    map = $("#map").geomap( );
+  }
+}
+
+$("body").on("pagebeforehide", "#home-map", function() {
+  map.geomap("destroy");
+  map = null; // not required but nice to do
+});
+
+
+==2012-11-09==
+===single cut up image===
+I responded on a GitHub image on ways to display a cut up image as tiles. I hope it works. I should make an example for it.
+
+https://github.com/AppGeo/geo/issues/105
 
 ==2012-11-02==
 ===shape functions===
