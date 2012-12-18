@@ -915,25 +915,11 @@
         if ( wkt.indexOf( "((" ) === -1 ) {
           multiSomething = lineStringParseUntagged( wkt );
         } else {
-         //Edited to accomodate changes made to multiLineStringParseUntagged                   
-                    var lineStringsWkt = wkt.substr( 1, wkt.length - 2 ),
-                        lineStrings = lineStringsWkt.split( ")),((" ),
-                        i = 0,
-                        multiLineString = {
-                          type: "MultiLineString",
-                          coordinates: [ ]
-                        };
+          multiSomething = multiLineStringParseUntagged( wkt );
+          multiSomething.coordinates = $.geo._allCoordinates( multiSomething );
+        }
 
-                    for ( ; i < lineStrings.length; i++ ) {
-                        multiLineString.coordinates.push( lineStringParseUntagged( lineStrings[ i ] ).coordinates );
-                    }
-                    //multiSomething = multiLineStringParseUntagged(wkt);
-                    multiSomething = multiLineString;
-                    //End Ali's Edits
-                    multiSomething.coordinates = $.geo._allCoordinates(multiSomething);
-                }
-
-                multiSomething.type = "MultiPoint";
+        multiSomething.type = "MultiPoint";
 
         return multiSomething;
       }
@@ -945,15 +931,14 @@
             i = 0,
             multiLineString = {
                 type: "MultiLineString",
-                paths:[
-                        { type: "LineString",
-                          coordinates: []
-                        }
-                      ]               
+                 coordinates: [ ]      
             };
 
                 for (; i < lineStrings.length; i++) {                  
-                      multiLineString.paths[i] = (lineStringParseUntagged("(" + (lineStrings[i])+ ")"));
+                     lineString = lineStringParseUntagged( "(" + lineStrings[ i ] + ")" );
+                     if ( lineString ) {
+                       multiLineString.coordinates.push( lineString.coordinates );
+                    }     
                 }
         return multiLineString;
       }
