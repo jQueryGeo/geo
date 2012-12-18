@@ -52,7 +52,9 @@
         zoom: 8,
         click: function(e, geo) {
           // append a label with a link
-          map.geomap("append", geo, '<p>hiya, <a href="#">link</a></p>');
+          // must be appended to the map to be clickable
+          // links in labels appended to specific services will be ignored
+          map.geomap("append", geo, '<a href="http://docs.jquerygeo.com" target="_blank">jQuery Geo Docs</a>');
         }
       } );
     } );  

@@ -19,7 +19,8 @@
 * geomap - audit mousewheel timing & behavior vs. interactiveTransform
 * docs - geomap - geo-attr class
 * geomap - geo-attr class
-* geomap - allow label links to be clicked
+* geographics - graphics stretch after resize, should just move
+* docs - geomap - top-level map label links are clickable
 
 === examples ===
 
@@ -246,6 +247,17 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2012-12-18==
+===parse multilinestring===
+I commented on Ali's pull request for the non-public (yet) feature of parsing WKT.
+
+===label links===
+Today will be to figure out if I can get label links to work. I'm looking into document.elementByPoint but it's not going well.
+
+Whelp, the answer wasn't elementByPoint. Actually, I could get what I wanted in IE & Firefox by setting position:relative & z-index:100 on all links after pasting. However, Chrome with webkit-transform wouldn't allow me to click the link to matter what. The final answer is to limit clickable labels to the top map and move the actual map's shape container to below everything. Top-level map label links will work in Chrome. Service-level label links will work in all browsers except for Chrome (and, in theory, iOS & Android).
+
+This will need some testing.
 
 ==2012-12-15==
 ===pul requests===

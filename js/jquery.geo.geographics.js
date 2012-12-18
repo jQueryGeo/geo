@@ -483,7 +483,12 @@
         }
 
 
-        geographics._$labelsContainerBack.html( geographics._labelsHtml );
+        geographics._$labelsContainerBack.html( geographics._labelsHtml ).find("a").css({
+          position: "relative",
+          zIndex: 100,
+          display: "inline-block",
+          webkitTransform: "translateZ(0)"
+        });
 
         var oldLabelsContainer = geographics._$labelsContainerFront;
 
