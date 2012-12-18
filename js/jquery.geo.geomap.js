@@ -1678,6 +1678,13 @@
     },
 
     _eventTarget_touchstart: function (e) {
+
+      if ( typeof(document.elementFromPoint) !== "undefined" ) {
+        var el = document.elementFromPoint(e.pageX, e.pageY);
+        //console.log(el);
+
+      }
+
       var mode = this._options[ "mode" ],
           shift = this._options[ "shift" ],
           defaultShift = ( mode === "dragBox" ? "dragBox" : "zoom" );

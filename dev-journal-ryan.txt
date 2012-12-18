@@ -8,6 +8,7 @@
 * docs - geomap - click mode
 * geomap - click mode
 * geomap - [bug] removing a shape from one service that has been appended to two services causes an error in the second service
+** cached bbox gets deleted
 * docs - geo - audit in-place geo calls, e.g., fromGeodetic
 * geo - audit in-place geo calls, e.g., fromGeodetic
 * geomap - convert MapQuest icon to data URI so we don't have to resolve developer.mapquest.com every time
@@ -18,6 +19,7 @@
 * geomap - audit mousewheel timing & behavior vs. interactiveTransform
 * docs - geomap - geo-attr class
 * geomap - geo-attr class
+* geomap - allow label links to be clicked
 
 === examples ===
 
