@@ -30,5 +30,9 @@
   "dependencies": {
     "jquery": "~1.7"
   },
+  "devDependencies": {
+    "jquery": "~1.7",
+    "grunt": "~0.3.17"
+  },
   "keywords": []
 }

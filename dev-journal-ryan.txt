@@ -267,6 +267,11 @@ Nice! I finally found a use for elementByPoint! I'm ignoring touchsart if the el
 ===webkit-transform===
 Also, I had put in some extra webkit-transform rules but I removed them before committing. That whole thing seems pretty unstable.
 
+===grunt===
+I upgraded to the latest version of grunt. Uses will have to locally install grunt to their geo directory in order to build, after installing grunt-cli do:
+
+npm install grunt
+
 ==2012-12-15==
 ===pul requests===
 I have some pull requests I haven't had a chance to get to. Time to check them out.
