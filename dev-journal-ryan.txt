@@ -85,6 +85,9 @@
 * geomap - clean up touch tracking
 * geomap - support high-precision mice better in tiled maps
 * geomap - don't repeat attr text if the same as one previously added
+* docs - geo - add simplify
+* geo - add simplify
+** http://stackoverflow.com/questions/1849928/how-to-intelligently-degrade-or-smooth-gis-data-simplifying-polygons
 * docs - geomap - zoomMin, zoomMax on service object
 ** determines if service is visible but doesn't change map interaction, only map zoomMax/zoomMin options do that
 * geomap - zoomMin, zoomMax on service object
