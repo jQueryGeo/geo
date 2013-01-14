@@ -252,6 +252,26 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-01-14==
+===new year, new job===
+Between the holidays and starting at Berkman Center for Internet & Society at Havard, I've had a pretty busy month!
+
+===popup example===
+I thought I had one example but it just uses alert. I need one for Nick that actually shows a popup.
+
+===services===
+There still needs to be a better way to add services but keep the default base map. I was originally thinking special strings instead of service objects, but I think service objects that have a special property to tell jQuery Geo to use some default would work better. Then, you can still set the style property.
+
+[
+  {
+    geoid: "mqo",
+  },
+  {
+    geoid: "mqoa",
+    style: { visibility: "hidden" }
+  }
+]
+
 ==2012-12-18==
 ===parse multilinestring===
 I commented on Ali's pull request for the non-public (yet) feature of parsing WKT.
@@ -276,7 +296,7 @@ I upgraded to the latest version of grunt. Uses will have to locally install gru
 npm install grunt
 
 ==2012-12-15==
-===pul requests===
+===pull requests===
 I have some pull requests I haven't had a chance to get to. Time to check them out.
 
 ==2012-12-13==
