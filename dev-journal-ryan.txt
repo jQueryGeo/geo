@@ -8,6 +8,7 @@
 * docs - geomap - click mode
 * geomap - click mode
 * geomap - [bug] removing a shape from one service that has been appended to two services causes an error in the second service
+** cached bbox gets deleted
 * docs - geo - audit in-place geo calls, e.g., fromGeodetic
 * geo - audit in-place geo calls, e.g., fromGeodetic
 * geomap - convert MapQuest icon to data URI so we don't have to resolve developer.mapquest.com every time
@@ -18,6 +19,9 @@
 * geomap - audit mousewheel timing & behavior vs. interactiveTransform
 * docs - geomap - geo-attr class
 * geomap - geo-attr class
+* geographics - graphics stretch after resize, should just move
+* docs - geomap - top-level map label links are clickable
+* geomap - Firefox - [bug] Firefox does not redraw shapes after zoom, a pan will fix them
 
 === examples ===
 
@@ -81,6 +85,9 @@
 * geomap - clean up touch tracking
 * geomap - support high-precision mice better in tiled maps
 * geomap - don't repeat attr text if the same as one previously added
+* docs - geo - add simplify
+* geo - add simplify
+** http://stackoverflow.com/questions/1849928/how-to-intelligently-degrade-or-smooth-gis-data-simplifying-polygons
 * docs - geomap - zoomMin, zoomMax on service object
 ** determines if service is visible but doesn't change map interaction, only map zoomMax/zoomMin options do that
 * geomap - zoomMin, zoomMax on service object
@@ -245,8 +252,59 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-01-17==
+===official jQuery plugin site===
+It's back up and I need to register jQuery Geo. Following these instructions: http://plugins.jquery.com/docs/publish/
+
+I'm going to do a silent release of 1.0b1.5 in order to verify the plugin site is working.
+
+The geo.jquery.json file is identical to the grunt package.json. I will see about having grunt use the jquery.json file later. Doh! The name is different. I can't have jquery in the name for the jquery.json file but grunt needs it to build the correct file names.
+
+==2013-01-14==
+===new year, new job===
+Between the holidays and starting at Berkman Center for Internet & Society at Havard, I've had a pretty busy month!
+
+===popup example===
+I thought I had one example but it just uses alert. I need one for Nick that actually shows a popup.
+
+===services===
+There still needs to be a better way to add services but keep the default base map. I was originally thinking special strings instead of service objects, but I think service objects that have a special property to tell jQuery Geo to use some default would work better. Then, you can still set the style property.
+
+[
+  {
+    geoid: "mqo",
+  },
+  {
+    geoid: "mqoa",
+    style: { visibility: "hidden" }
+  }
+]
+
+==2012-12-18==
+===parse multilinestring===
+I commented on Ali's pull request for the non-public (yet) feature of parsing WKT.
+
+===label links===
+Today will be to figure out if I can get label links to work. I'm looking into document.elementByPoint but it's not going well.
+
+Whelp, the answer wasn't elementByPoint. Actually, I could get what I wanted in IE & Firefox by setting position:relative & z-index:100 on all links after pasting. However, Chrome with webkit-transform wouldn't allow me to click the link to matter what. The final answer is to limit clickable labels to the top map and move the actual map's shape container to below everything. Top-level map label links will work in Chrome. Service-level label links will work in all browsers except for Chrome (and, in theory, iOS & Android).
+
+This will need some testing.
+
+Clicking label links still triggers the geomapclick event. Hmm.
+
+Nice! I finally found a use for elementByPoint! I'm ignoring touchsart if the element under the point is a link.
+
+===webkit-transform===
+Also, I had put in some extra webkit-transform rules but I removed them before committing. That whole thing seems pretty unstable.
+
+===grunt===
+I upgraded to the latest version of grunt. Uses will have to locally install grunt to their geo directory in order to build, after installing grunt-cli do:
+
+npm install grunt
+
 ==2012-12-15==
-===pul requests===
+===pull requests===
 I have some pull requests I haven't had a chance to get to. Time to check them out.
 
 ==2012-12-13==
