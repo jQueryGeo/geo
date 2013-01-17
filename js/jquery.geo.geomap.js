@@ -892,9 +892,6 @@
       this._$contentFrame.append('<div class="geo-services-container" style="' + contentPosCss + contentSizeCss + '"></div>');
       this._$servicesContainer = this._$contentFrame.children(':last');
 
-      this._$contentFrame.append('<div class="geo-shapes-container" style="' + contentPosCss + contentSizeCss + '"></div>');
-      this._$shapesContainer = this._$contentFrame.children(':last');
-
       this._$contentFrame.append( '<ul style="position: absolute; bottom: 8px; left: 8px; list-style-type: none; max-width: 50%; padding: 0; margin: 0;"></ul>' );
       this._$attrList = this._$contentFrame.children( ":last" );
 
@@ -904,6 +901,9 @@
       this._$contentFrame.append('<div class="geo-measure-container" style="' + contentPosCss + contentSizeCss + '"><span class="geo-measure-label" style="' + contentPosCss + '; display: none;"></span></div>');
       this._$measureContainer = this._$contentFrame.children(':last');
       this._$measureLabel = this._$measureContainer.children();
+
+      this._$contentFrame.append('<div class="geo-shapes-container" style="' + contentPosCss + contentSizeCss + '"></div>');
+      this._$shapesContainer = this._$contentFrame.children(':last');
 
       this._$panContainer = $( [ this._$shapesContainer[ 0 ], this._$drawContainer[ 0 ], this._$measureContainer[ 0 ] ] );
 
@@ -1678,6 +1678,10 @@
     },
 
     _eventTarget_touchstart: function (e) {
+      if (typeof(document.elementFromPoint) !== "undefined" && document.elementFromPoint(e.pageX, e.pageY).nodeName === "A") {
+        return;
+      }
+
       var mode = this._options[ "mode" ],
           shift = this._options[ "shift" ],
           defaultShift = ( mode === "dragBox" ? "dragBox" : "zoom" );

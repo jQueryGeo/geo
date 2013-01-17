@@ -1,5 +1,6 @@
 /sandbox
 /web.config
 /update.bat
+node_modules
 *.swp
 *.swo

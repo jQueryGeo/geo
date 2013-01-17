@@ -44,6 +44,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * geographics - build labels in background, replace html once
 * geomap - [bug] sometimes interaction with other elements doesn't work right on a page with a map
 * geographics - don't empty labels on map interaction
+* geomap - allow label links to be clicked
 
 ### 1.0b1.1 (2012-08-24)
 * geomap - [bug] shingled deferred services lose img elements when changing scales slowly
