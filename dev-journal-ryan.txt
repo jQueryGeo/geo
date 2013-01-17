@@ -256,6 +256,10 @@
 ===official jQuery plugin site===
 It's back up and I need to register jQuery Geo. Following these instructions: http://plugins.jquery.com/docs/publish/
 
+I'm going to do a silent release of 1.0b1.5 in order to verify the plugin site is working.
+
+The geo.jquery.json file is identical to the grunt package.json. I will see about having grunt use the jquery.json file later. Doh! The name is different. I can't have jquery in the name for the jquery.json file but grunt needs it to build the correct file names.
+
 ==2013-01-14==
 ===new year, new job===
 Between the holidays and starting at Berkman Center for Internet & Society at Havard, I've had a pretty busy month!
