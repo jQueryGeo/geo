@@ -22,6 +22,8 @@
 * geographics - graphics stretch after resize, should just move
 * docs - geomap - top-level map label links are clickable
 * geomap - Firefox - [bug] Firefox does not redraw shapes after zoom, a pan will fix them
+* geomap - remove z-index from attr so it doesn't show over everything
+* website - release test.jquerygeo.com
 
 === examples ===
 
@@ -251,6 +253,10 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2013-01-21==
+===popup===
+I have to finally put this as a demo on docs.
 
 ==2013-01-17==
 ===official jQuery plugin site===
