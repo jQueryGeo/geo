@@ -24,6 +24,7 @@
 * geomap - Firefox - [bug] Firefox does not redraw shapes after zoom, a pan will fix them
 * geomap - remove z-index from attr so it doesn't show over everything
 * website - release test.jquerygeo.com
+* website - all examples should be jsFiddle only
 
 === examples ===
 
@@ -253,6 +254,13 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2013-01-22==
+===null label===
+Any form of null label causes an error. It's when the shape centroid is calculated and the centroid ends up being undefined (why would it be undefined?). Maybe the centroid function is wrong.
+
+===test page===
+One test page to rule them all...I'm going to abandon individual pages for demos and component examples in favor of just keeping the jsFiddles up to date. The showcases will still be full pages...maybe.
 
 ==2013-01-21==
 ===popup===
