@@ -28,6 +28,8 @@
 
 === examples ===
 
+* examples - disease map
+** http://jsfiddle.net/ryanttb/gU7wS/14/
 * examples - jQuery Mobile
 * examples - pan cursor
 * examples - shape click pointer cursor
