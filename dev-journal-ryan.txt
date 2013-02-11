@@ -1,30 +1,18 @@
 ﻿== to do ==
 
 === b2 ===
-* geomap - delay refresh after append/remove/empty until some timeout; hook into interactiveTransform?
-* geomap - [bug] mouse wheel & mac touchpads zoom too quickly
-* geomap - [bug] setting zoom & then center on two lines does not zoom to the correct location
-** http://jsfiddle.net/dyTn9/11/
-* docs - geomap - click mode
-* geomap - click mode
-* geomap - [bug] removing a shape from one service that has been appended to two services causes an error in the second service
-** cached bbox gets deleted
-* docs - geo - audit in-place geo calls, e.g., fromGeodetic
-* geo - audit in-place geo calls, e.g., fromGeodetic
 * geomap - convert MapQuest icon to data URI so we don't have to resolve developer.mapquest.com every time
 * geomap - support Windows 8 Store apps
-* test with zepto
-** zepto doesn't have Deferred, but we can drop support for Deferred services in zepto mode
-* geographics - ie8 - append vml to text and set innerHTML once during refresh
-* geomap - audit mousewheel timing & behavior vs. interactiveTransform
-* docs - geomap - geo-attr class
-* geomap - geo-attr class
-* geographics - graphics stretch after resize, should just move
 * docs - geomap - top-level map label links are clickable
-* geomap - Firefox - [bug] Firefox does not redraw shapes after zoom, a pan will fix them
+* docs - geomap - click mode
+* geomap - click mode
 * geomap - remove z-index from attr so it doesn't show over everything
-* website - release test.jquerygeo.com
-* website - all examples should be jsFiddle only
+* geomap - Firefox - [bug] map does not always redraw shapes after interactiveTransform, a pan will fix them
+* geomap - [bug] mouse wheel & mac touchpads zoom too quickly
+* geomap - [bug] setting zoom & then center on two lines does not zoom to the correct location http://jsfiddle.net/dyTn9/11/
+* geomap - [bug] removing a shape from one service that has been appended to two services causes an error in the second service
+** cached bbox gets deleted
+* geographics - [bug] graphics stretch after resize, should just move
 
 === examples ===
 
@@ -51,7 +39,17 @@
 ** http://stephanmendler.de/thinkmaps/puzzle/index_en.html
 
 === future ===
-
+* geographics - ie8 - append vml to text and set innerHTML once during refresh
+* geomap - audit mousewheel timing & behavior vs. interactiveTransform
+* website - release test.jquerygeo.com
+* website - all examples should be jsFiddle only
+* docs - geomap - geo-attr class
+* geomap - geo-attr class
+* test with zepto
+** zepto doesn't have Deferred, but we can drop support for Deferred services in zepto mode
+* geomap - delay refresh after append/remove/empty until some timeout; hook into interactiveTransform?
+* docs - geo - audit in-place geo calls, e.g., fromGeodetic
+* geo - audit in-place geo calls, e.g., fromGeodetic
 * docs - geomap - layers template argument/service object property
 * geomap - layers template argument/service object property
 * geomap - map & map services type objects should refresh their own shapes after the map image (or tiles) has downloaded or after some timout
@@ -256,6 +254,22 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2013-02-09==
+===schedule===
+I need a better schedule for b2 release. Done. I have one major bug (in Firefox mostly) and a few other quick enhancements before b2 can go out.
+
+===interactive graphics===
+The new buffering for graphics works mostly well. The images bounce around a bit in all browsers and don't refresh in Firefox. I wonder if the moz-transform stuff might help.
+
+===bug fixing process===
+1. reproduce bug in jsFiddle with latest release version of jQuery Geo
+2. update jsFiddle to numbered revision, change to use hosted test version of jQuery Geo
+3. copy jsFiddle content to local test.html file
+4. fix bug & test locally
+5. build & publish a new test release
+6. test on numbered jsFiddle revision
+7. push code
 
 ==2013-01-22==
 ===null label===
