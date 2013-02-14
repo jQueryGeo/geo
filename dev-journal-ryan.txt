@@ -18,6 +18,7 @@
 
 * examples - disease map
 ** http://jsfiddle.net/ryanttb/gU7wS/14/
+* examples - 3d heatmap
 * examples - jQuery Mobile
 * examples - pan cursor
 * examples - shape click pointer cursor
@@ -254,6 +255,10 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2013-02-14==
+===twheat 3d===
+I really need to have a version of Twheat! that uses this WebGL heatmap library: http://codeflow.org/entries/2013/feb/04/high-performance-js-heatmaps/
 
 ==2013-02-09==
 ===schedule===
