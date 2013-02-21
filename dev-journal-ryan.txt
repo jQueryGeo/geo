@@ -256,6 +256,14 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-02-20==
+===Firefox interactive===
+The USA states demo shows this issue pretty well. It has to be full screen though. Click on MA, then zoom in off the coast of Maine and the state shapes don't refresh to match the new zoom level. 
+
+Time for some console.log (though, I do still wonder if 3d transform will fix it). That seems a little more responsive but it still has the graphics bug. I'm undoing that but might try again later when the real bug is fixed.
+
+I think I need to attach the load events for real and then determin if we still need to flip in the event handler. This .one("load") thing I think isn't working as I had hoped. The endcallback function is attaching two load event handlers and then doing two flips, ugh. I'm not sure why this is only Firefox.
+
 ==2013-02-14==
 ===twheat 3d===
 I really need to have a version of Twheat! that uses this WebGL heatmap library: http://codeflow.org/entries/2013/feb/04/high-performance-js-heatmaps/
