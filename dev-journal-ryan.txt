@@ -39,6 +39,13 @@
 * examples - continent puzzle
 ** http://stephanmendler.de/thinkmaps/puzzle/index_en.html
 
+=== official apps (x.jquerygeo.com) ===
+* twheat
+* maps
+* crowd
+* gis
+* embed
+
 === future ===
 * geographics - ie8 - append vml to text and set innerHTML once during refresh
 * geomap - audit mousewheel timing & behavior vs. interactiveTransform
@@ -255,6 +262,71 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2013-02-21==
+===Firefox===
+Still working on this.
+
+===front/back===
+These are bad names because either can be in front...they swap. Probably Zero & One are fine.
+
+===debug output===
+Huge, but maybe it'll help:
+
+==Firefox==
+
+[21:07:30.956] clear:_end 1361498850956
+[21:07:31.164]     _endCallback...
+[21:07:31.389]     ...flip: show scene1, hide scene0
+[21:07:34.038] clear:_end 1361498854038
+[21:07:34.175] clear:_end 1361498854175
+[21:07:34.398]     _endCallback...
+[21:07:34.611]     ...flip: show scene0, hide scene1
+[21:07:35.002] geographics:interactiveTransform scene0: origin: -768,-346, scale: 2
+[21:07:35.261] clear:_end 1361498855261
+[21:07:35.395]     _endCallback...
+[21:07:35.593] clear:_end 1361498855592
+[21:07:35.750]     _endCallback...
+[21:07:35.930]     ...flip: show scene1, hide scene0
+[21:07:36.275]     ...flip: show scene0, hide scene1
+
+
+==IE==
+
+ clear:_end 1361498805062 
+     _endCallback... 
+     ...flip: show scene1, hide scene0 
+ clear:_end 1361498807558 
+ clear:_end 1361498807631 
+     _endCallback... 
+     ...flip: show scene0, hide scene1 
+ geographics:interactiveTransform scene0: origin: -390,-343, scale: 2 
+ clear:_end 1361498808052 
+     _endCallback... 
+ clear:_end 1361498808234 
+     ...flip: show scene1, hide scene0 
+     _endCallback... 
+     ...flip: show scene0, hide scene1 
+
+==Chrome==
+
+clear:_end 1361498969312 jquery.geo.geographics.js:141
+    _endCallback... jquery.geo.geographics.js:490
+    ...flip: show scene1, hide scene0 jquery.geo.geographics.js:467
+clear:_end 1361498972617 jquery.geo.geographics.js:141
+clear:_end 1361498972700 jquery.geo.geographics.js:141
+    _endCallback... jquery.geo.geographics.js:490
+    ...flip: show scene0, hide scene1 jquery.geo.geographics.js:451
+geographics:interactiveTransform scene0: origin: -426,-321, scale: 2 jquery.geo.geographics.js:425
+clear:_end 1361498973858 jquery.geo.geographics.js:141
+    _endCallback... jquery.geo.geographics.js:490
+clear:_end 1361498974084 jquery.geo.geographics.js:141
+    ...flip: show scene1, hide scene0 jquery.geo.geographics.js:467
+    _endCallback... jquery.geo.geographics.js:490
+    ...flip: show scene0, hide scene1 
+
+
+
 
 ==2013-02-20==
 ===Firefox interactive===

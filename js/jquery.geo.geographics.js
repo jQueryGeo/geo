@@ -102,8 +102,9 @@
         this._blitcontext = this._blitcanvas.getContext("2d");
 
         // create our front & back buffers
-        this._$canvasSceneFront = $('<img id="scene0" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />');
-        this._$canvasSceneBack = $('<img id="scene1" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />');
+        // though, at any time either one can be in front
+        this._$canvasSceneFront = $('<img id="scene0" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />').load($.proxy(this._canvasSceneFrontLoad, this));
+        this._$canvasSceneBack = $('<img id="scene1" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />').load($.proxy(this._canvasSceneBackLoad, this));
 
       } else if (_ieVersion <= 8) {
         this._trueCanvas = false;
@@ -445,6 +446,77 @@
       } );
     },
 
+    _canvasSceneFrontLoad: function() {
+      var geographics = this;
+      console.log("    ...flip: show " + geographics._$canvasSceneBack.prop( "id" ) + ", hide " + geographics._$canvasSceneFront.prop("id"));
+      geographics._requireFlip = false;
+      var oldCanvasScene = geographics._$canvasSceneFront;
+
+      geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
+        left: 0,
+        top: 0,
+        width: geographics._width,
+        height: geographics._height
+      } ).prependTo( geographics._$elem );
+
+      geographics._$canvasSceneBack = oldCanvasScene.detach();
+    },
+
+    _canvasSceneBackLoad: function() {
+      var geographics = this;
+      console.log("    ...flip: show " + geographics._$canvasSceneBack.prop( "id" ) + ", hide " + geographics._$canvasSceneFront.prop("id"));
+      geographics._requireFlip = false;
+      var oldCanvasScene = geographics._$canvasSceneFront;
+
+      geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
+        left: 0,
+        top: 0,
+        width: geographics._width,
+        height: geographics._height
+      } ).prependTo( geographics._$elem );
+
+      geographics._$canvasSceneBack = oldCanvasScene.detach();
+    },
+
+    _endCallback: function() {
+      var geographics = this;
+
+      if ( !geographics._timeoutEnd ) {
+        // something has canceled the draw
+        return;
+      }
+
+      if ( geographics._trueCanvas && geographics._options.doubleBuffer && geographics._trueDoubleBuffer ) {
+        console.log("    _endCallback...");
+
+        //geographics._$canvasSceneFront = 
+        //geographics._$canvasSceneBack.prop( "src", "" ).one( "load", function( e ) {
+        geographics._$canvasSceneBack.prop( "src", geographics._$canvas[ 0 ].toDataURL( ) );
+      }
+
+
+      geographics._$labelsContainerBack.html( geographics._labelsHtml ).find("a").css({
+        position: "relative",
+        zIndex: 100,
+        display: "inline-block",
+        webkitTransform: "translateZ(0)"
+      });
+
+      var oldLabelsContainer = geographics._$labelsContainerFront;
+
+      geographics._$labelsContainerFront = geographics._$labelsContainerBack.css( {
+        left: 0,
+        top: 0,
+        width: geographics._width,
+        height: geographics._height
+      } ).prependTo( geographics._$elem );
+
+      geographics._$labelsContainerBack = oldLabelsContainer.detach();
+
+
+      geographics._timeoutEnd = null;
+    },
+
     _end: function( ) {
       // end/finalize a scene
       if ( this._timeoutEnd ) {
@@ -454,59 +526,13 @@
 
       this._requireFlip = true;
 
-      var geographics = this;
+      //var geographics = this;
 
-      function endCallback( ) {
-        if ( !geographics._timeoutEnd ) {
-          // something has canceled the draw
-          return;
-        }
-
-        if ( geographics._trueCanvas && geographics._options.doubleBuffer && geographics._trueDoubleBuffer ) {
-          console.log("    endCallback...");
-
-          //geographics._$canvasSceneFront = 
-          geographics._$canvasSceneBack.prop( "src", "" ).one( "load", function( e ) {
-            console.log("    ...flip: show " + geographics._$canvasSceneBack.prop( "id" ) + ", hide " + geographics._$canvasSceneFront.prop("id"));
-            geographics._requireFlip = false;
-            var oldCanvasScene = geographics._$canvasSceneFront;
-
-            geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
-              left: 0,
-              top: 0,
-              width: geographics._width,
-              height: geographics._height
-            } ).prependTo( geographics._$elem );
-
-            geographics._$canvasSceneBack = oldCanvasScene.detach();
-          } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) );
-        }
-
-
-        geographics._$labelsContainerBack.html( geographics._labelsHtml ).find("a").css({
-          position: "relative",
-          zIndex: 100,
-          display: "inline-block",
-          webkitTransform: "translateZ(0)"
-        });
-
-        var oldLabelsContainer = geographics._$labelsContainerFront;
-
-        geographics._$labelsContainerFront = geographics._$labelsContainerBack.css( {
-          left: 0,
-          top: 0,
-          width: geographics._width,
-          height: geographics._height
-        } ).prependTo( geographics._$elem );
-
-        geographics._$labelsContainerBack = oldLabelsContainer.detach();
-
-
-        geographics._timeoutEnd = null;
-      }
+      //function endCallback( ) {
+      //}
 
       //if ( this._options.doubleBuffer ) {
-        this._timeoutEnd = setTimeout( endCallback, 20 );
+        this._timeoutEnd = setTimeout( $.proxy(this._endCallback, this), 20 );
       //} else {
         //geographics._$labelsContainerFront.html( geographics._labelsHtml );
       //}
