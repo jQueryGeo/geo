@@ -263,6 +263,14 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-02-22==
+===doubleBuffer===
+What is the pattern? Increasing the timeout for endcallback helps that one specific issue but shapes still jump around wildly while panning & zooming. I need this whole code to be much more solid.
+
+Ok, assuming there are shapes & buffer 0 is visible:
+
+
+
 ==2013-02-21==
 ===Firefox===
 Still working on this.
