@@ -100,8 +100,8 @@
 
         // create our front & back buffers
         // though, at any time either one can be in front
-        this._$canvasSceneFront = $('<img id="scene0" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />').load($.proxy(this._canvasSceneFrontLoad, this));
-        this._$canvasSceneBack = $('<img id="scene1" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />').load($.proxy(this._canvasSceneBackLoad, this));
+        this._$canvasSceneFront = $('<img id="scene0" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />').load($.proxy(this._canvasSceneLoad, this));
+        this._$canvasSceneBack = $('<img id="scene1" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />').load($.proxy(this._canvasSceneLoad, this));
 
       } else if (_ieVersion <= 8) {
         this._trueCanvas = false;
@@ -433,24 +433,7 @@
       } );
     },
 
-    _canvasSceneFrontLoad: function() {
-      var geographics = this;
-      if ( geographics._requireFlip ) {
-        geographics._requireFlip = false;
-        var oldCanvasScene = geographics._$canvasSceneFront;
-
-        geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
-          left: 0,
-          top: 0,
-          width: geographics._width,
-          height: geographics._height
-        } ).prependTo( geographics._$elem );
-
-        geographics._$canvasSceneBack = oldCanvasScene.detach();
-      }
-    },
-
-    _canvasSceneBackLoad: function() {
+    _canvasSceneLoad: function() {
       var geographics = this;
       if ( geographics._requireFlip ) {
         geographics._requireFlip = false;
