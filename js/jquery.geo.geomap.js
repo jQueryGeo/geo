@@ -237,9 +237,9 @@
       this._softDblClick = this._supportTouch || _ieVersion == 7;
 
       var geomap = this,
-          touchStartEvent = this._supportTouch ? "touchstart" : "mousedown",
-          touchStopEvent = this._supportTouch ? "touchend touchcancel" : "mouseup",
-          touchMoveEvent = this._supportTouch ? "touchmove" : "mousemove";
+          touchStartEvent = this._supportTouch ? "touchstart mousedown" : "mousedown",
+          touchStopEvent = this._supportTouch ? "touchend touchcancel mouseup" : "mouseup",
+          touchMoveEvent = this._supportTouch ? "touchmove mousemove" : "mousemove";
 
       $(document).keydown($.proxy(this._document_keydown, this));
 
@@ -1694,7 +1694,7 @@
       var offset = $(e.currentTarget).offset(),
           touches = e.originalEvent.changedTouches;
 
-      if ( this._supportTouch ) {
+      if ( this._supportTouch && touches ) {
         this._multiTouchAnchor = $.merge( [ ], touches );
 
         this._isMultiTouch = this._multiTouchAnchor.length > 1;
@@ -1794,7 +1794,7 @@
           service,
           i = 0;
 
-      if ( this._supportTouch ) {
+      if ( this._supportTouch && touches ) {
         if ( !this._isMultiTouch && this._mouseDown && this._multiTouchAnchor.length > 0 && touches[ 0 ].identifier !== this._multiTouchAnchor[ 0 ].identifier ) {
           // switch to multitouch
           this._mouseDown = false;
@@ -2015,7 +2015,7 @@
         mode = ( shift === "default" ? defaultShift : shift );
       }
 
-      if (this._supportTouch) {
+      if (this._supportTouch && e.originalEvent.changedTouches) {
         current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
         this._multiTouchAnchor = [];
         this._inOp = false;
