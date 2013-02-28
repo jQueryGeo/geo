@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>jQuery Geo test page</title>
+  <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1">
+  <meta name="description" content="Test all of the things!">
+  <meta name="author" content="Ryan Westphal">
+
+  <style type="text/css">
+
+    #map
+    {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+    }
+
+  </style>
+</head>
+<body>
+  <div id="map">
+  </div>
+
+  <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+
+  <script src="../../js/excanvas.js"></script>
+  <script src="../../js/jsrender.js"></script>
+  <script src="../../js/jquery.mousewheel.js"></script>
+  <script src="../../js/jquery.ui.widget.js"></script>
+  <script src="../../js/jquery.geo.core.js"></script>
+  <script src="../../js/jquery.geo.geographics.js"></script>
+  <script src="../../js/jquery.geo.geomap.js"></script>
+  <script src="../../js/jquery.geo.tiled.js"></script>
+  <script src="../../js/jquery.geo.shingled.js"></script>
+  <!--<script src="../jquery.geo-test.min.js"></script>-->
+
+  <script>
+    $( function ( ) {
+      // create a map
+      var map = $( "#map" ).geomap( {
+        center: [ -71.0595678, 42.3604823 ],
+        zoom: 8
+      } );
+    } );  
+  </script>
+</body>
+</html>
