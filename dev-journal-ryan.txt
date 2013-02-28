@@ -1,21 +1,29 @@
 ﻿== to do ==
 
 === b2 ===
-* geomap - convert MapQuest icon to data URI so we don't have to resolve developer.mapquest.com every time
 * geomap - support Windows 8 Store apps
 * docs - geomap - top-level map label links are clickable
 * docs - geomap - click mode
 * geomap - click mode
 * geomap - remove z-index from attr so it doesn't show over everything
-* geomap - Firefox - [bug] map does not always redraw shapes after interactiveTransform, a pan will fix them
 * geomap - [bug] mouse wheel & mac touchpads zoom too quickly
 * geomap - [bug] setting zoom & then center on two lines does not zoom to the correct location http://jsfiddle.net/dyTn9/11/
 * geomap - [bug] removing a shape from one service that has been appended to two services causes an error in the second service
 ** cached bbox gets deleted
 * geographics - [bug] graphics stretch after resize, should just move
 
-=== examples ===
+===bug fixing process===
+1. reproduce bug in jsFiddle with latest release version of jQuery Geo
+2. update jsFiddle to numbered revision (save the numbered URL)
+3. change to use hosted test version of jQuery Geo
+4. copy jsFiddle content to local test.html file
+5. fix bug & test locally
+6. build & test locally
+6. publish new test build
+7. test on numbered jsFiddle revision
+8. push code
 
+=== examples ===
 * examples - disease map
 ** http://jsfiddle.net/ryanttb/gU7wS/14/
 * examples - 3d heatmap
@@ -47,6 +55,7 @@
 * embed
 
 === future ===
+* geomap - convert MapQuest icon to data URI so we don't have to resolve developer.mapquest.com every time
 * geographics - ie8 - append vml to text and set innerHTML once during refresh
 * geomap - audit mousewheel timing & behavior vs. interactiveTransform
 * website - release test.jquerygeo.com
@@ -263,13 +272,31 @@
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-02-27==
+===doubleBuffer===
+By honoring the _requireFlip flag in the scene image's load event, Firefox appears to show the correct scene. It's a bit jumpy still in Firefox and I definitely should replace some of the timing stuff with Promise code.
+
 ==2013-02-22==
 ===doubleBuffer===
 What is the pattern? Increasing the timeout for endcallback helps that one specific issue but shapes still jump around wildly while panning & zooming. I need this whole code to be much more solid.
 
-Ok, assuming there are shapes & buffer 0 is visible:
+Ok, assuming there is one point on the map & buffer 1 is visible. User double clicks to zoom in:
 
+.geo-shapes-container
+  \- #scene1
 
+dblclick
+  geomap._interactiveTransform
+    geographics.interactiveTransform
+      #scene1.css
+  geomap._setInteractiveTimeout: _interactiveTimeout, 128
+  geomap._interactiveTimeout
+    geomap._setCenterAndSize refresh: true
+      geomap._refreshAllShapes
+        geographics.clear
+          geographics._context.clearRect ("clear:_end")
+            geographics._end
+              geographics._timeoutEnd: _endCallback, 20
 
 ==2013-02-21==
 ===Firefox===
@@ -283,58 +310,51 @@ Huge, but maybe it'll help:
 
 ==Firefox==
 
-[21:07:30.956] clear:_end 1361498850956
-[21:07:31.164]     _endCallback...
-[21:07:31.389]     ...flip: show scene1, hide scene0
-[21:07:34.038] clear:_end 1361498854038
-[21:07:34.175] clear:_end 1361498854175
-[21:07:34.398]     _endCallback...
-[21:07:34.611]     ...flip: show scene0, hide scene1
-[21:07:35.002] geographics:interactiveTransform scene0: origin: -768,-346, scale: 2
-[21:07:35.261] clear:_end 1361498855261
-[21:07:35.395]     _endCallback...
-[21:07:35.593] clear:_end 1361498855592
-[21:07:35.750]     _endCallback...
-[21:07:35.930]     ...flip: show scene1, hide scene0
-[21:07:36.275]     ...flip: show scene0, hide scene1
-
+[20:28:59.137] clear:_end 1362014939137
+[20:28:59.141] drawArc:_end 1362014939141
+[20:28:59.156]     _endCallback...
+[20:28:59.403]     ...flip (back): show scene1, hide scene0
+[20:29:00.767] geographics:interactiveTransform scene1: origin: -1143,-759, scale: 2
+[20:29:00.989] clear:_end 1362014940989
+[20:29:00.989] drawArc:_end 1362014940989
+[20:29:01.032]     _endCallback...
+[20:29:01.180] clear:_end 1362014941179
+[20:29:01.180] drawArc:_end 1362014941180
+[20:29:01.204]     _endCallback...
+[20:29:01.297]     ...flip (front): show scene0, hide scene1
+[20:29:01.423]     ...flip (front): show scene1, hide scene0
 
 ==IE==
 
- clear:_end 1361498805062 
+ clear:_end 1362015024460 
+ drawArc:_end 1362015024461 
      _endCallback... 
-     ...flip: show scene1, hide scene0 
- clear:_end 1361498807558 
- clear:_end 1361498807631 
+     ...flip (back): show scene1, hide scene0 
+ geographics:interactiveTransform scene1: origin: -1161,-694, scale: 2 
+ clear:_end 1362015026962 
+ drawArc:_end 1362015026962 
      _endCallback... 
-     ...flip: show scene0, hide scene1 
- geographics:interactiveTransform scene0: origin: -390,-343, scale: 2 
- clear:_end 1361498808052 
+ clear:_end 1362015027077 
+ drawArc:_end 1362015027078 
+     ...flip (front): show scene0, hide scene1 
      _endCallback... 
- clear:_end 1361498808234 
-     ...flip: show scene1, hide scene0 
-     _endCallback... 
-     ...flip: show scene0, hide scene1 
+     ...flip (back): show scene1, hide scene0 
 
 ==Chrome==
 
-clear:_end 1361498969312 jquery.geo.geographics.js:141
+clear:_end 1362015050415 jquery.geo.geographics.js:141
+drawArc:_end 1362015050423 jquery.geo.geographics.js:189
     _endCallback... jquery.geo.geographics.js:490
-    ...flip: show scene1, hide scene0 jquery.geo.geographics.js:467
-clear:_end 1361498972617 jquery.geo.geographics.js:141
-clear:_end 1361498972700 jquery.geo.geographics.js:141
+    ...flip (back): show scene1, hide scene0 jquery.geo.geographics.js:467
+geographics:interactiveTransform scene1: origin: -1172,-658, scale: 2 jquery.geo.geographics.js:425
+clear:_end 1362015054165 jquery.geo.geographics.js:141
+drawArc:_end 1362015054165 jquery.geo.geographics.js:189
     _endCallback... jquery.geo.geographics.js:490
-    ...flip: show scene0, hide scene1 jquery.geo.geographics.js:451
-geographics:interactiveTransform scene0: origin: -426,-321, scale: 2 jquery.geo.geographics.js:425
-clear:_end 1361498973858 jquery.geo.geographics.js:141
+    ...flip (front): show scene0, hide scene1 jquery.geo.geographics.js:451
+clear:_end 1362015054372 jquery.geo.geographics.js:141
+drawArc:_end 1362015054374 jquery.geo.geographics.js:189
     _endCallback... jquery.geo.geographics.js:490
-clear:_end 1361498974084 jquery.geo.geographics.js:141
-    ...flip: show scene1, hide scene0 jquery.geo.geographics.js:467
-    _endCallback... jquery.geo.geographics.js:490
-    ...flip: show scene0, hide scene1 
-
-
-
+    ...flip (back): show scene1, hide scene0 jquery.geo.geographics.js:467
 
 ==2013-02-20==
 ===Firefox interactive===
@@ -354,15 +374,6 @@ I need a better schedule for b2 release. Done. I have one major bug (in Firefox 
 
 ===interactive graphics===
 The new buffering for graphics works mostly well. The images bounce around a bit in all browsers and don't refresh in Firefox. I wonder if the moz-transform stuff might help.
-
-===bug fixing process===
-1. reproduce bug in jsFiddle with latest release version of jQuery Geo
-2. update jsFiddle to numbered revision, change to use hosted test version of jQuery Geo
-3. copy jsFiddle content to local test.html file
-4. fix bug & test locally
-5. build & publish a new test release
-6. test on numbered jsFiddle revision
-7. push code
 
 ==2013-01-22==
 ===null label===
