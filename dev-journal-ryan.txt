@@ -277,6 +277,12 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-02-28==
+===emily image server===
+I need to consume an image server for Harvard. There might be a bug with axisLayout=image and shingled services.
+
+Nope, I just forgot to set $.geo.proj = null. Maybe I should do that by default on axisLayout=image? There's no geodetic, so I souldn't ever check.
+
 ==2013-02-27==
 ===doubleBuffer===
 By honoring the _requireFlip flag in the scene image's load event, Firefox appears to show the correct scene. It's a bit jumpy still in Firefox and I definitely should replace some of the timing stuff with Promise code.

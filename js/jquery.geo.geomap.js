@@ -335,7 +335,7 @@
             this._clearInteractiveTimeout( );
           }
 
-          this._userGeodetic = $.geo.proj && $.geo._isGeodetic( value );
+          this._userGeodetic = this._options["axisLayout"] === "map" && $.geo.proj && $.geo._isGeodetic( value );
           if ( this._userGeodetic ) {
             value = $.geo.proj.fromGeodetic( value );
           }
@@ -367,7 +367,7 @@
           break;
 
         case "bboxMax":
-          this._userGeodetic = $.geo.proj && $.geo._isGeodetic( value );
+          this._userGeodetic = this._options["axisLayout"] === "map" && $.geo.proj && $.geo._isGeodetic( value );
           break;
 
         case "center":
@@ -375,7 +375,7 @@
             this._clearInteractiveTimeout( );
           }
 
-          this._userGeodetic = $.geo.proj && $.geo._isGeodetic( value );
+          this._userGeodetic = this._options["axisLayout"] === "map" && $.geo.proj && $.geo._isGeodetic( value );
           if ( this._userGeodetic ) {
             value = $.geo.proj.fromGeodetic( value );
           }
@@ -453,7 +453,7 @@
           break;
 
         case "bboxMax":
-          if ( $.geo.proj && $.geo._isGeodetic( value ) ) {
+          if ( this._userGeodetic ) {
             bbox = $.geo.proj.fromGeodetic( value );
           } else {
             bbox = value;
