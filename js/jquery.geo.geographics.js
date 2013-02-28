@@ -138,7 +138,7 @@
       this._context.clearRect(0, 0, this._width, this._height);
       this._labelsHtml = "";
 
-          if ( this._options.doubleBuffer ) console.log("clear:_end " + $.now());
+          //if ( this._options.doubleBuffer ) console.log("clear:_end " + $.now());
       this._end( );
     },
 
@@ -186,7 +186,7 @@
         }
       }
 
-          if ( this._options.doubleBuffer ) console.log("drawArc:_end " + $.now());
+          //if ( this._options.doubleBuffer ) console.log("drawArc:_end " + $.now());
       this._end( );
     },
 
@@ -226,7 +226,7 @@
           this._context.stroke();
         }
 
-          if ( this._options.doubleBuffer ) console.log("drawPoint:_end " + $.now());
+          //if ( this._options.doubleBuffer ) console.log("drawPoint:_end " + $.now());
         this._end( );
       }
     },
@@ -330,7 +330,7 @@
           if ( pixelBbox[ 0 ] !== pixelBbox[ 2 ] && pixelBbox[ 1 ] !== pixelBbox[ 3 ] ) {
             this._context.drawImage(this._blitcanvas, pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ], pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ] );
 
-          if ( this._options.doubleBuffer ) console.log("drawPolygon:_end " + $.now());
+          //if ( this._options.doubleBuffer ) console.log("drawPolygon:_end " + $.now());
             this._end( );
           }
         }
@@ -422,7 +422,7 @@
           }
 
 
-          console.log("geographics:interactiveTransform " + this._$canvasSceneFront.prop( "id" ) + ": origin: " + origin.toString() + ", scale: " + scale);
+          //console.log("geographics:interactiveTransform " + this._$canvasSceneFront.prop( "id" ) + ": origin: " + origin.toString() + ", scale: " + scale);
           // transform a finished scene, can assume no drawing during these calls
           this._$canvasSceneFront.css( {
             left: Math.round( origin[ 0 ] ),
@@ -448,34 +448,38 @@
 
     _canvasSceneFrontLoad: function() {
       var geographics = this;
-      console.log("    ...flip: show " + geographics._$canvasSceneBack.prop( "id" ) + ", hide " + geographics._$canvasSceneFront.prop("id"));
-      geographics._requireFlip = false;
-      var oldCanvasScene = geographics._$canvasSceneFront;
+      if ( geographics._requireFlip ) {
+        //console.log("    ...flip (front): show " + geographics._$canvasSceneBack.prop( "id" ) + ", hide " + geographics._$canvasSceneFront.prop("id"));
+        geographics._requireFlip = false;
+        var oldCanvasScene = geographics._$canvasSceneFront;
 
-      geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
-        left: 0,
-        top: 0,
-        width: geographics._width,
-        height: geographics._height
-      } ).prependTo( geographics._$elem );
+        geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
+          left: 0,
+          top: 0,
+          width: geographics._width,
+          height: geographics._height
+        } ).prependTo( geographics._$elem );
 
-      geographics._$canvasSceneBack = oldCanvasScene.detach();
+        geographics._$canvasSceneBack = oldCanvasScene.detach();
+      }
     },
 
     _canvasSceneBackLoad: function() {
       var geographics = this;
-      console.log("    ...flip: show " + geographics._$canvasSceneBack.prop( "id" ) + ", hide " + geographics._$canvasSceneFront.prop("id"));
-      geographics._requireFlip = false;
-      var oldCanvasScene = geographics._$canvasSceneFront;
+      if ( geographics._requireFlip ) {
+        //console.log("    ...flip (back): show " + geographics._$canvasSceneBack.prop( "id" ) + ", hide " + geographics._$canvasSceneFront.prop("id"));
+        geographics._requireFlip = false;
+        var oldCanvasScene = geographics._$canvasSceneFront;
 
-      geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
-        left: 0,
-        top: 0,
-        width: geographics._width,
-        height: geographics._height
-      } ).prependTo( geographics._$elem );
+        geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
+          left: 0,
+          top: 0,
+          width: geographics._width,
+          height: geographics._height
+        } ).prependTo( geographics._$elem );
 
-      geographics._$canvasSceneBack = oldCanvasScene.detach();
+        geographics._$canvasSceneBack = oldCanvasScene.detach();
+      }
     },
 
     _endCallback: function() {
@@ -487,7 +491,7 @@
       }
 
       if ( geographics._trueCanvas && geographics._options.doubleBuffer && geographics._trueDoubleBuffer ) {
-        console.log("    _endCallback...");
+        //console.log("    _endCallback...");
 
         //geographics._$canvasSceneFront = 
         //geographics._$canvasSceneBack.prop( "src", "" ).one( "load", function( e ) {
