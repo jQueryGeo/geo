@@ -7,8 +7,8 @@ Using jQuery Geo requires adding one element, including one script (apart from j
 
 ```html
 <div id="map" style="height: 320px;"></div>
-<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
-<script src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script src="http://code.jquerygeo.com/jquery.geo-1.0.0-b1.5.min.js"></script>
 <script>
   $(function() {
     $( "#map" ).geomap( ); // you've got a map!
@@ -18,9 +18,8 @@ Using jQuery Geo requires adding one element, including one script (apart from j
 
 You can also download the latest release as a [minified JavaScript file][min] or a [full, uncompressed one][max].
 
-[min]: http://code.jquerygeo.com/jquery.geo-1.0b1.min.js
-[max]: http://code.jquerygeo.com/jquery.geo-1.0b1.js
-
+[min]: http://code.jquerygeo.com/jquery.geo-1.0.0-b1.5.min.js
+[max]: http://code.jquerygeo.com/jquery.geo-1.0.0-b1.5.js
 
 ## Documentation
 The latest docs are hosted at: http://docs.jquerygeo.com
@@ -35,6 +34,9 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 ## Release History
 
 ### 1.0b2
+* geomap - [bug] map does not always redraw shapes after interactiveTransform, a pan will fix them
+
+### 1.0.0-b1.5 (2013-01-17)
 * examples - drawing markers
 * geomap - ie8 - [bug] graphics do not resize with window
 * examples - kml points

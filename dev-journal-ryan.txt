@@ -1,30 +1,32 @@
 ﻿== to do ==
 
 === b2 ===
-* geomap - delay refresh after append/remove/empty until some timeout; hook into interactiveTransform?
-* geomap - [bug] mouse wheel & mac touchpads zoom too quickly
-* geomap - [bug] setting zoom & then center on two lines does not zoom to the correct location
-** http://jsfiddle.net/dyTn9/11/
+* geomap - support Windows 8 Store apps
+* docs - geomap - top-level map label links are clickable
 * docs - geomap - click mode
 * geomap - click mode
+* geomap - remove z-index from attr so it doesn't show over everything
+* geomap - [bug] mouse wheel & mac touchpads zoom too quickly
+* geomap - [bug] setting zoom & then center on two lines does not zoom to the correct location http://jsfiddle.net/dyTn9/11/
 * geomap - [bug] removing a shape from one service that has been appended to two services causes an error in the second service
 ** cached bbox gets deleted
-* docs - geo - audit in-place geo calls, e.g., fromGeodetic
-* geo - audit in-place geo calls, e.g., fromGeodetic
-* geomap - convert MapQuest icon to data URI so we don't have to resolve developer.mapquest.com every time
-* geomap - support Windows 8 Store apps
-* test with zepto
-** zepto doesn't have Deferred, but we can drop support for Deferred services in zepto mode
-* geographics - ie8 - append vml to text and set innerHTML once during refresh
-* geomap - audit mousewheel timing & behavior vs. interactiveTransform
-* docs - geomap - geo-attr class
-* geomap - geo-attr class
-* geographics - graphics stretch after resize, should just move
-* docs - geomap - top-level map label links are clickable
-* geomap - Firefox - [bug] Firefox does not redraw shapes after zoom, a pan will fix them
+* geographics - [bug] graphics stretch after resize, should just move
+
+===bug fixing process===
+1. reproduce bug in jsFiddle with latest release version of jQuery Geo
+2. update jsFiddle to numbered revision (save the numbered URL)
+3. change to use hosted test version of jQuery Geo
+4. copy jsFiddle content to local test.html file
+5. fix bug & test locally
+6. build & test locally
+6. publish new test build
+7. test on numbered jsFiddle revision
+8. push code
 
 === examples ===
-
+* examples - disease map
+** http://jsfiddle.net/ryanttb/gU7wS/14/
+* examples - 3d heatmap
 * examples - jQuery Mobile
 * examples - pan cursor
 * examples - shape click pointer cursor
@@ -45,8 +47,26 @@
 * examples - continent puzzle
 ** http://stephanmendler.de/thinkmaps/puzzle/index_en.html
 
-=== future ===
+=== official apps (x.jquerygeo.com) ===
+* twheat
+* maps
+* crowd
+* gis
+* embed
 
+=== future ===
+* geomap - convert MapQuest icon to data URI so we don't have to resolve developer.mapquest.com every time
+* geographics - ie8 - append vml to text and set innerHTML once during refresh
+* geomap - audit mousewheel timing & behavior vs. interactiveTransform
+* website - release test.jquerygeo.com
+* website - all examples should be jsFiddle only
+* docs - geomap - geo-attr class
+* geomap - geo-attr class
+* test with zepto
+** zepto doesn't have Deferred, but we can drop support for Deferred services in zepto mode
+* geomap - delay refresh after append/remove/empty until some timeout; hook into interactiveTransform?
+* docs - geo - audit in-place geo calls, e.g., fromGeodetic
+* geo - audit in-place geo calls, e.g., fromGeodetic
 * docs - geomap - layers template argument/service object property
 * geomap - layers template argument/service object property
 * geomap - map & map services type objects should refresh their own shapes after the map image (or tiles) has downloaded or after some timout
@@ -251,6 +271,120 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2013-02-27==
+===doubleBuffer===
+By honoring the _requireFlip flag in the scene image's load event, Firefox appears to show the correct scene. It's a bit jumpy still in Firefox and I definitely should replace some of the timing stuff with Promise code.
+
+==2013-02-22==
+===doubleBuffer===
+What is the pattern? Increasing the timeout for endcallback helps that one specific issue but shapes still jump around wildly while panning & zooming. I need this whole code to be much more solid.
+
+Ok, assuming there is one point on the map & buffer 1 is visible. User double clicks to zoom in:
+
+.geo-shapes-container
+  \- #scene1
+
+dblclick
+  geomap._interactiveTransform
+    geographics.interactiveTransform
+      #scene1.css
+  geomap._setInteractiveTimeout: _interactiveTimeout, 128
+  geomap._interactiveTimeout
+    geomap._setCenterAndSize refresh: true
+      geomap._refreshAllShapes
+        geographics.clear
+          geographics._context.clearRect ("clear:_end")
+            geographics._end
+              geographics._timeoutEnd: _endCallback, 20
+
+==2013-02-21==
+===Firefox===
+Still working on this.
+
+===front/back===
+These are bad names because either can be in front...they swap. Probably Zero & One are fine.
+
+===debug output===
+Huge, but maybe it'll help:
+
+==Firefox==
+
+[20:28:59.137] clear:_end 1362014939137
+[20:28:59.141] drawArc:_end 1362014939141
+[20:28:59.156]     _endCallback...
+[20:28:59.403]     ...flip (back): show scene1, hide scene0
+[20:29:00.767] geographics:interactiveTransform scene1: origin: -1143,-759, scale: 2
+[20:29:00.989] clear:_end 1362014940989
+[20:29:00.989] drawArc:_end 1362014940989
+[20:29:01.032]     _endCallback...
+[20:29:01.180] clear:_end 1362014941179
+[20:29:01.180] drawArc:_end 1362014941180
+[20:29:01.204]     _endCallback...
+[20:29:01.297]     ...flip (front): show scene0, hide scene1
+[20:29:01.423]     ...flip (front): show scene1, hide scene0
+
+==IE==
+
+ clear:_end 1362015024460 
+ drawArc:_end 1362015024461 
+     _endCallback... 
+     ...flip (back): show scene1, hide scene0 
+ geographics:interactiveTransform scene1: origin: -1161,-694, scale: 2 
+ clear:_end 1362015026962 
+ drawArc:_end 1362015026962 
+     _endCallback... 
+ clear:_end 1362015027077 
+ drawArc:_end 1362015027078 
+     ...flip (front): show scene0, hide scene1 
+     _endCallback... 
+     ...flip (back): show scene1, hide scene0 
+
+==Chrome==
+
+clear:_end 1362015050415 jquery.geo.geographics.js:141
+drawArc:_end 1362015050423 jquery.geo.geographics.js:189
+    _endCallback... jquery.geo.geographics.js:490
+    ...flip (back): show scene1, hide scene0 jquery.geo.geographics.js:467
+geographics:interactiveTransform scene1: origin: -1172,-658, scale: 2 jquery.geo.geographics.js:425
+clear:_end 1362015054165 jquery.geo.geographics.js:141
+drawArc:_end 1362015054165 jquery.geo.geographics.js:189
+    _endCallback... jquery.geo.geographics.js:490
+    ...flip (front): show scene0, hide scene1 jquery.geo.geographics.js:451
+clear:_end 1362015054372 jquery.geo.geographics.js:141
+drawArc:_end 1362015054374 jquery.geo.geographics.js:189
+    _endCallback... jquery.geo.geographics.js:490
+    ...flip (back): show scene1, hide scene0 jquery.geo.geographics.js:467
+
+==2013-02-20==
+===Firefox interactive===
+The USA states demo shows this issue pretty well. It has to be full screen though. Click on MA, then zoom in off the coast of Maine and the state shapes don't refresh to match the new zoom level. 
+
+Time for some console.log (though, I do still wonder if 3d transform will fix it). That seems a little more responsive but it still has the graphics bug. I'm undoing that but might try again later when the real bug is fixed.
+
+I think I need to attach the load events for real and then determin if we still need to flip in the event handler. This .one("load") thing I think isn't working as I had hoped. The endcallback function is attaching two load event handlers and then doing two flips, ugh. I'm not sure why this is only Firefox.
+
+==2013-02-14==
+===twheat 3d===
+I really need to have a version of Twheat! that uses this WebGL heatmap library: http://codeflow.org/entries/2013/feb/04/high-performance-js-heatmaps/
+
+==2013-02-09==
+===schedule===
+I need a better schedule for b2 release. Done. I have one major bug (in Firefox mostly) and a few other quick enhancements before b2 can go out.
+
+===interactive graphics===
+The new buffering for graphics works mostly well. The images bounce around a bit in all browsers and don't refresh in Firefox. I wonder if the moz-transform stuff might help.
+
+==2013-01-22==
+===null label===
+Any form of null label causes an error. It's when the shape centroid is calculated and the centroid ends up being undefined (why would it be undefined?). Maybe the centroid function is wrong.
+
+===test page===
+One test page to rule them all...I'm going to abandon individual pages for demos and component examples in favor of just keeping the jsFiddles up to date. The showcases will still be full pages...maybe.
+
+==2013-01-21==
+===popup===
+I have to finally put this as a demo on docs.
 
 ==2013-01-17==
 ===official jQuery plugin site===
