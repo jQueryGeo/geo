@@ -23,6 +23,11 @@
 7. test on numbered jsFiddle revision
 8. push code
 
+===demo template===
+Starting point for a jQuery Geo demo:
+
+http://jsfiddle.net/ryanttb/KQHN9/
+
 === examples ===
 * examples - disease map
 ** http://jsfiddle.net/ryanttb/gU7wS/14/
