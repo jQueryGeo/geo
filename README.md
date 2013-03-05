@@ -35,6 +35,8 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ### 1.0.0-b2
 * geomap - [bug] map does not always redraw shapes after interactiveTransform, a pan will fix them
+* geomap - make zoomFactor an init-only public, option
+* geomap - support touch/mouse events on hybrid devices
 
 ### 1.0.0-b1.5 (2013-01-17)
 * examples - drawing markers
