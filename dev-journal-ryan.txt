@@ -11,6 +11,7 @@
 * geomap - [bug] removing a shape from one service that has been appended to two services causes an error in the second service
 ** cached bbox gets deleted
 * geographics - [bug] graphics stretch after resize, should just move
+* project - get on https://github.com/cdnjs/cdnjs
 
 ===bug fixing process===
 1. reproduce bug in jsFiddle with latest release version of jQuery Geo
