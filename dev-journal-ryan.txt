@@ -279,6 +279,12 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-03-14==
+===triage!===
+I'm re-ramping up for b2 release next month and went through the open GitHub issues giving them all labels and answering as many as I could (there were only 19). I added a couple issues too. It felt good.
+
+I intended to actually implement or document some of the remaining few b2 features but didn't get to it tonight.
+
 ==2013-02-28==
 ===emily image server===
 I need to consume an image server for Harvard. There might be a bug with axisLayout=image and shingled services.
