@@ -2,7 +2,6 @@
 
 === b2 ===
 * geomap - support Windows 8 Store apps
-* docs - geomap - click mode
 * docs - geomap - make zoomFactor an init-only public option
 * geomap - click mode
 * geomap - remove z-index from attr so it doesn't show over everything
