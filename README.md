@@ -37,6 +37,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 * geomap - [bug] map does not always redraw shapes after interactiveTransform, a pan will fix them
 * geomap - make zoomFactor an init-only public, option
 * geomap - support touch/mouse events on hybrid devices
+* docs - geomap - top-level map label links are clickable
 
 ### 1.0.0-b1.5 (2013-01-17)
 * examples - drawing markers
