@@ -172,6 +172,12 @@ $( &quot;#map .osm&quot; ).geomap( &quot;append&quot;, { type: &quot;Point&quot;
 
       <p>Shapes appended to the primary map element (as opposed to service-level shapes mentioned below) can have clickable link elements. This means, if you include an &quot;a&quot; element in the label for a shape appended to your map, users can click that link. This also means that the link elements interfere with map interaction, so be careful how your design your labels because they can stop users from panning while hovering over a clickable label link. Due to browser inconsistencies, sometimes links in service-level shape labels can be clicked. However, since this behavior is not consistent, you should not rely on it.</p>
 
+      <pre><code><span class="comment">// users can click the link in this shape's label</span>
+$( &quot;#map&quot; ).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, &quot;&lt;a href='info.html'&gt;More info&lt;/a&gt;&quot; );
+
+<span class="comment">// users cannot click the link in this service-level shape's label</span>
+$( &quot;#map .osm&quot; ).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, &quot;&lt;a href='info.html'&gt;More info&lt;/a&gt;&quot; );</code></pre>
+
       <h2>delaying refresh</h2>
 
       <p>The optional refresh argument determines if geomap refreshes the map graphics after this call to append. It defaults to true. If you pass false, geomap will add the shape internally but not immediately redraw the graphics. The changes will display if the user moves the map or you call geomap's refresh method.</p>
