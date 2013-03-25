@@ -29,7 +29,33 @@ Release and other announcements via @jQueryGeo on Twitter: https://twitter.com/j
 News and smaller updates via @ryanttb on Twitter: https://twitter.com/ryanttb
 
 ## Contributing
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [grunt](https://github.com/cowboy/grunt).
+Before submitting a pull request, please verify that you have attempted the following:
+
+* code changes follow jQuery Foundation's [JavaScript Style Guide](http://contribute.jquery.org/style-guide/js/) and/or [idomatic.js](https://github.com/rwldrn/idiomatic.js/)
+* pull latest code from repository master branch
+* lint and test your code using [grunt](http://gruntjs.com/getting-started)
+
+## Building with grunt
+* install node.js ~0.8
+* install grunt-cli
+
+```
+npm install -g grunt-cli
+```
+
+* install grunt locally into your project folder
+
+
+```
+cd project-root/geo
+npm install grunt
+```
+
+* run grunt
+
+```
+grunt
+```
 
 ## Release History
 
