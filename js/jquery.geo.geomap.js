@@ -55,6 +55,7 @@
         zoom: 0,
         zoomMin: 0,
         zoomMax: Number.POSITIVE_INFINITY,
+        zoomFactor: 2, //< determines what a zoom level means
         pixelSize: 0
       };
 
@@ -107,8 +108,6 @@
 
     _wheelTimeout: null,
     _wheelLevel: 0,
-
-    _zoomFactor: 2, //< determines what a zoom level means
 
     _fullZoomFactor: 2, //< interactiveScale factor needed to zoom a whole level
     _partialZoomFactor: 1.18920711500273, //< interactiveScale factor needed to zoom a fraction of a level (the fourth root of 2)
@@ -294,6 +293,11 @@
         if (this._initOptions.zoomMax !== undefined) {
           this._setOption("zoomMax", this._initOptions.zoomMax, false);
         }
+        if (this._initOptions.zoomFactor !== undefined) {
+          this._setOption("zoomFactor", this._initOptions.zoomFactor, false);
+          this._fullZoomFactor = this._initOptions.zoomFactor;
+          this._partialZoomFactor = Math.pow(4, 1 / this._fullZoomFactor); // 4th root of full
+        }
         if (this._initOptions.bbox) {
           this._setOption("bbox", this._initOptions.bbox, false);
         }
@@ -335,7 +339,7 @@
             this._clearInteractiveTimeout( );
           }
 
-          this._userGeodetic = $.geo.proj && $.geo._isGeodetic( value );
+          this._userGeodetic = this._options["axisLayout"] === "map" && $.geo.proj && $.geo._isGeodetic( value );
           if ( this._userGeodetic ) {
             value = $.geo.proj.fromGeodetic( value );
           }
@@ -367,7 +371,7 @@
           break;
 
         case "bboxMax":
-          this._userGeodetic = $.geo.proj && $.geo._isGeodetic( value );
+          this._userGeodetic = this._options["axisLayout"] === "map" && $.geo.proj && $.geo._isGeodetic( value );
           break;
 
         case "center":
@@ -375,7 +379,7 @@
             this._clearInteractiveTimeout( );
           }
 
-          this._userGeodetic = $.geo.proj && $.geo._isGeodetic( value );
+          this._userGeodetic = this._options["axisLayout"] === "map" && $.geo.proj && $.geo._isGeodetic( value );
           if ( this._userGeodetic ) {
             value = $.geo.proj.fromGeodetic( value );
           }
@@ -453,7 +457,7 @@
           break;
 
         case "bboxMax":
-          if ( $.geo.proj && $.geo._isGeodetic( value ) ) {
+          if ( this._userGeodetic ) {
             bbox = $.geo.proj.fromGeodetic( value );
           } else {
             bbox = value;
@@ -858,7 +862,7 @@
             bbox = $.geo.reaspect( this._getBbox( center, pixelSize ), ratio, true ),
             bboxMax = $.geo.reaspect(this._getBboxMax(), ratio, true);
 
-        return Math.round( Math.log($.geo.width(bboxMax, true) / $.geo.width(bbox, true)) / Math.log(this._zoomFactor) );
+        return Math.round( Math.log($.geo.width(bboxMax, true) / $.geo.width(bbox, true)) / Math.log(this._fullZoomFactor) );
       }
     },
 
@@ -1201,7 +1205,7 @@
           return tilingScheme.basePixelSize / Math.pow(2, zoom);
         }
       } else {
-        var bbox = $.geo.scaleBy( this._getBboxMax(), 1 / Math.pow( this._zoomFactor, zoom ), true );
+        var bbox = $.geo.scaleBy( this._getBboxMax(), 1 / Math.pow( this._fullZoomFactor, zoom ), true );
         return Math.max( $.geo.width( bbox, true ) / this._contentBounds.width, $.geo.height( bbox, true ) / this._contentBounds.height );
       }
     },
