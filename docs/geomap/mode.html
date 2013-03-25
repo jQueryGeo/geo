@@ -60,6 +60,7 @@
         <li>static</li>
         <li>pan</li>
         <li>zoom</li>
+        <li>click</li>
       </ul>
 
       <h3>drag</h3>
@@ -160,6 +161,24 @@
         <li>bboxchange &ndash; when the user changes the bbox by zooming</li>
       </ul>
 
+      <h2>click</h2>
+
+      <h3>user experience</h3>
+      <p>The default cursor is a crosshair.</p>
+
+      <p>In this mode the user can single-click or tap the map. Apart from the default cursor, this mode is similar to pan in that the user can drag the map to pan. They can zoom in or out with the scroll wheel. They can also double-click or double-tap to zoom in one level. On some multitouch devices, users can use two fingers to &quot;pinch zoom&quot; (currently not available on Android).</p>
+
+      <p>The user can hold the shift key to temporarily switch to zoom mode.</p>
+
+      <h3>events</h3>
+      <p>In click mode, the geomap widget triggers the following events on the original map div.</p>
+      <ul>
+        <li>move &ndash; when the user moves the mouse above the map but is not actively panning</li>
+        <li>click &ndash; when the user clicks or taps a point on the map without initiating a pan, i.e., they let go of the map at the same point and within a short time threshold</li>
+        <li>dblclick &ndash; when the user double-clicks or double-taps a point on the map</li>
+        <li>bboxchange &ndash; when the user changes the bbox by panning or zooming</li>
+      </ul>
+
       <h2>dragBox</h2>
 
       <h3>user experience</h3>
@@ -209,11 +228,9 @@
       <h3>user experience</h3>
       <p>The default cursor is a crosshair.</p>
 
-      <p>In this mode the user can digitize a Point shape by single-clicking or tapping the map. Apart from the default cursor, this mode is similar to pan in that the user can drag the map to pan. However, to allow a user more accuracy during digitization, the map will not continue panning a little after the user lets go. They can zoom in or out with the scroll wheel. They can also double-click or double-tap to zoom in one level.</p>
+      <p>In this mode the user can digitize a Point shape by single-clicking or tapping the map. Apart from the default cursor, this mode is similar to pan in that the user can drag the map to pan. However, to allow a user more accuracy during digitization, the map will not continue panning a little after the user lets go. They can zoom in or out with the scroll wheel. They can also double-click or double-tap to zoom in one level. On some multitouch devices, users can use two fingers to &quot;pinch zoom&quot; (currently not available on Android).</p>
 
       <p>A visual point will appear temporarily until they either let go to draw the point or begin panning.</p>
-
-      <p>Similar to pan mode, the user can drag the map to pan. However, to allow a user more accuracy during digitization, the map will not continue panning a little after the user lets go. They can zoom in or out with the scroll wheel. They can also double-click or double-tap to zoom in one level. On some multitouch devices, users can use two fingers to &quot;pinch zoom&quot; (currently not available on Android).</p>
 
       <p>The user can hold the shift key to temporarily switch to zoom mode.</p>
 

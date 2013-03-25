@@ -2,8 +2,7 @@
 
 === b2 ===
 * geomap - support Windows 8 Store apps
-* docs - geomap - top-level map label links are clickable
-* docs - geomap - click mode
+* docs - geomap - make zoomFactor an init-only public option
 * geomap - click mode
 * geomap - remove z-index from attr so it doesn't show over everything
 * geomap - [bug] mouse wheel & mac touchpads zoom too quickly
@@ -11,6 +10,7 @@
 * geomap - [bug] removing a shape from one service that has been appended to two services causes an error in the second service
 ** cached bbox gets deleted
 * geographics - [bug] graphics stretch after resize, should just move
+* project - get on https://github.com/cdnjs/cdnjs
 
 ===bug fixing process===
 1. reproduce bug in jsFiddle with latest release version of jQuery Geo
@@ -23,13 +23,20 @@
 7. test on numbered jsFiddle revision
 8. push code
 
+===demo template===
+Starting point for a jQuery Geo demo:
+
+http://jsfiddle.net/ryanttb/KQHN9/
+
 === examples ===
+* examples - location based notes/to do list
 * examples - disease map
 ** http://jsfiddle.net/ryanttb/gU7wS/14/
 * examples - 3d heatmap
 * examples - jQuery Mobile
 * examples - pan cursor
 * examples - shape click pointer cursor
+* examples - custering demo/support
 * examples - weather
 ** http://openweathermap.org/example-json
 * examples - MBCR: http://www.mbta.com/rider_tools/developers/default.asp?id=21899
@@ -55,6 +62,8 @@
 * embed
 
 === future ===
+* docs - geomap - allow template engine plugins
+* geomap - allow template engine plugins
 * geomap - convert MapQuest icon to data URI so we don't have to resolve developer.mapquest.com every time
 * geographics - ie8 - append vml to text and set innerHTML once during refresh
 * geomap - audit mousewheel timing & behavior vs. interactiveTransform
@@ -231,7 +240,6 @@
 * code - prefer $.data over $.fn.data
 * docs - internal - explain what projection is and which one we use by default (3395) and maybe why we call it web mercator & why we can't get to +/- 90 lat
 * docs - internal - document how geomap draws shapes, the geomapgraphics widget and the reason shapeStyle is a method
-* docs - demo - location based notes/to do list
 * geomap - find should check labels first
 * geo - geometry - implement JTS note: "The centroid is equal to the centroid of the set of component Geometries of highest dimension (since the lower-dimension geometries contribute zero "weight" to the centroid)"
 * geo - all bbox operations should be done in non-geodetic coordinates for accuracy
@@ -242,7 +250,6 @@
 * docs/geomap - store WKT input for each service
 * geographics - rename the generated style properties to something simple or get better control over closure compiler
 * geomap - document and implement find's callback syntax
-* geomap - custering demo/support
 * proj - take scale factor into account when calculating distance in web mercator
 * geographics - disable fill by setting style.fill to "" & stroke by style.stroke to ""
 * geographics - See Modernizr for comment on BB Storm & canvas detection
@@ -271,6 +278,29 @@
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2013-03-18==
+===templating===
+I think I am going to keep jsRender syntax in my templates, assuming jQuery UI continues to. But I will:
+
+a) remove the full dependency on jsRender
+b) allow template engine plugins
+
+So, I will support, e.g. and specifically, {{:zoom}}, but it will be specific without much engine. If you need a full engine, jsRender or handlebars, developers will be able to add that. We will support what we support out of the box by simple clean string replace: zoom, length, etc. If a dev needs more, use a real engine. This is not 1.0 release stuff so it will be tabled until 1.1 or 1.2.
+
+One result is that we won't need to include jsRender in its entirety.
+
+==2013-03-14==
+===triage!===
+I'm re-ramping up for b2 release next month and went through the open GitHub issues giving them all labels and answering as many as I could (there were only 19). I added a couple issues too. It felt good.
+
+I intended to actually implement or document some of the remaining few b2 features but didn't get to it tonight.
+
+==2013-02-28==
+===emily image server===
+I need to consume an image server for Harvard. There might be a bug with axisLayout=image and shingled services.
+
+Nope, I just forgot to set $.geo.proj = null. Maybe I should do that by default on axisLayout=image? There's no geodetic, so I souldn't ever check.
 
 ==2013-02-27==
 ===doubleBuffer===
