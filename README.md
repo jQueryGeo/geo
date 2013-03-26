@@ -37,13 +37,13 @@ Before submitting a pull request, please verify that you have attempted the foll
 
 ## Building with grunt
 * install node.js ~0.8
-* install grunt-cli
+* install grunt-cli ( [info](http://gruntjs.com/getting-started#installing-the-cli) ):
 
 ```
 npm install -g grunt-cli
 ```
 
-* install grunt locally into your project folder
+* install grunt locally into your project folder ( [info](http://gruntjs.com/getting-started#working-with-an-existing-grunt-project) ):
 
 
 ```
@@ -51,11 +51,13 @@ cd project-root/geo
 npm install grunt
 ```
 
-* run grunt
+* run grunt:
 
 ```
 grunt
 ```
+
+Unless you have downloaded a tagged release, grunt will create a test version of jQuery Geo: docs/jquery.geo-test.min.js
 
 ## Release History
 
