@@ -68,6 +68,7 @@ Unless you have downloaded a tagged release, grunt will create a test version of
 * geomap - support touch/mouse events on hybrid devices
 * docs - geomap - top-level map label links are clickable
 * docs - geomap - click mode
+* geomap - click mode
 
 ### 1.0.0-b1.5 (2013-01-17)
 * examples - drawing markers
