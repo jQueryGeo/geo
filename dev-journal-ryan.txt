@@ -277,6 +277,15 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-03-31==
+===click mode===
+All I had to do was add it to the cursors object.
+
+===offline test===
+I'm going to build an offline example so I can develop even when there's no Internet.
+
+It's called test-offline.html. I started with the defer example which draws tile coords on each tile and removed any async stuff (the logo image & the actual Deferred object). Without async, I can just draw the coords inline & return a data URL.
+
 ==2013-03-18==
 ===templating===
 I think I am going to keep jsRender syntax in my templates, assuming jQuery UI continues to. But I will:
