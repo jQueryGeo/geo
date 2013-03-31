@@ -968,7 +968,9 @@
 
       this._$attrList.find( "a" ).css( {
         position: "relative",
-        zIndex: 100
+        zIndex: 1,
+        display: "inline-block",
+        webkitTransform: "translateZ(0)"
       } );
     },
 
