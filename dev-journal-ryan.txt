@@ -34,6 +34,7 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * examples - pan cursor
 * examples - shape click pointer cursor
 * examples - custering demo/support
+* examples - shared-canvas sketch app
 * examples - weather
 ** http://openweathermap.org/example-json
 * examples - MBCR: http://www.mbta.com/rider_tools/developers/default.asp?id=21899
