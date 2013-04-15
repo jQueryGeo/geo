@@ -26,6 +26,7 @@ Starting point for a jQuery Geo demo:
 http://jsfiddle.net/ryanttb/KQHN9/
 
 === examples ===
+* examples - forecast.io skycons on jQuery Geo map
 * examples - location based notes/to do list
 * examples - disease map
 ** http://jsfiddle.net/ryanttb/gU7wS/14/
