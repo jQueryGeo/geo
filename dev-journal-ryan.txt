@@ -3,11 +3,10 @@
 === b2 ===
 * geomap - support Windows 8 Store apps
 * geomap - [bug] mouse wheel & mac touchpads zoom too quickly
-* geomap - [bug] setting zoom & then center on two lines does not zoom to the correct location http://jsfiddle.net/dyTn9/11/
 * geomap - [bug] removing a shape from one service that has been appended to two services causes an error in the second service
 ** cached bbox gets deleted
 * geographics - [bug] graphics stretch after resize, should just move
-* project - get on https://github.com/cdnjs/cdnjs
+* project - remove download property from package json files
 
 ===bug fixing process===
 1. reproduce bug in jsFiddle with latest release version of jQuery Geo
@@ -61,6 +60,7 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * embed
 
 === future ===
+* project - get on https://github.com/cdnjs/cdnjs
 * geomap - [bug] scrolling a relative div over a fixed map breaks interaction with lower portion of map (see comment from 2013-03-31)
 * docs - geomap - allow template engine plugins
 * geomap - allow template engine plugins
@@ -185,6 +185,7 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geomap - determine if moz-transform improves speed in Firefox
 * geomap - [bug] once we detect a pan, disable the ability to go to multitouch
 * geomap - [bug] verify label clamping is correct in axisLayout=image maps
+* geomap - [bug] setting zoom & then center on two lines does not zoom to the correct location http://jsfiddle.net/dyTn9/11/
 * docs - geomap - pass the service id (if there is one) to the src callback as a view property
 * geomap - pass the service id (if there is one) to the src callback as a view property
 * docs - geomap - support dynamic map services that only work in geodetic coordinates (sr=4326)?
@@ -278,6 +279,13 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2013-04-23==
+===b2===
+What's left?
+
+===center/zoom on one line===
+I cannot reproduce this bug so I'm removing it from the b2 list.
 
 ==2013-03-31==
 ===click mode===
