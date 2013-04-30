@@ -1,4 +1,4 @@
-/*! jQuery Geo - vtest - 2013-03-25
+/*! jQuery Geo - vtest - 2013-04-30
  * http://jquerygeo.com
  * Copyright (c) 2013 Ryan Westphal/Applied Geographics, Inc.; Licensed MIT, GPL */
 
@@ -4253,7 +4253,7 @@ $.Widget.prototype = {
 
       geographics._$labelsContainerBack.html( geographics._labelsHtml ).find("a").css({
         position: "relative",
-        zIndex: 100,
+        zIndex: 1,
         display: "inline-block",
         webkitTransform: "translateZ(0)"
       });
@@ -4364,6 +4364,7 @@ $.Widget.prototype = {
         cursors: {
           "static": "default",
           pan: "url(data:image/vnd.microsoft.icon;base64,AAACAAEAICACAAgACAAwAQAAFgAAACgAAAAgAAAAQAAAAAEAAQAAAAAAAAEAAAAAAAAAAAAAAgAAAAAAAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD8AAAA/AAAAfwAAAP+AAAH/gAAB/8AAA//AAAd/wAAGf+AAAH9gAADbYAAA2yAAAZsAAAGbAAAAGAAAAAAAAA//////////////////////////////////////////////////////////////////////////////////////gH///4B///8Af//+AD///AA///wAH//4AB//8AAf//AAD//5AA///gAP//4AD//8AF///AB///5A////5///8=), move",
+          click: "crosshair",
           zoom: "crosshair",
           dragBox: "crosshair",
           dragCircle: "crosshair",
@@ -5316,7 +5317,9 @@ $.Widget.prototype = {
 
       this._$attrList.find( "a" ).css( {
         position: "relative",
-        zIndex: 100
+        zIndex: 1,
+        display: "inline-block",
+        webkitTransform: "translateZ(0)"
       } );
     },
 
@@ -6026,8 +6029,11 @@ $.Widget.prototype = {
     },
 
     _eventTarget_touchstart: function (e) {
-      if (typeof(document.elementFromPoint) !== "undefined" && document.elementFromPoint(e.pageX, e.pageY).nodeName === "A") {
-        return;
+      if ( typeof( document.elementFromPoint ) !== "undefined" ) {
+        var elFromPt = document.elementFromPoint( e.pageX, e.pageY );
+        if ( elFromPt && elFromPt.nodeName === "A" ) {
+          return;
+        }
       }
 
       var mode = this._options[ "mode" ],
