@@ -1,4 +1,4 @@
-/*! jQuery Geo - vtest - 2013-04-30
+/*! jQuery Geo - vtest - 2013-05-08
  * http://jquerygeo.com
  * Copyright (c) 2013 Ryan Westphal/Applied Geographics, Inc.; Licensed MIT, GPL */
 
@@ -5007,7 +5007,7 @@ $.Widget.prototype = {
         }
 
         for ( i = 0; i < shapes.length; i++ ) {
-          if ( shapes[ i ].type != "Point" ) {
+          if ( !$.data( shapes[ i ], "geoBbox" ) ) {
             var bbox = $.geo.bbox( shapes[ i ] );
             if ( $.geo.proj && $.geo._isGeodetic( bbox ) ) {
               bbox = $.geo.proj.fromGeodetic( bbox );
@@ -5034,10 +5034,6 @@ $.Widget.prototype = {
     },
 
     empty: function ( refresh ) {
-      for ( var i = 0; i < this._graphicShapes.length; i++ ) {
-        $.removeData( this._graphicShapes[ i ].shape, "geoBbox" );
-      }
-
       this._graphicShapes = [];
 
       if ( refresh === undefined || refresh ) {
@@ -5116,7 +5112,6 @@ $.Widget.prototype = {
 
         for ( var i = 0; i < this._graphicShapes.length; i++ ) {
           if ( $.inArray( this._graphicShapes[ i ].shape, shapes ) >= 0 ) {
-            $.removeData( shape, "geoBbox" );
             rest = this._graphicShapes.slice( i + 1 );
             this._graphicShapes.length = i;
             this._graphicShapes.push.apply( this._graphicShapes, rest );

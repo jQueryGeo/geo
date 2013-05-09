@@ -658,7 +658,7 @@
         }
 
         for ( i = 0; i < shapes.length; i++ ) {
-          if ( shapes[ i ].type != "Point" ) {
+          if ( !$.data( shapes[ i ], "geoBbox" ) ) {
             var bbox = $.geo.bbox( shapes[ i ] );
             if ( $.geo.proj && $.geo._isGeodetic( bbox ) ) {
               bbox = $.geo.proj.fromGeodetic( bbox );
@@ -685,10 +685,6 @@
     },
 
     empty: function ( refresh ) {
-      for ( var i = 0; i < this._graphicShapes.length; i++ ) {
-        $.removeData( this._graphicShapes[ i ].shape, "geoBbox" );
-      }
-
       this._graphicShapes = [];
 
       if ( refresh === undefined || refresh ) {
@@ -767,7 +763,6 @@
 
         for ( var i = 0; i < this._graphicShapes.length; i++ ) {
           if ( $.inArray( this._graphicShapes[ i ].shape, shapes ) >= 0 ) {
-            $.removeData( shape, "geoBbox" );
             rest = this._graphicShapes.slice( i + 1 );
             this._graphicShapes.length = i;
             this._graphicShapes.push.apply( this._graphicShapes, rest );

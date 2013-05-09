@@ -3,8 +3,6 @@
 === b2 ===
 * geomap - support Windows 8 Store apps
 * geomap - [bug] mouse wheel & mac touchpads zoom too quickly
-* geomap - [bug] removing a shape from one service that has been appended to two services causes an error in the second service
-** cached bbox gets deleted
 * geographics - [bug] graphics stretch after resize, should just move
 * project - remove download property from package json files
 
@@ -95,6 +93,7 @@ http://jsfiddle.net/ryanttb/KQHN9/
 ** destroy should unbind all geomap events
 * geomap - [bug] there's an extra service.refresh call after a non-mousedown touchmove after a refresh
 ** most noticeable on shingled services
+* geomap - default services (see 2013-05-08)
 * geomap - [bug] if panning is false, mode is draw*, and user attempts to pan, the drawing begins (or another point is added) on the touchstop point
 ** a failed pan shouldn't add a point to drawCoords
 * geomap - ie (8?) - [bug] ie highlights entire map div during shift-zoom
@@ -279,6 +278,35 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2013-04-23==
+==2013-05-08==
+===one shape two services===
+This is a nasty bug that I've been itching to get rid of for some time.
+
+I'm having trouble reproducing this. Which demo had the error? I think it was the USA sates one. Regardless, the issue is when you try to call find after removing a service. I have a jsFiddle now: http://jsfiddle.net/ryanttb/VTGa5/
+
+
+===jsFiddle===
+I think I'm still going to use jsFiddle for debugging and only use codepen.io for public examples. I wonder how it works in IE8 though. It's probably fine in full screen mode.
+
+The simplest solution is to not remove the geoBbox property.
+
+Another solution is to begin storing the bbox on the shape. The issue with that is, we would have to make sure we're storing the bbox in the projection used by the shape itself. Sure, isGeodetic will help but I'm not sure if this is the correct way to do things. It might be nice to have append guarantee that bbox is on the shape and not have to remove it. An odd side effect that would have to go into the documentation. Heh, what do my docs say about append currently? I can't find where I mention that we don't mess with your shape objects. Maybe that was only in a presentation. I'm technically already messing with the shape objects via the $.data. I don't think storing the bbox will be that much worse. It will be more efficient because I don't have to worry about calculating it each time if it already exists.
+
+If there is outrage, I can add an option to not modify the shapes at all. This would be slower & horribly inefficient in comparison but functional. Instead of going directly from shape=>data, I would have to look the shape data up in some map: shape=>map of shape to data=>data.
+
+Another consideration is that the shape coming in may already have a bbox...what if it's wrong? Hmm. Also, I like the idea of keeping the bbox in projected coordinates for fast lookup. Although, I would only have to convert the bbox, not calculate the bbox. This feels like a wash. I have to pick one and do it.
+
+I think I'm settling on keeping this behind the scenes. I'm going to keep the geoBbox data property and just not remove it. I'm also going to start storing it for points. Therefore, I know there is a geoBbox data value, and I know it's in projected coordinates.
+
+===default service===
+A blast from the past, I'm still thinking about supporting strings as well-known services. However, it might be better to allow the src property to be the string instead of the whole object. That way, developers can use whatever id/class, etc. they want.
+
+services: [ {
+  type: "tiled",
+  src: "default"
+} ]
 
 ==2013-04-23==
 ===b2===
