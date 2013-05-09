@@ -4,7 +4,6 @@
 * geomap - support Windows 8 Store apps
 * geomap - [bug] mouse wheel & mac touchpads zoom too quickly
 * geographics - [bug] graphics stretch after resize, should just move
-* project - remove download property from package json files
 
 ===bug fixing process===
 1. reproduce bug in jsFiddle with latest release version of jQuery Geo
@@ -279,13 +278,19 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
-==2013-04-23==
+==2013-05-08==
+===plugin download link===
+I'm going to remove the link to the minified src. It just opens in a browser. Without the link it will at least download all the code for the user (but this project isn't setup to build things in a useful place. I should fix that, too. I currently build to docs/jquery.geo-* and need to build to anywhere else that makes sense.
+
+Backbone.js builds to root, but is unversioned. jQuery itself build to dist/. I like that.
+
+I removed the download property of my manifest and I'm also going to have grunt build to dist/
+
 ==2013-05-08==
 ===one shape two services===
 This is a nasty bug that I've been itching to get rid of for some time.
 
 I'm having trouble reproducing this. Which demo had the error? I think it was the USA sates one. Regardless, the issue is when you try to call find after removing a service. I have a jsFiddle now: http://jsfiddle.net/ryanttb/VTGa5/
-
 
 ===jsFiddle===
 I think I'm still going to use jsFiddle for debugging and only use codepen.io for public examples. I wonder how it works in IE8 though. It's probably fine in full screen mode.
