@@ -138,6 +138,9 @@
       <h3>attr</h3>
 
       <p>The attr property is optional. It stands for attribution and is a way to give credit to the source of your map imagery. It defaults to an empty string if not specified in a service object. When present, the map widget displays the HTML provided on the bottom-left corner of the map when the service is visible. Users can click links but cannot interact with all other text or images.</p>
+
+      <p><b>Note:</b> If you display non-map content over the map div, links in the attribution will show through that content unless you either remove anchor elements from your service's attr property or give your overlay content a z-index greater than 1.</p>
+
       <h3>style</h3>
       <p>The style property is optional. It contains presentation options for the service.</p>
 

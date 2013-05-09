@@ -49,13 +49,9 @@
 
       <p>You can use the zoomFactor option change how the map handles zoom levels including the <a href="zoom.html">zoom option</a> and double-click zoom interaction.</p>
 
-      <p>This is an advanced, init-only option that you don't usually need to change.</p>
+      <p>This is an advanced, init-only option that you don't usually need to change. The primary case where you would change this is if you have a tilingScheme where the pixelSize between zoom levels isn't a clean power of two. For example, in web mercator (the default tilingScheme) the pixelSize at zoom 0 is 156543.03392799936. At zoom 1, the pixelSize is exactly half that. With a zoomFactor of 2, double-click zoom will go directly from zoom 0 to zoom 1. Not all tilingSchemes follow this pattern and you may want to change zoomFactor so that scroll and double-click zoom behave naturally.</p>
 
-      <p>For tiled maps, this option overrides the <a href="tilingScheme.html">tilingScheme option</a> when it is smaller than what you've specified in the tilingScheme. For example, if the tilingScheme has a total of 18 levels but you set the zoomFactor option to 7, the user will not be able to zoom in past level 7.</p>
-
-      <p>For non-tiled maps, i.e., tilingScheme is null and you're using all shingled services, this option determines the maximum zoom (and therefore minimum pixelSize) a user can achieve. Without setting this option for non-tiled maps, users will be able to infinitely zoom in to fully dynamic maps which is likely not what you want. Non-tiled maps require the <a href="bboxMax.html">bboxMax option</a> to determine what zoom level 0 means. This option represents the other side of the zoom range.</p>
-
-      <p>This option also overrides programmatic changes. If zoomFactor is 7 and you try to set the zoom option to 8 using JavaScript, it will be set to 7 instead.</p>
+      <p>Another case is if you want to define a tilingScheme for a non-tiled map service. Since the map service can handle any pixelSize, you may want your scroll and double-click zoom to hit more than powers of two. For example, if you set zoomFactor to 1.18920711500273 (the 4th root of 2) then it will take a user four <i>clicks</i> of the mouse wheel to zoom in to what usually only takes one. This will give a user more scale options.</p>
     </div>
   </div> <!-- end of #container -->
 

@@ -39,11 +39,52 @@
 
   <script>
     $( function ( ) {
-      // create a map
-      var map = $( "#map" ).geomap( {
-        center: [ -71.0595678, 42.3604823 ],
-        zoom: 8
-      } );
+// create a map
+  var map = $("#map").geomap({
+    center: [ -72, 42 ],
+    zoom: 6,
+    services: [
+      {
+        type: "tiled",
+        src: "http://otile1.mqcdn.com/tiles/1.0.0/osm/{{:zoom}}/{{:tile.column}}/{{:tile.row}}.png"
+      },
+      {
+        id: "gfx",
+        type: "shingled"                 
+      }
+    ]
+  });
+  
+  var gfx = $("#gfx").geomap("option", "shapeStyle", {
+    color: "blue",
+    strokeWidth: 8   
+  });
+  
+  var shape = {
+    type: "LineString",
+    coordinates: [[ -72, 42 ], [-72.5, 42.5]]
+  };
+  
+  map.geomap("append", shape);
+  
+  gfx.geomap("append", shape);
+  
+  setTimeout(function() {
+    gfx.geomap("remove", shape);
+    
+    setTimeout(function() {
+      console.log("searching for shape");
+      
+      var foundShape = map.geomap("find", {
+        type: "Point",
+        coordinates: [ -72, 42 ]
+      }, 2);
+      
+      console.log( foundShape.length );
+      //gfx.geomap("append", shape);
+    }, 1000);
+  }, 1000);
+
     } );  
   </script>
 </body>
