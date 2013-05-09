@@ -286,6 +286,13 @@ Backbone.js builds to root, but is unversioned. jQuery itself build to dist/. I 
 
 I removed the download property of my manifest and I'm also going to have grunt build to dist/
 
+===shape resize===
+Shapes should only move if the pixelSize doesn't change. They currently stretch to match the window resize. Here's a simple fiddle: http://jsfiddle.net/ryanttb/n2fCR/2/
+
+I can resize canvasSceneBack and leave canvasSceneFront alone but I will have to resize it later. Maybe after the flip. That's only for trueCanvas. I also need to handle non-trueCanvas properly.
+
+I will also have to reset the position of the (now) back buffer after the flip. Actually, I don't need to. The flip makes sure the new canvasSceneFront is of the proper width and height.
+
 ==2013-05-08==
 ===one shape two services===
 This is a nasty bug that I've been itching to get rid of for some time.

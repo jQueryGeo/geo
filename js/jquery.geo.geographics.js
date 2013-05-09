@@ -353,13 +353,22 @@
       }
 
       if ( this._trueCanvas ) {
+        var dx = ( this._width - this._$canvas[0].width ) / 2;
+        var dy = ( this._height - this._$canvas[0].height ) / 2;
+
         this._$canvas[0].width = this._width;
         this._$canvas[0].height = this._height;
 
         this._$canvasSceneFront.css( {
+          left: dx,
+          top: dy
+        } );
+        /*
+        this._$canvasSceneFront.css( {
           width: this._width,
           height: this._height
         } );
+        */
 
         this._$canvasSceneBack.css( {
           width: this._width,
