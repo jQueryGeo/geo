@@ -137,6 +137,8 @@ $(function () {
         // however, here we're calling remove on the same target where we found the shapes
         // (note: remove can take an array of shapes, which the find method returns)
         target.geomap( "remove", shapes );
+      } else {
+        alert( "clicked [ " + geo.coordinates[0].toFixed(2) + ", " + geo.coordinates[1].toFixed(2) + " ]" );
       }
     }
   } );

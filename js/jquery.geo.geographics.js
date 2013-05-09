@@ -465,7 +465,7 @@
 
       geographics._$labelsContainerBack.html( geographics._labelsHtml ).find("a").css({
         position: "relative",
-        zIndex: 100,
+        zIndex: 1,
         display: "inline-block",
         webkitTransform: "translateZ(0)"
       });

@@ -50,7 +50,7 @@ $( <i>map selector</i> ).geomap( &quot;option&quot;, {
   <i>optionName</i>: <i>newValue</i>
 } );</code></pre>
 
-      <p>One exception is pixelSize, which is read-only.</p>
+      <p>Two exceptions are pixelSize (which is read-only) and zoomFactor (which is init-only).</p>
 
       <p>The map view refreshes when you change these options: bbox, center, services, tilingScheme, bboxMax, &amp; zoom.</p>
 
@@ -61,6 +61,7 @@ $( <i>map selector</i> ).geomap( &quot;option&quot;, {
         <li><a href="zoom.html"><h3>zoom</h3><p>zoom level of the currently visible viewport</p></a></li>
         <li><a href="zoomMin.html"><h3>zoomMin</h3><p>minimum zoom level for all services in the map</p></a></li>
         <li><a href="zoomMax.html"><h3>zoomMax</h3><p>maximum zoom level for all services in the map</p></a></li>
+        <li><a href="zoomFactor.html"><h3>zoomFactor</h3><p>determines how the map handles tiled zoom interactions</p></a></li>
         <li><a href="pixelSize.html"><h3>pixelSize</h3><p>read-only Earth-size of a pixel in the current map viewport</p></a></li>
         <li><a href="mode.html"><h3>mode</h3><p class="ui-li-desc">determines how the map, user, &amp; developer interact</p></a></li>
         <li><a href="pannable.html"><h3>pannable</h3><p class="ui-li-desc">allow or prohit map panning</p></a>

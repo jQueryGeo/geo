@@ -63,10 +63,14 @@ Unless you have downloaded a tagged release, grunt will create a test version of
 
 ### 1.0.0-b2
 * geomap - [bug] map does not always redraw shapes after interactiveTransform, a pan will fix them
+* docs - geomap - make zoomFactor an init-only public option
 * geomap - make zoomFactor an init-only public, option
 * geomap - support touch/mouse events on hybrid devices
 * docs - geomap - top-level map label links are clickable
 * docs - geomap - click mode
+* geomap - click mode
+* geomap - decrease z-index from attr & shape label links & document how to hide them behind non-map conent
+* geomap - [bug] removing a shape from one service that has been appended to two services causes an error in the second service
 
 ### 1.0.0-b1.5 (2013-01-17)
 * examples - drawing markers
