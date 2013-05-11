@@ -293,6 +293,10 @@ I can resize canvasSceneBack and leave canvasSceneFront alone but I will have to
 
 I will also have to reset the position of the (now) back buffer after the flip. Actually, I don't need to. The flip makes sure the new canvasSceneFront is of the proper width and height.
 
+Now, how to test not-trueCanvas? I might just hide the shapes until the resize is over if not trueCanvas. I don't, not trueCanvas resize works fine as is. To test, I disabled trueCanvas mode in code & ran IE10 as IE8.
+
+I also forgot about labels...they have to move appropriately. They do move, but it's not horribly noticable. Not nearly as much as the shapes. However, they could be 
+
 ==2013-05-08==
 ===one shape two services===
 This is a nasty bug that I've been itching to get rid of for some time.

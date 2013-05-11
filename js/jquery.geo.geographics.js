@@ -363,12 +363,6 @@
           left: dx,
           top: dy
         } );
-        /*
-        this._$canvasSceneFront.css( {
-          width: this._width,
-          height: this._height
-        } );
-        */
 
         this._$canvasSceneBack.css( {
           width: this._width,
