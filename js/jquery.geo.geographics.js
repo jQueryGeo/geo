@@ -343,7 +343,7 @@
       this._labelsHtml += '<div class="geo-label" style="-webkit-transform:translateZ(0);position:absolute; left:' + ( coordinates[ 0 ] / this._width * 100 ) + '%; top:' + ( coordinates[ 1 ] / this._height * 100 ) + '%;">' + label + '</div>';
     },
 
-    resize: function( ) {
+    resize: function( dx, dy ) {
       this._width = this._$elem.width();
       this._height = this._$elem.height();
 

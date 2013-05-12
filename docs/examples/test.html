@@ -41,7 +41,7 @@
     $( function ( ) {
       // create a map
       var map = $("#map").geomap( {
-          center: [ -71.0595678, 42.3604823 ],
+          center: [ -69.7595678, 42.3604823 ],
           zoom: 8
       } );
 
@@ -54,7 +54,12 @@
               [ -71.5, 42.0 ],
               [ -71.5, 42.8 ]
           ] ]
-      }, "<p>o hai shapes<br>there are some<br>woot! LABELS!!!!</p>");
+      }, "<p>o hai shapes<br>there are some<br>woot! LABELS!!!!</p>", false);
+
+      map.geomap( "append", {
+        type: "Point",
+        coordinates: [ -69.7595678, 42.3604823 ]
+      } );
     });
   </script>
 </body>

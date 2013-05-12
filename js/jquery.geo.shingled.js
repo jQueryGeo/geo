@@ -142,7 +142,7 @@
         }
       },
 
-      resize: function (map, service) {
+      resize: function (map, service, dx, dy) {
         var serviceState = $.data(service, "geoServiceState");
 
         if ( serviceState && service && service.style.visibility === "visible" ) {

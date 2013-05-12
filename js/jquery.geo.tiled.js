@@ -245,7 +245,7 @@
         }
       },
 
-      resize: function (map, service) {
+      resize: function (map, service, dx, dy) {
       },
 
       opacity: function ( map, service ) {

@@ -613,13 +613,13 @@
       } );
 
       for (i = 0; i < this._currentServices.length; i++) {
-        $.geo["_serviceTypes"][this._currentServices[i].type].resize(this, this._currentServices[i]);
+        $.geo["_serviceTypes"][this._currentServices[i].type].resize(this, this._currentServices[i], dx, dy);
       }
 
       this._$elem.find( ".geo-graphics" ).css( {
         width: size["width"],
         height: size["height"]
-      }).geographics( "resize" );
+      }).geographics( "resize", dx, dy );
 
       for (i = 0; i < this._drawPixels.length; i++) {
         this._drawPixels[i][0] += dx;
