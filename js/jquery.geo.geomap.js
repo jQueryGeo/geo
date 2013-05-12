@@ -626,7 +626,7 @@
         this._drawPixels[i][1] += dy;
       }
 
-      this._setCenterAndSize(this._center, this._pixelSize, _trigger, true);
+      //this._setCenterAndSize(this._center, this._pixelSize, _trigger, true);
     },
 
     append: function ( shape, style, label, refresh ) {

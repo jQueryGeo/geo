@@ -278,6 +278,10 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-05-12==
+===resize===
+This is a bigger problem than just shapes. Tiled services don't move the tiles at all until after refresh & the jump looks awful.
+
 ==2013-05-08==
 ===plugin download link===
 I'm going to remove the link to the minified src. It just opens in a browser. Without the link it will at least download all the code for the user (but this project isn't setup to build things in a useful place. I should fix that, too. I currently build to docs/jquery.geo-* and need to build to anywhere else that makes sense.
@@ -287,7 +291,7 @@ Backbone.js builds to root, but is unversioned. jQuery itself build to dist/. I 
 I removed the download property of my manifest and I'm also going to have grunt build to dist/
 
 ===shape resize===
-Shapes should only move if the pixelSize doesn't change. They currently stretch to match the window resize. Here's a simple fiddle: http://jsfiddle.net/ryanttb/n2fCR/2/
+Shapes should only move if the pixelSize doesn't change. They currently stretch to match the window resize. Here's a simple fiddle: http://jsfiddle.net/ryanttb/n2fCR/3/
 
 I can resize canvasSceneBack and leave canvasSceneFront alone but I will have to resize it later. Maybe after the flip. That's only for trueCanvas. I also need to handle non-trueCanvas properly.
 
