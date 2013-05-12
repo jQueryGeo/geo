@@ -3,7 +3,6 @@
 === b2 ===
 * geomap - support Windows 8 Store apps
 * geomap - [bug] mouse wheel & mac touchpads zoom too quickly
-* geographics - [bug] graphics stretch after resize, should just move
 
 ===bug fixing process===
 1. reproduce bug in jsFiddle with latest release version of jQuery Geo
@@ -57,6 +56,7 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * embed
 
 === future ===
+* project - update grunt
 * project - get on https://github.com/cdnjs/cdnjs
 * geomap - [bug] scrolling a relative div over a fixed map breaks interaction with lower portion of map (see comment from 2013-03-31)
 * docs - geomap - allow template engine plugins
@@ -281,6 +281,13 @@ http://jsfiddle.net/ryanttb/KQHN9/
 ==2013-05-12==
 ===resize===
 This is a bigger problem than just shapes. Tiled services don't move the tiles at all until after refresh & the jump looks awful.
+
+Since resize currently depends on a timout, the movement of the services is not as important as I originally thought. I want to make resize more dynamic at some point in the future, there is no reason I can't. However, it's not the bug I'm looking for. As far as I'm concerned for 1.0.0b2 and even 1.0.0 final, I've fixed this issue. Time to move on.
+
+I have saved the start of some edits for a more dynamic resize event into the resize-redo branch.
+
+===grunt===
+I'm a few major versions behind in grunt. My laptop has a newer grunt-cli installed and I can no longer build jQuery Geo on it. That's not good and, before 1.0 release, I need to make sure I'm using the latest and greatest grunt.
 
 ==2013-05-08==
 ===plugin download link===

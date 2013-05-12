@@ -246,35 +246,6 @@
       },
 
       resize: function (map, service, dx, dy) {
-        // this will have to be similar to _interactiveTransform, but only move the scaleContainers
-                /*
-        var serviceState = $.data( service, "geoServiceState" ),
-            tilingScheme = map.options[ "tilingScheme" ];
-
-        if ( serviceState ) {
-          this._cancelUnloaded( map, service );
-
-          serviceState.serviceContainer.children( ).each( function ( i ) {
-            var $scaleContainer = $(this),
-                scalePixelSize = $scaleContainer.data("pixelSize"),
-                scaleRatio = scalePixelSize / pixelSize;
-
-            if ( scalePixelSize > 0 ) {
-              scaleRatio = Math.round(scaleRatio * 1000) / 1000;
-
-              var oldMapCoord = $scaleContainer.data("scaleOrigin"),
-                  newPixelPoint = map._toPixel(oldMapCoord, center, pixelSize);
-
-              $scaleContainer.css( {
-                left: Math.round(newPixelPoint[0]) + "px",
-                top: Math.round(newPixelPoint[1]) + "px",
-                width: tilingScheme.tileWidth * scaleRatio,
-                height: tilingScheme.tileHeight * scaleRatio
-              } );
-            }
-          });
-        }
-        */
       },
 
       opacity: function ( map, service ) {

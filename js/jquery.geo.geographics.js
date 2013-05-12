@@ -375,7 +375,11 @@
         } );
       }
 
+      var labelPositionFront = this._$labelsContainerFront.position();
+
       this._$labelsContainerFront.css( {
+        left: labelPositionFront.left + dx,
+        top: labelPositionFront.top + dy,
         width: this._width,
         height: this._height
       } );

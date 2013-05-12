@@ -71,6 +71,7 @@ Unless you have downloaded a tagged release, grunt will create a test version of
 * geomap - click mode
 * geomap - decrease z-index from attr & shape label links & document how to hide them behind non-map conent
 * geomap - [bug] removing a shape from one service that has been appended to two services causes an error in the second service
+* geographics - [bug] graphics stretch after resize
 
 ### 1.0.0-b1.5 (2013-01-17)
 * examples - drawing markers
