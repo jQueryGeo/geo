@@ -13,7 +13,7 @@ module.exports = function(grunt) {
       ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n',
     // Task configuration.
     clean: {
-      files: ['dist']
+      files: ['dist/jquery.<%= pkg.name %>-<%= pkg.version %>.js', 'dist/jquery.<%= pkg.name %>-<%= pkg.version %>.min.js']
     },
     concat: {
       options: {
@@ -38,18 +38,6 @@ module.exports = function(grunt) {
     uglify: {
       options: {
         banner: '<%= banner %>'
-      },
-      excanvas: {
-        src: 'js/excanvas.js',
-        dest: 'dist/excanvas.min.js'
-      },
-      jsrender: {
-        src: 'js/jsrender.js',
-        dest: 'dist/jsrender.min.js'
-      },
-      widget: {
-        src: 'js/jquery.ui.widget.js',
-        dest: 'dist/jquery.ui.widget.min.js'
       },
       dist: {
         src: '<%= concat.dist.dest %>',
