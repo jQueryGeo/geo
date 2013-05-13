@@ -1,7 +1,6 @@
-/*! jQuery Geo - vtest - 2013-05-08
- * http://jquerygeo.com
- * Copyright (c) 2013 Ryan Westphal/Applied Geographics, Inc.; Licensed MIT, GPL */
-
+/*! jQuery Geo - v1.0.0-test - 2013-05-13
+* http://jquerygeo.com
+* Copyright (c) 2013 Ryan Westphal; Licensed MIT, GPL */
 // Copyright 2006 Google Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -2926,7 +2925,7 @@ $.Widget.prototype = {
         case "Polygon":
           var a = 0,
               c = [0, 0],
-              coords = $.merge( [ ], geom.type == "Polygon" ? geom.coordinates[0] : geom.coordinates ),
+              coords = $.merge( [ ], geom.type === "Polygon" ? geom.coordinates[0] : geom.coordinates ),
               i = 1, j, n,
               bbox = [ pos_oo, pos_oo, neg_oo, neg_oo ];
 
@@ -2979,7 +2978,7 @@ $.Widget.prototype = {
     // contains
 
     contains: function (geom1, geom2) {
-      if (geom1.type != "Polygon") {
+      if (geom1.type !== "Polygon") {
         return false;
       }
 
@@ -3023,7 +3022,7 @@ $.Widget.prototype = {
         a = b;
       }
 
-      return rayCross % 2 == 1;
+      return rayCross % 2 === 1;
     },
 
     _containsPolygonLineString: function (polygonCoordinates, lineStringCoordinates) {
@@ -3098,7 +3097,7 @@ $.Widget.prototype = {
             apx = pointCoordinate[0] - a[0],
             apy = pointCoordinate[1] - a[1];
 
-        if (lineStringCoordinates.length == 1) {
+        if (lineStringCoordinates.length === 1) {
           return Math.sqrt(apx * apx + apy * apy);
         } else {
           for (var i = 1; i < lineStringCoordinates.length; i++) {
@@ -3689,7 +3688,7 @@ $.Widget.prototype = {
           var isMultiPointOrLineString = $.isArray(coordinates[ 0 ]),
               fromGeodeticPos = this.fromGeodeticPos;
 
-          if (!isMultiPointOrLineString && coordinates.length == 4) {
+          if (!isMultiPointOrLineString && coordinates.length === 4) {
             // bbox
             var min = fromGeodeticPos([ coordinates[ 0 ], coordinates[ 1 ] ]),
                 max = fromGeodeticPos([ coordinates[ 2 ], coordinates[ 3 ] ]);
@@ -3740,7 +3739,7 @@ $.Widget.prototype = {
           var isMultiPointOrLineString = $.isArray(coordinates[ 0 ]),
               toGeodeticPos = this.toGeodeticPos;
 
-          if (!isMultiPointOrLineString && coordinates.length == 4) {
+          if (!isMultiPointOrLineString && coordinates.length === 4) {
             // bbox
             var min = toGeodeticPos([ coordinates[ 0 ], coordinates[ 1 ] ]),
                 max = toGeodeticPos([ coordinates[ 2 ], coordinates[ 3 ] ]);
@@ -3848,7 +3847,7 @@ $.Widget.prototype = {
         textAlign: "left"
       } );
 
-      if (this._$elem.css("position") == "static") {
+      if (this._$elem.css("position") === "static") {
         this._$elem.css("position", "relative");
       }
 
@@ -3907,7 +3906,7 @@ $.Widget.prototype = {
     },
 
     _setOption: function (key, value) {
-      if (key == "style") {
+      if (key === "style") {
         value = $.extend({}, this._options.style, value);
       }
       $.Widget.prototype._setOption.apply(this, arguments);
@@ -3928,7 +3927,7 @@ $.Widget.prototype = {
     drawArc: function (coordinates, startAngle, sweepAngle, style) {
       style = this._getGraphicStyle(style);
 
-      if (style.visibility != "hidden" && style.opacity > 0 && style.widthValue > 0 && style.heightValue > 0) {
+      if (style.visibility !== "hidden" && style.opacity > 0 && style.widthValue > 0 && style.heightValue > 0) {
         var r = Math.min(style.widthValue, style.heightValue) / 2;
 
         startAngle = (startAngle * Math.PI / 180);
@@ -3974,9 +3973,9 @@ $.Widget.prototype = {
 
     drawPoint: function (coordinates, style) {
       style = this._getGraphicStyle(style);
-      if (style.widthValue == style.heightValue && style.heightValue == style.borderRadiusValue) {
+      if (style.widthValue === style.heightValue && style.heightValue === style.borderRadiusValue) {
         this.drawArc(coordinates, 0, 360, style);
-      } else if (style.visibility != "hidden" && style.opacity > 0) {
+      } else if (style.visibility !== "hidden" && style.opacity > 0) {
         style.borderRadiusValue = Math.min(Math.min(style.widthValue, style.heightValue) / 2, style.borderRadiusValue);
         coordinates[0] -= style.widthValue / 2;
         coordinates[1] -= style.heightValue / 2;
@@ -4017,7 +4016,7 @@ $.Widget.prototype = {
     },
 
     drawPolygon: function (coordinates, style) {
-      if ( !this._trueCanvas || coordinates.length == 1 ) {
+      if ( !this._trueCanvas || coordinates.length === 1 ) {
         // either we don't have fancy rendering or there's no need for it (no holes)
         this._drawLines( coordinates, true, style );
       } else {
@@ -4030,7 +4029,7 @@ $.Widget.prototype = {
 
         var pixelBbox, i, j;
 
-        if ( style.visibility != "hidden" && style.opacity > 0 ) {
+        if ( style.visibility !== "hidden" && style.opacity > 0 ) {
           this._blitcontext.clearRect(0, 0, this._width, this._height);
 
           if ( style.doFill ) {
@@ -4131,7 +4130,7 @@ $.Widget.prototype = {
       this._labelsHtml += '<div class="geo-label" style="-webkit-transform:translateZ(0);position:absolute; left:' + ( coordinates[ 0 ] / this._width * 100 ) + '%; top:' + ( coordinates[ 1 ] / this._height * 100 ) + '%;">' + label + '</div>';
     },
 
-    resize: function( ) {
+    resize: function( dx, dy ) {
       this._width = this._$elem.width();
       this._height = this._$elem.height();
 
@@ -4145,8 +4144,8 @@ $.Widget.prototype = {
         this._$canvas[0].height = this._height;
 
         this._$canvasSceneFront.css( {
-          width: this._width,
-          height: this._height
+          left: dx,
+          top: dy
         } );
 
         this._$canvasSceneBack.css( {
@@ -4160,7 +4159,11 @@ $.Widget.prototype = {
         } );
       }
 
+      var labelPositionFront = this._$labelsContainerFront.position();
+
       this._$labelsContainerFront.css( {
+        left: labelPositionFront.left + dx,
+        top: labelPositionFront.top + dy,
         width: this._width,
         height: this._height
       } );
@@ -4311,7 +4314,7 @@ $.Widget.prototype = {
       var i, j;
       style = this._getGraphicStyle(style);
 
-      if (style.visibility != "hidden" && style.opacity > 0) {
+      if (style.visibility !== "hidden" && style.opacity > 0) {
         this._context.beginPath();
 
         for (i = 0; i < coordinates.length; i++) {
@@ -4456,7 +4459,6 @@ $.Widget.prototype = {
 
     _loadCount: 0,
 
-    _wheelTimeout: null,
     _wheelLevel: 0,
 
     _fullZoomFactor: 2, //< interactiveScale factor needed to zoom a whole level
@@ -4583,7 +4585,7 @@ $.Widget.prototype = {
       this._map = this;
 
       this._supportTouch = "ontouchend" in document;
-      this._softDblClick = this._supportTouch || _ieVersion == 7;
+      this._softDblClick = this._supportTouch || _ieVersion === 7;
 
       var geomap = this,
           touchStartEvent = this._supportTouch ? "touchstart mousedown" : "mousedown",
@@ -4671,7 +4673,7 @@ $.Widget.prototype = {
     },
 
     _setOption: function (key, value, refresh) {
-      if ( key == "pixelSize" ) {
+      if ( key === "pixelSize" ) {
         return;
       }
 
@@ -4886,7 +4888,7 @@ $.Widget.prototype = {
         if ( value >= 0 || value <= 1 ) {
           for ( var i = 0; i < this._currentServices.length; i++ ) {
             var service = this._currentServices[ i ];
-            if ( !_serviceContainer || service.serviceContainer[ 0 ] == _serviceContainer[ 0 ] ) {
+            if ( !_serviceContainer || service.serviceContainer[ 0 ] === _serviceContainer[ 0 ] ) {
               service.style.opacity = value;
 
               // update the original service object's style property
@@ -4907,7 +4909,7 @@ $.Widget.prototype = {
         for ( var i = 0; i < this._currentServices.length; i++ ) {
           var service = this._currentServices[ i ];
 
-          if ( !_serviceContainer || service.serviceContainer[ 0 ] == _serviceContainer[ 0 ] ) {
+          if ( !_serviceContainer || service.serviceContainer[ 0 ] === _serviceContainer[ 0 ] ) {
             if ( value === undefined ) {
               // toggle visibility
               value = ( service.style.visibility !== "visible" );
@@ -4962,13 +4964,13 @@ $.Widget.prototype = {
       } );
 
       for (i = 0; i < this._currentServices.length; i++) {
-        $.geo["_serviceTypes"][this._currentServices[i].type].resize(this, this._currentServices[i]);
+        $.geo["_serviceTypes"][this._currentServices[i].type].resize(this, this._currentServices[i], dx, dy);
       }
 
       this._$elem.find( ".geo-graphics" ).css( {
         width: size["width"],
         height: size["height"]
-      }).geographics( "resize" );
+      }).geographics( "resize", dx, dy );
 
       for (i = 0; i < this._drawPixels.length; i++) {
         this._drawPixels[i][0] += dx;
@@ -4978,7 +4980,7 @@ $.Widget.prototype = {
       this._setCenterAndSize(this._center, this._pixelSize, _trigger, true);
     },
 
-    append: function ( shape, style, label, refresh ) {
+    append: function ( shape /* , style, label, refresh */ ) {
       if ( shape && ( $.isPlainObject( shape ) || ( $.isArray( shape ) && shape.length > 0 ) ) ) {
         if ( !this._createdGraphics ) {
           this._createServiceGraphics( );
@@ -4988,7 +4990,7 @@ $.Widget.prototype = {
 
         if ( $.isArray( shape ) ) {
           shapes = shape;
-        } else if ( shape.type == "FeatureCollection" ) {
+        } else if ( shape.type === "FeatureCollection" ) {
           shapes = shape.features;
         } else {
           shapes = [ shape ];
@@ -5048,7 +5050,7 @@ $.Widget.prototype = {
 
     find: function ( selector, pixelTolerance ) {
       var isPoint = $.isPlainObject( selector ),
-          searchPixel = isPoint ? this._map.toPixel( selector.coordinates ) : undefined,
+          //searchPixel = isPoint ? this._map.toPixel( selector.coordinates ) : undefined,
           mapTol = this._map._pixelSize * pixelTolerance,
           result = [],
           graphicShape,
@@ -5060,7 +5062,7 @@ $.Widget.prototype = {
         graphicShape = this._graphicShapes[ i ];
 
         if ( isPoint ) {
-          if ( graphicShape.shape.type == "Point" ) {
+          if ( graphicShape.shape.type === "Point" ) {
             if ( $.geo.distance( graphicShape.shape, selector ) <= mapTol ) {
               result.push( graphicShape.shape );
             }
@@ -5140,7 +5142,7 @@ $.Widget.prototype = {
       return [ center[ 0 ] - halfWidth, center[ 1 ] - halfHeight, center[ 0 ] + halfWidth, center[ 1 ] + halfHeight ];
     },
 
-    _setBbox: function (value, trigger, refresh) {
+    _setBbox: function (value /* , trigger, refresh */ ) {
       var center = [value[0] + (value[2] - value[0]) / 2, value[1] + (value[3] - value[1]) / 2],
           pixelSize = Math.max($.geo.width(value, true) / this._contentBounds.width, $.geo.height(value, true) / this._contentBounds.height),
           zoom = this._getZoom( center, pixelSize );
@@ -5211,7 +5213,7 @@ $.Widget.prototype = {
       }
     },
 
-    _setZoom: function ( value, trigger, refresh ) {
+    _setZoom: function ( value, trigger /* , refresh */ ) {
       // set the map widget's zoom, taking zoomMin and zoomMax into account
       this._clearInteractiveTimeout( );
 
@@ -5292,7 +5294,7 @@ $.Widget.prototype = {
         var idString = service.id ? ' id="' + service.id + '"' : "",
             classString = 'class="geo-service ' + ( service["class"] ? service["class"] : '' ) + '"',
             scHtml = '<div ' + idString + classString + ' style="-webkit-transform:translateZ(0);position:absolute; left:0; top:0; width:32px; height:32px; margin:0; padding:0; display:' + ( service.style.visibility === "visible" ? "block" : "none" ) + ';"></div>',
-            servicesContainer;
+            serviceContainer;
 
         this._$servicesContainer.append( scHtml );
         serviceContainer = this._$servicesContainer.children( ":last" );
@@ -5529,7 +5531,7 @@ $.Widget.prototype = {
 
     _forcePosition: function (elem) {
       var cssPosition = elem.css("position");
-      if (cssPosition != "relative" && cssPosition != "absolute" && cssPosition != "fixed") {
+      if (cssPosition !== "relative" && cssPosition !== "absolute" && cssPosition !== "fixed") {
         elem.css("position", "relative");
       }
     },
@@ -5582,28 +5584,9 @@ $.Widget.prototype = {
       return { pixelSize: pixelSize, center: scaleCenter };
     },
 
-    _mouseWheelFinish: function ( refresh ) {
-      this._wheelTimeout = null;
-
-      if (this._wheelLevel !== 0) {
-        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, this._options[ "tilingScheme" ] !== null );
-
-        this._wheelLevel = 0;
-      } else if ( refresh ) {
-        this._refresh();
-        this._refreshAllShapes( );
-      }
-    },
-
     _panFinalize: function () {
       if (this._panning) {
         this._velocity = [0, 0];
-
-        var dx = this._current[0] - this._anchor[0],
-            dy = this._current[1] - this._anchor[1],
-            image = this._options[ "axisLayout" ] === "image",
-            dxMap = -dx * this._pixelSize,
-            dyMap = ( image ? -1 : 1 ) * dy * this._pixelSize;
 
         this._$eventTarget.css("cursor", this._options["cursors"][this._options["mode"]]);
 
@@ -5619,10 +5602,7 @@ $.Widget.prototype = {
       }
 
       var dx = this._current[0] - this._lastDrag[0],
-          dy = this._current[1] - this._lastDrag[1],
-          i = 0,
-          service,
-          translateObj;
+          dy = this._current[1] - this._lastDrag[1];
 
       if (this._toolPan || dx > 3 || dx < -3 || dy > 3 || dy < -3) {
         if (!this._toolPan) {
@@ -5665,15 +5645,9 @@ $.Widget.prototype = {
     },
 
     _interactiveTransform: function( ) {
-      var mapWidth = this._contentBounds[ "width" ],
-          mapHeight = this._contentBounds[ "height" ],
+      var service,
 
-          halfWidth = mapWidth / 2,
-          halfHeight = mapHeight / 2,
-
-          bbox = [ this._centerInteractive[ 0 ] - halfWidth, this._centerInteractive[ 1 ] - halfHeight, this._centerInteractive[ 0 ] + halfWidth, this._centerInteractive[ 1 ] + halfHeight ];
-
-      var scalePixelSize = this._pixelSize,
+          scalePixelSize = this._pixelSize,
           scaleRatio = scalePixelSize / this._pixelSizeInteractive;
           
       if ( scalePixelSize > 0 ) {
@@ -5684,36 +5658,7 @@ $.Widget.prototype = {
 
 
         this._$shapesContainers.geographics("interactiveTransform", newPixelPoint, scaleRatio);
-
-        /*
-        $scaleContainer.css( {
-          left: Math.round( newPixelPoint[ 0 ] ),
-          top: Math.round( newPixelPoint[ 1 ] ),
-          width: mapWidth * scaleRatio,
-          height: mapHeight * scaleRatio
-        } );
-        */
-        
       }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
       for ( var i = 0; i < this._currentServices.length; i++ ) {
         service = this._currentServices[ i ];
@@ -5728,7 +5673,7 @@ $.Widget.prototype = {
 
     _interactiveTimeout: function( ) {
       if ( this._isMultiTouch ) {
-        this._timeoutInteractive = setTimeout( $.proxy( interactiveTimeout, this ), 128 );
+        this._timeoutInteractive = setTimeout( $.proxy( this._interactiveTimeout, this ), 128 );
       } else if ( this._created && this._timeoutInteractive ) {
         this._setCenterAndSize( this._centerInteractive, this._pixelSizeInteractive, this._triggerInteractive, true );
         this._timeoutInteractive = null;
@@ -5749,7 +5694,7 @@ $.Widget.prototype = {
 
       for ( ; i < this._currentServices.length; i++ ) {
         service = this._currentServices[ i ];
-        if ( !_serviceContainer || service.serviceContainer[ 0 ] == _serviceContainer[ 0 ] ) {
+        if ( !_serviceContainer || service.serviceContainer[ 0 ] === _serviceContainer[ 0 ] ) {
           $.geo[ "_serviceTypes" ][ service.type ].refresh( this, service, force );
         }
       }
@@ -5777,7 +5722,7 @@ $.Widget.prototype = {
     },
 
     _setCenterAndSize: function (center, pixelSize, trigger, refresh) {
-      if ( ! $.isArray( center ) || center.length != 2 || typeof center[ 0 ] !== "number" || typeof center[ 1 ] !== "number" ) {
+      if ( ! $.isArray( center ) || center.length !== 2 || typeof center[ 0 ] !== "number" || typeof center[ 1 ] !== "number" ) {
         return;
       }
 
@@ -5934,7 +5879,7 @@ $.Widget.prototype = {
 
     _document_keydown: function (e) {
       var len = this._drawCoords.length;
-      if (len > 0 && e.which == 27) {
+      if (len > 0 && e.which === 27) {
         if (len <= 2) {
           this._resetDrawing();
           this._inOp = false;
@@ -5979,13 +5924,11 @@ $.Widget.prototype = {
         this._drawTimeout = null;
       }
 
-      var offset = $(e.currentTarget).offset();
-
       switch (this._options["mode"]) {
         case "drawLineString":
         case "measureLength":
-          if ( this._drawCoords.length > 1 && ! ( this._drawCoords[0][0] == this._drawCoords[1][0] &&
-                                                  this._drawCoords[0][1] == this._drawCoords[1][1] ) ) {
+          if ( this._drawCoords.length > 1 && ! ( this._drawCoords[0][0] === this._drawCoords[1][0] &&
+                                                  this._drawCoords[0][1] === this._drawCoords[1][1] ) ) {
               this._drawCoords.length--;
               this._trigger( "shape", e, {
                 type: "LineString",
@@ -5999,8 +5942,8 @@ $.Widget.prototype = {
 
         case "drawPolygon":
         case "measureArea":
-          if ( this._drawCoords.length > 1 && ! ( this._drawCoords[0][0] == this._drawCoords[1][0] &&
-                                                  this._drawCoords[0][1] == this._drawCoords[1][1] ) ) {
+          if ( this._drawCoords.length > 1 && ! ( this._drawCoords[0][0] === this._drawCoords[1][0] &&
+                                                  this._drawCoords[0][1] === this._drawCoords[1][1] ) ) {
             var endIndex = this._drawCoords.length - 1;
             if (endIndex > 2) {
               this._drawCoords[endIndex] = $.merge( [], this._drawCoords[0] );
@@ -6039,7 +5982,7 @@ $.Widget.prototype = {
         return;
       }
 
-      if ( !this._supportTouch && e.which != 1 ) {
+      if ( !this._supportTouch && e.which !== 1 ) {
         return;
       }
 
@@ -6145,7 +6088,6 @@ $.Widget.prototype = {
           drawCoordsLen = this._drawCoords.length,
           touches = e.originalEvent.changedTouches,
           current,
-          service,
           i = 0;
 
       if ( this._supportTouch && touches ) {
@@ -6233,7 +6175,7 @@ $.Widget.prototype = {
         }
       }
 
-      if ( _ieVersion == 7 ) {
+      if ( _ieVersion === 7 ) {
         this._isDbltap = this._isTap = false;
       }
 
@@ -6341,7 +6283,7 @@ $.Widget.prototype = {
       }
 
       if ( !this._mouseDown ) {
-        if ( _ieVersion == 7 ) {
+        if ( _ieVersion === 7 ) {
           // ie7 doesn't appear to trigger dblclick on this._$eventTarget,
           // we fake regular click here to cause soft dblclick
           this._eventTarget_touchstart(e);
@@ -6567,8 +6509,8 @@ $.Widget.prototype = {
               this._drawCoords[i] = this._toMap(current);
               this._drawPixels[i] = current;
 
-              if (i < 2 || !(this._drawCoords[i][0] == this._drawCoords[i-1][0] &&
-                             this._drawCoords[i][1] == this._drawCoords[i-1][1])) {
+              if (i < 2 || !(this._drawCoords[i][0] === this._drawCoords[i-1][0] &&
+                             this._drawCoords[i][1] === this._drawCoords[i-1][1])) {
                 this._drawCoords[i + 1] = this._toMap( current, this._centerInteractive, this._pixelSizeInteractive );
                 this._drawPixels[i + 1] = current;
               }
@@ -6634,9 +6576,7 @@ $.Widget.prototype = {
         var offset = $(e.currentTarget).offset();
         this._anchor = [e.pageX - offset.left, e.pageY - offset.top];
 
-        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, this._options[ "tilingScheme" ] !== null ),
-            service,
-            i = 0;
+        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, this._options[ "tilingScheme" ] !== null );
 
         this._setInteractiveCenterAndSize( wheelCenterAndSize.center, wheelCenterAndSize.pixelSize );
         this._interactiveTransform( );
@@ -6654,7 +6594,7 @@ $.Widget.prototype = {
 (function ($, undefined) {
   $.geo._serviceTypes.tiled = (function () {
     return {
-      create: function (map, serviceContainer, service, index) {
+      create: function (map, serviceContainer, service /* , index */) {
         var serviceState = $.data(service, "geoServiceState");
 
         if ( !serviceState ) {
@@ -6691,7 +6631,7 @@ $.Widget.prototype = {
         if ( serviceState ) {
           this._cancelUnloaded( map, service );
 
-          serviceState.serviceContainer.children( ).each( function ( i ) {
+          serviceState.serviceContainer.children( ).each( function ( ) {
             var $scaleContainer = $(this),
                 scalePixelSize = $scaleContainer.data("pixelSize"),
                 scaleRatio = scalePixelSize / pixelSize;
@@ -6738,10 +6678,6 @@ $.Widget.prototype = {
 
               serviceObj = this,
               $serviceContainer = serviceState.serviceContainer,
-
-              contentBounds = map._getContentBounds(),
-              mapWidth = contentBounds["width"],
-              mapHeight = contentBounds["height"],
 
               image = map.options[ "axisLayout" ] === "image",
               ySign = image ? +1 : -1,
@@ -6799,10 +6735,9 @@ $.Widget.prototype = {
               top: (serviceTop % tileHeight) + "px"
             }).data("scaleOrigin", map._toMap( [ (serviceLeft % tileWidth), (serviceTop % tileHeight) ] ) );
 
-            scaleContainer.children().each(function (i) {
-              var 
-              $img = $(this),
-              tile = $img.attr("data-tile").split(",");
+            scaleContainer.children().each( function () {
+              var $img = $(this),
+                  tile = $img.attr("data-tile").split(",");
 
               $img.css({
                 left: Math.round(((parseInt(tile[0], 10) - fullXAtScale) * 100) + (serviceLeft - (serviceLeft % tileWidth)) / tileWidth * 100) + "%",
@@ -6812,7 +6747,7 @@ $.Widget.prototype = {
               if (opacity < 1) {
                 $img.fadeTo(0, opacity);
               }
-            });
+            } );
           }
 
           for (x = tileX; x < tileX2; x++) {
@@ -6867,13 +6802,6 @@ $.Widget.prototype = {
 
                   imgMarkup += "width: 100%; height: 100%;";
 
-                  // #newpanzoom
-                  /*
-                  if ($("body")[0].filters === undefined) {
-                    imgMarkup += "width: 100%; height: 100%;";
-                  }
-                  */
-
                   imgMarkup += "margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;' unselectable='on' data-tile='" + tileStr + "' />";
 
                   scaleContainer.append(imgMarkup);
@@ -6898,7 +6826,7 @@ $.Widget.prototype = {
         }
       },
 
-      resize: function (map, service) {
+      resize: function ( /* map, service, dx, dy */ ) {
       },
 
       opacity: function ( map, service ) {
@@ -6958,7 +6886,7 @@ $.Widget.prototype = {
 (function ($, undefined) {
   $.geo._serviceTypes.shingled = (function () {
     return {
-      create: function (map, serviceContainer, service, index) {
+      create: function ( map, serviceContainer, service /* , index */ ) {
         var serviceState = $.data(service, "geoServiceState");
 
         if ( !serviceState ) {
@@ -6990,17 +6918,12 @@ $.Widget.prototype = {
 
             contentBounds = map._getContentBounds(),
             mapWidth = contentBounds[ "width" ],
-            mapHeight = contentBounds[ "height" ],
-
-            halfWidth = mapWidth / 2,
-            halfHeight = mapHeight / 2,
-
-            bbox = [ center[ 0 ] - halfWidth, center[ 1 ] - halfHeight, center[ 0 ] + halfWidth, center[ 1 ] + halfHeight ];
+            mapHeight = contentBounds[ "height" ];
 
         if ( serviceState ) {
           this._cancelUnloaded( map, service );
 
-          serviceState.serviceContainer.children( ).each( function ( i ) {
+          serviceState.serviceContainer.children( ).each( function ( ) {
             var $scaleContainer = $(this),
                 scalePixelSize = $scaleContainer.data( "pixelSize" ),
                 scaleRatio = scalePixelSize / pixelSize;
@@ -7099,7 +7022,7 @@ $.Widget.prototype = {
         }
       },
 
-      resize: function (map, service) {
+      resize: function ( map, service /* , dx, dy */ ) {
         var serviceState = $.data(service, "geoServiceState");
 
         if ( serviceState && service && service.style.visibility === "visible" ) {
@@ -7115,12 +7038,9 @@ $.Widget.prototype = {
 
           scaleContainers.attr("data-pixel-size", "0");
 
-          scaleContainers.each( function ( i ) {
+          scaleContainers.each( function ( ) {
             var $scaleContainer = $(this),
                 position = $scaleContainer.position( );
-
-            var oldMapOrigin = $scaleContainer.data( "origin" ),
-                newPixelPoint = map._toPixel( oldMapOrigin );
 
             $scaleContainer.css( {
               left: position.left + ( mapWidth - $scaleContainer.width( ) ) / 2,
@@ -7128,14 +7048,6 @@ $.Widget.prototype = {
             } );
 
           } );
-            
-
-          /*
-          scaleContainer.css({
-            left: halfWidth + 'px',
-            top: halfHeight + 'px'
-          });
-          */
         }
       },
 

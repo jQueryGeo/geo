@@ -1,7 +1,7 @@
 (function ($, undefined) {
   $.geo._serviceTypes.tiled = (function () {
     return {
-      create: function (map, serviceContainer, service, index) {
+      create: function (map, serviceContainer, service /* , index */) {
         var serviceState = $.data(service, "geoServiceState");
 
         if ( !serviceState ) {
@@ -38,7 +38,7 @@
         if ( serviceState ) {
           this._cancelUnloaded( map, service );
 
-          serviceState.serviceContainer.children( ).each( function ( i ) {
+          serviceState.serviceContainer.children( ).each( function ( ) {
             var $scaleContainer = $(this),
                 scalePixelSize = $scaleContainer.data("pixelSize"),
                 scaleRatio = scalePixelSize / pixelSize;
@@ -85,10 +85,6 @@
 
               serviceObj = this,
               $serviceContainer = serviceState.serviceContainer,
-
-              contentBounds = map._getContentBounds(),
-              mapWidth = contentBounds["width"],
-              mapHeight = contentBounds["height"],
 
               image = map.options[ "axisLayout" ] === "image",
               ySign = image ? +1 : -1,
@@ -146,10 +142,9 @@
               top: (serviceTop % tileHeight) + "px"
             }).data("scaleOrigin", map._toMap( [ (serviceLeft % tileWidth), (serviceTop % tileHeight) ] ) );
 
-            scaleContainer.children().each(function (i) {
-              var 
-              $img = $(this),
-              tile = $img.attr("data-tile").split(",");
+            scaleContainer.children().each( function () {
+              var $img = $(this),
+                  tile = $img.attr("data-tile").split(",");
 
               $img.css({
                 left: Math.round(((parseInt(tile[0], 10) - fullXAtScale) * 100) + (serviceLeft - (serviceLeft % tileWidth)) / tileWidth * 100) + "%",
@@ -159,7 +154,7 @@
               if (opacity < 1) {
                 $img.fadeTo(0, opacity);
               }
-            });
+            } );
           }
 
           for (x = tileX; x < tileX2; x++) {
@@ -214,13 +209,6 @@
 
                   imgMarkup += "width: 100%; height: 100%;";
 
-                  // #newpanzoom
-                  /*
-                  if ($("body")[0].filters === undefined) {
-                    imgMarkup += "width: 100%; height: 100%;";
-                  }
-                  */
-
                   imgMarkup += "margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;' unselectable='on' data-tile='" + tileStr + "' />";
 
                   scaleContainer.append(imgMarkup);
@@ -245,7 +233,7 @@
         }
       },
 
-      resize: function (map, service, dx, dy) {
+      resize: function ( /* map, service, dx, dy */ ) {
       },
 
       opacity: function ( map, service ) {

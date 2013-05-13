@@ -60,7 +60,7 @@
         textAlign: "left"
       } );
 
-      if (this._$elem.css("position") == "static") {
+      if (this._$elem.css("position") === "static") {
         this._$elem.css("position", "relative");
       }
 
@@ -119,7 +119,7 @@
     },
 
     _setOption: function (key, value) {
-      if (key == "style") {
+      if (key === "style") {
         value = $.extend({}, this._options.style, value);
       }
       $.Widget.prototype._setOption.apply(this, arguments);
@@ -140,7 +140,7 @@
     drawArc: function (coordinates, startAngle, sweepAngle, style) {
       style = this._getGraphicStyle(style);
 
-      if (style.visibility != "hidden" && style.opacity > 0 && style.widthValue > 0 && style.heightValue > 0) {
+      if (style.visibility !== "hidden" && style.opacity > 0 && style.widthValue > 0 && style.heightValue > 0) {
         var r = Math.min(style.widthValue, style.heightValue) / 2;
 
         startAngle = (startAngle * Math.PI / 180);
@@ -186,9 +186,9 @@
 
     drawPoint: function (coordinates, style) {
       style = this._getGraphicStyle(style);
-      if (style.widthValue == style.heightValue && style.heightValue == style.borderRadiusValue) {
+      if (style.widthValue === style.heightValue && style.heightValue === style.borderRadiusValue) {
         this.drawArc(coordinates, 0, 360, style);
-      } else if (style.visibility != "hidden" && style.opacity > 0) {
+      } else if (style.visibility !== "hidden" && style.opacity > 0) {
         style.borderRadiusValue = Math.min(Math.min(style.widthValue, style.heightValue) / 2, style.borderRadiusValue);
         coordinates[0] -= style.widthValue / 2;
         coordinates[1] -= style.heightValue / 2;
@@ -229,7 +229,7 @@
     },
 
     drawPolygon: function (coordinates, style) {
-      if ( !this._trueCanvas || coordinates.length == 1 ) {
+      if ( !this._trueCanvas || coordinates.length === 1 ) {
         // either we don't have fancy rendering or there's no need for it (no holes)
         this._drawLines( coordinates, true, style );
       } else {
@@ -242,7 +242,7 @@
 
         var pixelBbox, i, j;
 
-        if ( style.visibility != "hidden" && style.opacity > 0 ) {
+        if ( style.visibility !== "hidden" && style.opacity > 0 ) {
           this._blitcontext.clearRect(0, 0, this._width, this._height);
 
           if ( style.doFill ) {
@@ -353,9 +353,6 @@
       }
 
       if ( this._trueCanvas ) {
-        var dx = ( this._width - this._$canvas[0].width ) / 2;
-        var dy = ( this._height - this._$canvas[0].height ) / 2;
-
         this._$canvas[0].width = this._width;
         this._$canvas[0].height = this._height;
 
@@ -530,7 +527,7 @@
       var i, j;
       style = this._getGraphicStyle(style);
 
-      if (style.visibility != "hidden" && style.opacity > 0) {
+      if (style.visibility !== "hidden" && style.opacity > 0) {
         this._context.beginPath();
 
         for (i = 0; i < coordinates.length; i++) {

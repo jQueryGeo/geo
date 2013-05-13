@@ -35,32 +35,16 @@
   <script src="../../js/jquery.geo.geomap.js"></script>
   <script src="../../js/jquery.geo.tiled.js"></script>
   <script src="../../js/jquery.geo.shingled.js"></script>
-  <!--<script src="../jquery.geo-test.min.js"></script>-->
+  <!--<script src="../../dist/jquery.geo-1.0.0-test.min.js"></script>-->
 
   <script>
     $( function ( ) {
       // create a map
       var map = $("#map").geomap( {
-          center: [ -69.7595678, 42.3604823 ],
+          center: [ -71.3595678, 42.3604823 ],
           zoom: 8
       } );
-
-      map.geomap("append", {
-          type: "Polygon",
-          coordinates: [ [
-              [ -71.5, 42.8 ],
-              [ -70.5, 42.8 ],
-              [ -70.5, 42.0 ],
-              [ -71.5, 42.0 ],
-              [ -71.5, 42.8 ]
-          ] ]
-      }, "<p>o hai shapes<br>there are some<br>woot! LABELS!!!!</p>", false);
-
-      map.geomap( "append", {
-        type: "Point",
-        coordinates: [ -69.7595678, 42.3604823 ]
-      } );
-    });
+    } );
   </script>
 </body>
 </html>

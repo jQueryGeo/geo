@@ -107,7 +107,6 @@
 
     _loadCount: 0,
 
-    _wheelTimeout: null,
     _wheelLevel: 0,
 
     _fullZoomFactor: 2, //< interactiveScale factor needed to zoom a whole level
@@ -234,7 +233,7 @@
       this._map = this;
 
       this._supportTouch = "ontouchend" in document;
-      this._softDblClick = this._supportTouch || _ieVersion == 7;
+      this._softDblClick = this._supportTouch || _ieVersion === 7;
 
       var geomap = this,
           touchStartEvent = this._supportTouch ? "touchstart mousedown" : "mousedown",
@@ -322,7 +321,7 @@
     },
 
     _setOption: function (key, value, refresh) {
-      if ( key == "pixelSize" ) {
+      if ( key === "pixelSize" ) {
         return;
       }
 
@@ -537,7 +536,7 @@
         if ( value >= 0 || value <= 1 ) {
           for ( var i = 0; i < this._currentServices.length; i++ ) {
             var service = this._currentServices[ i ];
-            if ( !_serviceContainer || service.serviceContainer[ 0 ] == _serviceContainer[ 0 ] ) {
+            if ( !_serviceContainer || service.serviceContainer[ 0 ] === _serviceContainer[ 0 ] ) {
               service.style.opacity = value;
 
               // update the original service object's style property
@@ -558,7 +557,7 @@
         for ( var i = 0; i < this._currentServices.length; i++ ) {
           var service = this._currentServices[ i ];
 
-          if ( !_serviceContainer || service.serviceContainer[ 0 ] == _serviceContainer[ 0 ] ) {
+          if ( !_serviceContainer || service.serviceContainer[ 0 ] === _serviceContainer[ 0 ] ) {
             if ( value === undefined ) {
               // toggle visibility
               value = ( service.style.visibility !== "visible" );
@@ -629,7 +628,7 @@
       this._setCenterAndSize(this._center, this._pixelSize, _trigger, true);
     },
 
-    append: function ( shape, style, label, refresh ) {
+    append: function ( shape /* , style, label, refresh */ ) {
       if ( shape && ( $.isPlainObject( shape ) || ( $.isArray( shape ) && shape.length > 0 ) ) ) {
         if ( !this._createdGraphics ) {
           this._createServiceGraphics( );
@@ -639,7 +638,7 @@
 
         if ( $.isArray( shape ) ) {
           shapes = shape;
-        } else if ( shape.type == "FeatureCollection" ) {
+        } else if ( shape.type === "FeatureCollection" ) {
           shapes = shape.features;
         } else {
           shapes = [ shape ];
@@ -699,7 +698,7 @@
 
     find: function ( selector, pixelTolerance ) {
       var isPoint = $.isPlainObject( selector ),
-          searchPixel = isPoint ? this._map.toPixel( selector.coordinates ) : undefined,
+          //searchPixel = isPoint ? this._map.toPixel( selector.coordinates ) : undefined,
           mapTol = this._map._pixelSize * pixelTolerance,
           result = [],
           graphicShape,
@@ -711,7 +710,7 @@
         graphicShape = this._graphicShapes[ i ];
 
         if ( isPoint ) {
-          if ( graphicShape.shape.type == "Point" ) {
+          if ( graphicShape.shape.type === "Point" ) {
             if ( $.geo.distance( graphicShape.shape, selector ) <= mapTol ) {
               result.push( graphicShape.shape );
             }
@@ -791,7 +790,7 @@
       return [ center[ 0 ] - halfWidth, center[ 1 ] - halfHeight, center[ 0 ] + halfWidth, center[ 1 ] + halfHeight ];
     },
 
-    _setBbox: function (value, trigger, refresh) {
+    _setBbox: function (value /* , trigger, refresh */ ) {
       var center = [value[0] + (value[2] - value[0]) / 2, value[1] + (value[3] - value[1]) / 2],
           pixelSize = Math.max($.geo.width(value, true) / this._contentBounds.width, $.geo.height(value, true) / this._contentBounds.height),
           zoom = this._getZoom( center, pixelSize );
@@ -862,7 +861,7 @@
       }
     },
 
-    _setZoom: function ( value, trigger, refresh ) {
+    _setZoom: function ( value, trigger /* , refresh */ ) {
       // set the map widget's zoom, taking zoomMin and zoomMax into account
       this._clearInteractiveTimeout( );
 
@@ -943,7 +942,7 @@
         var idString = service.id ? ' id="' + service.id + '"' : "",
             classString = 'class="geo-service ' + ( service["class"] ? service["class"] : '' ) + '"',
             scHtml = '<div ' + idString + classString + ' style="-webkit-transform:translateZ(0);position:absolute; left:0; top:0; width:32px; height:32px; margin:0; padding:0; display:' + ( service.style.visibility === "visible" ? "block" : "none" ) + ';"></div>',
-            servicesContainer;
+            serviceContainer;
 
         this._$servicesContainer.append( scHtml );
         serviceContainer = this._$servicesContainer.children( ":last" );
@@ -1180,7 +1179,7 @@
 
     _forcePosition: function (elem) {
       var cssPosition = elem.css("position");
-      if (cssPosition != "relative" && cssPosition != "absolute" && cssPosition != "fixed") {
+      if (cssPosition !== "relative" && cssPosition !== "absolute" && cssPosition !== "fixed") {
         elem.css("position", "relative");
       }
     },
@@ -1233,28 +1232,9 @@
       return { pixelSize: pixelSize, center: scaleCenter };
     },
 
-    _mouseWheelFinish: function ( refresh ) {
-      this._wheelTimeout = null;
-
-      if (this._wheelLevel !== 0) {
-        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, this._options[ "tilingScheme" ] !== null );
-
-        this._wheelLevel = 0;
-      } else if ( refresh ) {
-        this._refresh();
-        this._refreshAllShapes( );
-      }
-    },
-
     _panFinalize: function () {
       if (this._panning) {
         this._velocity = [0, 0];
-
-        var dx = this._current[0] - this._anchor[0],
-            dy = this._current[1] - this._anchor[1],
-            image = this._options[ "axisLayout" ] === "image",
-            dxMap = -dx * this._pixelSize,
-            dyMap = ( image ? -1 : 1 ) * dy * this._pixelSize;
 
         this._$eventTarget.css("cursor", this._options["cursors"][this._options["mode"]]);
 
@@ -1270,10 +1250,7 @@
       }
 
       var dx = this._current[0] - this._lastDrag[0],
-          dy = this._current[1] - this._lastDrag[1],
-          i = 0,
-          service,
-          translateObj;
+          dy = this._current[1] - this._lastDrag[1];
 
       if (this._toolPan || dx > 3 || dx < -3 || dy > 3 || dy < -3) {
         if (!this._toolPan) {
@@ -1316,15 +1293,9 @@
     },
 
     _interactiveTransform: function( ) {
-      var mapWidth = this._contentBounds[ "width" ],
-          mapHeight = this._contentBounds[ "height" ],
+      var service,
 
-          halfWidth = mapWidth / 2,
-          halfHeight = mapHeight / 2,
-
-          bbox = [ this._centerInteractive[ 0 ] - halfWidth, this._centerInteractive[ 1 ] - halfHeight, this._centerInteractive[ 0 ] + halfWidth, this._centerInteractive[ 1 ] + halfHeight ];
-
-      var scalePixelSize = this._pixelSize,
+          scalePixelSize = this._pixelSize,
           scaleRatio = scalePixelSize / this._pixelSizeInteractive;
           
       if ( scalePixelSize > 0 ) {
@@ -1335,36 +1306,7 @@
 
 
         this._$shapesContainers.geographics("interactiveTransform", newPixelPoint, scaleRatio);
-
-        /*
-        $scaleContainer.css( {
-          left: Math.round( newPixelPoint[ 0 ] ),
-          top: Math.round( newPixelPoint[ 1 ] ),
-          width: mapWidth * scaleRatio,
-          height: mapHeight * scaleRatio
-        } );
-        */
-        
       }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
       for ( var i = 0; i < this._currentServices.length; i++ ) {
         service = this._currentServices[ i ];
@@ -1379,7 +1321,7 @@
 
     _interactiveTimeout: function( ) {
       if ( this._isMultiTouch ) {
-        this._timeoutInteractive = setTimeout( $.proxy( interactiveTimeout, this ), 128 );
+        this._timeoutInteractive = setTimeout( $.proxy( this._interactiveTimeout, this ), 128 );
       } else if ( this._created && this._timeoutInteractive ) {
         this._setCenterAndSize( this._centerInteractive, this._pixelSizeInteractive, this._triggerInteractive, true );
         this._timeoutInteractive = null;
@@ -1400,7 +1342,7 @@
 
       for ( ; i < this._currentServices.length; i++ ) {
         service = this._currentServices[ i ];
-        if ( !_serviceContainer || service.serviceContainer[ 0 ] == _serviceContainer[ 0 ] ) {
+        if ( !_serviceContainer || service.serviceContainer[ 0 ] === _serviceContainer[ 0 ] ) {
           $.geo[ "_serviceTypes" ][ service.type ].refresh( this, service, force );
         }
       }
@@ -1428,7 +1370,7 @@
     },
 
     _setCenterAndSize: function (center, pixelSize, trigger, refresh) {
-      if ( ! $.isArray( center ) || center.length != 2 || typeof center[ 0 ] !== "number" || typeof center[ 1 ] !== "number" ) {
+      if ( ! $.isArray( center ) || center.length !== 2 || typeof center[ 0 ] !== "number" || typeof center[ 1 ] !== "number" ) {
         return;
       }
 
@@ -1585,7 +1527,7 @@
 
     _document_keydown: function (e) {
       var len = this._drawCoords.length;
-      if (len > 0 && e.which == 27) {
+      if (len > 0 && e.which === 27) {
         if (len <= 2) {
           this._resetDrawing();
           this._inOp = false;
@@ -1630,13 +1572,11 @@
         this._drawTimeout = null;
       }
 
-      var offset = $(e.currentTarget).offset();
-
       switch (this._options["mode"]) {
         case "drawLineString":
         case "measureLength":
-          if ( this._drawCoords.length > 1 && ! ( this._drawCoords[0][0] == this._drawCoords[1][0] &&
-                                                  this._drawCoords[0][1] == this._drawCoords[1][1] ) ) {
+          if ( this._drawCoords.length > 1 && ! ( this._drawCoords[0][0] === this._drawCoords[1][0] &&
+                                                  this._drawCoords[0][1] === this._drawCoords[1][1] ) ) {
               this._drawCoords.length--;
               this._trigger( "shape", e, {
                 type: "LineString",
@@ -1650,8 +1590,8 @@
 
         case "drawPolygon":
         case "measureArea":
-          if ( this._drawCoords.length > 1 && ! ( this._drawCoords[0][0] == this._drawCoords[1][0] &&
-                                                  this._drawCoords[0][1] == this._drawCoords[1][1] ) ) {
+          if ( this._drawCoords.length > 1 && ! ( this._drawCoords[0][0] === this._drawCoords[1][0] &&
+                                                  this._drawCoords[0][1] === this._drawCoords[1][1] ) ) {
             var endIndex = this._drawCoords.length - 1;
             if (endIndex > 2) {
               this._drawCoords[endIndex] = $.merge( [], this._drawCoords[0] );
@@ -1690,7 +1630,7 @@
         return;
       }
 
-      if ( !this._supportTouch && e.which != 1 ) {
+      if ( !this._supportTouch && e.which !== 1 ) {
         return;
       }
 
@@ -1796,7 +1736,6 @@
           drawCoordsLen = this._drawCoords.length,
           touches = e.originalEvent.changedTouches,
           current,
-          service,
           i = 0;
 
       if ( this._supportTouch && touches ) {
@@ -1884,7 +1823,7 @@
         }
       }
 
-      if ( _ieVersion == 7 ) {
+      if ( _ieVersion === 7 ) {
         this._isDbltap = this._isTap = false;
       }
 
@@ -1992,7 +1931,7 @@
       }
 
       if ( !this._mouseDown ) {
-        if ( _ieVersion == 7 ) {
+        if ( _ieVersion === 7 ) {
           // ie7 doesn't appear to trigger dblclick on this._$eventTarget,
           // we fake regular click here to cause soft dblclick
           this._eventTarget_touchstart(e);
@@ -2218,8 +2157,8 @@
               this._drawCoords[i] = this._toMap(current);
               this._drawPixels[i] = current;
 
-              if (i < 2 || !(this._drawCoords[i][0] == this._drawCoords[i-1][0] &&
-                             this._drawCoords[i][1] == this._drawCoords[i-1][1])) {
+              if (i < 2 || !(this._drawCoords[i][0] === this._drawCoords[i-1][0] &&
+                             this._drawCoords[i][1] === this._drawCoords[i-1][1])) {
                 this._drawCoords[i + 1] = this._toMap( current, this._centerInteractive, this._pixelSizeInteractive );
                 this._drawPixels[i + 1] = current;
               }
@@ -2285,9 +2224,7 @@
         var offset = $(e.currentTarget).offset();
         this._anchor = [e.pageX - offset.left, e.pageY - offset.top];
 
-        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, this._options[ "tilingScheme" ] !== null ),
-            service,
-            i = 0;
+        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, this._options[ "tilingScheme" ] !== null );
 
         this._setInteractiveCenterAndSize( wheelCenterAndSize.center, wheelCenterAndSize.pixelSize );
         this._interactiveTransform( );

@@ -1,6 +1,7 @@
 ﻿== to do ==
 
 === b2 ===
+* project - verify it works with jQuery 2.0
 * geomap - support Windows 8 Store apps
 * geomap - [bug] Microsoft high-precision mouse wheel & mac touchpads zoom too quickly
 
@@ -281,6 +282,10 @@ http://jsfiddle.net/ryanttb/KQHN9/
 ==2013-05-13==
 ===grunt===
 I've updated to version 0.4 of Grunt. I need to go further but 0.4 works for now. I had to make my test build a valid version, 1.0.0-test.
+
+Heh, I updated grunt but didn't check that it builds. Latest grunt uses jshint which seems much better at telling me of issues. I need to lint a bunch.
+
+I have a whole function left over from the mouse wheel fixes that's not being used.
 
 ==2013-05-12==
 ===resize===
