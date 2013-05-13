@@ -4,6 +4,7 @@
 * project - verify it works with jQuery 2.0
 * geomap - support Windows 8 Store apps
 * geomap - [bug] Microsoft high-precision mouse wheel & mac touchpads zoom too quickly
+* examples - [bug] inset doesn't show inset map
 
 ===bug fixing process===
 1. reproduce bug in jsFiddle with latest release version of jQuery Geo
@@ -48,6 +49,8 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * examples - SVG & other neat elements/media in labels
 * examples - continent puzzle
 ** http://stephanmendler.de/thinkmaps/puzzle/index_en.html
+* examples - MapBox vector tiles
+** http://mapbox.com/blog/vector-tiles/
 
 === official apps (x.jquerygeo.com) ===
 * twheat
@@ -286,6 +289,11 @@ I've updated to version 0.4 of Grunt. I need to go further but 0.4 works for now
 Heh, I updated grunt but didn't check that it builds. Latest grunt uses jshint which seems much better at telling me of issues. I need to lint a bunch.
 
 I have a whole function left over from the mouse wheel fixes that's not being used.
+
+===MapBox vector tiles===
+I will need to support these.
+
+http://mapbox.com/blog/vector-tiles/
 
 ==2013-05-12==
 ===resize===
