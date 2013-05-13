@@ -2,7 +2,7 @@
 
 === b2 ===
 * geomap - support Windows 8 Store apps
-* geomap - [bug] mouse wheel & mac touchpads zoom too quickly
+* geomap - [bug] Microsoft high-precision mouse wheel & mac touchpads zoom too quickly
 
 ===bug fixing process===
 1. reproduce bug in jsFiddle with latest release version of jQuery Geo
@@ -278,6 +278,10 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-05-13==
+===grunt===
+I've updated to version 0.4 of Grunt. I need to go further but 0.4 works for now. I had to make my test build a valid version, 1.0.0-test.
+
 ==2013-05-12==
 ===resize===
 This is a bigger problem than just shapes. Tiled services don't move the tiles at all until after refresh & the jump looks awful.
@@ -288,6 +292,12 @@ I have saved the start of some edits for a more dynamic resize event into the re
 
 ===grunt===
 I'm a few major versions behind in grunt. My laptop has a newer grunt-cli installed and I can no longer build jQuery Geo on it. That's not good and, before 1.0 release, I need to make sure I'm using the latest and greatest grunt.
+
+===win8===
+Since I last wanted Windows 8 support, jQuery itself threw errors. Now, with jQuery 2 released, I think I can make jQuery Geo work fine in Windows 8 without errors since jQuery has noted support for Windows 8 desktop apps. It's finally time to check this out.
+
+===scroll===
+Super fast, uncontrollable scrolling is a problem in both Windows & Mac. The pad on the Macbook Pro zooms too fast and so does the wheel on Microsoft high-precision mice. I'm guessing and hoping that they're both the same problem and have to do with the ??? event. It's not delta, it's some factor property.
 
 ==2013-05-08==
 ===plugin download link===
