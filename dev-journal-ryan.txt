@@ -21,6 +21,10 @@ Starting point for a jQuery Geo demo:
 
 http://jsfiddle.net/ryanttb/KQHN9/
 
+=== posts ===
+* posts - SQL Server to jQuery Geo
+* posts - WKT object
+
 === examples ===
 * examples - forecast.io skycons on jQuery Geo map
 * examples - location based notes/to do list
