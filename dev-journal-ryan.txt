@@ -2,9 +2,8 @@
 
 === b2 ===
 * geomap - support Windows 8 Store apps
-* geomap - [bug] mouse wheel & mac touchpads zoom too quickly
-* geographics - [bug] graphics stretch after resize, should just move
-* project - remove download property from package json files
+* geomap - [bug] Microsoft high-precision mouse wheel & mac touchpads zoom too quickly
+* examples - [bug] inset doesn't show inset map
 
 ===bug fixing process===
 1. reproduce bug in jsFiddle with latest release version of jQuery Geo
@@ -49,6 +48,8 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * examples - SVG & other neat elements/media in labels
 * examples - continent puzzle
 ** http://stephanmendler.de/thinkmaps/puzzle/index_en.html
+* examples - MapBox vector tiles
+** http://mapbox.com/blog/vector-tiles/
 
 === official apps (x.jquerygeo.com) ===
 * twheat
@@ -58,6 +59,7 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * embed
 
 === future ===
+* project - update grunt
 * project - get on https://github.com/cdnjs/cdnjs
 * geomap - [bug] scrolling a relative div over a fixed map breaks interaction with lower portion of map (see comment from 2013-03-31)
 * docs - geomap - allow template engine plugins
@@ -279,13 +281,63 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
-==2013-04-23==
+==2013-05-13==
+===grunt===
+I've updated to version 0.4 of Grunt. I need to go further but 0.4 works for now. I had to make my test build a valid version, 1.0.0-test.
+
+Heh, I updated grunt but didn't check that it builds. Latest grunt uses jshint which seems much better at telling me of issues. I need to lint a bunch.
+
+I have a whole function left over from the mouse wheel fixes that's not being used.
+
+===MapBox vector tiles===
+I will need to support these.
+
+http://mapbox.com/blog/vector-tiles/
+
+===jQuery 2.0===
+Finally time to test this. Seems ok on the surface: http://jsfiddle.net/ryanttb/DFetn/
+
+==2013-05-12==
+===resize===
+This is a bigger problem than just shapes. Tiled services don't move the tiles at all until after refresh & the jump looks awful.
+
+Since resize currently depends on a timout, the movement of the services is not as important as I originally thought. I want to make resize more dynamic at some point in the future, there is no reason I can't. However, it's not the bug I'm looking for. As far as I'm concerned for 1.0.0b2 and even 1.0.0 final, I've fixed this issue. Time to move on.
+
+I have saved the start of some edits for a more dynamic resize event into the resize-redo branch.
+
+===grunt===
+I'm a few major versions behind in grunt. My laptop has a newer grunt-cli installed and I can no longer build jQuery Geo on it. That's not good and, before 1.0 release, I need to make sure I'm using the latest and greatest grunt.
+
+===win8===
+Since I last wanted Windows 8 support, jQuery itself threw errors. Now, with jQuery 2 released, I think I can make jQuery Geo work fine in Windows 8 without errors since jQuery has noted support for Windows 8 desktop apps. It's finally time to check this out.
+
+===scroll===
+Super fast, uncontrollable scrolling is a problem in both Windows & Mac. The pad on the Macbook Pro zooms too fast and so does the wheel on Microsoft high-precision mice. I'm guessing and hoping that they're both the same problem and have to do with the ??? event. It's not delta, it's some factor property.
+
+==2013-05-08==
+===plugin download link===
+I'm going to remove the link to the minified src. It just opens in a browser. Without the link it will at least download all the code for the user (but this project isn't setup to build things in a useful place. I should fix that, too. I currently build to docs/jquery.geo-* and need to build to anywhere else that makes sense.
+
+Backbone.js builds to root, but is unversioned. jQuery itself build to dist/. I like that.
+
+I removed the download property of my manifest and I'm also going to have grunt build to dist/
+
+===shape resize===
+Shapes should only move if the pixelSize doesn't change. They currently stretch to match the window resize. Here's a simple fiddle: http://jsfiddle.net/ryanttb/n2fCR/3/
+
+I can resize canvasSceneBack and leave canvasSceneFront alone but I will have to resize it later. Maybe after the flip. That's only for trueCanvas. I also need to handle non-trueCanvas properly.
+
+I will also have to reset the position of the (now) back buffer after the flip. Actually, I don't need to. The flip makes sure the new canvasSceneFront is of the proper width and height.
+
+Now, how to test not-trueCanvas? I might just hide the shapes until the resize is over if not trueCanvas. I don't, not trueCanvas resize works fine as is. To test, I disabled trueCanvas mode in code & ran IE10 as IE8.
+
+I also forgot about labels...they have to move appropriately. They do move, but it's not horribly noticable. Not nearly as much as the shapes. However, they could be 
+
 ==2013-05-08==
 ===one shape two services===
 This is a nasty bug that I've been itching to get rid of for some time.
 
 I'm having trouble reproducing this. Which demo had the error? I think it was the USA sates one. Regardless, the issue is when you try to call find after removing a service. I have a jsFiddle now: http://jsfiddle.net/ryanttb/VTGa5/
-
 
 ===jsFiddle===
 I think I'm still going to use jsFiddle for debugging and only use codepen.io for public examples. I wonder how it works in IE8 though. It's probably fine in full screen mode.

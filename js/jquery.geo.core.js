@@ -292,7 +292,7 @@
         case "Polygon":
           var a = 0,
               c = [0, 0],
-              coords = $.merge( [ ], geom.type == "Polygon" ? geom.coordinates[0] : geom.coordinates ),
+              coords = $.merge( [ ], geom.type === "Polygon" ? geom.coordinates[0] : geom.coordinates ),
               i = 1, j, n,
               bbox = [ pos_oo, pos_oo, neg_oo, neg_oo ];
 
@@ -345,7 +345,7 @@
     // contains
 
     contains: function (geom1, geom2) {
-      if (geom1.type != "Polygon") {
+      if (geom1.type !== "Polygon") {
         return false;
       }
 
@@ -389,7 +389,7 @@
         a = b;
       }
 
-      return rayCross % 2 == 1;
+      return rayCross % 2 === 1;
     },
 
     _containsPolygonLineString: function (polygonCoordinates, lineStringCoordinates) {
@@ -464,7 +464,7 @@
             apx = pointCoordinate[0] - a[0],
             apy = pointCoordinate[1] - a[1];
 
-        if (lineStringCoordinates.length == 1) {
+        if (lineStringCoordinates.length === 1) {
           return Math.sqrt(apx * apx + apy * apy);
         } else {
           for (var i = 1; i < lineStringCoordinates.length; i++) {
@@ -1055,7 +1055,7 @@
           var isMultiPointOrLineString = $.isArray(coordinates[ 0 ]),
               fromGeodeticPos = this.fromGeodeticPos;
 
-          if (!isMultiPointOrLineString && coordinates.length == 4) {
+          if (!isMultiPointOrLineString && coordinates.length === 4) {
             // bbox
             var min = fromGeodeticPos([ coordinates[ 0 ], coordinates[ 1 ] ]),
                 max = fromGeodeticPos([ coordinates[ 2 ], coordinates[ 3 ] ]);
@@ -1106,7 +1106,7 @@
           var isMultiPointOrLineString = $.isArray(coordinates[ 0 ]),
               toGeodeticPos = this.toGeodeticPos;
 
-          if (!isMultiPointOrLineString && coordinates.length == 4) {
+          if (!isMultiPointOrLineString && coordinates.length === 4) {
             // bbox
             var min = toGeodeticPos([ coordinates[ 0 ], coordinates[ 1 ] ]),
                 max = toGeodeticPos([ coordinates[ 2 ], coordinates[ 3 ] ]);

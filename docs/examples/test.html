@@ -35,57 +35,16 @@
   <script src="../../js/jquery.geo.geomap.js"></script>
   <script src="../../js/jquery.geo.tiled.js"></script>
   <script src="../../js/jquery.geo.shingled.js"></script>
-  <!--<script src="../jquery.geo-test.min.js"></script>-->
+  <!--<script src="../../dist/jquery.geo-1.0.0-test.min.js"></script>-->
 
   <script>
     $( function ( ) {
-// create a map
-  var map = $("#map").geomap({
-    center: [ -72, 42 ],
-    zoom: 6,
-    services: [
-      {
-        type: "tiled",
-        src: "http://otile1.mqcdn.com/tiles/1.0.0/osm/{{:zoom}}/{{:tile.column}}/{{:tile.row}}.png"
-      },
-      {
-        id: "gfx",
-        type: "shingled"                 
-      }
-    ]
-  });
-  
-  var gfx = $("#gfx").geomap("option", "shapeStyle", {
-    color: "blue",
-    strokeWidth: 8   
-  });
-  
-  var shape = {
-    type: "LineString",
-    coordinates: [[ -72, 42 ], [-72.5, 42.5]]
-  };
-  
-  map.geomap("append", shape);
-  
-  gfx.geomap("append", shape);
-  
-  setTimeout(function() {
-    gfx.geomap("remove", shape);
-    
-    setTimeout(function() {
-      console.log("searching for shape");
-      
-      var foundShape = map.geomap("find", {
-        type: "Point",
-        coordinates: [ -72, 42 ]
-      }, 2);
-      
-      console.log( foundShape.length );
-      //gfx.geomap("append", shape);
-    }, 1000);
-  }, 1000);
-
-    } );  
+      // create a map
+      var map = $("#map").geomap( {
+          center: [ -71.3595678, 42.3604823 ],
+          zoom: 8
+      } );
+    } );
   </script>
 </body>
 </html>
