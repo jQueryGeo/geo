@@ -1,4 +1,4 @@
-/*! jQuery Geo - vtest - 2013-05-08
+/*! jQuery Geo - v1.0.0-b1.5 - 2013-01-17
  * http://jquerygeo.com
  * Copyright (c) 2013 Ryan Westphal/Applied Geographics, Inc.; Licensed MIT, GPL */
 
@@ -3869,6 +3869,8 @@ $.Widget.prototype = {
       this._blitcanvas = document.createElement( "canvas" );
 
       if ( this._blitcanvas.getContext ) {
+        //this._$elem.append('<canvas ' + sizeAttr + ' style="-webkit-transform:translateZ(0);' + posCss + '"></canvas>');
+        //this._$canvas = this._$elem.children(':last');
         this._$canvas = $('<canvas ' + sizeAttr + ' style="-webkit-transform:translateZ(0);' + posCss + '"></canvas>');
 
         // test _trueDoubleBuffer
@@ -3882,14 +3884,14 @@ $.Widget.prototype = {
 
         this._context = this._$canvas[0].getContext("2d");
 
+        //this._blitcanvas = document.createElement( "canvas" );
         this._blitcanvas.width = this._width;
         this._blitcanvas.height = this._height;
         this._blitcontext = this._blitcanvas.getContext("2d");
 
         // create our front & back buffers
-        // though, at any time either one can be in front
-        this._$canvasSceneFront = $('<img id="scene0" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />').load($.proxy(this._canvasSceneLoad, this));
-        this._$canvasSceneBack = $('<img id="scene1" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />').load($.proxy(this._canvasSceneLoad, this));
+        this._$canvasSceneFront = $('<img id="scene0" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />');
+        this._$canvasSceneBack = $('<img id="scene1" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />');
 
       } else if (_ieVersion <= 8) {
         this._trueCanvas = false;
@@ -3922,6 +3924,8 @@ $.Widget.prototype = {
     clear: function () {
       this._context.clearRect(0, 0, this._width, this._height);
       this._labelsHtml = "";
+
+          //if ( this._options.doubleBuffer ) console.log("clear:_end " + $.now());
       this._end( );
     },
 
@@ -3969,6 +3973,7 @@ $.Widget.prototype = {
         }
       }
 
+          //if ( this._options.doubleBuffer ) console.log("drawArc:_end " + $.now());
       this._end( );
     },
 
@@ -4008,6 +4013,7 @@ $.Widget.prototype = {
           this._context.stroke();
         }
 
+          //if ( this._options.doubleBuffer ) console.log("drawPoint:_end " + $.now());
         this._end( );
       }
     },
@@ -4111,6 +4117,7 @@ $.Widget.prototype = {
           if ( pixelBbox[ 0 ] !== pixelBbox[ 2 ] && pixelBbox[ 1 ] !== pixelBbox[ 3 ] ) {
             this._context.drawImage(this._blitcanvas, pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ], pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ] );
 
+          //if ( this._options.doubleBuffer ) console.log("drawPolygon:_end " + $.now());
             this._end( );
           }
         }
@@ -4177,6 +4184,9 @@ $.Widget.prototype = {
         this._timeoutEnd = null;
       }
 
+      // hide labels for now until they are on the interactive div 
+      //this._$labelsContainerFront.html("");
+
       if ( this._trueCanvas ) {
         if ( this._options.doubleBuffer && this._trueDoubleBuffer ) {
 
@@ -4198,6 +4208,8 @@ $.Widget.prototype = {
             geographics._requireFlip = false;
           }
 
+
+          //console.log("geographics:interactiveTransform " + this._$canvasSceneFront.prop( "id" ) + ": origin: " + origin.toString() + ", scale: " + scale);
           // transform a finished scene, can assume no drawing during these calls
           this._$canvasSceneFront.css( {
             left: Math.round( origin[ 0 ] ),
@@ -4221,58 +4233,6 @@ $.Widget.prototype = {
       } );
     },
 
-    _canvasSceneLoad: function() {
-      var geographics = this;
-      if ( geographics._requireFlip ) {
-        geographics._requireFlip = false;
-        var oldCanvasScene = geographics._$canvasSceneFront;
-
-        geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
-          left: 0,
-          top: 0,
-          width: geographics._width,
-          height: geographics._height
-        } ).prependTo( geographics._$elem );
-
-        geographics._$canvasSceneBack = oldCanvasScene.detach();
-      }
-    },
-
-    _endCallback: function() {
-      var geographics = this;
-
-      if ( !geographics._timeoutEnd ) {
-        // something has canceled the draw
-        return;
-      }
-
-      if ( geographics._trueCanvas && geographics._options.doubleBuffer && geographics._trueDoubleBuffer ) {
-        geographics._$canvasSceneBack.prop( "src", geographics._$canvas[ 0 ].toDataURL( ) );
-      }
-
-
-      geographics._$labelsContainerBack.html( geographics._labelsHtml ).find("a").css({
-        position: "relative",
-        zIndex: 1,
-        display: "inline-block",
-        webkitTransform: "translateZ(0)"
-      });
-
-      var oldLabelsContainer = geographics._$labelsContainerFront;
-
-      geographics._$labelsContainerFront = geographics._$labelsContainerBack.css( {
-        left: 0,
-        top: 0,
-        width: geographics._width,
-        height: geographics._height
-      } ).prependTo( geographics._$elem );
-
-      geographics._$labelsContainerBack = oldLabelsContainer.detach();
-
-
-      geographics._timeoutEnd = null;
-    },
-
     _end: function( ) {
       // end/finalize a scene
       if ( this._timeoutEnd ) {
@@ -4282,7 +4242,62 @@ $.Widget.prototype = {
 
       this._requireFlip = true;
 
-      this._timeoutEnd = setTimeout( $.proxy(this._endCallback, this), 20 );
+      var geographics = this;
+
+      function endCallback( ) {
+        if ( !geographics._timeoutEnd ) {
+          // something has canceled the draw
+          return;
+        }
+
+        if ( geographics._trueCanvas && geographics._options.doubleBuffer && geographics._trueDoubleBuffer ) {
+          //console.log("    endCallback...");
+
+          //geographics._$canvasSceneFront = 
+          geographics._$canvasSceneBack.prop( "src", "" ).one( "load", function( e ) {
+            //console.log("    ...flip: show " + geographics._$canvasSceneBack.prop( "id" ) + ", hide " + geographics._$canvasSceneFront.prop("id"));
+            geographics._requireFlip = false;
+            var oldCanvasScene = geographics._$canvasSceneFront;
+
+            geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
+              left: 0,
+              top: 0,
+              width: geographics._width,
+              height: geographics._height
+            } ).prependTo( geographics._$elem );
+
+            geographics._$canvasSceneBack = oldCanvasScene.detach();
+          } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) );
+        }
+
+
+        geographics._$labelsContainerBack.html( geographics._labelsHtml ).find("a").css({
+          position: "relative",
+          zIndex: 100,
+          display: "inline-block",
+          webkitTransform: "translateZ(0)"
+        });
+
+        var oldLabelsContainer = geographics._$labelsContainerFront;
+
+        geographics._$labelsContainerFront = geographics._$labelsContainerBack.css( {
+          left: 0,
+          top: 0,
+          width: geographics._width,
+          height: geographics._height
+        } ).prependTo( geographics._$elem );
+
+        geographics._$labelsContainerBack = oldLabelsContainer.detach();
+
+
+        geographics._timeoutEnd = null;
+      }
+
+      //if ( this._options.doubleBuffer ) {
+        this._timeoutEnd = setTimeout( endCallback, 20 );
+      //} else {
+        //geographics._$labelsContainerFront.html( geographics._labelsHtml );
+      //}
     },
 
     _getGraphicStyle: function (style) {
@@ -4340,6 +4355,7 @@ $.Widget.prototype = {
           this._context.stroke();
         }
 
+          //if ( this._options.doubleBuffer ) console.log("_drawLines:_end " + $.now());
         this._end( );
       }
     }
@@ -4364,7 +4380,6 @@ $.Widget.prototype = {
         cursors: {
           "static": "default",
           pan: "url(data:image/vnd.microsoft.icon;base64,AAACAAEAICACAAgACAAwAQAAFgAAACgAAAAgAAAAQAAAAAEAAQAAAAAAAAEAAAAAAAAAAAAAAgAAAAAAAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD8AAAA/AAAAfwAAAP+AAAH/gAAB/8AAA//AAAd/wAAGf+AAAH9gAADbYAAA2yAAAZsAAAGbAAAAGAAAAAAAAA//////////////////////////////////////////////////////////////////////////////////////gH///4B///8Af//+AD///AA///wAH//4AB//8AAf//AAD//5AA///gAP//4AD//8AF///AB///5A////5///8=), move",
-          click: "crosshair",
           zoom: "crosshair",
           dragBox: "crosshair",
           dragCircle: "crosshair",
@@ -4405,7 +4420,6 @@ $.Widget.prototype = {
         zoom: 0,
         zoomMin: 0,
         zoomMax: Number.POSITIVE_INFINITY,
-        zoomFactor: 2, //< determines what a zoom level means
         pixelSize: 0
       };
 
@@ -4458,6 +4472,8 @@ $.Widget.prototype = {
 
     _wheelTimeout: null,
     _wheelLevel: 0,
+
+    _zoomFactor: 2, //< determines what a zoom level means
 
     _fullZoomFactor: 2, //< interactiveScale factor needed to zoom a whole level
     _partialZoomFactor: 1.18920711500273, //< interactiveScale factor needed to zoom a fraction of a level (the fourth root of 2)
@@ -4586,9 +4602,9 @@ $.Widget.prototype = {
       this._softDblClick = this._supportTouch || _ieVersion == 7;
 
       var geomap = this,
-          touchStartEvent = this._supportTouch ? "touchstart mousedown" : "mousedown",
-          touchStopEvent = this._supportTouch ? "touchend touchcancel mouseup" : "mouseup",
-          touchMoveEvent = this._supportTouch ? "touchmove mousemove" : "mousemove";
+          touchStartEvent = this._supportTouch ? "touchstart" : "mousedown",
+          touchStopEvent = this._supportTouch ? "touchend touchcancel" : "mouseup",
+          touchMoveEvent = this._supportTouch ? "touchmove" : "mousemove";
 
       $(document).keydown($.proxy(this._document_keydown, this));
 
@@ -4643,11 +4659,6 @@ $.Widget.prototype = {
         if (this._initOptions.zoomMax !== undefined) {
           this._setOption("zoomMax", this._initOptions.zoomMax, false);
         }
-        if (this._initOptions.zoomFactor !== undefined) {
-          this._setOption("zoomFactor", this._initOptions.zoomFactor, false);
-          this._fullZoomFactor = this._initOptions.zoomFactor;
-          this._partialZoomFactor = Math.pow(4, 1 / this._fullZoomFactor); // 4th root of full
-        }
         if (this._initOptions.bbox) {
           this._setOption("bbox", this._initOptions.bbox, false);
         }
@@ -4689,7 +4700,7 @@ $.Widget.prototype = {
             this._clearInteractiveTimeout( );
           }
 
-          this._userGeodetic = this._options["axisLayout"] === "map" && $.geo.proj && $.geo._isGeodetic( value );
+          this._userGeodetic = $.geo.proj && $.geo._isGeodetic( value );
           if ( this._userGeodetic ) {
             value = $.geo.proj.fromGeodetic( value );
           }
@@ -4721,7 +4732,7 @@ $.Widget.prototype = {
           break;
 
         case "bboxMax":
-          this._userGeodetic = this._options["axisLayout"] === "map" && $.geo.proj && $.geo._isGeodetic( value );
+          this._userGeodetic = $.geo.proj && $.geo._isGeodetic( value );
           break;
 
         case "center":
@@ -4729,7 +4740,7 @@ $.Widget.prototype = {
             this._clearInteractiveTimeout( );
           }
 
-          this._userGeodetic = this._options["axisLayout"] === "map" && $.geo.proj && $.geo._isGeodetic( value );
+          this._userGeodetic = $.geo.proj && $.geo._isGeodetic( value );
           if ( this._userGeodetic ) {
             value = $.geo.proj.fromGeodetic( value );
           }
@@ -4807,7 +4818,7 @@ $.Widget.prototype = {
           break;
 
         case "bboxMax":
-          if ( this._userGeodetic ) {
+          if ( $.geo.proj && $.geo._isGeodetic( value ) ) {
             bbox = $.geo.proj.fromGeodetic( value );
           } else {
             bbox = value;
@@ -5007,7 +5018,7 @@ $.Widget.prototype = {
         }
 
         for ( i = 0; i < shapes.length; i++ ) {
-          if ( !$.data( shapes[ i ], "geoBbox" ) ) {
+          if ( shapes[ i ].type != "Point" ) {
             var bbox = $.geo.bbox( shapes[ i ] );
             if ( $.geo.proj && $.geo._isGeodetic( bbox ) ) {
               bbox = $.geo.proj.fromGeodetic( bbox );
@@ -5034,6 +5045,10 @@ $.Widget.prototype = {
     },
 
     empty: function ( refresh ) {
+      for ( var i = 0; i < this._graphicShapes.length; i++ ) {
+        $.removeData( this._graphicShapes[ i ].shape, "geoBbox" );
+      }
+
       this._graphicShapes = [];
 
       if ( refresh === undefined || refresh ) {
@@ -5112,6 +5127,7 @@ $.Widget.prototype = {
 
         for ( var i = 0; i < this._graphicShapes.length; i++ ) {
           if ( $.inArray( this._graphicShapes[ i ].shape, shapes ) >= 0 ) {
+            $.removeData( shape, "geoBbox" );
             rest = this._graphicShapes.slice( i + 1 );
             this._graphicShapes.length = i;
             this._graphicShapes.push.apply( this._graphicShapes, rest );
@@ -5207,7 +5223,7 @@ $.Widget.prototype = {
             bbox = $.geo.reaspect( this._getBbox( center, pixelSize ), ratio, true ),
             bboxMax = $.geo.reaspect(this._getBboxMax(), ratio, true);
 
-        return Math.round( Math.log($.geo.width(bboxMax, true) / $.geo.width(bbox, true)) / Math.log(this._fullZoomFactor) );
+        return Math.round( Math.log($.geo.width(bboxMax, true) / $.geo.width(bbox, true)) / Math.log(this._zoomFactor) );
       }
     },
 
@@ -5312,9 +5328,7 @@ $.Widget.prototype = {
 
       this._$attrList.find( "a" ).css( {
         position: "relative",
-        zIndex: 1,
-        display: "inline-block",
-        webkitTransform: "translateZ(0)"
+        zIndex: 100
       } );
     },
 
@@ -5444,6 +5458,11 @@ $.Widget.prototype = {
           labelPixel,
           bbox = this._map._getBbox(center, pixelSize);
 
+      /*
+      if ( shapes.length > 0 ) {
+        console.log( "_refreshShapes " + $.now() );
+      }
+      */
       for (i = 0; i < shapes.length; i++) {
         shape = shapes[i].shape || shapes[i];
         shape = shape.geometry || shape;
@@ -5552,7 +5571,7 @@ $.Widget.prototype = {
           return tilingScheme.basePixelSize / Math.pow(2, zoom);
         }
       } else {
-        var bbox = $.geo.scaleBy( this._getBboxMax(), 1 / Math.pow( this._fullZoomFactor, zoom ), true );
+        var bbox = $.geo.scaleBy( this._getBboxMax(), 1 / Math.pow( this._zoomFactor, zoom ), true );
         return Math.max( $.geo.width( bbox, true ) / this._contentBounds.width, $.geo.height( bbox, true ) / this._contentBounds.height );
       }
     },
@@ -6024,11 +6043,8 @@ $.Widget.prototype = {
     },
 
     _eventTarget_touchstart: function (e) {
-      if ( typeof( document.elementFromPoint ) !== "undefined" ) {
-        var elFromPt = document.elementFromPoint( e.pageX, e.pageY );
-        if ( elFromPt && elFromPt.nodeName === "A" ) {
-          return;
-        }
+      if (typeof(document.elementFromPoint) !== "undefined" && document.elementFromPoint(e.pageX, e.pageY).nodeName === "A") {
+        return;
       }
 
       var mode = this._options[ "mode" ],
@@ -6048,7 +6064,7 @@ $.Widget.prototype = {
       var offset = $(e.currentTarget).offset(),
           touches = e.originalEvent.changedTouches;
 
-      if ( this._supportTouch && touches ) {
+      if ( this._supportTouch ) {
         this._multiTouchAnchor = $.merge( [ ], touches );
 
         this._isMultiTouch = this._multiTouchAnchor.length > 1;
@@ -6148,7 +6164,7 @@ $.Widget.prototype = {
           service,
           i = 0;
 
-      if ( this._supportTouch && touches ) {
+      if ( this._supportTouch ) {
         if ( !this._isMultiTouch && this._mouseDown && this._multiTouchAnchor.length > 0 && touches[ 0 ].identifier !== this._multiTouchAnchor[ 0 ].identifier ) {
           // switch to multitouch
           this._mouseDown = false;
@@ -6369,7 +6385,7 @@ $.Widget.prototype = {
         mode = ( shift === "default" ? defaultShift : shift );
       }
 
-      if (this._supportTouch && e.originalEvent.changedTouches) {
+      if (this._supportTouch) {
         current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
         this._multiTouchAnchor = [];
         this._inOp = false;

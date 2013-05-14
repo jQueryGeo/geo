@@ -1,7 +1,7 @@
 (function ($, undefined) {
   $.geo._serviceTypes.shingled = (function () {
     return {
-      create: function (map, serviceContainer, service, index) {
+      create: function ( map, serviceContainer, service /* , index */ ) {
         var serviceState = $.data(service, "geoServiceState");
 
         if ( !serviceState ) {
@@ -33,17 +33,12 @@
 
             contentBounds = map._getContentBounds(),
             mapWidth = contentBounds[ "width" ],
-            mapHeight = contentBounds[ "height" ],
-
-            halfWidth = mapWidth / 2,
-            halfHeight = mapHeight / 2,
-
-            bbox = [ center[ 0 ] - halfWidth, center[ 1 ] - halfHeight, center[ 0 ] + halfWidth, center[ 1 ] + halfHeight ];
+            mapHeight = contentBounds[ "height" ];
 
         if ( serviceState ) {
           this._cancelUnloaded( map, service );
 
-          serviceState.serviceContainer.children( ).each( function ( i ) {
+          serviceState.serviceContainer.children( ).each( function ( ) {
             var $scaleContainer = $(this),
                 scalePixelSize = $scaleContainer.data( "pixelSize" ),
                 scaleRatio = scalePixelSize / pixelSize;
@@ -142,7 +137,7 @@
         }
       },
 
-      resize: function (map, service) {
+      resize: function ( map, service /* , dx, dy */ ) {
         var serviceState = $.data(service, "geoServiceState");
 
         if ( serviceState && service && service.style.visibility === "visible" ) {
@@ -158,12 +153,9 @@
 
           scaleContainers.attr("data-pixel-size", "0");
 
-          scaleContainers.each( function ( i ) {
+          scaleContainers.each( function ( ) {
             var $scaleContainer = $(this),
                 position = $scaleContainer.position( );
-
-            var oldMapOrigin = $scaleContainer.data( "origin" ),
-                newPixelPoint = map._toPixel( oldMapOrigin );
 
             $scaleContainer.css( {
               left: position.left + ( mapWidth - $scaleContainer.width( ) ) / 2,
@@ -171,14 +163,6 @@
             } );
 
           } );
-            
-
-          /*
-          scaleContainer.css({
-            left: halfWidth + 'px',
-            top: halfHeight + 'px'
-          });
-          */
         }
       },
 
