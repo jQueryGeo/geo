@@ -1,7 +1,6 @@
 ﻿== to do ==
 
 === b2 ===
-* project - verify it works with jQuery 2.0
 * geomap - support Windows 8 Store apps
 * geomap - [bug] Microsoft high-precision mouse wheel & mac touchpads zoom too quickly
 * examples - [bug] inset doesn't show inset map
@@ -294,6 +293,9 @@ I have a whole function left over from the mouse wheel fixes that's not being us
 I will need to support these.
 
 http://mapbox.com/blog/vector-tiles/
+
+===jQuery 2.0===
+Finally time to test this. Seems ok on the surface: http://jsfiddle.net/ryanttb/DFetn/
 
 ==2013-05-12==
 ===resize===
