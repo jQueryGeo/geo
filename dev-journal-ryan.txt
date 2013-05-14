@@ -295,6 +295,9 @@ I will need to support these.
 
 http://mapbox.com/blog/vector-tiles/
 
+===jQuery 2.0===
+Finally time to test this. Seems ok on the surface: http://jsfiddle.net/ryanttb/DFetn/
+
 ==2013-05-12==
 ===resize===
 This is a bigger problem than just shapes. Tiled services don't move the tiles at all until after refresh & the jump looks awful.
