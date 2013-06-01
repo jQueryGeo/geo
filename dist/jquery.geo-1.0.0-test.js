@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0.0-test - 2013-05-13
+/*! jQuery Geo - v1.0.0-test - 2013-06-01
 * http://jquerygeo.com
 * Copyright (c) 2013 Ryan Westphal; Licensed MIT, GPL */
 // Copyright 2006 Google Inc.
@@ -2632,6 +2632,8 @@ $.Widget.prototype = {
 
 
 (function ($, window, undefined) {
+  window.toStaticHTML = window.toStaticHTML || function ( x ) { return x; };
+
   var pos_oo = Number.POSITIVE_INFINITY,
       neg_oo = Number.NEGATIVE_INFINITY;
 
@@ -3785,7 +3787,7 @@ $.Widget.prototype = {
   };
 }(jQuery, this));
 
-(function ($, undefined) {
+(function ($, window, undefined) {
   var _ieVersion = ( function () {
     var v = 5, div = document.createElement("div"), a = div.all || [];
     do {
@@ -3868,7 +3870,7 @@ $.Widget.prototype = {
       this._blitcanvas = document.createElement( "canvas" );
 
       if ( this._blitcanvas.getContext ) {
-        this._$canvas = $('<canvas ' + sizeAttr + ' style="-webkit-transform:translateZ(0);' + posCss + '"></canvas>');
+        this._$canvas = $( window.toStaticHTML( '<canvas ' + sizeAttr + ' style="-webkit-transform:translateZ(0);' + posCss + '"></canvas>' ) );
 
         // test _trueDoubleBuffer
         this._blitcanvas.width = 1;
@@ -3887,8 +3889,8 @@ $.Widget.prototype = {
 
         // create our front & back buffers
         // though, at any time either one can be in front
-        this._$canvasSceneFront = $('<img id="scene0" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />').load($.proxy(this._canvasSceneLoad, this));
-        this._$canvasSceneBack = $('<img id="scene1" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />').load($.proxy(this._canvasSceneLoad, this));
+        this._$canvasSceneFront = $( window.toStaticHTML( '<img id="scene0" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ).load($.proxy(this._canvasSceneLoad, this));
+        this._$canvasSceneBack = $( window.toStaticHTML( '<img id="scene1" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ).load($.proxy(this._canvasSceneLoad, this));
 
       } else if (_ieVersion <= 8) {
         this._trueCanvas = false;
@@ -3901,8 +3903,8 @@ $.Widget.prototype = {
       }
 
       // create our front & back label containers
-      this._$labelsContainerFront = $('<div class="geo-labels-container" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '"></div>');
-      this._$labelsContainerBack = $('<div class="geo-labels-container" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '"></div>');
+      this._$labelsContainerFront = $( window.toStaticHTML( '<div class="geo-labels-container" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '"></div>' ) );
+      this._$labelsContainerBack = $( window.toStaticHTML( '<div class="geo-labels-container" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '"></div>' ) );
     },
 
     _setOption: function (key, value) {
@@ -4254,7 +4256,7 @@ $.Widget.prototype = {
       }
 
 
-      geographics._$labelsContainerBack.html( geographics._labelsHtml ).find("a").css({
+      geographics._$labelsContainerBack.html( window.toStaticHTML( geographics._labelsHtml ) ).find("a").css({
         position: "relative",
         zIndex: 1,
         display: "inline-block",
@@ -4271,7 +4273,6 @@ $.Widget.prototype = {
       } ).prependTo( geographics._$elem );
 
       geographics._$labelsContainerBack = oldLabelsContainer.detach();
-
 
       geographics._timeoutEnd = null;
     },
@@ -4347,10 +4348,10 @@ $.Widget.prototype = {
       }
     }
   });
-}(jQuery));
+}(jQuery, window));
 
 
-(function ($, undefined) {
+(function ($, window, undefined) {
   var _widgetIdSeed = 0,
       _ieVersion = ( function () {
         var v = 5, div = document.createElement("div"), a = div.all || [];
@@ -5237,7 +5238,7 @@ $.Widget.prototype = {
       var contentSizeCss = "width:" + this._contentBounds["width"] + "px; height:" + this._contentBounds["height"] + "px; margin:0; padding:0;",
           contentPosCss = "position:absolute; left:0; top:0;";
 
-      this._$elem.prepend('<div class="geo-event-target geo-content-frame" style="position:absolute; left:' + this._contentBounds.x + 'px; top:' + this._contentBounds.y + 'px;' + contentSizeCss + 'overflow:hidden; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none;" unselectable="on"></div>');
+      this._$elem.prepend( window.toStaticHTML( '<div class="geo-event-target geo-content-frame" style="position:absolute; left:' + this._contentBounds.x + 'px; top:' + this._contentBounds.y + 'px;' + contentSizeCss + 'overflow:hidden; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none;" unselectable="on"></div>' ) );
       this._$eventTarget = this._$contentFrame = this._$elem.children(':first');
 
       this._$contentFrame.append('<div class="geo-services-container" style="' + contentPosCss + contentSizeCss + '"></div>');
@@ -5263,7 +5264,7 @@ $.Widget.prototype = {
       this._$contentFrame.append(this._$existingChildren);
 
       if ( ! $("#geo-measure-style").length ) {
-        $("head").prepend( '<style type="text/css" id="geo-measure-style">.geo-measure-label { margin: 4px 0 0 6px; font-family: sans-serif;' + ( _ieVersion ? 'letter-spacing: 2px; color: #444; filter:progid:DXImageTransform.Microsoft.DropShadow(Color=white, OffX=1, OffY=2, Positive=true);' : 'color: #000; text-shadow: #fff 1px 2px; font-weight: bold;' ) + ' }</style>' );
+        $("head").prepend( window.toStaticHTML( '<style type="text/css" id="geo-measure-style">.geo-measure-label { margin: 4px 0 0 6px; font-family: sans-serif;' + ( _ieVersion ? 'letter-spacing: 2px; color: #444; filter:progid:DXImageTransform.Microsoft.DropShadow(Color=white, OffX=1, OffY=2, Positive=true);' : 'color: #000; text-shadow: #fff 1px 2px; font-weight: bold;' ) + ' }</style>' ) );
       }
     },
 
@@ -5296,7 +5297,7 @@ $.Widget.prototype = {
             scHtml = '<div ' + idString + classString + ' style="-webkit-transform:translateZ(0);position:absolute; left:0; top:0; width:32px; height:32px; margin:0; padding:0; display:' + ( service.style.visibility === "visible" ? "block" : "none" ) + ';"></div>',
             serviceContainer;
 
-        this._$servicesContainer.append( scHtml );
+        this._$servicesContainer.append( window.toStaticHTML( scHtml ) );
         serviceContainer = this._$servicesContainer.children( ":last" );
         service.serviceContainer = serviceContainer;
         
@@ -6588,10 +6589,10 @@ $.Widget.prototype = {
     }
   }
   );
-}(jQuery));
+}(jQuery, window));
 
 
-(function ($, undefined) {
+(function ($, window, undefined) {
   $.geo._serviceTypes.tiled = (function () {
     return {
       create: function (map, serviceContainer, service /* , index */) {
@@ -6605,7 +6606,7 @@ $.Widget.prototype = {
 
           var scHtml = '<div data-geo-service="tiled" style="-webkit-transform:translateZ(0); position:absolute; left:0; top:0; width:8px; height:8px; margin:0; padding:0;"></div>';
 
-          serviceContainer.append(scHtml);
+          serviceContainer.append( window.toStaticHTML( scHtml ) );
 
           serviceState.serviceContainer = serviceContainer.children( ":last" );
 
@@ -6727,7 +6728,7 @@ $.Widget.prototype = {
           }
 
           if (!scaleContainer.size()) {
-            $serviceContainer.append("<div style='-webkit-transform:translateZ(0);position:absolute; left:" + serviceLeft % tileWidth + "px; top:" + serviceTop % tileHeight + "px; width:" + tileWidth + "px; height:" + tileHeight + "px; margin:0; padding:0;' data-pixel-size='" + pixelSize + "'></div>");
+            $serviceContainer.append( window.toStaticHTML( "<div style='-webkit-transform:translateZ(0);position:absolute; left:" + serviceLeft % tileWidth + "px; top:" + serviceTop % tileHeight + "px; width:" + tileWidth + "px; height:" + tileHeight + "px; margin:0; padding:0;' data-pixel-size='" + pixelSize + "'></div>" ) );
             scaleContainer = $serviceContainer.children(":last").data("scaleOrigin", map._toMap( [ (serviceLeft % tileWidth), (serviceTop % tileHeight) ] ) );
           } else {
             scaleContainer.css({
@@ -6804,7 +6805,7 @@ $.Widget.prototype = {
 
                   imgMarkup += "margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;' unselectable='on' data-tile='" + tileStr + "' />";
 
-                  scaleContainer.append(imgMarkup);
+                  scaleContainer.append( window.toStaticHTML( imgMarkup ) );
                   $img = scaleContainer.children(":last");
                 }
 
@@ -6881,9 +6882,9 @@ $.Widget.prototype = {
       }
     };
   }());
-}(jQuery));
+}(jQuery, window));
 
-(function ($, undefined) {
+(function ($, window, undefined) {
   $.geo._serviceTypes.shingled = (function () {
     return {
       create: function ( map, serviceContainer, service /* , index */ ) {
@@ -6896,7 +6897,7 @@ $.Widget.prototype = {
 
           var scHtml = '<div data-geo-service="shingled" style="-webkit-transform:translateZ(0);position:absolute; left:0; top:0; width:16px; height:16px; margin:0; padding:0;"></div>';
 
-          serviceContainer.append(scHtml);
+          serviceContainer.append( window.toStaticHTML( scHtml ) );
 
           serviceState.serviceContainer = serviceContainer.children(":last");
           $.data(service, "geoServiceState", serviceState);
@@ -6973,7 +6974,7 @@ $.Widget.prototype = {
           }
 
           if ( !scaleContainer.size() ) {
-            serviceContainer.append('<div style="-webkit-transform:translateZ(0);position:absolute; left:0px; top: 0px; width:' + mapWidth + 'px; height:' + mapHeight + 'px; margin:0; padding:0;" data-pixel-size="' + pixelSize + '" data-origin="[' + map._toMap( [ 0, 0 ] ) + ']"></div>');
+            serviceContainer.append( window.toStaticHTML( '<div style="-webkit-transform:translateZ(0);position:absolute; left:0px; top: 0px; width:' + mapWidth + 'px; height:' + mapHeight + 'px; margin:0; padding:0;" data-pixel-size="' + pixelSize + '" data-origin="[' + map._toMap( [ 0, 0 ] ) + ']"></div>' ) );
             scaleContainer = serviceContainer.children(":last");
           }
 
@@ -7003,7 +7004,7 @@ $.Widget.prototype = {
           serviceState.loadCount++;
           map._requestQueued();
 
-          scaleContainer.append('<img style="-webkit-transform:translateZ(0);position:absolute; left:' + ( imagePos.left / scaleContainer.width( ) * 100 ) + '%; top:' + ( imagePos.top / scaleContainer.height( ) * 100 ) + '%; width:100%; height:100%; margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;" unselectable="on" />');
+          scaleContainer.append( window.toStaticHTML( '<img style="-webkit-transform:translateZ(0);position:absolute; left:' + ( imagePos.left / scaleContainer.width( ) * 100 ) + '%; top:' + ( imagePos.top / scaleContainer.height( ) * 100 ) + '%; width:100%; height:100%; margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;" unselectable="on" />' ) );
           $img = scaleContainer.children(":last").data("center", map._center);
 
           if ( typeof imageUrl === "string" ) {
@@ -7117,4 +7118,4 @@ $.Widget.prototype = {
       }
     };
   }());
-}(jQuery));
+}(jQuery, window));

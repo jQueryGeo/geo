@@ -95,6 +95,7 @@ Unless you have downloaded a tagged release, grunt will create a test version of
 * geomap - [bug] removing a shape from one service that has been appended to two services causes an error in the second service
 * geographics - [bug] graphics stretch after resize
 * project - upgrade to gruntjs 0.4.1
+* geomap - support Windows 8 Store apps
 
 ### 1.0.0-b1.5 (2013-01-17)
 * examples - drawing markers
