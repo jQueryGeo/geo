@@ -1,4 +1,4 @@
-(function ($, undefined) {
+(function ($, window, undefined) {
   $.geo._serviceTypes.tiled = (function () {
     return {
       create: function (map, serviceContainer, service /* , index */) {
@@ -12,7 +12,7 @@
 
           var scHtml = '<div data-geo-service="tiled" style="-webkit-transform:translateZ(0); position:absolute; left:0; top:0; width:8px; height:8px; margin:0; padding:0;"></div>';
 
-          serviceContainer.append(scHtml);
+          serviceContainer.append( window.toStaticHTML( scHtml ) );
 
           serviceState.serviceContainer = serviceContainer.children( ":last" );
 
@@ -134,7 +134,7 @@
           }
 
           if (!scaleContainer.size()) {
-            $serviceContainer.append("<div style='-webkit-transform:translateZ(0);position:absolute; left:" + serviceLeft % tileWidth + "px; top:" + serviceTop % tileHeight + "px; width:" + tileWidth + "px; height:" + tileHeight + "px; margin:0; padding:0;' data-pixel-size='" + pixelSize + "'></div>");
+            $serviceContainer.append( window.toStaticHTML( "<div style='-webkit-transform:translateZ(0);position:absolute; left:" + serviceLeft % tileWidth + "px; top:" + serviceTop % tileHeight + "px; width:" + tileWidth + "px; height:" + tileHeight + "px; margin:0; padding:0;' data-pixel-size='" + pixelSize + "'></div>" ) );
             scaleContainer = $serviceContainer.children(":last").data("scaleOrigin", map._toMap( [ (serviceLeft % tileWidth), (serviceTop % tileHeight) ] ) );
           } else {
             scaleContainer.css({
@@ -211,7 +211,7 @@
 
                   imgMarkup += "margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;' unselectable='on' data-tile='" + tileStr + "' />";
 
-                  scaleContainer.append(imgMarkup);
+                  scaleContainer.append( window.toStaticHTML( imgMarkup ) );
                   $img = scaleContainer.children(":last");
                 }
 
@@ -288,4 +288,4 @@
       }
     };
   }());
-}(jQuery));
+}(jQuery, window));

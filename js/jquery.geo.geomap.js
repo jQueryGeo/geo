@@ -1,4 +1,4 @@
-(function ($, undefined) {
+(function ($, window, undefined) {
   var _widgetIdSeed = 0,
       _ieVersion = ( function () {
         var v = 5, div = document.createElement("div"), a = div.all || [];
@@ -885,7 +885,7 @@
       var contentSizeCss = "width:" + this._contentBounds["width"] + "px; height:" + this._contentBounds["height"] + "px; margin:0; padding:0;",
           contentPosCss = "position:absolute; left:0; top:0;";
 
-      this._$elem.prepend('<div class="geo-event-target geo-content-frame" style="position:absolute; left:' + this._contentBounds.x + 'px; top:' + this._contentBounds.y + 'px;' + contentSizeCss + 'overflow:hidden; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none;" unselectable="on"></div>');
+      this._$elem.prepend( window.toStaticHTML( '<div class="geo-event-target geo-content-frame" style="position:absolute; left:' + this._contentBounds.x + 'px; top:' + this._contentBounds.y + 'px;' + contentSizeCss + 'overflow:hidden; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none;" unselectable="on"></div>' ) );
       this._$eventTarget = this._$contentFrame = this._$elem.children(':first');
 
       this._$contentFrame.append('<div class="geo-services-container" style="' + contentPosCss + contentSizeCss + '"></div>');
@@ -911,7 +911,7 @@
       this._$contentFrame.append(this._$existingChildren);
 
       if ( ! $("#geo-measure-style").length ) {
-        $("head").prepend( '<style type="text/css" id="geo-measure-style">.geo-measure-label { margin: 4px 0 0 6px; font-family: sans-serif;' + ( _ieVersion ? 'letter-spacing: 2px; color: #444; filter:progid:DXImageTransform.Microsoft.DropShadow(Color=white, OffX=1, OffY=2, Positive=true);' : 'color: #000; text-shadow: #fff 1px 2px; font-weight: bold;' ) + ' }</style>' );
+        $("head").prepend( window.toStaticHTML( '<style type="text/css" id="geo-measure-style">.geo-measure-label { margin: 4px 0 0 6px; font-family: sans-serif;' + ( _ieVersion ? 'letter-spacing: 2px; color: #444; filter:progid:DXImageTransform.Microsoft.DropShadow(Color=white, OffX=1, OffY=2, Positive=true);' : 'color: #000; text-shadow: #fff 1px 2px; font-weight: bold;' ) + ' }</style>' ) );
       }
     },
 
@@ -944,7 +944,7 @@
             scHtml = '<div ' + idString + classString + ' style="-webkit-transform:translateZ(0);position:absolute; left:0; top:0; width:32px; height:32px; margin:0; padding:0; display:' + ( service.style.visibility === "visible" ? "block" : "none" ) + ';"></div>',
             serviceContainer;
 
-        this._$servicesContainer.append( scHtml );
+        this._$servicesContainer.append( window.toStaticHTML( scHtml ) );
         serviceContainer = this._$servicesContainer.children( ":last" );
         service.serviceContainer = serviceContainer;
         
@@ -2236,5 +2236,5 @@
     }
   }
   );
-}(jQuery));
+}(jQuery, window));
 

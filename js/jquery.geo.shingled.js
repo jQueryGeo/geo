@@ -1,4 +1,4 @@
-(function ($, undefined) {
+(function ($, window, undefined) {
   $.geo._serviceTypes.shingled = (function () {
     return {
       create: function ( map, serviceContainer, service /* , index */ ) {
@@ -11,7 +11,7 @@
 
           var scHtml = '<div data-geo-service="shingled" style="-webkit-transform:translateZ(0);position:absolute; left:0; top:0; width:16px; height:16px; margin:0; padding:0;"></div>';
 
-          serviceContainer.append(scHtml);
+          serviceContainer.append( window.toStaticHTML( scHtml ) );
 
           serviceState.serviceContainer = serviceContainer.children(":last");
           $.data(service, "geoServiceState", serviceState);
@@ -88,7 +88,7 @@
           }
 
           if ( !scaleContainer.size() ) {
-            serviceContainer.append('<div style="-webkit-transform:translateZ(0);position:absolute; left:0px; top: 0px; width:' + mapWidth + 'px; height:' + mapHeight + 'px; margin:0; padding:0;" data-pixel-size="' + pixelSize + '" data-origin="[' + map._toMap( [ 0, 0 ] ) + ']"></div>');
+            serviceContainer.append( window.toStaticHTML( '<div style="-webkit-transform:translateZ(0);position:absolute; left:0px; top: 0px; width:' + mapWidth + 'px; height:' + mapHeight + 'px; margin:0; padding:0;" data-pixel-size="' + pixelSize + '" data-origin="[' + map._toMap( [ 0, 0 ] ) + ']"></div>' ) );
             scaleContainer = serviceContainer.children(":last");
           }
 
@@ -118,7 +118,7 @@
           serviceState.loadCount++;
           map._requestQueued();
 
-          scaleContainer.append('<img style="-webkit-transform:translateZ(0);position:absolute; left:' + ( imagePos.left / scaleContainer.width( ) * 100 ) + '%; top:' + ( imagePos.top / scaleContainer.height( ) * 100 ) + '%; width:100%; height:100%; margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;" unselectable="on" />');
+          scaleContainer.append( window.toStaticHTML( '<img style="-webkit-transform:translateZ(0);position:absolute; left:' + ( imagePos.left / scaleContainer.width( ) * 100 ) + '%; top:' + ( imagePos.top / scaleContainer.height( ) * 100 ) + '%; width:100%; height:100%; margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;" unselectable="on" />' ) );
           $img = scaleContainer.children(":last").data("center", map._center);
 
           if ( typeof imageUrl === "string" ) {
@@ -232,4 +232,4 @@
       }
     };
   }());
-}(jQuery));
+}(jQuery, window));
