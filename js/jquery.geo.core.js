@@ -1,4 +1,6 @@
 (function ($, window, undefined) {
+  window.toStaticHTML = window.toStaticHTML || function ( x ) { return x; };
+
   var pos_oo = Number.POSITIVE_INFINITY,
       neg_oo = Number.NEGATIVE_INFINITY;
 

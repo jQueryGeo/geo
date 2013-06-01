@@ -1,4 +1,4 @@
-(function ($, undefined) {
+(function ($, window, undefined) {
   var _ieVersion = ( function () {
     var v = 5, div = document.createElement("div"), a = div.all || [];
     do {
@@ -81,7 +81,7 @@
       this._blitcanvas = document.createElement( "canvas" );
 
       if ( this._blitcanvas.getContext ) {
-        this._$canvas = $('<canvas ' + sizeAttr + ' style="-webkit-transform:translateZ(0);' + posCss + '"></canvas>');
+        this._$canvas = $( window.toStaticHTML( '<canvas ' + sizeAttr + ' style="-webkit-transform:translateZ(0);' + posCss + '"></canvas>' ) );
 
         // test _trueDoubleBuffer
         this._blitcanvas.width = 1;
@@ -100,8 +100,8 @@
 
         // create our front & back buffers
         // though, at any time either one can be in front
-        this._$canvasSceneFront = $('<img id="scene0" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />').load($.proxy(this._canvasSceneLoad, this));
-        this._$canvasSceneBack = $('<img id="scene1" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />').load($.proxy(this._canvasSceneLoad, this));
+        this._$canvasSceneFront = $( window.toStaticHTML( '<img id="scene0" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ).load($.proxy(this._canvasSceneLoad, this));
+        this._$canvasSceneBack = $( window.toStaticHTML( '<img id="scene1" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ).load($.proxy(this._canvasSceneLoad, this));
 
       } else if (_ieVersion <= 8) {
         this._trueCanvas = false;
@@ -114,8 +114,8 @@
       }
 
       // create our front & back label containers
-      this._$labelsContainerFront = $('<div class="geo-labels-container" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '"></div>');
-      this._$labelsContainerBack = $('<div class="geo-labels-container" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '"></div>');
+      this._$labelsContainerFront = $( window.toStaticHTML( '<div class="geo-labels-container" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '"></div>' ) );
+      this._$labelsContainerBack = $( window.toStaticHTML( '<div class="geo-labels-container" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '"></div>' ) );
     },
 
     _setOption: function (key, value) {
@@ -467,7 +467,7 @@
       }
 
 
-      geographics._$labelsContainerBack.html( geographics._labelsHtml ).find("a").css({
+      geographics._$labelsContainerBack.html( window.toStaticHTML( geographics._labelsHtml ) ).find("a").css({
         position: "relative",
         zIndex: 1,
         display: "inline-block",
@@ -484,7 +484,6 @@
       } ).prependTo( geographics._$elem );
 
       geographics._$labelsContainerBack = oldLabelsContainer.detach();
-
 
       geographics._timeoutEnd = null;
     },
@@ -560,5 +559,5 @@
       }
     }
   });
-}(jQuery));
+}(jQuery, window));
 

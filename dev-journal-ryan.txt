@@ -1,7 +1,6 @@
 ﻿== to do ==
 
 === b2 ===
-* geomap - support Windows 8 Store apps
 * geomap - [bug] Microsoft high-precision mouse wheel & mac touchpads zoom too quickly
 * examples - [bug] inset doesn't show inset map
 
@@ -20,6 +19,10 @@
 Starting point for a jQuery Geo demo:
 
 http://jsfiddle.net/ryanttb/KQHN9/
+
+=== posts ===
+* posts - SQL Server to jQuery Geo
+* posts - WKT object
 
 === examples ===
 * examples - forecast.io skycons on jQuery Geo map
@@ -113,6 +116,8 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geomap - add indexMax property to service object to limit the view.index number so it can be used in template src
 * geomap - [bug] page scroll effects zoom center on fixed position maps
 * geomap - clean up touch tracking
+* geomap - support MS pointer events
+** http://msdn.microsoft.com/en-us/library/ie/hh673557(v=vs.85).aspx
 * geomap - support high-precision mice better in tiled maps
 * geomap - don't repeat attr text if the same as one previously added
 * docs - geo - add simplify
@@ -280,6 +285,28 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2013-06-01==
+===win8===
+Continuing on this today.
+
+It's toStaticHTML, not toStaticHtml. Calling .css doesn't make your elements insecure, however, you have to wrap them in toStaticHTML when you create them initially, e.g., $( window.toStaticHTML( '<canvas>' ) );
+
+No alert function in WinJS. You have to:
+  (new Windows.UI.Popups.MessageDialog("msg")).showAsync();
+
+
+
+
+==2013-05-21==
+===win8===
+JavaScript references go in default.html. The map will go in home.html/js in a navigation app.
+
+The toStaticHtml errors don't happen unil you try to initialize a map.
+
+==2013-05-15==
+===win8===
+I put the toStaticHtml methods in an old copy of jQuery Geo I used in the Win8 install event.
 
 ==2013-05-13==
 ===grunt===
