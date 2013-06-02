@@ -96,6 +96,7 @@ Unless you have downloaded a tagged release, grunt will create a test version of
 * geographics - [bug] graphics stretch after resize
 * project - upgrade to gruntjs 0.4.1
 * geomap - support Windows 8 Store apps
+* geomap - [bug] #93 mac and some pc touchpads zoom too quickly
 
 ### 1.0.0-b1.5 (2013-01-17)
 * examples - drawing markers
