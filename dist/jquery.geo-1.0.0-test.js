@@ -6566,6 +6566,7 @@ $.Widget.prototype = {
       }
 
       if (delta !== 0) {
+        var tiledFull = Math.abs( delta ) >= 1;
         this._clearInteractiveTimeout( );
 
         if ( delta > 0 ) {
@@ -6577,7 +6578,7 @@ $.Widget.prototype = {
         var offset = $(e.currentTarget).offset();
         this._anchor = [e.pageX - offset.left, e.pageY - offset.top];
 
-        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, this._options[ "tilingScheme" ] !== null );
+        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, this._options[ "tilingScheme" ] !== null ? tiledFull : true );
 
         this._setInteractiveCenterAndSize( wheelCenterAndSize.center, wheelCenterAndSize.pixelSize );
         this._interactiveTransform( );
