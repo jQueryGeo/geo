@@ -1,7 +1,7 @@
 ﻿== to do ==
 
 === b2 ===
-* geomap - [bug] Microsoft high-precision mouse wheel & mac touchpads zoom too quickly
+* geomap - [bug] high-precision mouse wheels require lots of spin to begin zooming, then zoom too quickly
 * examples - [bug] inset doesn't show inset map
 
 ===bug fixing process===
@@ -29,6 +29,7 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * examples - location based notes/to do list
 * examples - disease map
 ** http://jsfiddle.net/ryanttb/gU7wS/14/
+* examples - Windows Store app
 * examples - 3d heatmap
 * examples - jQuery Mobile
 * examples - pan cursor
@@ -101,6 +102,8 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geomap - default services (see 2013-05-08)
 * geomap - [bug] if panning is false, mode is draw*, and user attempts to pan, the drawing begins (or another point is added) on the touchstop point
 ** a failed pan shouldn't add a point to drawCoords
+* geomap - stop handling the real dblclick event, handle all doudble clicks as softDblClick
+** http://www.quirksmode.org/js/events_mouse.html#Dblclick
 * geomap - ie (8?) - [bug] ie highlights entire map div during shift-zoom
 ** possibly only when axisLayout is image
 * geomap - [bug] first use of mouse/touch in any mode moves map by one pixel on mousedown/touch
@@ -295,8 +298,25 @@ It's toStaticHTML, not toStaticHtml. Calling .css doesn't make your elements ins
 No alert function in WinJS. You have to:
   (new Windows.UI.Popups.MessageDialog("msg")).showAsync();
 
+Seems okay enough to call it a version.
 
+===high precision mice===
+The last major bug are those high precision mouse events.
 
+From before:
+  Peter's mouse can't wheel zoom easilly. It's a high precision mouse and it doesn't click when you scroll it. I have a feeling I'm getting .25 delta and it's rounding down to zero.
+
+Mouse wheel events in Firefox are a mess it looks. FF17 is finally using the standard one, I guess, but Chrome is not? https://developer.mozilla.org/en-US/docs/Web/API/WheelEvent
+
+Anyway, back to the wheel issue. There are two, actually. Peter's issue is that the first click doesn't register. My issue (and Macbook issues) are that scrolling goes WAY too fast.
+
+On my laptop touch pad, I'm getting  wheel delta of 0.116666...7.
+
+The code goes on to ceil it to 1.0.
+
+The new scale is calculated by raising the zoomFactor by the delta. Hmm, we are doing full zoom levels because tilingScheme is not null. If I check for high precision delta, I should maybe force it to not use full level zooming.
+
+But what's a normal mouse wheel value? Right, just +/- 1, 2, etc. They build on each other though. Ah, but _getZoomCenterAndSize handles the delta values as absolute.
 
 ==2013-05-21==
 ===win8===
