@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0.0-test - 2013-06-01
+/*! jQuery Geo - v1.0.0-test - 2013-06-02
 * http://jquerygeo.com
 * Copyright (c) 2013 Ryan Westphal; Licensed MIT, GPL */
 // Copyright 2006 Google Inc.
@@ -4516,6 +4516,7 @@ $.Widget.prototype = {
       }
 
       this._widgetId = _widgetIdSeed++;
+      this._serviceIdSeed = 0;
       this._tmplLengthId = "geoMeasureLength" + this._widgetId;
       this._tmplAreaId = "geoMeasureArea" + this._widgetId;
 
@@ -6595,8 +6596,17 @@ $.Widget.prototype = {
 
 (function ($, window, undefined) {
   $.geo._serviceTypes.tiled = (function () {
+    var rTmplString = new RegExp( "<.*>|{{.*}}" );
+
     return {
+      _serviceId: 0,
+      _tmplGeoSrcId: "",
+
+
       create: function (map, serviceContainer, service /* , index */) {
+        this._serviceId = map._serviceIdSeed++;
+        this._tmplGeoSrcId = "geoSrc" + this._serviceId;
+
         var serviceState = $.data(service, "geoServiceState");
 
         if ( !serviceState ) {
@@ -6788,8 +6798,12 @@ $.Widget.prototype = {
                 if ( isFunc ) {
                   imageUrl = service[ urlProp ]( urlArgs );
                 } else {
-                  $.templates( "geoSrc", service[ urlProp ] );
-                  imageUrl = $.render[ "geoSrc" ]( urlArgs );
+                  if ( rTmplString.test( service[ urlProp ] ) ) {
+                    $.templates( this._tmplGeoSrcId, service[ urlProp ] );
+                    imageUrl = $.render[ this._tmplGeoSrcId ]( urlArgs );
+                  } else {
+                    imageUrl = service[ urlProp ];
+                  }
                 }
 
                 serviceState.loadCount++;
@@ -6887,8 +6901,16 @@ $.Widget.prototype = {
 
 (function ($, window, undefined) {
   $.geo._serviceTypes.shingled = (function () {
+    var rTmplString = new RegExp( "<.*>|{{.*}}" );
+
     return {
+      _serviceId: 0,
+      _tmplGeoSrcId: "",
+
       create: function ( map, serviceContainer, service /* , index */ ) {
+        this._serviceId = map._serviceIdSeed++;
+        this._tmplGeoSrcId = "geoSrc" + this._serviceId;
+
         var serviceState = $.data(service, "geoServiceState");
 
         if ( !serviceState ) {
@@ -6998,8 +7020,12 @@ $.Widget.prototype = {
           if ( isFunc ) {
             imageUrl = service[ urlProp ]( urlArgs );
           } else {
-            $.templates( "geoSrc", service[ urlProp ] );
-            imageUrl = $.render[ "geoSrc" ]( urlArgs );
+            if ( rTmplString.test( service[ urlProp ] ) ) {
+              $.templates( this._tmplGeoSrcId, service[ urlProp ] );
+              imageUrl = $.render[ this._tmplGeoSrcId ]( urlArgs );
+            } else {
+              imageUrl = service[ urlProp ];
+            }
           }
 
           serviceState.loadCount++;

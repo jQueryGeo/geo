@@ -163,6 +163,7 @@
       }
 
       this._widgetId = _widgetIdSeed++;
+      this._serviceIdSeed = 0;
       this._tmplLengthId = "geoMeasureLength" + this._widgetId;
       this._tmplAreaId = "geoMeasureArea" + this._widgetId;
 

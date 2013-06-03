@@ -1,7 +1,16 @@
 (function ($, window, undefined) {
   $.geo._serviceTypes.tiled = (function () {
+    var rTmplString = new RegExp( "<.*>|{{.*}}" );
+
     return {
+      _serviceId: 0,
+      _tmplGeoSrcId: "",
+
+
       create: function (map, serviceContainer, service /* , index */) {
+        this._serviceId = map._serviceIdSeed++;
+        this._tmplGeoSrcId = "geoSrc" + this._serviceId;
+
         var serviceState = $.data(service, "geoServiceState");
 
         if ( !serviceState ) {
@@ -193,8 +202,12 @@
                 if ( isFunc ) {
                   imageUrl = service[ urlProp ]( urlArgs );
                 } else {
-                  $.templates( "geoSrc", service[ urlProp ] );
-                  imageUrl = $.render[ "geoSrc" ]( urlArgs );
+                  if ( rTmplString.test( service[ urlProp ] ) ) {
+                    $.templates( this._tmplGeoSrcId, service[ urlProp ] );
+                    imageUrl = $.render[ this._tmplGeoSrcId ]( urlArgs );
+                  } else {
+                    imageUrl = service[ urlProp ];
+                  }
                 }
 
                 serviceState.loadCount++;
