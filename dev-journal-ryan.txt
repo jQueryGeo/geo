@@ -1,8 +1,8 @@
 ﻿== to do ==
 
 === b2 ===
-* geomap - [bug] high-precision mouse wheels require lots of spin to begin zooming, then zoom too quickly
-* examples - [bug] inset doesn't show inset map
+* geomap - remove support for deprecated getUrl service object property
+** renamed to: src
 
 ===bug fixing process===
 1. reproduce bug in jsFiddle with latest release version of jQuery Geo
@@ -63,7 +63,10 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * embed
 
 === future ===
-* project - update grunt
+* project - upgrade to jsRender 1.0pre
+* geomap - each service need a different geoSrc tempate name to avoid conflicts
+** i.e. - don't rebuild the geoSrc template for every single image/tile
+* geomap - [bug] high-precision mouse wheels require lots of spin to begin zooming, then zoom too quickly
 * project - get on https://github.com/cdnjs/cdnjs
 * geomap - [bug] scrolling a relative div over a fixed map breaks interaction with lower portion of map (see comment from 2013-03-31)
 * docs - geomap - allow template engine plugins
@@ -288,6 +291,61 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2013-06-02==
+===inset map===
+I'm not sure what's going on here. The code on docs.jquerygeo.com appears to be the same as my jsFiddle using b1.1 but doesn't work in jsFiddle. It works fine on docs.
+
+Let's try a local test version. They may be a security issue with localhost and jsFiddle
+
+Ah! It's a change in jQuery. The inset example works fine with latest jQuery Geo works fine with jQuery 1.7 but not with 1.8 or 1.9.
+
+Actually, this might be related to having two maps. The geoSrc template might be interfering with each other.
+
+On that note, has there been a new jsRender release? Yes, the official beta is out. The release should be next month so I can get that into b3 or 1.0 release.
+
+Back to this issue...I fixed a jsRender template naming issue with measure tools already, I think. This is similar. I did. I'm going to use the same _widgetId for now, getting it right from the map widget itself.
+
+OR...I can stop supporting geoSrc, since it's been deprecated since 1.0a4...hmm. In fact, on jquerygeo.com, I explicitly say that support for the old getUrl property of service objects will be removed in beta. Done.
+
+Ugh, geoSrc is the template and has nothing to do with the old getUrl vs. src property names. I am going to have to support multiple widget geoSrc templates.
+
+I think I'm on the wrong trail. It's good to keep geoSrc different per widget, but I might need it different per service as well. Each service can have a different src template.
+
+Before I fix this, I would like to have an example of it in a broken state with b1.5.
+
+Since I seem to be off on a tangent/new issue, here's a fiddle for the original issue I was working with (inset map not working in jQuery > 1.7) http://jsfiddle.net/ryanttb/5p7q9/
+
+===geoSrc===
+
+The new issue is with the geoSrc template name being used on multiple services. What if each service has a different template?
+
+The example will be two tiled services spitting out two different static images.
+
+The other issue is way more important. I can't set a service's src property to have a static string template in jQuery > 1.7.
+
+===static src===
+
+Here's the issue in b1.5: http://jsfiddle.net/ryanttb/q2QF4/
+
+Now, to fix it.
+
+The static url is not a template string, jsRender checks for that.
+
+At the moment, the only way to get around this is to perform the same test on the URL that jsRender does. If it's not a template string, don't compile a template. Although, I sort of wonder if the latest jsRender fixes this.
+
+*Interesting* ! The latest jsRender still throws the same exception in sizzle but jsRender traps it. So, the demo still works but it's throwing an exception for each tile. That's not good. I'm going to do what I said and not use jsRender if I know it's not a template thereby avoiding the error. I will test the latest jsRender at another time.
+
+If you're curious, the exception being thrown is at:
+jQuery 1.9.1, line 4421
+
+Though, it won't be hard to find.
+
+My geoSrc id aside/issue is a non issue as I appear to recreate the template every time. That's an optimization that can wait.
+
+Not the cleanest fix, but it'll do. I have a feeling the sizzle exception wasn't being throwin in jQuery 1.7 or below.
+
+I'm going to commit the geoSrcId change as part of this. I can undo it if I find a better way to handle the issue that isn't there yet (currently the geoSrc template is overwritten for every image/tile). I marked that as another bug.
 
 ==2013-06-01==
 ===win8===
