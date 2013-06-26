@@ -85,6 +85,10 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geo - audit in-place geo calls, e.g., fromGeodetic
 * docs - geomap - layers template argument/service object property
 * geomap - layers template argument/service object property
+* docs - geomap - design service type plugin support
+* geomap - design service type plugin support
+** pattern after popcornjs plugin? http://popcornjs.org/creating-plugins
+** (function (jQueryGeo) { jQueryGeo.service( "serviceType", { /* stuff */ } ) })( $.geo );
 * geomap - map & map services type objects should refresh their own shapes after the map image (or tiles) has downloaded or after some timout
 ** this could increase responsiveness in case the user interacts just slightly after it's time to refresh
 ** it will also be required for plugin service objects
@@ -278,7 +282,6 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geomap - toDataURL method
 * docs - geo - $.geo.guessLocation function
 * geo - $.geo.guessLocation function
-* docs - services - document the plugin architecture
 * docs - geomap - drawPush function
 ** in the drawing modes, this function starts drawing or adds a point into the already-started shape at the given coordinate
 ** immediately triggers the shape event if mode is drawPoint
@@ -291,6 +294,10 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2013-06-26==
+===plugin===
+Some thoughts on a plugin engine. Should I model after popcornjs? Is there a more jQuery-like solution?
 
 ==2013-06-25==
 ===Firefox shape redraw===
