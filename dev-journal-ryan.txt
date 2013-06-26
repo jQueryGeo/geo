@@ -1,8 +1,6 @@
 ﻿== to do ==
 
 === b2 ===
-* geomap - remove support for deprecated getUrl service object property
-** renamed to: src
 
 ===bug fixing process===
 1. reproduce bug in jsFiddle with latest release version of jQuery Geo
@@ -63,6 +61,8 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * embed
 
 === future ===
+* geomap - remove support for deprecated getUrl service object property
+** renamed to: src
 * project - upgrade to jsRender 1.0pre
 * geomap - each service need a different geoSrc tempate name to avoid conflicts
 ** i.e. - don't rebuild the geoSrc template for every single image/tile
@@ -291,6 +291,14 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2013-06-25==
+===Firefox shape redraw===
+We meet again!
+
+I have another report that this is an issue. I'm not sure how to test it but it's definitely visibile in the test site which is using a test version of jQueryGeo from 2012-11-02.
+
+I can see the issue in all-tiled in b1.5 but not in the latest test version. I'm sending that to Tarin and going to see if that helps Beverly.
 
 ==2013-06-02==
 ===inset map===
