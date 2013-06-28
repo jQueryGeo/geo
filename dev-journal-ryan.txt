@@ -243,6 +243,8 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * docs - geo - support up to GeometryCollection in centroid
 * geo - support up to GeometryCollection in centroid
 * geomap - show a drawPoint style while the mouse is down, hide if toolPan or dbltap scale
+* geomap - audit potential reflow
+** http://gent.ilcore.com/2011/03/how-not-to-trigger-layout-in-webkit.html
 * geomap - audit allocations and reduce garbage
 ** see http://www.scirra.com/blog/76/how-to-write-low-garbage-real-time-javascript
 * geomap - re-use services that have the same id as existing services
