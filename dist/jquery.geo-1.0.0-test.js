@@ -2682,7 +2682,7 @@ $.Widget.prototype = {
 
       while ( $.isArray( coords ) ) {
         if ( coords.length > 1 && ! $.isArray( coords[ 0 ] ) ) {
-          return ( coords[ 0 ] >= -180 && coords[ 0 ] <= 180 && coords[ 1 ] >= -85 && coords[ 1 ] <= 85 );
+          return ( coords[ 0 ] >= -180.001 && coords[ 0 ] <= 180.001 && coords[ 1 ] >= -90.001 && coords[ 1 ] <= 90.001 );
         } else {
           coords = coords[ 0 ];
         }

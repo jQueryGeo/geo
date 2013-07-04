@@ -99,6 +99,7 @@ Unless you have downloaded a tagged release, grunt will create a test version of
 * geomap - [bug] #93 mac and some pc touchpads zoom too quickly
 * geomap - [bug] static string urls for service object src do not work with jQuery > 1.7
 * geomap - [bug] append can ignore style
+* geomap - [bug] polygon not displayed when a longitude is -180.0
 
 ### 1.0.0-b1.5 (2013-01-17)
 * examples - drawing markers
