@@ -311,6 +311,22 @@ Firefox can get pretty choppy when panning with the boat launch markers and a si
 === #98 null to refresh ignores style ===
 jsFiddle test: http://jsfiddle.net/ryanttb/Sb79W/
 
+=== #130 MultiPolygon not displayed properly ===
+The MultiPolygon is the USA states, with a single label. However, there's a Polygon at the end that has -180 in the longitude. This might be related to #128. I think it is. I might want to tackle that one first.
+
+=== #128 ===
+I can see the Polygon at zoom 0-1, but not at zoom > 2.
+
+jsfiddle of b1.5: http://jsfiddle.net/ryanttb/auJN9/
+
+Hmm, we're disjoint comparing a definitely projected map bbox (internal) to a *possibly* geodetic (definitely geodetic in this example) shape bbox.
+
+When we go to draw, we use the full geomap.toPixel method which guarantees converting to projected coordinates. We might need to do that earlier, before we check for disjoint (which doesn't convert, because it's a private, underscore, method). 
+
+So, something's not right...Ah! The shape bbox is not being converted to projected because it's just outside the geodetic range for web mercator (rounded down to -180.000003 or something).
+
+I'm going to make the isGeodetic function a little more fuzzy. That seemed to do it. I wonder if there will be any bad effects. Along longitude, I added .001 on either side. I upped the latitude check from 85 to 90 and also added the .001. So, very fuzzy but should be ok.
+
 ==2013-06-26==
 ===plugin===
 Some thoughts on a plugin engine. Should I model after popcornjs? Is there a more jQuery-like solution?
