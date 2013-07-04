@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0.0-test - 2013-06-02
+/*! jQuery Geo - v1.0.0-test - 2013-07-04
 * http://jquerygeo.com
 * Copyright (c) 2013 Ryan Westphal; Licensed MIT, GPL */
 // Copyright 2006 Google Inc.
@@ -5001,12 +5001,14 @@ $.Widget.prototype = {
         for ( i = 1; i < arguments.length; i++ ) {
           arg = arguments[ i ];
 
-          if ( typeof arg === "object" ) {
-            realStyle = arg;
-          } else if ( typeof arg === "number" || typeof arg === "string" ) {
-            realLabel = arg;
-          } else if ( typeof arg === "boolean" ) {
-            realRefresh = arg;
+          if ( arg !== null ) {
+            if ( typeof arg === "object" ) {
+              realStyle = arg;
+            } else if ( typeof arg === "number" || typeof arg === "string" ) {
+              realLabel = arg;
+            } else if ( typeof arg === "boolean" ) {
+              realRefresh = arg;
+            }
           }
         }
 
