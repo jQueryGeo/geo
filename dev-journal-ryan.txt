@@ -308,6 +308,9 @@ I need to test the actual report before closing this issue, though I think it's 
 
 Firefox can get pretty choppy when panning with the boat launch markers and a single circle shape but in the end, I think everything falls into the correct place.
 
+=== #98 null to refresh ignores style ===
+jsFiddle test: http://jsfiddle.net/ryanttb/Sb79W/
+
 ==2013-06-26==
 ===plugin===
 Some thoughts on a plugin engine. Should I model after popcornjs? Is there a more jQuery-like solution?

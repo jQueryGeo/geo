@@ -648,12 +648,14 @@
         for ( i = 1; i < arguments.length; i++ ) {
           arg = arguments[ i ];
 
-          if ( typeof arg === "object" ) {
-            realStyle = arg;
-          } else if ( typeof arg === "number" || typeof arg === "string" ) {
-            realLabel = arg;
-          } else if ( typeof arg === "boolean" ) {
-            realRefresh = arg;
+          if ( arg !== null ) {
+            if ( typeof arg === "object" ) {
+              realStyle = arg;
+            } else if ( typeof arg === "number" || typeof arg === "string" ) {
+              realLabel = arg;
+            } else if ( typeof arg === "boolean" ) {
+              realRefresh = arg;
+            }
           }
         }
 
