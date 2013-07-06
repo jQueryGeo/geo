@@ -61,8 +61,10 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * embed
 
 === future ===
+* geomap - [bug] centroid throws exception for USA states data
 * geographics - [bug] doubleBuffer is choppy
 ** especially noticeable in Firefox
+** pretty bad with the USA demo: http://jsfiddle.net/ryanttb/8TvMB/2/
 * geomap - remove support for deprecated getUrl service object property
 ** renamed to: src
 * project - upgrade to jsRender 1.0pre
@@ -299,6 +301,10 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-07-06==
+=== #127 geo.include without proj ===
+You should be able to use the core functions ($.geo) without a map or a proj object. I was originally calling fromGeodetic on the passed in value w/o checking for proj.
+
 ==2013-07-04==
 ===happy independence day===
 Nothing major left on my b2 list above. I have a few things to clear from GitHub. Best get to it.
@@ -326,6 +332,17 @@ When we go to draw, we use the full geomap.toPixel method which guarantees conve
 So, something's not right...Ah! The shape bbox is not being converted to projected because it's just outside the geodetic range for web mercator (rounded down to -180.000003 or something).
 
 I'm going to make the isGeodetic function a little more fuzzy. That seemed to do it. I wonder if there will be any bad effects. Along longitude, I added .001 on either side. I upped the latitude check from 85 to 90 and also added the .001. So, very fuzzy but should be ok.
+
+=== #130 ===
+I'm having trouble just trying to render all these points.
+
+The center was way too far off (now that 90 is a valid center value, it was moving the map to a bad place). That might be another issue.
+
+As expected, the fix for #128 fixed this.
+
+However, this test makes obvious other issues:
+* All those graphics make the image original flip bug (where stuff isn't where it belongs until you pan) more apparent (especially in Firefox again but I even got it in IE)
+* $.geo.centroid doesn't work on the USA states data, throws exception
 
 ==2013-06-26==
 ===plugin===
