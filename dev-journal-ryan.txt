@@ -301,6 +301,10 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-07-06==
+=== #127 geo.include without proj ===
+You should be able to use the core functions ($.geo) without a map or a proj object. I was originally calling fromGeodetic on the passed in value w/o checking for proj.
+
 ==2013-07-04==
 ===happy independence day===
 Nothing major left on my b2 list above. I have a few things to clear from GitHub. Best get to it.
