@@ -11,7 +11,6 @@
   "boss": true,
   "eqnull": true,
   "node": true,
-  "es5": true,
   "browser": true,
   "jquery": true,
   "globals": {

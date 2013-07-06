@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0.0-test - 2013-07-04
+/*! jQuery Geo - v1.0.0-test - 2013-07-06
 * http://jquerygeo.com
 * Copyright (c) 2013 Ryan Westphal; Licensed MIT, GPL */
 // Copyright 2006 Google Inc.
@@ -2762,7 +2762,9 @@ $.Widget.prototype = {
         value = [ value[ 0 ], value[ 1 ], value[ 0 ], value[ 1 ] ];
       }
 
-      value = $.geo.proj.fromGeodetic( value );
+      if ( $.geo.proj ) {
+        value = $.geo.proj.fromGeodetic( value );
+      }
 
       bbox[0] = Math.min( value[ 0 ], bbox[ 0 ] );
       bbox[1] = Math.min( value[ 1 ], bbox[ 1 ] );
