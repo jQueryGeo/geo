@@ -1,6 +1,8 @@
 ﻿== to do ==
 
 === b2 ===
+* geomap - [bug] exception thrown when appending a labeled shape where centroid cannot be calculated
+* geo - [bug] calculating the centroid of some MultiPolygons return null
 
 ===bug fixing process===
 1. reproduce bug in jsFiddle with latest release version of jQuery Geo
@@ -96,6 +98,9 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geomap - map & map services type objects should refresh their own shapes after the map image (or tiles) has downloaded or after some timout
 ** this could increase responsiveness in case the user interacts just slightly after it's time to refresh
 ** it will also be required for plugin service objects
+* docs - geomap - allow null for zoomFactor to signify that there is no consistent zoomFactor between zoom levels
+* geomap - allow null for zoomFactor to signify that there is no consistent zoomFactor between zoom levels
+** see #101 notes below & on GitHub
 * geomap - [bug] using shift-zoom during interactiveTransform doesn't zoom to correct location
 ** tiled maps only
 ** not as noticeable now that the refresh timeout is shorter
@@ -304,6 +309,21 @@ http://jsfiddle.net/ryanttb/KQHN9/
 ==2013-07-06==
 === #127 geo.include without proj ===
 You should be able to use the core functions ($.geo) without a map or a proj object. I was originally calling fromGeodetic on the passed in value w/o checking for proj.
+
+=== #101 interactive zoom & strange pixelSizes ===
+This is still an issue but we may be able to fix it with the new zoomFactor option. Original issue:
+
+http://jsfiddle.net/ryanttb/zJMtr/
+
+** reset internal _zoomFactors but always use partial zoom even for dblclick and wheel zoom
+
+The zoomFactor between zoom levels changes too much, e.g., it's not a consistent "factor". I'm going to have to allow a null/undefined/NaN for zoomFactor (though, behind the scenes, it will set _full & _partial back to 2/root(4, 2) and make sure we never actually use full zoom.
+
+To make sense, dblclick zoom will have to jump to the next level regardless of the zoom factor between them. This will get tricky if the dblclick happens in the middle of some other interaction like wheel zoom.
+
+Actually, I can get rid of the zoomFactor option and calculate it in the beginning if there's a ...well, not get rid of, it's nice to have for non-tiled maps I think... but if we're a tiled map, we can calculate it based on the difference between the zoom levels. If the difference isn't the same between all zoom levels, we can set zoomFactor to null. Although, since we want it anyway (for shingled), it seems a bit heavy handed to not let people set it for tiled maps. Although*2, it might be nice to set it properly if the developer doesn't manually set it when initializing a map.
+
+So, check for tiled, then check for consistent zoomFactor, then set _full and _partial zoomFactor, otherwise, set it to null and use a zoom level-based (variable) zoomFactor.
 
 ==2013-07-04==
 ===happy independence day===
