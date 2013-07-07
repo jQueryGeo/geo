@@ -954,27 +954,29 @@
       }
 
       function multiLineStringParseUntagged(wkt) {
-        //edited to improve parseing of multilinestring geometry
-       var lineStringsWkt = wkt.substr(2, wkt.length - 4),
-            lineStrings = lineStringsWkt.split("), ("),
+        var lineStringsWkt = wkt.substr( 2, wkt.length - 4 ),
+            lineString,
+            lineStrings = lineStringsWkt.split( /\),\s*\(/ ),
             i = 0,
             multiLineString = {
-                type: "MultiLineString",
-                 coordinates: [ ]      
+              type: "MultiLineString",
+              coordinates: [ ]      
             };
 
-                for (; i < lineStrings.length; i++) {                  
-                     lineString = lineStringParseUntagged( "(" + lineStrings[ i ] + ")" );
-                     if ( lineString ) {
-                       multiLineString.coordinates.push( lineString.coordinates );
-                    }     
-                }
+        for ( ; i < lineStrings.length; i++ ) {
+          lineString = lineStringParseUntagged( "(" + lineStrings[ i ] + ")" );
+          if ( lineString ) {
+            multiLineString.coordinates.push( lineString.coordinates );
+          }     
+        }
+
         return multiLineString;
       }
 
       function multiPolygonParseUntagged(wkt) {
         var polygonsWkt = wkt.substr( 1, wkt.length - 2 ),
-            polygons = polygonsWkt.split( ")),((" ),
+            polygon,
+            polygons = polygonsWkt.split( /\),\s*\(/ ),
             i = 0,
             multiPolygon = {
               type: "MultiPolygon",
@@ -982,7 +984,10 @@
             };
 
         for ( ; i < polygons.length; i++ ) {
-          multiPolygon.coordinates.push( polygonParseUntagged( polygons[ i ] ).coordinates );
+          polygon = polygonParseUntagged( "(" + polygons[ i ] + ")" );
+          if ( polygon ) {
+            multiPolygon.coordinates.push( polygon.coordinates );
+          }
         }
 
         return multiPolygon;

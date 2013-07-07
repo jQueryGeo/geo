@@ -3587,16 +3587,20 @@ $.Widget.prototype = {
       }
 
       function multiLineStringParseUntagged(wkt) {
-        var lineStringsWkt = wkt.substr( 1, wkt.length - 2 ),
-            lineStrings = lineStringsWkt.split( ")),((" ),
+        var lineStringsWkt = wkt.substr( 2, wkt.length - 4 ),
+            lineString,
+            lineStrings = lineStringsWkt.split( /\),\s*\(/ ),
             i = 0,
             multiLineString = {
               type: "MultiLineString",
-              coordinates: [ ]
+              coordinates: [ ]      
             };
 
         for ( ; i < lineStrings.length; i++ ) {
-          multiLineString.coordinates.push( lineStringParseUntagged( lineStrings[ i ] ).coordinates );
+          lineString = lineStringParseUntagged( "(" + lineStrings[ i ] + ")" );
+          if ( lineString ) {
+            multiLineString.coordinates.push( lineString.coordinates );
+          }     
         }
 
         return multiLineString;
@@ -3604,7 +3608,8 @@ $.Widget.prototype = {
 
       function multiPolygonParseUntagged(wkt) {
         var polygonsWkt = wkt.substr( 1, wkt.length - 2 ),
-            polygons = polygonsWkt.split( ")),((" ),
+            polygon,
+            polygons = polygonsWkt.split( /\),\s*\(/ ),
             i = 0,
             multiPolygon = {
               type: "MultiPolygon",
@@ -3612,7 +3617,10 @@ $.Widget.prototype = {
             };
 
         for ( ; i < polygons.length; i++ ) {
-          multiPolygon.coordinates.push( polygonParseUntagged( polygons[ i ] ).coordinates );
+          polygon = polygonParseUntagged( "(" + polygons[ i ] + ")" );
+          if ( polygon ) {
+            multiPolygon.coordinates.push( polygon.coordinates );
+          }
         }
 
         return multiPolygon;
