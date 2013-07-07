@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0.0-test - 2013-07-06
+/*! jQuery Geo - v1.0.0-test - 2013-07-07
 * http://jquerygeo.com
 * Copyright (c) 2013 Ryan Westphal; Licensed MIT, GPL */
 // Copyright 2006 Google Inc.
@@ -2921,6 +2921,8 @@ $.Widget.prototype = {
     // centroid
     
     centroid: function( geom, _ignoreGeo /* Internal Use Only */ ) {
+      var c; //< temp storage for any coordinate during centroid op
+
       switch (geom.type) {
         case "Point":
           return $.extend({}, geom);
@@ -2928,10 +2930,11 @@ $.Widget.prototype = {
         case "LineString":
         case "Polygon":
           var a = 0,
-              c = [0, 0],
               coords = $.merge( [ ], geom.type === "Polygon" ? geom.coordinates[0] : geom.coordinates ),
               i = 1, j, n,
               bbox = [ pos_oo, pos_oo, neg_oo, neg_oo ];
+
+          c = [ 0, 0 ];
 
           var wasGeodetic = false;
           if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( coords ) ) {
@@ -2975,6 +2978,28 @@ $.Widget.prototype = {
           c[1] = Math.min( Math.max( c[1] / a, bbox[ 1 ] ), bbox[ 3 ] );
 
           return { type: "Point", coordinates: wasGeodetic ? $.geo.proj.toGeodetic(c) : c };
+
+        case "MultiPoint":
+          // should return center of mass for point cluster but just return first point for now
+          if ( geom.coordinates.length > 0 ) {
+            c = geom.coordinates[ 0 ];
+            return {
+              type: "Point",
+              coordinates: [ c[ 0 ], c[ 1 ] ]
+            };
+          }
+          break;
+
+        case "MultiLineString":
+        case "MultiPolygon":
+          if ( geom.coordinates.length > 0 ) {
+            return this.centroid( {
+              type: geom.type.substr( 5 ),
+              coordinates: geom.coordinates[ 0 ]
+            }, _ignoreGeo );
+          }
+          break;
+
       }
       return undefined;
     },
@@ -4353,7 +4378,7 @@ $.Widget.prototype = {
 }(jQuery, window));
 
 
-(function ($, window, undefined) {
+                       (function ($, window, undefined) {
   var _widgetIdSeed = 0,
       _ieVersion = ( function () {
         var v = 5, div = document.createElement("div"), a = div.all || [];
@@ -5450,6 +5475,7 @@ $.Widget.prototype = {
           label,
           hasLabel,
           labelPixel,
+          centroid,
           bbox = this._map._getBbox(center, pixelSize);
 
       for (i = 0; i < shapes.length; i++) {
@@ -5465,6 +5491,7 @@ $.Widget.prototype = {
         label = $.isArray(labels) ? labels[i].label : labels;
         hasLabel = ( label !== undefined );
         labelPixel = undefined;
+        centroid = $.geo.centroid( shape );
 
         switch (shape.type) {
           case "Point":
@@ -5479,32 +5506,32 @@ $.Widget.prototype = {
             break;
           case "Polygon":
             this._$shapesContainer.geographics("drawPolygon", this._map.toPixel(shape.coordinates, center, pixelSize), style);
-            if ( hasLabel ) {
-              labelPixel = this._map.toPixel( $.geo.centroid( shape ).coordinates, center, pixelSize );
+            if ( hasLabel && centroid ) {
+              labelPixel = this._map.toPixel( centroid.coordinates, center, pixelSize );
             }
             break;
           case "MultiPoint":
             for (mgi = 0; mgi < shape.coordinates.length; mgi++) {
               this._$shapesContainer.geographics("drawPoint", this._map.toPixel(shape.coordinates[mgi], center, pixelSize), style);
             }
-            if ( hasLabel ) {
-              labelPixel = this._map.toPixel( $.geo.centroid( shape ).coordinates, center, pixelSize );
+            if ( hasLabel && centroid ) {
+              labelPixel = this._map.toPixel( centroid.coordinates, center, pixelSize );
             }
             break;
           case "MultiLineString":
             for (mgi = 0; mgi < shape.coordinates.length; mgi++) {
               this._$shapesContainer.geographics("drawLineString", this._map.toPixel(shape.coordinates[mgi], center, pixelSize), style);
             }
-            if ( hasLabel ) {
-              labelPixel = this._map.toPixel( $.geo.centroid( shape ).coordinates, center, pixelSize );
+            if ( hasLabel && centroid ) {
+              labelPixel = this._map.toPixel( centroid.coordinates, center, pixelSize );
             }
             break;
           case "MultiPolygon":
             for (mgi = 0; mgi < shape.coordinates.length; mgi++) {
               this._$shapesContainer.geographics("drawPolygon", this._map.toPixel(shape.coordinates[mgi], center, pixelSize), style);
             }
-            if ( hasLabel ) {
-              labelPixel = this._map.toPixel( $.geo.centroid( shape ).coordinates, center, pixelSize );
+            if ( hasLabel && centroid ) {
+              labelPixel = this._map.toPixel( centroid.coordinates, center, pixelSize );
             }
             break;
 
