@@ -4353,7 +4353,7 @@ $.Widget.prototype = {
 }(jQuery, window));
 
 
-(function ($, window, undefined) {
+                       (function ($, window, undefined) {
   var _widgetIdSeed = 0,
       _ieVersion = ( function () {
         var v = 5, div = document.createElement("div"), a = div.all || [];
@@ -5450,6 +5450,7 @@ $.Widget.prototype = {
           label,
           hasLabel,
           labelPixel,
+          centroid,
           bbox = this._map._getBbox(center, pixelSize);
 
       for (i = 0; i < shapes.length; i++) {
@@ -5465,6 +5466,7 @@ $.Widget.prototype = {
         label = $.isArray(labels) ? labels[i].label : labels;
         hasLabel = ( label !== undefined );
         labelPixel = undefined;
+        centroid = $.geo.centroid( shape );
 
         switch (shape.type) {
           case "Point":
@@ -5479,32 +5481,32 @@ $.Widget.prototype = {
             break;
           case "Polygon":
             this._$shapesContainer.geographics("drawPolygon", this._map.toPixel(shape.coordinates, center, pixelSize), style);
-            if ( hasLabel ) {
-              labelPixel = this._map.toPixel( $.geo.centroid( shape ).coordinates, center, pixelSize );
+            if ( hasLabel && centroid ) {
+              labelPixel = this._map.toPixel( centroid.coordinates, center, pixelSize );
             }
             break;
           case "MultiPoint":
             for (mgi = 0; mgi < shape.coordinates.length; mgi++) {
               this._$shapesContainer.geographics("drawPoint", this._map.toPixel(shape.coordinates[mgi], center, pixelSize), style);
             }
-            if ( hasLabel ) {
-              labelPixel = this._map.toPixel( $.geo.centroid( shape ).coordinates, center, pixelSize );
+            if ( hasLabel && centroid ) {
+              labelPixel = this._map.toPixel( centroid.coordinates, center, pixelSize );
             }
             break;
           case "MultiLineString":
             for (mgi = 0; mgi < shape.coordinates.length; mgi++) {
               this._$shapesContainer.geographics("drawLineString", this._map.toPixel(shape.coordinates[mgi], center, pixelSize), style);
             }
-            if ( hasLabel ) {
-              labelPixel = this._map.toPixel( $.geo.centroid( shape ).coordinates, center, pixelSize );
+            if ( hasLabel && centroid ) {
+              labelPixel = this._map.toPixel( centroid.coordinates, center, pixelSize );
             }
             break;
           case "MultiPolygon":
             for (mgi = 0; mgi < shape.coordinates.length; mgi++) {
               this._$shapesContainer.geographics("drawPolygon", this._map.toPixel(shape.coordinates[mgi], center, pixelSize), style);
             }
-            if ( hasLabel ) {
-              labelPixel = this._map.toPixel( $.geo.centroid( shape ).coordinates, center, pixelSize );
+            if ( hasLabel && centroid ) {
+              labelPixel = this._map.toPixel( centroid.coordinates, center, pixelSize );
             }
             break;
 

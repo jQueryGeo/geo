@@ -1,7 +1,6 @@
 ﻿== to do ==
 
 === b2 ===
-* geomap - [bug] exception thrown when appending a labeled shape where centroid cannot be calculated
 * geo - [bug] calculating the centroid of some MultiPolygons return null
 
 ===bug fixing process===
@@ -324,6 +323,13 @@ To make sense, dblclick zoom will have to jump to the next level regardless of t
 Actually, I can get rid of the zoomFactor option and calculate it in the beginning if there's a ...well, not get rid of, it's nice to have for non-tiled maps I think... but if we're a tiled map, we can calculate it based on the difference between the zoom levels. If the difference isn't the same between all zoom levels, we can set zoomFactor to null. Although, since we want it anyway (for shingled), it seems a bit heavy handed to not let people set it for tiled maps. Although*2, it might be nice to set it properly if the developer doesn't manually set it when initializing a map.
 
 So, check for tiled, then check for consistent zoomFactor, then set _full and _partial zoomFactor, otherwise, set it to null and use a zoom level-based (variable) zoomFactor.
+
+===append labeled shape w/o centroid===
+There is an exception. Apart from the fact that $.geo.centroid can't calculate the centroid, the label engine shouldn't throw an exeption. That's the first thing to fix.
+
+This version shows the exception with b1.5: http://jsfiddle.net/ryanttb/wAwyG/
+
+This version with latest test does not have the issue: http://jsfiddle.net/ryanttb/wAwyG/3/
 
 ==2013-07-04==
 ===happy independence day===
