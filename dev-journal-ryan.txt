@@ -1,7 +1,7 @@
 ﻿== to do ==
 
 === b2 ===
-* geo - [bug] calculating the centroid of some MultiPolygons return null
+* geomap - [bug] labels for non-basic shapes do not show
 
 ===bug fixing process===
 1. reproduce bug in jsFiddle with latest release version of jQuery Geo
@@ -62,12 +62,14 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * embed
 
 === future ===
-* geomap - [bug] centroid throws exception for USA states data
 * geographics - [bug] doubleBuffer is choppy
 ** especially noticeable in Firefox
 ** pretty bad with the USA demo: http://jsfiddle.net/ryanttb/8TvMB/2/
 * geomap - remove support for deprecated getUrl service object property
 ** renamed to: src
+* docs - geo - support up to GeometryCollection in centroid
+* geo - support up to GeometryCollection in centroid
+** implement JTS note: "The centroid is equal to the centroid of the set of component Geometries of highest dimension (since the lower-dimension geometries contribute zero "weight" to the centroid)"
 * project - upgrade to jsRender 1.0pre
 * geomap - each service need a different geoSrc tempate name to avoid conflicts
 ** i.e. - don't rebuild the geoSrc template for every single image/tile
@@ -248,8 +250,6 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geo - support up to GeometryCollection in distance
 * docs - geo - support up to GeometryCollection in contains
 * geo - support up to GeometryCollection in contains
-* docs - geo - support up to GeometryCollection in centroid
-* geo - support up to GeometryCollection in centroid
 * geomap - show a drawPoint style while the mouse is down, hide if toolPan or dbltap scale
 * geomap - audit potential reflow
 ** http://gent.ilcore.com/2011/03/how-not-to-trigger-layout-in-webkit.html
@@ -268,7 +268,6 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * docs - internal - explain what projection is and which one we use by default (3395) and maybe why we call it web mercator & why we can't get to +/- 90 lat
 * docs - internal - document how geomap draws shapes, the geomapgraphics widget and the reason shapeStyle is a method
 * geomap - find should check labels first
-* geo - geometry - implement JTS note: "The centroid is equal to the centroid of the set of component Geometries of highest dimension (since the lower-dimension geometries contribute zero "weight" to the centroid)"
 * geo - all bbox operations should be done in non-geodetic coordinates for accuracy
 * geo - support bbox in distance ( fix geomap.find )
 * geomap - perf test putting all containers that need to move with panning in a single super-container
@@ -330,6 +329,11 @@ There is an exception. Apart from the fact that $.geo.centroid can't calculate t
 This version shows the exception with b1.5: http://jsfiddle.net/ryanttb/wAwyG/
 
 This version with latest test does not have the issue: http://jsfiddle.net/ryanttb/wAwyG/3/
+
+===centroid of MultiPolygon===
+Technically, this is not a bug as the docs state that you can get the centroid of only basic geometries: Point, LineString, & Polygon. A MultiPolygon is not one of those. I should do something about the label though, maybe get the centroid of the first Polygon in a MultiPolygon?
+
+Until I get centroid to do more, I think I should do labels that way so something shows up.
 
 ==2013-07-04==
 ===happy independence day===
