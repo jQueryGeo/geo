@@ -1,9 +1,11 @@
 ﻿== to do ==
 
 === b2 ===
+* docs - $.geo.WKT object
+* geo - $.geo.WKT object
 
 ===bug fixing process===
-1. reproduce bug in jsFiddle with latest release version of jQuery Geo
+1. reproduce bug in jsFiddle with latest release version of jQuery Geo ( fork http://jsfiddle.net/ryanttb/KQHN9/ )
 2. update jsFiddle to numbered revision (save the numbered URL)
 3. change to use hosted test version of jQuery Geo
 4. copy jsFiddle content to local test.html file
@@ -14,7 +16,7 @@
 8. push code
 
 ===demo template===
-Starting point for a jQuery Geo demo:
+Starting point for a jQuery Geo demo & bug fix test:
 
 http://jsfiddle.net/ryanttb/KQHN9/
 
@@ -232,8 +234,6 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geomap - use requestAnimationFrame instead of setTimeout when waiting to move the map during intractiveTransform
 * expose jQuery Geo as an AMD module so asynchronous loaders like RequireJS and curl.js can use it
 * cdn - test cache headers with http://redbot.org/ before release
-* docs - $.geo.WKT object
-* geo - $.geo.WKT object
 * geomap - panning cursor (closed hand, for when user is actually panning)
 * geomap - completely original cursor set for pan, zoom, draw, etc.
 * docs - geomap - replace method
@@ -302,6 +302,25 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2013-07-07==
+===parse MultiLineString===
+I'm finally merging this fix from Ali.
+
+Bug in 1.5: http://jsfiddle.net/ryanttb/n7PYy/ (should look like two separate lines)
+
+Like how it looks with latest test: http://jsfiddle.net/ryanttb/n7PYy/4/
+
+WKT parsing is good enough to include in the actual public API. I guess I have to write the docs.
+
+===parse MultiPolygon===
+Why not do this now: http://jsfiddle.net/ryanttb/dfUvR/
+
+This is worse because there's an actual error during the parse routine.
+
+Now it works! http://jsfiddle.net/ryanttb/dfUvR/2/
+
+Also, with regexp split.
 
 ==2013-07-06==
 === #127 geo.include without proj ===
@@ -760,7 +779,7 @@ There still needs to be a better way to add services but keep the default base m
 ]
 
 ==2012-12-18==
-===parse multilinestring===
+===parse MultiLineString===
 I commented on Ali's pull request for the non-public (yet) feature of parsing WKT.
 
 ===label links===
