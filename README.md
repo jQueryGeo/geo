@@ -102,6 +102,7 @@ Unless you have downloaded a tagged release, grunt will create a test version of
 * geomap - [bug] polygon not displayed when a longitude is -180.0
 * geomap - [bug] can't use $.geo.include with $.geo.proj = null
 * geomap - [bug] exception thrown when appending a labeled shape where centroid cannot be calculated
+* geomap - [bug] labels for non-basic shapes do not show
 
 ### 1.0.0-b1.5 (2013-01-17)
 * examples - drawing markers

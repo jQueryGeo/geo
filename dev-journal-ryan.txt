@@ -1,7 +1,6 @@
 ﻿== to do ==
 
 === b2 ===
-* geomap - [bug] labels for non-basic shapes do not show
 
 ===bug fixing process===
 1. reproduce bug in jsFiddle with latest release version of jQuery Geo
@@ -334,6 +333,15 @@ This version with latest test does not have the issue: http://jsfiddle.net/ryant
 Technically, this is not a bug as the docs state that you can get the centroid of only basic geometries: Point, LineString, & Polygon. A MultiPolygon is not one of those. I should do something about the label though, maybe get the centroid of the first Polygon in a MultiPolygon?
 
 Until I get centroid to do more, I think I should do labels that way so something shows up.
+
+Here's a jsFiddle to show off what happens when you ask for the centroid of a MultiPolygon: http://jsfiddle.net/ryanttb/zaEpg/
+
+===labels of non-basic shapes===
+I should do something.
+
+Going back to http://jsfiddle.net/ryanttb/wAwyG/3/ the word Test somewhere.
+
+And now it does.
 
 ==2013-07-04==
 ===happy independence day===
