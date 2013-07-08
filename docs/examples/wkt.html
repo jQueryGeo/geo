@@ -61,13 +61,13 @@ GEOMETRYCOLLECTION (POINT (-71.070554128125 42.36859979580157),LINESTRING (-71.5
         center: [-71.0595678, 42.3604823],
         zoom: 8,
         click: function (e, geo) {
-          $("#wkt").val($.geo._WKT.stringify(geo));
+          $("#wkt").val($.geo.WKT.stringify(geo));
           map.geomap("append", geo);
         }
       });
 
       $("#parse").button().click(function (e) {
-        var geo = $.geo._WKT.parse($("textarea").val());
+        var geo = $.geo.WKT.parse($("textarea").val());
         if (geo) {
           map.geomap("append", geo, false);
           map.geomap( "option", "bbox", $.geo.scaleBy( $.geo.bbox( geo ), 2 ) );

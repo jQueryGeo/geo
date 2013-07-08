@@ -1,8 +1,6 @@
 ﻿== to do ==
 
 === b2 ===
-* docs - $.geo.WKT object
-* geo - $.geo.WKT object
 
 ===bug fixing process===
 1. reproduce bug in jsFiddle with latest release version of jQuery Geo ( fork http://jsfiddle.net/ryanttb/KQHN9/ )
@@ -309,7 +307,7 @@ I'm finally merging this fix from Ali.
 
 Bug in 1.5: http://jsfiddle.net/ryanttb/n7PYy/ (should look like two separate lines)
 
-Like how it looks with latest test: http://jsfiddle.net/ryanttb/n7PYy/4/
+Like how it looks with latest test: http://jsfiddle.net/ryanttb/n7PYy/5/
 
 WKT parsing is good enough to include in the actual public API. I guess I have to write the docs.
 
@@ -318,9 +316,25 @@ Why not do this now: http://jsfiddle.net/ryanttb/dfUvR/
 
 This is worse because there's an actual error during the parse routine.
 
-Now it works! http://jsfiddle.net/ryanttb/dfUvR/2/
+Now it works! http://jsfiddle.net/ryanttb/dfUvR/3/
 
 Also, with regexp split.
+
+===public $.geo.WKT===
+It's now public, documented code and has been renamed from the private version. Anyone using the hidden private stuff will have to make sure to change to the public name: $.geo._WKT => $.geo.WKT.
+
+I'll test & update the fiddles above.
+
+Did that. Still seems to work.
+
+=== #111 cursors ===
+I'm going to take a minute to look at this. I'm curious if it's an issue with browsers (webkit specifically) and CSS.
+
+Here's the starting point with b1.5: http://jsfiddle.net/ryanttb/MVdQr/
+
+I don't think this is something I can reliably handle. Here's an example without jQuery Geo:
+
+http://jsfiddle.net/ryanttb/2ndqa/
 
 ==2013-07-06==
 === #127 geo.include without proj ===

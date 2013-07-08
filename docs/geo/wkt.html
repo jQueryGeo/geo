@@ -28,7 +28,7 @@
 
       <p>The second is <a href="http://en.wikipedia.org/wiki/Well-known_text" rel="external">well-known text</a> (WKT). It considerably predates GeoJSON and can look a lot nicer when viewed in a database (well, databases that aren't JSON based to begin with (CouchDB, MongoDB, etc.) or databases that have more suppport for JSON such as PostgreSQL 9.2). The point is that at some point in web mapping, you may come across WKT and jQuery Geo has you covered.</p>
 
-      <p>The $.geo.WKT object has two functions: parse &amp; stringify. They are the same names as the HTML5 JSON object by design to give you the option of writing serialization functions that can take either the native JSON object or $.geo.WKT. The $.geo.WKT.parse function parses as WKT string and constructs a GeoJSON object that's ready to be used elsewhere in the library such as the geomap widget's <a href="../geomap/append.html">append function</a>. While the stringify function accepts a JavaScript object that follows the GeoJSON specification and returns its WKT equivalent.</p>
+      <p>The $.geo.WKT object has two functions: parse &amp; stringify. They are the same names as the HTML5 JSON object by design to give you the option of writing serialization functions that can take either the native JSON object or $.geo.WKT. The $.geo.WKT.parse function parses as WKT string and constructs a GeoJSON object that's ready to be used elsewhere in the library such as the geomap widget's <a href="../geomap/append.html">append function</a>. The stringify function accepts a JavaScript object that follows the GeoJSON specification and returns its WKT equivalent.</p>
 
       <h2>parsing WKT strings</h2>
 
@@ -55,10 +55,21 @@
   }
 } );</code></pre>
 
+      <h2>patterned after JSON</h2>
 
+      <p>The $.geo.WKT object's function names are the same as the native JSON object you find in modern web browsers. Therefore, you can write a geometry object serialization function that takes either:</p>
 
+      <pre><code>function geoToString( geo, serializer ) {
+  return serializer.stringify( geo );
+}
 
+// log JSON
+console.log( geoToString( geo, JSON ) );
 
+// log WKT
+console.log( geoToString( geo, $.geo.WKT ) );</code></pre>
+
+      <p>This limited example is not terribly useful but hints at what can be done.</p> 
     </div>
   </div> <!-- end of page -->
 
