@@ -3391,7 +3391,7 @@ $.Widget.prototype = {
     // WKT functions
     //
 
-    _WKT: (function () {
+    WKT: (function () {
       function pointToString(value) {
         return "POINT " + pointToUntaggedString(value.coordinates);
       }
