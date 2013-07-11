@@ -409,7 +409,7 @@
               height: geographics._height
             } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) ).prependTo( geographics._$elem );
 
-            geographics._$canvasSceneBack = oldCanvasScene.detach();
+            geographics._$canvasSceneBack = oldCanvasScene.prop( "src", ""  ).detach();
 
             geographics._requireFlip = false;
           }
@@ -450,7 +450,7 @@
           height: geographics._height
         } ).prependTo( geographics._$elem );
 
-        geographics._$canvasSceneBack = oldCanvasScene.detach();
+        geographics._$canvasSceneBack = oldCanvasScene.prop( "src", "" ).detach();
       }
     },
 

@@ -3,20 +3,21 @@
 === b2 ===
 
 ===bug fixing process===
-1. reproduce bug in jsFiddle with latest release version of jQuery Geo ( fork http://jsfiddle.net/ryanttb/KQHN9/ )
-2. update jsFiddle to numbered revision (save the numbered URL)
-3. change to use hosted test version of jQuery Geo
-4. copy jsFiddle content to local test.html file
+1. browse to the jQuery Geo release template: http://jsbin.com/uhabox/17/edit
+2. clone it
+3. reproduce bug
+4. copy jsbin content to local test.html file
 5. fix bug & test locally
 6. build & test locally
-6. publish new test build
-7. test on numbered jsFiddle revision
-8. push code
+7. publish new test build
+8. update jsbin to use hosted test version of jQuery Geo
+9. test on numbered test jsbin revision
+10. push code
 
 ===demo template===
 Starting point for a jQuery Geo demo & bug fix test:
 
-http://jsfiddle.net/ryanttb/KQHN9/
+http://jsbin.com/uhabox/17/edit
 
 === posts ===
 * posts - SQL Server to jQuery Geo
@@ -300,6 +301,30 @@ http://jsfiddle.net/ryanttb/KQHN9/
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2013-07-10==
+===refresh after remove===
+There's an issue with the highlight example in Chrome, it won't remove the yellow highlight, even with refresh, until there's some other map interaction.
+
+http://jsbin.com/acapay/4
+
+Click on the red dot, then click somewhere else. 
+
+Chrome is getting two calls to refresh...which makes sense? Yeah, it's the two functions remove & append. I can pass false to both and put a refresh at the end and I still get the issue.
+
+I'm not getting a final _canvasSceneLoad, the img tag is not getting the load event. What's up with that?
+
+It's a caching thing, I think. Since the data URI was the exact same as the original URL, it's not noticing it as a change. I'm now setting the back scene's img.src to "" when we flip. It a little code in two places unfortunately but we can factor that out maybe later.
+
+==2013-07-08==
+===examples===
+I was hoping to use codepen for all my examples becaues the site looks nicer but, unfortunately, the full screen examples do not work in IE. Even 10, which is weird. I get an Access is denied error, but 10 supports regular XHR.
+
+I suppose it's back to jsfiddle, or maybe I should look at jsbin? jsbin does look very clean in the Live Preview mode. There's just an Edit in JS Bin button.
+
+Here's a staring template: http://jsbin.com/uhabox/17/edit and, hey! it works in IE >:|
+
+I'm switching to position: absolute so they look nicer in IE8- without putting more text into the code.
 
 ==2013-07-07==
 ===parse MultiLineString===
