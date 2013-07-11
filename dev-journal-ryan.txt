@@ -302,6 +302,20 @@ http://jsbin.com/uhabox/17/edit
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-07-10==
+===refresh after remove===
+There's an issue with the highlight example in Chrome, it won't remove the yellow highlight, even with refresh, until there's some other map interaction.
+
+http://jsbin.com/acapay/4
+
+Click on the red dot, then click somewhere else. 
+
+Chrome is getting two calls to refresh...which makes sense? Yeah, it's the two functions remove & append. I can pass false to both and put a refresh at the end and I still get the issue.
+
+I'm not getting a final _canvasSceneLoad, the img tag is not getting the load event. What's up with that?
+
+It's a caching thing, I think. Since the data URI was the exact same as the original URL, it's not noticing it as a change. I'm now setting the back scene's img.src to "" when we flip. It a little code in two places unfortunately but we can factor that out maybe later.
+
 ==2013-07-08==
 ===examples===
 I was hoping to use codepen for all my examples becaues the site looks nicer but, unfortunately, the full screen examples do not work in IE. Even 10, which is weird. I get an Access is denied error, but 10 supports regular XHR.

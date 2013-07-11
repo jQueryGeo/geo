@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0.0-b2 - 2013-07-08
+/*! jQuery Geo - v1.0.0-b2 - 2013-07-10
 * http://jquerygeo.com
 * Copyright (c) 2013 Ryan Westphal; Licensed MIT */
 // Copyright 2006 Google Inc.
@@ -4233,7 +4233,7 @@ $.Widget.prototype = {
               height: geographics._height
             } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) ).prependTo( geographics._$elem );
 
-            geographics._$canvasSceneBack = oldCanvasScene.detach();
+            geographics._$canvasSceneBack = oldCanvasScene.prop( "src", ""  ).detach();
 
             geographics._requireFlip = false;
           }
@@ -4274,7 +4274,7 @@ $.Widget.prototype = {
           height: geographics._height
         } ).prependTo( geographics._$elem );
 
-        geographics._$canvasSceneBack = oldCanvasScene.detach();
+        geographics._$canvasSceneBack = oldCanvasScene.prop( "src", "" ).detach();
       }
     },
 
