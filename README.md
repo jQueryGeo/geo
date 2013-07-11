@@ -105,6 +105,7 @@ Unless you have downloaded a tagged release, grunt will create a test version of
 * geomap - [bug] labels for non-basic shapes do not show
 * docs - geo - $.geo.WKT object
 * geo - $.geo.WKT object
+* geomap - Chrome - [bug] after remove, shapes are not refreshed
 
 ### 1.0.0-b1.5 (2013-01-17)
 * examples - drawing markers
