@@ -302,6 +302,10 @@ http://jsbin.com/uhabox/17/edit
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-07-20==
+===examples===
+I need to finish some more examples.
+
 ==2013-07-10==
 ===refresh after remove===
 There's an issue with the highlight example in Chrome, it won't remove the yellow highlight, even with refresh, until there's some other map interaction.
