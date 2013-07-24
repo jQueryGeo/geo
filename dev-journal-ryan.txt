@@ -302,6 +302,10 @@ http://jsbin.com/uhabox/18/edit
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-07-23==
+===examples===
+And some more...
+
 ==2013-07-20==
 ===examples===
 I need to finish some more examples.
