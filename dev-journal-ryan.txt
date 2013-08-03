@@ -30,6 +30,7 @@ http://jsbin.com/uhabox/18/edit
 ** http://jsfiddle.net/ryanttb/gU7wS/14/
 * examples - Windows Store app
 * examples - 3d heatmap
+* examples - cache tiles for offline
 * examples - jQuery Mobile
 * examples - pan cursor
 * examples - shape click pointer cursor
@@ -301,6 +302,10 @@ http://jsbin.com/uhabox/18/edit
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2013-08-02==
+===examples===
+Which one's next? GigaPan. That was easy. I like jsbin's error checking. That's the last demo, I think I'm going to merge the simpler examples into the demos as one block of stuff. I need to make the proj demo look nicer though, somehow.
 
 ==2013-07-23==
 ===examples===
