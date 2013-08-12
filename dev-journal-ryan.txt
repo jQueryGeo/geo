@@ -303,6 +303,12 @@ http://jsbin.com/uhabox/18/edit
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-08-11==
+===examples===
+I now need to remove some boring examples (from the old all-emcompassing list) and turn the less boring ones into jsbin examples using 1.0b2. I really need to get rid of some of these old examples. I wish there were an easy way to explain the proj one though, that's useful for my target audience.
+
+I should only have two categories: apps & examples. Examples must be on jsbin. I'm going to have twheat & MapGeo be apps, but move Utah to examples because it's pretty simple & people might want to see the JS involved.
+
 ==2013-08-02==
 ===examples===
 Which one's next? GigaPan. That was easy. I like jsbin's error checking. That's the last demo, I think I'm going to merge the simpler examples into the demos as one block of stuff. I need to make the proj demo look nicer though, somehow.
