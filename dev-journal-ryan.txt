@@ -303,6 +303,12 @@ http://jsbin.com/uhabox/18/edit
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-08-18==
+===examples===
+I'm done with the demos, I need to figure out the old, crappy examples. Basically, I want everything to be in jsbin before I launch. I also want the docs to be Twitter bootstrap or something that doesn't require JavaScript to work. I'm starting to feel jQuery Mobile is a little too heavy for some docs, though I do want a jQuery Mobile demo.
+
+I don't want to turn the all-x demos into jsbins but I think I have to. The shingled one is too slow (*shakes fist at MassGIS*) so I'm going to not use it for now.
+
 ==2013-08-11==
 ===examples===
 I now need to remove some boring examples (from the old all-emcompassing list) and turn the less boring ones into jsbin examples using 1.0b2. I really need to get rid of some of these old examples. I wish there were an easy way to explain the proj one though, that's useful for my target audience.
