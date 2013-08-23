@@ -303,6 +303,10 @@ http://jsbin.com/uhabox/18/edit
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-08-22==
+===everything demo===
+I'm still converting this to jsbin. Phew! Finally done, it looks a bit simpler now without jQuery UI :/
+
 ==2013-08-18==
 ===examples===
 I'm done with the demos, I need to figure out the old, crappy examples. Basically, I want everything to be in jsbin before I launch. I also want the docs to be Twitter bootstrap or something that doesn't require JavaScript to work. I'm starting to feel jQuery Mobile is a little too heavy for some docs, though I do want a jQuery Mobile demo.
