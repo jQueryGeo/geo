@@ -3,7 +3,7 @@
 === b2 ===
 
 ===bug fixing process===
-1. browse to the jQuery Geo release template: http://jsbin.com/uhabox/17/edit
+1. browse to the jQuery Geo release template: http://jsbin.com/uhabox/18/edit
 2. clone it
 3. reproduce bug
 4. copy jsbin content to local test.html file
@@ -17,7 +17,7 @@
 ===demo template===
 Starting point for a jQuery Geo demo & bug fix test:
 
-http://jsbin.com/uhabox/17/edit
+http://jsbin.com/uhabox/18/edit
 
 === posts ===
 * posts - SQL Server to jQuery Geo
@@ -30,6 +30,7 @@ http://jsbin.com/uhabox/17/edit
 ** http://jsfiddle.net/ryanttb/gU7wS/14/
 * examples - Windows Store app
 * examples - 3d heatmap
+* examples - cache tiles for offline
 * examples - jQuery Mobile
 * examples - pan cursor
 * examples - shape click pointer cursor
@@ -302,6 +303,34 @@ http://jsbin.com/uhabox/17/edit
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-08-22==
+===everything demo===
+I'm still converting this to jsbin. Phew! Finally done, it looks a bit simpler now without jQuery UI :/
+
+==2013-08-18==
+===examples===
+I'm done with the demos, I need to figure out the old, crappy examples. Basically, I want everything to be in jsbin before I launch. I also want the docs to be Twitter bootstrap or something that doesn't require JavaScript to work. I'm starting to feel jQuery Mobile is a little too heavy for some docs, though I do want a jQuery Mobile demo.
+
+I don't want to turn the all-x demos into jsbins but I think I have to. The shingled one is too slow (*shakes fist at MassGIS*) so I'm going to not use it for now.
+
+==2013-08-11==
+===examples===
+I now need to remove some boring examples (from the old all-emcompassing list) and turn the less boring ones into jsbin examples using 1.0b2. I really need to get rid of some of these old examples. I wish there were an easy way to explain the proj one though, that's useful for my target audience.
+
+I should only have two categories: apps & examples. Examples must be on jsbin. I'm going to have twheat & MapGeo be apps, but move Utah to examples because it's pretty simple & people might want to see the JS involved.
+
+==2013-08-02==
+===examples===
+Which one's next? GigaPan. That was easy. I like jsbin's error checking. That's the last demo, I think I'm going to merge the simpler examples into the demos as one block of stuff. I need to make the proj demo look nicer though, somehow.
+
+==2013-07-23==
+===examples===
+And some more...
+
+==2013-07-20==
+===examples===
+I need to finish some more examples.
+
 ==2013-07-10==
 ===refresh after remove===
 There's an issue with the highlight example in Chrome, it won't remove the yellow highlight, even with refresh, until there's some other map interaction.
@@ -322,7 +351,7 @@ I was hoping to use codepen for all my examples becaues the site looks nicer but
 
 I suppose it's back to jsfiddle, or maybe I should look at jsbin? jsbin does look very clean in the Live Preview mode. There's just an Edit in JS Bin button.
 
-Here's a staring template: http://jsbin.com/uhabox/17/edit and, hey! it works in IE >:|
+Here's a staring template: http://jsbin.com/uhabox/18/edit and, hey! it works in IE >:|
 
 I'm switching to position: absolute so they look nicer in IE8- without putting more text into the code.
 
