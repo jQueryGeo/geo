@@ -303,6 +303,10 @@ http://jsbin.com/uhabox/18/edit
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-08-25==
+===some more demos===
+I'm now tasking myself with merging all the simple examples with the real demos. Everything will be in jsbin and nothing will be the ugly old format.
+
 ==2013-08-22==
 ===everything demo===
 I'm still converting this to jsbin. Phew! Finally done, it looks a bit simpler now without jQuery UI :/
