@@ -56,7 +56,7 @@ http://jsbin.com/uhabox/18/edit
 ** http://mapbox.com/blog/vector-tiles/
 
 === official apps (x.jquerygeo.com) ===
-* twheat
+* Twheat
 * maps
 * crowd
 * gis
@@ -303,6 +303,14 @@ http://jsbin.com/uhabox/18/edit
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-08-31==
+===Twheat===
+It's finally time to get Twheat! back up and running. Twitter changed their API so that search now requires it. I need to make it work again. My (mt) web server is running PHP so I need to look for a quick PHP client to handle all the auth for me.
+
+I've made a Twitter "application" for jquerygeo.com.
+
+I think I'm going to use this script to access Twitter: https://github.com/J7mbo/twitter-api-php
+
 ==2013-08-25==
 ===some more demos===
 I'm now tasking myself with merging all the simple examples with the real demos. Everything will be in jsbin and nothing will be the ugly old format.
@@ -321,7 +329,7 @@ I don't want to turn the all-x demos into jsbins but I think I have to. The shin
 ===examples===
 I now need to remove some boring examples (from the old all-emcompassing list) and turn the less boring ones into jsbin examples using 1.0b2. I really need to get rid of some of these old examples. I wish there were an easy way to explain the proj one though, that's useful for my target audience.
 
-I should only have two categories: apps & examples. Examples must be on jsbin. I'm going to have twheat & MapGeo be apps, but move Utah to examples because it's pretty simple & people might want to see the JS involved.
+I should only have two categories: apps & examples. Examples must be on jsbin. I'm going to have Twheat & MapGeo be apps, but move Utah to examples because it's pretty simple & people might want to see the JS involved.
 
 ==2013-08-02==
 ===examples===
@@ -799,7 +807,7 @@ Time for some console.log (though, I do still wonder if 3d transform will fix it
 I think I need to attach the load events for real and then determin if we still need to flip in the event handler. This .one("load") thing I think isn't working as I had hoped. The endcallback function is attaching two load event handlers and then doing two flips, ugh. I'm not sure why this is only Firefox.
 
 ==2013-02-14==
-===twheat 3d===
+===Twheat 3d===
 I really need to have a version of Twheat! that uses this WebGL heatmap library: http://codeflow.org/entries/2013/feb/04/high-performance-js-heatmaps/
 
 ==2013-02-09==
@@ -1121,7 +1129,7 @@ Good luck getting that to look nice in code :/
 I made it smaller. Oh, and you can't send that to Esri's REST API because it's a WMS parameter. Ignoring it for now. That's too bad, it would really add to my TIGER demo.
 
 ==2012-09-29==
-===twheat===
+===Twheat===
 I'm going to release the new version to Twheat! tonight, Twheat! 2.
 
 ===range===
@@ -1949,8 +1957,8 @@ measureDistance should be measureLength. The measureLabels object should have a 
 I was going to bring our urlFormat property over from the old code but now I think I want it to be the same property on the service object. I think getUrl can be a function, but can *also* be a string for shorthand. This will obviously be a jsrender template string.
 
 ==2011-11-30==
-===twheat===
-I'm going to keep the twitter-heat demo and also leave twheat as its own app.
+===Twheat===
+I'm going to keep the twitter-heat demo and also leave Twheat as its own app.
 
 ===service-level===
 Finally writing some service-level shape docs for 1.0a4.
@@ -2036,7 +2044,7 @@ Currently, the layout is, e.g.:
      ($textContainer)
 
 ==2011-11-15==
-===twheat===
+===Twheat===
 I'm going to make this a real app with its own subdomain. I would like to use paging because the first page doesn't have enough results with a geo argument. What happens when there's no further pages. Is there a "next_page" property? Is is null?
 
 The page will be more impressive if I try to geocode the location property to get more results.
