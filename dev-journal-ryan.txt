@@ -311,6 +311,14 @@ I've made a Twitter "application" for jquerygeo.com.
 
 I think I'm going to use this script to access Twitter: https://github.com/J7mbo/twitter-api-php
 
+Twheat will be it's own repo and removed from the jQuery Geo docs.
+
+So, I got that working but Twitter's new search API doesn't return the geo property :/ I posted to this discussion:
+
+https://dev.twitter.com/discussions/7455
+
+I seriously hope they fix it soon.
+
 ==2013-08-25==
 ===some more demos===
 I'm now tasking myself with merging all the simple examples with the real demos. Everything will be in jsbin and nothing will be the ugly old format.
