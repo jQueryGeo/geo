@@ -310,6 +310,11 @@ This app is its own project now and I'm going to remove it from the examples.
 ===Utah===
 I'm going to make the Utah demo its own repo/app and move it to showcase. It has resources, performs a function and is more than just an example. Done, time for a subdomain.
 
+===other examples===
+Hmm, what to do about all the other little test examples. They're a bit too basic to be useful and most of them are in the 'complex example' already.
+
+I'm working on a slightly simpler bbox sample on jsbin.
+
 ==2013-08-31==
 ===Twheat===
 It's finally time to get Twheat! back up and running. Twitter changed their API so that search now requires it. I need to make it work again. My (mt) web server is running PHP so I need to look for a quick PHP client to handle all the auth for me.
