@@ -24,35 +24,37 @@ http://jsbin.com/uhabox/18/edit
 * posts - WKT object
 
 === examples ===
-* examples - forecast.io skycons on jQuery Geo map
-* examples - location based notes/to do list
-* examples - disease map
+* sea monsters image from Slate
+** http://www.slate.com/articles/technology/future_tense/2013/09/olaus_magnus_carta_marina_sea_monsters_on_a_gorgeous_renaissance_map.html
+* forecast.io skycons on jQuery Geo map
+* location based notes/to do list
+* disease map
 ** http://jsfiddle.net/ryanttb/gU7wS/14/
-* examples - Windows Store app
-* examples - 3d heatmap
-* examples - cache tiles for offline
-* examples - jQuery Mobile
-* examples - pan cursor
-* examples - shape click pointer cursor
-* examples - custering demo/support
-* examples - shared-canvas sketch app
-* examples - weather
+* Windows Store app
+* 3d heatmap
+* cache tiles for offline
+* jQuery Mobile
+* pan cursor
+* shape click pointer cursor
+* custering demo/support
+* shared-canvas sketch app
+* weather
 ** http://openweathermap.org/example-json
-* examples - MBCR: http://www.mbta.com/rider_tools/developers/default.asp?id=21899
-* examples - drag shapes
-* examples - tiled image w/o zoom
+* MBCR: http://www.mbta.com/rider_tools/developers/default.asp?id=21899
+* drag shapes
+* tiled image w/o zoom
 ** https://github.com/AppGeo/geo/issues/105
-* examples - ie7 - [bug] floating info div doesn't show up, inputs are alone and on the left
-* examples - redo the jVectorMap demo page using jQuery Geo
-* examples - make OSM editing simple
+* ie7 - [bug] floating info div doesn't show up, inputs are alone and on the left
+* redo the jVectorMap demo page using jQuery Geo
+* make OSM editing simple
 ** http://www.maploser.com/2012/03/29/all-i-want-for-openstreetmap-is-simple/
 ** http://jvectormap.owl-hollow.net/ ( found via http://www.moretechtips.net/2011/12/22-most-popular-jquery-plugins-of-2011.html )
-* examples - geomap resize method
-* examples - Codecademy course
-* examples - SVG & other neat elements/media in labels
-* examples - continent puzzle
+* geomap resize method
+* Codecademy course
+* SVG & other neat elements/media in labels
+* continent puzzle
 ** http://stephanmendler.de/thinkmaps/puzzle/index_en.html
-* examples - MapBox vector tiles
+* MapBox vector tiles
 ** http://mapbox.com/blog/vector-tiles/
 
 === official apps (x.jquerygeo.com) ===
