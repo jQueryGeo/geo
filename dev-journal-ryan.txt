@@ -305,6 +305,14 @@ http://jsbin.com/uhabox/19/edit
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-09-16==
+===defer===
+Starting to move the defer example to jsbin. I have to decide how to handle images not working. I may have to use a data URI because canvas gets mad even for CORS images when you ask for the toDataURL of an image that's not in the same domain.
+
+Aparently it's available in Firefox & Chrome: https://developer.mozilla.org/en-US/docs/HTML/CORS_Enabled_Image?redirectlocale=en-US&redirectslug=CORS_Enabled_Image
+
+Interesting. Although, I could just use PHP proxy from Ben https://github.com/cowboy/php-simple-proxy/
+
 ==2013-09-08==
 ===Twheat===
 New coordinates property seems to work, though there are a ton fewer geolocated tweets. Anyway, new version of Twheat is published.
