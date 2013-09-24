@@ -305,6 +305,12 @@ http://jsbin.com/uhabox/19/edit
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-09-23==
+===defer===
+I can't use PHProxy because the app is not running from my server.
+
+I may have found a bug. When attempting to load a Deferred image, I am passing the data url to loadImageDeferredDone but calling _loadImage with $.data( this, "img" ). I forget what's going on though. Also, the two server types are completely different. Check out the // assume Deferred comment on both. I need to clean that up, I guess.
+
 ==2013-09-16==
 ===defer===
 Starting to move the defer example to jsbin. I have to decide how to handle images not working. I may have to use a data URI because canvas gets mad even for CORS images when you ask for the toDataURL of an image that's not in the same domain.
