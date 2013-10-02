@@ -1,6 +1,11 @@
 ﻿== to do ==
 
 === b2 ===
+* geomap - [bug] leaving the map page and then going 'back' in the browser does not refresh shape only maps
+** see Internet Monitor
+* geomap - [bug] double-click zoom with shingled services showing a lot of geometry renders wrong buffer for a second
+** world countries
+* geomap - [buf] find method does not work correctly on all MultiPolygon geometry
 
 ===bug fixing process===
 1. browse to the jQuery Geo release template: http://jsbin.com/uhabox/19/edit
@@ -304,6 +309,10 @@ http://jsbin.com/uhabox/19/edit
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2013-10-02==
+===bugs===
+I've found a few bugs in b2 that I would like to fix. The graphics drawing is obvious in Chrome on my work desktop and I think is the same jumping I see using wheel zoom on the track pad on my laptop.
 
 ==2013-09-23==
 ===defer===
