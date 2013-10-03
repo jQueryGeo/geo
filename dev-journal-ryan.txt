@@ -319,6 +319,10 @@ The issue can be seen here: http://jsbin.com/eJAneWa/1/edit
 
 In latest Chrome & Firefox. Not in IE for whatever reason.
 
+I think it's related to identical output coming back too fast. We're getting two _canvasSceneLoad calls but not always going into the flip.
+
+Hmm, though when I resize the window on the second page though, the data URL should be different and refresh should work but it doesn't. I need to gut the whole geographics refresh and fix this for good. Too many timing issues.
+
 ===highlight pop===
 Here's this issue: http://jsbin.com/OyeMUYo/1/edit
 
