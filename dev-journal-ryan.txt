@@ -1,9 +1,14 @@
 ﻿== to do ==
 
 === b2 ===
+* geomap - [bug] leaving the map page and then going 'back' in the browser does not refresh shape only maps
+** see Internet Monitor
+* geomap - [bug] double-click zoom on shingled graphics service with highlight renders wrong buffer for a second
+** world countries
+* geomap - [bug] infinite move events in Chrome
 
 ===bug fixing process===
-1. browse to the jQuery Geo release template: http://jsbin.com/uhabox/18/edit
+1. browse to the jQuery Geo release template: http://jsbin.com/uhabox/19/edit
 2. clone it
 3. reproduce bug
 4. copy jsbin content to local test.html file
@@ -17,46 +22,48 @@
 ===demo template===
 Starting point for a jQuery Geo demo & bug fix test:
 
-http://jsbin.com/uhabox/18/edit
+http://jsbin.com/uhabox/19/edit
 
 === posts ===
 * posts - SQL Server to jQuery Geo
 * posts - WKT object
 
 === examples ===
-* examples - forecast.io skycons on jQuery Geo map
-* examples - location based notes/to do list
-* examples - disease map
+* sea monsters image from Slate
+** http://www.slate.com/articles/technology/future_tense/2013/09/olaus_magnus_carta_marina_sea_monsters_on_a_gorgeous_renaissance_map.html
+* forecast.io skycons on jQuery Geo map
+* location based notes/to do list
+* disease map
 ** http://jsfiddle.net/ryanttb/gU7wS/14/
-* examples - Windows Store app
-* examples - 3d heatmap
-* examples - cache tiles for offline
-* examples - jQuery Mobile
-* examples - pan cursor
-* examples - shape click pointer cursor
-* examples - custering demo/support
-* examples - shared-canvas sketch app
-* examples - weather
+* Windows Store app
+* 3d heatmap
+* cache tiles for offline
+* jQuery Mobile
+* pan cursor
+* shape click pointer cursor
+* custering demo/support
+* shared-canvas sketch app
+* weather
 ** http://openweathermap.org/example-json
-* examples - MBCR: http://www.mbta.com/rider_tools/developers/default.asp?id=21899
-* examples - drag shapes
-* examples - tiled image w/o zoom
+* MBCR: http://www.mbta.com/rider_tools/developers/default.asp?id=21899
+* drag shapes
+* tiled image w/o zoom
 ** https://github.com/AppGeo/geo/issues/105
-* examples - ie7 - [bug] floating info div doesn't show up, inputs are alone and on the left
-* examples - redo the jVectorMap demo page using jQuery Geo
-* examples - make OSM editing simple
+* ie7 - [bug] floating info div doesn't show up, inputs are alone and on the left
+* redo the jVectorMap demo page using jQuery Geo
+* make OSM editing simple
 ** http://www.maploser.com/2012/03/29/all-i-want-for-openstreetmap-is-simple/
 ** http://jvectormap.owl-hollow.net/ ( found via http://www.moretechtips.net/2011/12/22-most-popular-jquery-plugins-of-2011.html )
-* examples - geomap resize method
-* examples - Codecademy course
-* examples - SVG & other neat elements/media in labels
-* examples - continent puzzle
+* geomap resize method
+* Codecademy course
+* SVG & other neat elements/media in labels
+* continent puzzle
 ** http://stephanmendler.de/thinkmaps/puzzle/index_en.html
-* examples - MapBox vector tiles
+* MapBox vector tiles
 ** http://mapbox.com/blog/vector-tiles/
 
 === official apps (x.jquerygeo.com) ===
-* twheat
+* Twheat
 * maps
 * crowd
 * gis
@@ -303,6 +310,95 @@ http://jsbin.com/uhabox/18/edit
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-10-02==
+===bugs===
+I've found a few bugs in b2 that I would like to fix. The graphics drawing is obvious in Chrome on my work desktop and I think is the same jumping I see using wheel zoom on the track pad on my laptop.
+
+===refresh after back===
+The issue can be seen here: http://jsbin.com/eJAneWa/1/edit
+
+In latest Chrome & Firefox. Not in IE for whatever reason.
+
+===highlight pop===
+Here's this issue: http://jsbin.com/OyeMUYo/1/edit
+
+This one is in Chrome & IE but not Firefox. Eesh!
+
+===find MultiPolygon===
+Finally, here's the last one: http://jsbin.com/ukicAHu/1/edit
+
+Uh, I'm getting infinite move events :( It's not a _supportsTouch thing, that's still false.
+
+Anyway, the actual issue here is that $.geo.distance doesn't handle MultiPolygon at all. Is that in the docs? Yeah, the docs say it only supports basic geometry. I should fix the find method to handle that itself.
+
+Fixed! I added a private _basic function to $.geo that not only flattens to non-collections but goes further and extracts Multi-geometries into individual basic geometries.
+
+==2013-09-23==
+===defer===
+I can't use PHProxy because the app is not running from my server.
+
+I may have found a bug. When attempting to load a Deferred image, I am passing the data url to loadImageDeferredDone but calling _loadImage with $.data( this, "img" ). I forget what's going on though. Also, the two server types are completely different. Check out the // assume Deferred comment on both. I need to clean that up, I guess.
+
+==2013-09-16==
+===defer===
+Starting to move the defer example to jsbin. I have to decide how to handle images not working. I may have to use a data URI because canvas gets mad even for CORS images when you ask for the toDataURL of an image that's not in the same domain.
+
+Aparently it's available in Firefox & Chrome: https://developer.mozilla.org/en-US/docs/HTML/CORS_Enabled_Image?redirectlocale=en-US&redirectslug=CORS_Enabled_Image
+
+Interesting. Although, I could just use PHP proxy from Ben https://github.com/cowboy/php-simple-proxy/
+
+==2013-09-08==
+===Twheat===
+New coordinates property seems to work, though there are a ton fewer geolocated tweets. Anyway, new version of Twheat is published.
+
+===bbox===
+I'm going to finish up moving the bbox example to jsbin. Ok, bbox example is updated http://jsbin.com/OGUGaxO/3. What's next?
+
+===limit pan===
+Limiting the pannable area doesn't work too well (currently, the only way to do it is to have the map jump back to a center and that doesn't look so good). That demo is out until there is a real way to limit the pannable area such as having bboxMax mean something more specific.
+
+===refresh===
+This has enough merit to be an example...like: hey! you can force the map to download images for tiles that have already been downloaded.
+
+Done. That was an easy conversion.
+
+==2013-09-05==
+===Twheat===
+I got word from a Twitter coder that geo stuff has changed names but is still around. I'm going to try that now. The gist is that the .geo property is now in the .coordinates or .place property.
+
+
+==2013-09-02==
+===Twheat===
+This app is its own project now and I'm going to remove it from the examples.
+
+===Utah===
+I'm going to make the Utah demo its own repo/app and move it to showcase. It has resources, performs a function and is more than just an example. Done, time for a subdomain.
+
+===other examples===
+Hmm, what to do about all the other little test examples. They're a bit too basic to be useful and most of them are in the 'complex example' already.
+
+I'm working on a slightly simpler bbox sample on jsbin.
+
+==2013-08-31==
+===Twheat===
+It's finally time to get Twheat! back up and running. Twitter changed their API so that search now requires it. I need to make it work again. My (mt) web server is running PHP so I need to look for a quick PHP client to handle all the auth for me.
+
+I've made a Twitter "application" for jquerygeo.com.
+
+I think I'm going to use this script to access Twitter: https://github.com/J7mbo/twitter-api-php
+
+Twheat will be it's own repo and removed from the jQuery Geo docs.
+
+So, I got that working but Twitter's new search API doesn't return the geo property :/ I posted to this discussion:
+
+https://dev.twitter.com/discussions/7455
+
+I seriously hope they fix it soon.
+
+==2013-08-25==
+===some more demos===
+I'm now tasking myself with merging all the simple examples with the real demos. Everything will be in jsbin and nothing will be the ugly old format.
+
 ==2013-08-22==
 ===everything demo===
 I'm still converting this to jsbin. Phew! Finally done, it looks a bit simpler now without jQuery UI :/
@@ -317,7 +413,7 @@ I don't want to turn the all-x demos into jsbins but I think I have to. The shin
 ===examples===
 I now need to remove some boring examples (from the old all-emcompassing list) and turn the less boring ones into jsbin examples using 1.0b2. I really need to get rid of some of these old examples. I wish there were an easy way to explain the proj one though, that's useful for my target audience.
 
-I should only have two categories: apps & examples. Examples must be on jsbin. I'm going to have twheat & MapGeo be apps, but move Utah to examples because it's pretty simple & people might want to see the JS involved.
+I should only have two categories: apps & examples. Examples must be on jsbin. I'm going to have Twheat & MapGeo be apps, but move Utah to examples because it's pretty simple & people might want to see the JS involved.
 
 ==2013-08-02==
 ===examples===
@@ -349,9 +445,9 @@ It's a caching thing, I think. Since the data URI was the exact same as the orig
 ===examples===
 I was hoping to use codepen for all my examples becaues the site looks nicer but, unfortunately, the full screen examples do not work in IE. Even 10, which is weird. I get an Access is denied error, but 10 supports regular XHR.
 
-I suppose it's back to jsfiddle, or maybe I should look at jsbin? jsbin does look very clean in the Live Preview mode. There's just an Edit in JS Bin button.
+I suppose it's back to jsfiddle, or maybe I should look at jsbin? jsbin does look very clean in the Live Preview mode. There's just an edit in JS Bin button.
 
-Here's a staring template: http://jsbin.com/uhabox/18/edit and, hey! it works in IE >:|
+Here's a staring template: http://jsbin.com/uhabox/19/edit and, hey! it works in IE >:|
 
 I'm switching to position: absolute so they look nicer in IE8- without putting more text into the code.
 
@@ -795,7 +891,7 @@ Time for some console.log (though, I do still wonder if 3d transform will fix it
 I think I need to attach the load events for real and then determin if we still need to flip in the event handler. This .one("load") thing I think isn't working as I had hoped. The endcallback function is attaching two load event handlers and then doing two flips, ugh. I'm not sure why this is only Firefox.
 
 ==2013-02-14==
-===twheat 3d===
+===Twheat 3d===
 I really need to have a version of Twheat! that uses this WebGL heatmap library: http://codeflow.org/entries/2013/feb/04/high-performance-js-heatmaps/
 
 ==2013-02-09==
@@ -1117,7 +1213,7 @@ Good luck getting that to look nice in code :/
 I made it smaller. Oh, and you can't send that to Esri's REST API because it's a WMS parameter. Ignoring it for now. That's too bad, it would really add to my TIGER demo.
 
 ==2012-09-29==
-===twheat===
+===Twheat===
 I'm going to release the new version to Twheat! tonight, Twheat! 2.
 
 ===range===
@@ -1945,8 +2041,8 @@ measureDistance should be measureLength. The measureLabels object should have a 
 I was going to bring our urlFormat property over from the old code but now I think I want it to be the same property on the service object. I think getUrl can be a function, but can *also* be a string for shorthand. This will obviously be a jsrender template string.
 
 ==2011-11-30==
-===twheat===
-I'm going to keep the twitter-heat demo and also leave twheat as its own app.
+===Twheat===
+I'm going to keep the twitter-heat demo and also leave Twheat as its own app.
 
 ===service-level===
 Finally writing some service-level shape docs for 1.0a4.
@@ -2032,7 +2128,7 @@ Currently, the layout is, e.g.:
      ($textContainer)
 
 ==2011-11-15==
-===twheat===
+===Twheat===
 I'm going to make this a real app with its own subdomain. I would like to use paging because the first page doesn't have enough results with a geo argument. What happens when there's no further pages. Is there a "next_page" property? Is is null?
 
 The page will be more impressive if I try to geocode the location property to get more results.
