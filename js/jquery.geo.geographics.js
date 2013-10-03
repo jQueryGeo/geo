@@ -396,10 +396,13 @@
       if ( this._trueCanvas ) {
         if ( this._options.doubleBuffer && this._trueDoubleBuffer ) {
 
+          var geographics = this;
 
-          //console.log('interactiveTransform: if ( this._requireFlip ): ' + this._requireFlip);
+          console.log('interactiveTransform: if ( this._requireFlip ): ' + this._requireFlip);
           if ( this._requireFlip ) {
-            var geographics = this;
+
+            //console.log('interactiveTransform: _requireFlip = false');
+            geographics._requireFlip = false;
 
             var oldCanvasScene = geographics._$canvasSceneFront;
 
@@ -411,9 +414,6 @@
             } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) ).prependTo( geographics._$elem );
 
             geographics._$canvasSceneBack = oldCanvasScene.prop( "src", ""  ).detach();
-
-            //console.log('interactiveTransform: _requireFlip = false');
-            geographics._requireFlip = false;
           }
 
           // transform a finished scene, can assume no drawing during these calls

@@ -18,10 +18,24 @@
       left: 0;
     }
 
+    #info {
+      background: #fafafa;
+      border-radius: .5em;
+      box-shadow: .2em .2em .4em #222;
+      font-size: .8em;
+      max-width: 66%;
+      padding: .25em .5em;
+      position: absolute;
+      left: 1em;
+      top: 1em;
+    }
+
+
   </style>
 </head>
 <body>
   <div id="map">
+    <div id="info">Browse to <a href="http://www.google.com">google.com</a> and then click back.</div>
   </div>
 
   <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
@@ -38,13 +52,80 @@
   <!--<script src="../../dist/jquery.geo-1.0.0-test.min.js"></script>-->
 
   <script>
-    $( function ( ) {
-      // create a map
-      var map = $("#map").geomap( {
-          center: [ -71.3595678, 42.3604823 ],
-          zoom: 8
-      } );
-    } );
+$(function() {
+  var hover = null;
+  
+  // create a map
+  var map = $("#map").geomap({
+    services: [
+      {
+        id: 'map-countries-service',
+        type: 'shingled',
+        src: ""
+      },
+      {
+        id: 'map-highlight-service',
+        type: 'shingled',
+        src: ""
+      }
+    ],
+    center: [ 0, 20 ],
+    zoom: 2,
+    cursors: {
+      click: 'pointer'
+    },
+    move: function( e, geo ) {
+      var countries = map.geomap( 'find', geo, 1 );
+      if ( countries.length > 0 ) {
+        map.geomap( 'option', 'mode', 'click' );
+        
+        if ( countries[ 0 ] !== hover ) {
+          if ( hover ) {
+            mapHighlightService.geomap( 'remove', hover, false );
+          }
+          
+          hover = $.extend( true, { }, countries[ 0 ] );
+          console.log("move - append");
+          mapHighlightService.geomap( 'append', hover );
+        }
+        
+      } else {
+        map.geomap( 'option', 'mode', 'pan' );
+        
+        if ( hover ) {
+          mapHighlightService.geomap( 'remove', hover );
+          hover = null;
+        }
+      }
+    }    
+  });
+  
+  var mapCountriesService = $( '#map-countries-service' ).geomap( 'option', 'shapeStyle', {
+    color: '#36484a',
+    fillOpacity: 1,
+    stroke: '#addfe6',
+    strokeWidth: '1px'
+  } );
+  var mapHighlightService = $( '#map-highlight-service' ).geomap( 'option', 'shapeStyle', {
+    fillOpacity: 0,
+    stroke: '#aaa04e',
+    strokeWidth: '2px'
+  } );
+  
+  // grab the world countries file
+  $.getJSON('http://data.jquerygeo.com/ne_110m_land.geojson', function (result) {
+    // append them to the map
+    $.each( result.features, function( ) {
+      mapCountriesService.geomap('append', this, {
+        color: '#36484a'
+      }, false);
+    });
+    
+    // show them
+    map.geomap('refresh');
+  });
+});
+
   </script>
 </body>
 </html>

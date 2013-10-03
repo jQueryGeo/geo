@@ -1,11 +1,10 @@
 ﻿== to do ==
 
 === b2 ===
-* geomap - [bug] leaving the map page and then going 'back' in the browser does not refresh shape only maps
-** see Internet Monitor
 * geomap - [bug] double-click zoom on shingled graphics service with highlight renders wrong buffer for a second
 ** world countries
 * geomap - [bug] infinite move events in Chrome
+* geomap - [bug] touchpad zoom not keeping center
 
 ===bug fixing process===
 1. browse to the jQuery Geo release template: http://jsbin.com/uhabox/19/edit
@@ -317,6 +316,21 @@ I need to fix this today. Last I remember, the flip bit wasn't getting set even 
 The second time in, all the _requireFlip sets are bundled together.
 
 I've stopped using the image load callbacks and just flipping the buffer when I set the image source. Seems fine on my dev machine in Chrome & IE but Firefox has an awful flash just before the new graphic appears. You can't win.
+
+Hmm, Firefox is better on my laptop. Maybe it's just the video driver in this work machine.
+
+===highlight pop===
+This might be related to having two graphic services. Is a variable interfering?
+
+It's showing the original image for a second but only on the second service.
+
+I think this is actually related to the infinite move events. I'm appending the shape during move, and we're getting a million move events in Chrome. After interactiveTransform, I might not be cancelling or clearing something, _anchor or _current.
+
+Huh! I get a million move events without even doing interactiveTransform in IE.
+
+It doesn't seem to be the cursor changes, I removed those from test and still get lots of moves with the mouse stable.
+
+So, I only trigger move events when I get a mousemove from the browser. Why am I getting so many mousemove events from the browsers?
 
 ==2013-10-02==
 ===bugs===

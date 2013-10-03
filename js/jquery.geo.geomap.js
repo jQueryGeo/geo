@@ -1,4 +1,4 @@
-                       (function ($, window, undefined) {
+(function ($, window, undefined) {
   var _widgetIdSeed = 0,
       _ieVersion = ( function () {
         var v = 5, div = document.createElement("div"), a = div.all || [];
@@ -236,10 +236,14 @@
       this._supportTouch = "ontouchend" in document;
       this._softDblClick = this._supportTouch || _ieVersion === 7;
 
+      console.log( '_supportTouch: ' + this._supportTouch );
+
       var geomap = this,
           touchStartEvent = this._supportTouch ? "touchstart mousedown" : "mousedown",
           touchStopEvent = this._supportTouch ? "touchend touchcancel mouseup" : "mouseup",
           touchMoveEvent = this._supportTouch ? "touchmove mousemove" : "mousemove";
+
+      console.log( 'touchMoveEvent: ' + touchMoveEvent );
 
       $(document).keydown($.proxy(this._document_keydown, this));
 
@@ -1728,6 +1732,7 @@
     },
 
     _dragTarget_touchmove: function (e) {
+      console.log( '_dragTarget_touchmove' );
       if ( this._options[ "mode" ] === "static" ) {
         return;
       }
@@ -1816,6 +1821,7 @@
         }
       } else {
         current = [e.pageX - offset.left, e.pageY - offset.top];
+        console.log( current );
       }
 
       if (current[0] === this._lastMove[0] && current[1] === this._lastMove[1]) {
@@ -1924,10 +1930,10 @@
         this._setInteractiveTimeout( true );
       }
 
-      if ( this._inOp ) {
+      //if ( this._inOp ) {
         e.preventDefault();
         return false;
-      }
+      //}
     },
 
     _dragTarget_touchstop: function (e) {
