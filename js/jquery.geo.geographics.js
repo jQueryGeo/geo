@@ -100,8 +100,8 @@
 
         // create our front & back buffers
         // though, at any time either one can be in front
-        this._$canvasSceneFront = $( window.toStaticHTML( '<img id="scene0" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ).load($.proxy(this._canvasSceneLoad, this));
-        this._$canvasSceneBack = $( window.toStaticHTML( '<img id="scene1" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ).load($.proxy(this._canvasSceneLoad, this));
+        this._$canvasSceneFront = $( window.toStaticHTML( '<img id="scene0" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ); //.load($.proxy(this._canvasSceneLoad, this));
+        this._$canvasSceneBack = $( window.toStaticHTML( '<img id="scene1" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ); //.load($.proxy(this._canvasSceneLoad, this));
 
       } else if (_ieVersion <= 8) {
         this._trueCanvas = false;
@@ -397,6 +397,7 @@
         if ( this._options.doubleBuffer && this._trueDoubleBuffer ) {
 
 
+          //console.log('interactiveTransform: if ( this._requireFlip ): ' + this._requireFlip);
           if ( this._requireFlip ) {
             var geographics = this;
 
@@ -411,6 +412,7 @@
 
             geographics._$canvasSceneBack = oldCanvasScene.prop( "src", ""  ).detach();
 
+            //console.log('interactiveTransform: _requireFlip = false');
             geographics._requireFlip = false;
           }
 
@@ -439,7 +441,9 @@
 
     _canvasSceneLoad: function() {
       var geographics = this;
+      //console.log('_canvasSceneLoad: if ( this._requireFlip ): ' + this._requireFlip);
       if ( geographics._requireFlip ) {
+        //console.log('_canvasSceneLoad: _requireFlip = false');
         geographics._requireFlip = false;
         var oldCanvasScene = geographics._$canvasSceneFront;
 
@@ -458,12 +462,15 @@
       var geographics = this;
 
       if ( !geographics._timeoutEnd ) {
+        /* bug - never hit */
+        //console.log( "_endCallback: !_timeoutEnd: return" );
         // something has canceled the draw
         return;
       }
 
       if ( geographics._trueCanvas && geographics._options.doubleBuffer && geographics._trueDoubleBuffer ) {
         geographics._$canvasSceneBack.prop( "src", geographics._$canvas[ 0 ].toDataURL( ) );
+        this._canvasSceneLoad( );
       }
 
 
@@ -495,6 +502,7 @@
         this._timeoutEnd = null;
       }
 
+      //console.log('_end: _requireFlip = true');
       this._requireFlip = true;
 
       this._timeoutEnd = setTimeout( $.proxy(this._endCallback, this), 20 );

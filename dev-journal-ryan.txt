@@ -310,6 +310,14 @@ http://jsbin.com/uhabox/19/edit
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-10-03==
+===refresh after back===
+I need to fix this today. Last I remember, the flip bit wasn't getting set even though we get two _canvasSceneLoad callbacks.
+
+The second time in, all the _requireFlip sets are bundled together.
+
+I've stopped using the image load callbacks and just flipping the buffer when I set the image source. Seems fine on my dev machine in Chrome & IE but Firefox has an awful flash just before the new graphic appears. You can't win.
+
 ==2013-10-02==
 ===bugs===
 I've found a few bugs in b2 that I would like to fix. The graphics drawing is obvious in Chrome on my work desktop and I think is the same jumping I see using wheel zoom on the track pad on my laptop.
