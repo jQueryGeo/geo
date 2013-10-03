@@ -5,7 +5,7 @@
 ** see Internet Monitor
 * geomap - [bug] double-click zoom on shingled graphics service with highlight renders wrong buffer for a second
 ** world countries
-* geomap - [buf] find method does not work correctly on all MultiPolygon geometry
+* geomap - [bug] infinite move events in Chrome
 
 ===bug fixing process===
 1. browse to the jQuery Geo release template: http://jsbin.com/uhabox/19/edit
@@ -326,6 +326,12 @@ This one is in Chrome & IE but not Firefox. Eesh!
 
 ===find MultiPolygon===
 Finally, here's the last one: http://jsbin.com/ukicAHu/1/edit
+
+Uh, I'm getting infinite move events :( It's not a _supportsTouch thing, that's still false.
+
+Anyway, the actual issue here is that $.geo.distance doesn't handle MultiPolygon at all. Is that in the docs? Yeah, the docs say it only supports basic geometry. I should fix the find method to handle that itself.
+
+Fixed! I added a private _basic function to $.geo that not only flattens to non-collections but goes further and extracts Multi-geometries into individual basic geometries.
 
 ==2013-09-23==
 ===defer===

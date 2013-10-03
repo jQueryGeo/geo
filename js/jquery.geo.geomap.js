@@ -735,7 +735,7 @@
                 };
 
             if ( $.geo.distance( bboxPolygon, projectedPoint, true ) <= mapTol ) {
-              geometries = $.geo._flatten( graphicShape.shape );
+              geometries = $.geo._basic( graphicShape.shape );
               for ( curGeom = 0; curGeom < geometries.length; curGeom++ ) {
                 if ( $.geo.distance( geometries[ curGeom ], selector ) <= mapTol ) {
                   result.push( graphicShape.shape );

@@ -587,8 +587,39 @@
     // feature
     //
 
-    _flatten: function (geom) {
+    _basic: function( geom ) {
       // return an array of all basic geometries
+      // e.g., MultiPolygons become multiple Polygons
+      // coordinate arrays are kept as references for speed & should not be altered
+      // not in JTS
+      var geometries = [ ];
+      var multiType;
+      var i = 0;
+      var j;
+
+      var flat = this._flatten( geom );
+
+      for ( ; i < flat.length; i++ ) {
+        if ( flat[ i ].type.substring( 0, 5 ) === "Multi" ) {
+          multiType = flat[ i ].type.substring( 5 );
+
+          for ( j = 0; j < flat[ i ].coordinates.length; j++ ) {
+            geometries.push( {
+              type: multiType,
+              coordinates: flat[ i ].coordinates[ j ]
+            } );
+          }
+        } else {
+          geometries.push( flat[ i ] );
+        }
+      }
+
+      return geometries;
+    },
+
+    _flatten: function (geom) {
+      // return an array of only geometries
+      // will extract geometries from Feature, FeatureCollection, & GeometryCollection
       // not in JTS
       var geometries = [],
           curGeom = 0;
