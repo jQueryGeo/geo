@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0.0-b2 - 2013-07-10
+/*! jQuery Geo - v1.0.0-b2 - 2013-10-02
 * http://jquerygeo.com
 * Copyright (c) 2013 Ryan Westphal; Licensed MIT */
 // Copyright 2006 Google Inc.
@@ -3220,8 +3220,39 @@ $.Widget.prototype = {
     // feature
     //
 
-    _flatten: function (geom) {
+    _basic: function( geom ) {
       // return an array of all basic geometries
+      // e.g., MultiPolygons become multiple Polygons
+      // coordinate arrays are kept as references for speed & should not be altered
+      // not in JTS
+      var geometries = [ ];
+      var multiType;
+      var i = 0;
+      var j;
+
+      var flat = this._flatten( geom );
+
+      for ( ; i < flat.length; i++ ) {
+        if ( flat[ i ].type.substring( 0, 5 ) === "Multi" ) {
+          multiType = flat[ i ].type.substring( 5 );
+
+          for ( j = 0; j < flat[ i ].coordinates.length; j++ ) {
+            geometries.push( {
+              type: multiType,
+              coordinates: flat[ i ].coordinates[ j ]
+            } );
+          }
+        } else {
+          geometries.push( flat[ i ] );
+        }
+      }
+
+      return geometries;
+    },
+
+    _flatten: function (geom) {
+      // return an array of only geometries
+      // will extract geometries from Feature, FeatureCollection, & GeometryCollection
       // not in JTS
       var geometries = [],
           curGeom = 0;
@@ -5123,7 +5154,7 @@ $.Widget.prototype = {
                 };
 
             if ( $.geo.distance( bboxPolygon, projectedPoint, true ) <= mapTol ) {
-              geometries = $.geo._flatten( graphicShape.shape );
+              geometries = $.geo._basic( graphicShape.shape );
               for ( curGeom = 0; curGeom < geometries.length; curGeom++ ) {
                 if ( $.geo.distance( geometries[ curGeom ], selector ) <= mapTol ) {
                   result.push( graphicShape.shape );

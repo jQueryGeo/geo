@@ -106,6 +106,7 @@ Unless you have downloaded a tagged release, grunt will create a test version of
 * docs - geo - $.geo.WKT object
 * geo - $.geo.WKT object
 * geomap - Chrome - [bug] after remove, shapes are not refreshed
+* geomap - [bug] find method does not work on all Multi* geometries
 
 ### 1.0.0-b1.5 (2013-01-17)
 * examples - drawing markers
