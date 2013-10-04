@@ -1,7 +1,7 @@
 ﻿== to do ==
 
 === b2 ===
-* geomap - [bug] infinite move events when cursor is not moving
+* geomap - [bug] infinite mousemove events when cursor is not moving
 * geomap - [bug] touchpad zoom not keeping center
 
 ===bug fixing process===
@@ -310,6 +310,9 @@ http://jsbin.com/uhabox/19/edit
 ==2013-10-04==
 ===highlight pop===
 Returning false when we detect the current move point is the same as the last one stops the infinite move events triggered by jQueryGeo, but what's causing them in the first place?
+
+===infinite move===
+So, it appeared to go away, but there is definitely some mousemove issue. I'm going to try it on my laptop to see if it's just this machine. I can't image it is. Again, doesn't happen to Firefox.
 
 ==2013-10-03==
 ===refresh after back===

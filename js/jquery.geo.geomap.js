@@ -1728,7 +1728,9 @@
     },
 
     _dragTarget_touchmove: function (e) {
+      console.log( $.now( ) + ' move' );
       if ( this._options[ "mode" ] === "static" ) {
+        console.log( '  return false; - static' );
         return;
       }
 
@@ -1771,6 +1773,7 @@
           if ( doInteractiveTimeout ) {
             this._setInteractiveTimeout( true );
           }
+          console.log( '  return false; - switch to multitouch' );
           return false;
         }
 
@@ -1819,14 +1822,18 @@
       }
 
       if (current[0] === this._lastMove[0] && current[1] === this._lastMove[1]) {
-        e.preventDefault();
         if ( this._inOp ) {
+          e.preventDefault();
           if ( doInteractiveTimeout ) {
             this._setInteractiveTimeout( true );
           }
+          console.log( '  e.preventDefault(); return false; - current === _lastMove && _inOp' );
+          return false;
+        } else {
+          // fixes: [bug] highlight pop
+          console.log( '  return; - current === _lastMove' );
+          return false;
         }
-        // fixes: [bug] highlight pop
-        return false;
       }
 
       if ( _ieVersion === 7 ) {
@@ -1844,6 +1851,7 @@
         if ( doInteractiveTimeout ) {
           this._setInteractiveTimeout( true );
         }
+        console.log( '  e.preventDefault(); return false; - _isMultiTouch' );
         return false;
       }
 
@@ -1927,6 +1935,7 @@
 
       if ( this._inOp ) {
         e.preventDefault();
+        console.log( '  e.preventDefault(); return false; - _inOp' );
         return false;
       }
     },
