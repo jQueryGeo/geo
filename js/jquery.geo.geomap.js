@@ -1925,10 +1925,10 @@
         this._setInteractiveTimeout( true );
       }
 
-      //if ( this._inOp ) {
+      if ( this._inOp ) {
         e.preventDefault();
         return false;
-      //}
+      }
     },
 
     _dragTarget_touchstop: function (e) {

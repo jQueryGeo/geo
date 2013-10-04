@@ -79,13 +79,13 @@ $(function() {
       if ( countries.length > 0 ) {
         map.geomap( 'option', 'mode', 'click' );
         
-        if ( countries[ 0 ] !== hover ) {
+        if ( !hover || countries[ 0 ] !== hover ) { //.properties.name !== hover.properties.name ) {
           if ( hover ) {
             mapHighlightService.geomap( 'remove', hover, false );
           }
           
-          hover = $.extend( true, { }, countries[ 0 ] );
-          console.log("move - append");
+          hover = countries[ 0 ]; // $.extend( true, { }, countries[ 0 ] );
+          console.log("move - append " + hover.properties.name);
           mapHighlightService.geomap( 'append', hover );
         }
         
