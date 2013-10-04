@@ -38,79 +38,13 @@
   <!--<script src="../../dist/jquery.geo-1.0.0-test.min.js"></script>-->
 
   <script>
-$(function() {
-  var hover = null;
-  
-  // create a map
-  var map = $("#map").geomap({
-    services: [
-      {
-        id: 'map-countries-service',
-        type: 'shingled',
-        src: ""
-      },
-      {
-        id: 'map-highlight-service',
-        type: 'shingled',
-        src: ""
-      }
-    ],
-    center: [ 0, 20 ],
-    zoom: 2,
-    cursors: {
-      click: 'pointer'
-    },
-    move: function( e, geo ) {
-      var countries = map.geomap( 'find', geo, 1 );
-      if ( countries.length > 0 ) {
-        map.geomap( 'option', 'mode', 'click' );
-        
-        if ( countries[ 0 ] !== hover ) {
-          if ( hover ) {
-            mapHighlightService.geomap( 'remove', hover, false );
-          }
-          
-          hover = countries[ 0 ];
-          mapHighlightService.geomap( 'append', hover );
-        }
-        
-      } else {
-        map.geomap( 'option', 'mode', 'pan' );
-        
-        if ( hover ) {
-          mapHighlightService.geomap( 'remove', hover );
-          hover = null;
-        }
-      }
-    }    
-  });
-  
-  var mapCountriesService = $( '#map-countries-service' ).geomap( 'option', 'shapeStyle', {
-    color: '#36484a',
-    fillOpacity: 1,
-    stroke: '#addfe6',
-    strokeWidth: '1px'
-  } );
-  var mapHighlightService = $( '#map-highlight-service' ).geomap( 'option', 'shapeStyle', {
-    fillOpacity: 0,
-    stroke: '#aaa04e',
-    strokeWidth: '2px'
-  } );
-  
-  // grab the world countries file
-  $.getJSON('http://data.jquerygeo.com/ne_110m_land.geojson', function (result) {
-    // append them to the map
-    $.each( result.features, function( ) {
-      mapCountriesService.geomap('append', this, {
-        color: '#36484a'
-      }, false);
+    $(function() {
+      // create a map
+      var map = $("#map").geomap({
+        center: [ -71.3595678, 42.3604823 ],
+        zoom: 8,
+      });
     });
-    
-    // show them
-    map.geomap('refresh');
-  });
-});
-
   </script>
 </body>
 </html>

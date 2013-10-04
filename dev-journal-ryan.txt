@@ -1,7 +1,6 @@
 ﻿== to do ==
 
 === b2 ===
-* geomap - [bug] infinite mousemove events when cursor is not moving
 * geomap - [bug] touchpad zoom not keeping center
 
 ===bug fixing process===
@@ -313,6 +312,8 @@ Returning false when we detect the current move point is the same as the last on
 
 ===infinite move===
 So, it appeared to go away, but there is definitely some mousemove issue. I'm going to try it on my laptop to see if it's just this machine. I can't image it is. Again, doesn't happen to Firefox.
+
+I'm happy with it, I think there's some hardware thing with the work machine (or something to do with the game controller & Pinnacle Game Profiler. It's not happening at all on my laptop. I'll maybe try my home desktop later.
 
 ==2013-10-03==
 ===refresh after back===

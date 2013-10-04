@@ -6238,14 +6238,16 @@ $.Widget.prototype = {
       }
 
       if (current[0] === this._lastMove[0] && current[1] === this._lastMove[1]) {
-        e.preventDefault();
         if ( this._inOp ) {
+          e.preventDefault();
           if ( doInteractiveTimeout ) {
             this._setInteractiveTimeout( true );
           }
+          return false;
+        } else {
+          // fixes: [bug] highlight pop
+          return false;
         }
-        // fixes: [bug] highlight pop
-        return false;
       }
 
       if ( _ieVersion === 7 ) {
