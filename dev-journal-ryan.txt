@@ -1,6 +1,7 @@
 ﻿== to do ==
 
 === b2 ===
+* geomap - [bug] infinite move events when cursor is not moving
 * geomap - [bug] touchpad zoom not keeping center
 
 ===bug fixing process===
@@ -305,6 +306,10 @@ http://jsbin.com/uhabox/19/edit
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2013-10-04==
+===highlight pop===
+Returning false when we detect the current move point is the same as the last one stops the infinite move events triggered by jQueryGeo, but what's causing them in the first place?
 
 ==2013-10-03==
 ===refresh after back===

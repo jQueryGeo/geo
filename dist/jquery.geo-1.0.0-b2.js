@@ -4336,7 +4336,7 @@ $.Widget.prototype = {
         top: 0,
         width: geographics._width,
         height: geographics._height
-      } ).prependTo( geographics._$elem );
+      } ).appendTo( geographics._$elem );
 
       geographics._$labelsContainerBack = oldLabelsContainer.detach();
 
