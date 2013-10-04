@@ -33,7 +33,7 @@ module.exports = function(grunt) {
           'js/jquery.geo.shingled.js'
         ],
         dest: 'dist/jquery.<%= pkg.name %>-<%= pkg.version %>.js'
-      },
+      }
     },
     uglify: {
       options: {
@@ -42,7 +42,7 @@ module.exports = function(grunt) {
       dist: {
         src: '<%= concat.dist.dest %>',
         dest: 'dist/jquery.<%= pkg.name %>-<%= pkg.version %>.min.js'
-      },
+      }
     },
     qunit: {
       files: ['test/**/*.html']
@@ -59,14 +59,14 @@ module.exports = function(grunt) {
           jshintrc: '.jshintrc'
         },
         src: ['js/jquery.geo.core.js', 'js/jquery.geo.geographics.js', 'js/jquery.geo.geomap.js', 'js/jquery.geo.shingled.js', 'js/jquery.geo.tiled.js']
-      },
+      }
 //      test: {
 //        options: {
 //          jshintrc: '.jshintrc'
 //        },
 //        src: ['test/**/*.js']
 //      },
-    },
+    }
   });
 
   // These plugins provide necessary tasks.
