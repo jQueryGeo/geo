@@ -202,8 +202,8 @@
           this._isTap =
           this._isDbltap = false;
 
-      this._anchor = [ 0, 0 ];
-      this._current = [ 0, 0 ];
+      this._anchor = [ 0, 0 ]; /* mouse down */
+      this._current = [ 0, 0 ]; /* mouse move no matter what */
       this._lastMove = [ 0, 0 ];
       this._lastDrag = [ 0, 0 ];
       this._velocity = [ 0, 0 ];
@@ -236,14 +236,10 @@
       this._supportTouch = "ontouchend" in document;
       this._softDblClick = this._supportTouch || _ieVersion === 7;
 
-      console.log( '_supportTouch: ' + this._supportTouch );
-
       var geomap = this,
           touchStartEvent = this._supportTouch ? "touchstart mousedown" : "mousedown",
           touchStopEvent = this._supportTouch ? "touchend touchcancel mouseup" : "mouseup",
           touchMoveEvent = this._supportTouch ? "touchmove mousemove" : "mousemove";
-
-      console.log( 'touchMoveEvent: ' + touchMoveEvent );
 
       $(document).keydown($.proxy(this._document_keydown, this));
 
@@ -1732,7 +1728,6 @@
     },
 
     _dragTarget_touchmove: function (e) {
-      console.log( '_dragTarget_touchmove' );
       if ( this._options[ "mode" ] === "static" ) {
         return;
       }
@@ -1821,17 +1816,17 @@
         }
       } else {
         current = [e.pageX - offset.left, e.pageY - offset.top];
-        console.log( current );
       }
 
       if (current[0] === this._lastMove[0] && current[1] === this._lastMove[1]) {
+        e.preventDefault();
         if ( this._inOp ) {
-          e.preventDefault();
           if ( doInteractiveTimeout ) {
             this._setInteractiveTimeout( true );
           }
-          return false;
         }
+        // fixes: [bug] highlight pop
+        return false;
       }
 
       if ( _ieVersion === 7 ) {

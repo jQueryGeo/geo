@@ -398,10 +398,7 @@
 
           var geographics = this;
 
-          console.log('interactiveTransform: if ( this._requireFlip ): ' + this._requireFlip);
           if ( this._requireFlip ) {
-
-            //console.log('interactiveTransform: _requireFlip = false');
             geographics._requireFlip = false;
 
             var oldCanvasScene = geographics._$canvasSceneFront;
@@ -441,9 +438,7 @@
 
     _canvasSceneLoad: function() {
       var geographics = this;
-      //console.log('_canvasSceneLoad: if ( this._requireFlip ): ' + this._requireFlip);
       if ( geographics._requireFlip ) {
-        //console.log('_canvasSceneLoad: _requireFlip = false');
         geographics._requireFlip = false;
         var oldCanvasScene = geographics._$canvasSceneFront;
 
@@ -462,8 +457,6 @@
       var geographics = this;
 
       if ( !geographics._timeoutEnd ) {
-        /* bug - never hit */
-        //console.log( "_endCallback: !_timeoutEnd: return" );
         // something has canceled the draw
         return;
       }
@@ -502,7 +495,6 @@
         this._timeoutEnd = null;
       }
 
-      //console.log('_end: _requireFlip = true');
       this._requireFlip = true;
 
       this._timeoutEnd = setTimeout( $.proxy(this._endCallback, this), 20 );

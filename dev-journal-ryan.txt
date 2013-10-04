@@ -1,9 +1,6 @@
 ﻿== to do ==
 
 === b2 ===
-* geomap - [bug] double-click zoom on shingled graphics service with highlight renders wrong buffer for a second
-** world countries
-* geomap - [bug] infinite move events in Chrome
 * geomap - [bug] touchpad zoom not keeping center
 
 ===bug fixing process===
@@ -318,6 +315,10 @@ The second time in, all the _requireFlip sets are bundled together.
 I've stopped using the image load callbacks and just flipping the buffer when I set the image source. Seems fine on my dev machine in Chrome & IE but Firefox has an awful flash just before the new graphic appears. You can't win.
 
 Hmm, Firefox is better on my laptop. Maybe it's just the video driver in this work machine.
+
+I only check delta changes in panMove, the demo is set to click mode. I think not triggering move events if the delta is 0 should be the pattern across the board.
+
+I still find it hard to believe that there are move events when the mouse isn't moving. Do I *really* have to start tracking that now?
 
 ===highlight pop===
 This might be related to having two graphic services. Is a variable interfering?
