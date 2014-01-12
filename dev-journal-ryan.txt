@@ -1,11 +1,7 @@
 ﻿== to do ==
 
 === b2 ===
-* geomap - [bug] leaving the map page and then going 'back' in the browser does not refresh shape only maps
-** see Internet Monitor
-* geomap - [bug] double-click zoom on shingled graphics service with highlight renders wrong buffer for a second
-** world countries
-* geomap - [bug] infinite move events in Chrome
+* geomap - [bug] touchpad zoom not keeping center
 
 ===bug fixing process===
 1. browse to the jQuery Geo release template: http://jsbin.com/uhabox/19/edit
@@ -310,6 +306,42 @@ http://jsbin.com/uhabox/19/edit
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2013-10-04==
+===highlight pop===
+Returning false when we detect the current move point is the same as the last one stops the infinite move events triggered by jQueryGeo, but what's causing them in the first place?
+
+===infinite move===
+So, it appeared to go away, but there is definitely some mousemove issue. I'm going to try it on my laptop to see if it's just this machine. I can't image it is. Again, doesn't happen to Firefox.
+
+I'm happy with it, I think there's some hardware thing with the work machine (or something to do with the game controller & Pinnacle Game Profiler. It's not happening at all on my laptop. I'll maybe try my home desktop later.
+
+==2013-10-03==
+===refresh after back===
+I need to fix this today. Last I remember, the flip bit wasn't getting set even though we get two _canvasSceneLoad callbacks.
+
+The second time in, all the _requireFlip sets are bundled together.
+
+I've stopped using the image load callbacks and just flipping the buffer when I set the image source. Seems fine on my dev machine in Chrome & IE but Firefox has an awful flash just before the new graphic appears. You can't win.
+
+Hmm, Firefox is better on my laptop. Maybe it's just the video driver in this work machine.
+
+I only check delta changes in panMove, the demo is set to click mode. I think not triggering move events if the delta is 0 should be the pattern across the board.
+
+I still find it hard to believe that there are move events when the mouse isn't moving. Do I *really* have to start tracking that now?
+
+===highlight pop===
+This might be related to having two graphic services. Is a variable interfering?
+
+It's showing the original image for a second but only on the second service.
+
+I think this is actually related to the infinite move events. I'm appending the shape during move, and we're getting a million move events in Chrome. After interactiveTransform, I might not be cancelling or clearing something, _anchor or _current.
+
+Huh! I get a million move events without even doing interactiveTransform in IE.
+
+It doesn't seem to be the cursor changes, I removed those from test and still get lots of moves with the mouse stable.
+
+So, I only trigger move events when I get a mousemove from the browser. Why am I getting so many mousemove events from the browsers?
+
 ==2013-10-02==
 ===bugs===
 I've found a few bugs in b2 that I would like to fix. The graphics drawing is obvious in Chrome on my work desktop and I think is the same jumping I see using wheel zoom on the track pad on my laptop.
@@ -318,6 +350,10 @@ I've found a few bugs in b2 that I would like to fix. The graphics drawing is ob
 The issue can be seen here: http://jsbin.com/eJAneWa/1/edit
 
 In latest Chrome & Firefox. Not in IE for whatever reason.
+
+I think it's related to identical output coming back too fast. We're getting two _canvasSceneLoad calls but not always going into the flip.
+
+Hmm, though when I resize the window on the second page though, the data URL should be different and refresh should work but it doesn't. I need to gut the whole geographics refresh and fix this for good. Too many timing issues.
 
 ===highlight pop===
 Here's this issue: http://jsbin.com/OyeMUYo/1/edit

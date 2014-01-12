@@ -1,4 +1,4 @@
-                       (function ($, window, undefined) {
+(function ($, window, undefined) {
   var _widgetIdSeed = 0,
       _ieVersion = ( function () {
         var v = 5, div = document.createElement("div"), a = div.all || [];
@@ -202,8 +202,8 @@
           this._isTap =
           this._isDbltap = false;
 
-      this._anchor = [ 0, 0 ];
-      this._current = [ 0, 0 ];
+      this._anchor = [ 0, 0 ]; /* mouse down */
+      this._current = [ 0, 0 ]; /* mouse move no matter what */
       this._lastMove = [ 0, 0 ];
       this._lastDrag = [ 0, 0 ];
       this._velocity = [ 0, 0 ];
@@ -1824,6 +1824,9 @@
           if ( doInteractiveTimeout ) {
             this._setInteractiveTimeout( true );
           }
+          return false;
+        } else {
+          // fixes: [bug] highlight pop
           return false;
         }
       }

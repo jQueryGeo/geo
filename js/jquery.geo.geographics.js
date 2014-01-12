@@ -100,8 +100,8 @@
 
         // create our front & back buffers
         // though, at any time either one can be in front
-        this._$canvasSceneFront = $( window.toStaticHTML( '<img id="scene0" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ).load($.proxy(this._canvasSceneLoad, this));
-        this._$canvasSceneBack = $( window.toStaticHTML( '<img id="scene1" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ).load($.proxy(this._canvasSceneLoad, this));
+        this._$canvasSceneFront = $( window.toStaticHTML( '<img id="scene0" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ); //.load($.proxy(this._canvasSceneLoad, this));
+        this._$canvasSceneBack = $( window.toStaticHTML( '<img id="scene1" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ); //.load($.proxy(this._canvasSceneLoad, this));
 
       } else if (_ieVersion <= 8) {
         this._trueCanvas = false;
@@ -396,9 +396,10 @@
       if ( this._trueCanvas ) {
         if ( this._options.doubleBuffer && this._trueDoubleBuffer ) {
 
+          var geographics = this;
 
           if ( this._requireFlip ) {
-            var geographics = this;
+            geographics._requireFlip = false;
 
             var oldCanvasScene = geographics._$canvasSceneFront;
 
@@ -410,8 +411,6 @@
             } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) ).prependTo( geographics._$elem );
 
             geographics._$canvasSceneBack = oldCanvasScene.prop( "src", ""  ).detach();
-
-            geographics._requireFlip = false;
           }
 
           // transform a finished scene, can assume no drawing during these calls
@@ -464,6 +463,7 @@
 
       if ( geographics._trueCanvas && geographics._options.doubleBuffer && geographics._trueDoubleBuffer ) {
         geographics._$canvasSceneBack.prop( "src", geographics._$canvas[ 0 ].toDataURL( ) );
+        this._canvasSceneLoad( );
       }
 
 
@@ -481,7 +481,7 @@
         top: 0,
         width: geographics._width,
         height: geographics._height
-      } ).prependTo( geographics._$elem );
+      } ).appendTo( geographics._$elem );
 
       geographics._$labelsContainerBack = oldLabelsContainer.detach();
 
