@@ -319,6 +319,9 @@ It works, I'm extending the Deferred object's promise now. Phew!
 
 Note that this is only a problem for tiled services as shingled services only have the one image and we don't need to store any additional data.
 
+===destroy===
+Next on the list of samples to move to jsbin: destroy.
+
 ==2013-10-04==
 ===highlight pop===
 Returning false when we detect the current move point is the same as the last one stops the infinite move events triggered by jQueryGeo, but what's causing them in the first place?
