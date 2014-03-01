@@ -2,7 +2,7 @@
   "name": "geo",
   "title": "jQuery Geo",
   "description": "An interactive mapping widget and geo-spatial API built on open source and open data (*NOT* a wrapper of other APIs, such as Google Maps)",
-  "version": "1.0.0-b2",
+  "version": "1.0.0-test",
   "homepage": "http://jquerygeo.com",
   "docs": "http://docs.jquerygeo.com",
   "demo": "http://docs.jquerygeo.com",
@@ -24,7 +24,7 @@
     }
   ],
   "dependencies": {
-    "jquery": "1.7"
+    "jquery": "1.9"
   },
   "keywords": [
     "geo",

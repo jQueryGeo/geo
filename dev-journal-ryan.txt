@@ -1,8 +1,5 @@
 ﻿== to do ==
 
-=== b2 ===
-* geomap - [bug] touchpad zoom not keeping center
-
 ===bug fixing process===
 1. browse to the jQuery Geo release template: http://jsbin.com/uhabox/19/edit
 2. clone it
@@ -66,6 +63,7 @@ http://jsbin.com/uhabox/19/edit
 * embed
 
 === future ===
+* geomap - [bug] touchpad zoom not keeping center
 * geographics - [bug] doubleBuffer is choppy
 ** especially noticeable in Firefox
 ** pretty bad with the USA demo: http://jsfiddle.net/ryanttb/8TvMB/2/
@@ -305,6 +303,21 @@ http://jsbin.com/uhabox/19/edit
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2014-03-01==
+===new year===
+Apart from answering a few questions on GitHub, I haven't done much to the project in five months or so :/ It's pretty stable but still, time to pull up the sleeves again and actually get 1.0 out.
+
+===defer===
+The defer example still does not work. Maybe a change in jQuery I have to handle? I'm sure I made the example with 1.8 so there shouldn't be a problem in 1.9.
+
+It's just cross origin stuff plus I think data URI code happens too fast & we get the loadImageDeferredDone gets called with a promise object we're not expecting.
+
+Yeah, something's changed. The example works fine with jQuery 1.8.3 but not with 1.9.1. Yep, the callback context is the promise now, not the Deferred object http://bugs.jquery.com/ticket/14086 . After this change, I will have to require jQuery 1.9. I'm fine with that considering they're on 1.11 now.
+
+It works, I'm extending the Deferred object's promise now. Phew!
+
+Note that this is only a problem for tiled services as shingled services only have the one image and we don't need to store any additional data.
 
 ==2013-10-04==
 ===highlight pop===

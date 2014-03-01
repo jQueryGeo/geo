@@ -3,7 +3,7 @@
 After years of internal development, we are pleased to bring our JavaScript map widget and spatial analysis tools to the open-source world in the form of a jQuery plugin.
 
 ## Getting Started
-Using jQuery Geo requires adding one element, including one script (apart from jQuery itself) and calling one function. The following copy-and-paste snippet will help you get started.
+Using jQuery Geo requires adding one element, including one script (apart from jQuery itself, version 1.9 or higher required) and calling one function. The following copy-and-paste snippet will help you get started.
 
 ```html
 <div id="map" style="height: 320px;"></div>
@@ -84,6 +84,8 @@ Unless you have downloaded a tagged release, grunt will create a test version of
 ## Release History
 
 ### 1.0.0-b2
+* project - update jQuery dependency to 1.9 in package 
+* geomap - [bug] deferred src functions no longer work
 * geomap - [bug] map does not always redraw shapes after interactiveTransform, a pan will fix them
 * docs - geomap - make zoomFactor an init-only public option
 * geomap - make zoomFactor an init-only public, option
