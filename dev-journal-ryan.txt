@@ -21,6 +21,9 @@ http://jsbin.com/uhabox/19/edit
 * posts - SQL Server to jQuery Geo
 * posts - WKT object
 
+=== showcase ====
+Trail - http://www.mytrailapp.com/index.php
+
 === examples ===
 * sea monsters image from Slate
 ** http://www.slate.com/articles/technology/future_tense/2013/09/olaus_magnus_carta_marina_sea_monsters_on_a_gorgeous_renaissance_map.html
@@ -304,8 +307,15 @@ http://jsbin.com/uhabox/19/edit
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2014-03-05==
+===trail===
+Helping someone with some issues on GitHub for their project: Trail ( http://www.mytrailapp.com/index.php )
+
+===examples===
+Keep going.
+
 ==2014-03-01==
-===new year===
+===new year?===
 Apart from answering a few questions on GitHub, I haven't done much to the project in five months or so :/ It's pretty stable but still, time to pull up the sleeves again and actually get 1.0 out.
 
 ===defer===
