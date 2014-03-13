@@ -309,6 +309,10 @@ Trail - http://www.mytrailapp.com/index.php
 
 ==2014-03-05==
 ===trail===
+One more issue with the trail app on GitHub.
+
+==2014-03-05==
+===trail===
 Helping someone with some issues on GitHub for their project: Trail ( http://www.mytrailapp.com/index.php )
 
 ===examples===
