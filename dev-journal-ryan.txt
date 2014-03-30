@@ -1,6 +1,8 @@
 ﻿== to do ==
 
 ===bug fixing process===
+insert the following above line 288 in autoload\htmlcomplete.vim:
+let classlines = []
 1. browse to the jQuery Geo release template: http://jsbin.com/uhabox/19/edit
 2. clone it
 3. reproduce bug
@@ -23,13 +25,13 @@ http://jsbin.com/uhabox/19/edit
 
 === showcase ====
 Trail - http://www.mytrailapp.com/index.php
+Disease map
 
 === examples ===
 * sea monsters image from Slate
 ** http://www.slate.com/articles/technology/future_tense/2013/09/olaus_magnus_carta_marina_sea_monsters_on_a_gorgeous_renaissance_map.html
 * forecast.io skycons on jQuery Geo map
 * location based notes/to do list
-* disease map
 ** http://jsfiddle.net/ryanttb/gU7wS/14/
 * Windows Store app
 * 3d heatmap
@@ -306,6 +308,10 @@ Trail - http://www.mytrailapp.com/index.php
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2014-03-29==
+===disease===
+Rogers' disease map is online & looks good. He sent me a screenshot a while ago. I need to add that to the showcase.
 
 ==2014-03-05==
 ===trail===
