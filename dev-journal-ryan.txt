@@ -66,6 +66,7 @@ Disease map
 * crowd
 * gis
 * embed
+* draw
 
 === future ===
 * geomap - [bug] touchpad zoom not keeping center
