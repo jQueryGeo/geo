@@ -1,4 +1,5 @@
 ﻿== to do ==
+* bug - $.distance returns positive value for polygons that intersect
 
 ===bug fixing process===
 insert the following above line 288 in autoload\htmlcomplete.vim:
@@ -309,6 +310,10 @@ Disease map
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2014-05-11==
+===examples===
+Actually finishing these up. And...of course, found a bug.
 
 ==2014-03-29==
 ===disease===
