@@ -11,46 +11,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+  <link rel="stylesheet" href="css/bootstrap.min.css" />
+  <link rel="stylesheet" href="css/bootstrap-theme.min.css" />
 </head>
 
 <body>
 
-  <div id="index" data-role="page" data-theme="b">
+  <div id="index" class="container" data-theme="b">
     <div data-role="header">
       <h1><img src="images/$.geo-logo.png" alt="" />jQuery Geo docs</h1>
     </div>
     
-    <div data-role="content">
+    <ul data-role="content">
       <h2>Welcome!</h2>
 
       <p>jQuery Geo is an open-source, geospatial mapping jQuery plugin from Applied Geographics developed with the intention of making spatial web mapping significantly simpler than it may initially seem. We would like to point out the term &quot;open-source&quot; to explictly state that Google, Bing, &amp; Esri are generally free but not open.</p>
 
-      <ul data-role="listview" data-inset="true">
-        <li><a href="http://github.com/AppGeo/geo" rel="external">project source on GitHub</a></li>
-      </ul>
+      <div class="list-group" data-inset="true">
+        <a class="list-group-item" href="http://github.com/AppGeo/geo" rel="external">project source on GitHub</a>
+      </div>
 
       <p>Please read the following sections for more information and examples, and thank you for considering us! If you have any questions feel free to ask the lead developer on Twitter.</p>
 
-      <ul data-role="listview" data-inset="true">
-        <li><a href="https://twitter.com/ryanttb" rel="external">ryanttb on Twitter</a></li>
-      </ul>
+      <div class="list-group" data-inset="true">
+        <a class="list-group-item" href="https://twitter.com/ryanttb" rel="external">ryanttb on Twitter</a>
+      </div>
 
       <p>If you would like only release notifications, you can follow the project itself on Twitter.</p>
 
-      <ul data-role="listview" data-inset="true">
-        <li><a href="https://twitter.com/jquerygeo" rel="external">jQueryGeo on Twitter</a></li>
-      </ul>
+      <div class="list-group" data-inset="true">
+        <a class="list-group-item" href="https://twitter.com/jquerygeo" rel="external">jQueryGeo on Twitter</a>
+      </div>
 
       <h2>api docs</h2>
 
-      <ul data-role="listview" data-inset="true">
-        <li><a href="what/index.html">what?</a></li>
-        <li><a href="quickstart/index.html">quickstart</a></li>
-        <li><a href="html/index.html">html</a></li>
-        <li><a href="geomap/index.html">geomap widget</a></li>
-        <li><a href="geo/index.html">geometry functions &amp; more!</a></li>
-      </ul>
+      <div class="list-group" data-inset="true">
+        <a class="list-group-item" href="what/index.html">what?</a>
+        <a class="list-group-item" href="quickstart/index.html">quickstart</a>
+        <a class="list-group-item" href="html/index.html">html</a>
+        <a class="list-group-item" href="geomap/index.html">geomap widget</a>
+        <a class="list-group-item" href="geo/index.html">geometry functions &amp; more!</a>
+      </div>
 
       <p>This project takes pride in having easy-to-use, up-to-date documentation. Before any code is committed, these docs are updated with any public API changes and sometimes internal design decisions. The side effect is that the documenation may be ahead of the code at times. Also, any undocumented features you find in the source should be ignored or asked about.</p>
 
@@ -71,11 +72,11 @@
 
       <p>First, check out some apps built using jQuery Geo!</p>
 
-      <ul data-role="listview" data-inset="true">
-        <li><a href="http://twheat.jquerygeo.com" rel="external"><h3>Twheat !</h3><p>query Twitter to create a heat map</p></a></li>
-        <li><a href="http://www.mapgeo.com/CumberlandME/" rel="external"><h3>MapGeo</h3><p>local parcel/town mapping (they have many towns, this app is for Cumberland, ME)</p></a></li>
-        <li><a href="http://utah.jquerygeo.com" rel="external"><h3>Atlas Utah!</h3><p>implementation of State of Utah's map cache viewer</p></a></li>
-      </ul>
+      <div class="list-group" data-inset="true">
+        <a class="list-group-item" href="http://twheat.jquerygeo.com" rel="external"><h3>Twheat !</h3><p>query Twitter to create a heat map</p></a>
+        <a class="list-group-item" href="http://www.mapgeo.com/CumberlandME/" rel="external"><h3>MapGeo</h3><p>local parcel/town mapping (they have many towns, this app is for Cumberland, ME)</p></a>
+        <a class="list-group-item" href="http://utah.jquerygeo.com" rel="external"><h3>Atlas Utah!</h3><p>implementation of State of Utah's map cache viewer</p></a>
+      </div>
 
       <h2>examples</h2>
 
@@ -83,68 +84,68 @@
 
       <p>All of these examples are done in JS Bin so you can easily view and play with all the JavaScript that makes them work.</p>
 
-      <ul data-role="listview" data-inset=true>
-        <li><a href="http://jsbin.com/iBICOno/1" rel="external"><h3>a simple map</h3><p>one function call to create a map</p></a></li>
-        <li><a href="http://jsbin.com/OqEFUtU/4" rel="external"><h3>a complicated map</h3><p>attempt to fit many features of jQuery Geo onto one page</p></a></li>
-        <li><a href="http://jsbin.com/OGUGaxO/3" rel="external">$.geo's bbox functions</a></li>
-        <li><a href="http://jsbin.com/anusuy/3" rel="external">map popup with labels</a></li>
-        <li><a href="http://jsbin.com/acapay/4" rel="external">map popup with highlight shape</a></li>
-        <li><a href="http://jsbin.com/liven/4" rel="external">shape styles</a></li>
-        <li><a href="http://jsbin.com/eromeg/1" rel="external">interactive inset map</a></li>
-        <li><a href="http://jsbin.com/ejujas/4" rel="external">basemap switcher</a></li>
-        <li><a href="http://jsbin.com/ecequf/2" rel="external">jQuery Geo logos</a></li>
-        <li><a href="http://jsbin.com/zicam/2" rel="external">a trail drawn across four services</a></li>
-        <li><a href="http://jsbin.com/osehuj/2" rel="external">USA states</a></li>
-        <li><a href="http://jsbin.com/ojemed/3" rel="external">GPS tracking</a></li>
-        <li><a href="http://jsbin.com/efixip/3" rel="external">Hurricane tracking</a></li>
-        <li><a href="http://jsbin.com/alarah/2" rel="external">Olympic Volleyball GigaPan</a></li>
-        <li><a href="http://jsbin.com/OcuJikU/1" rel="external"><h3>refresh, false vs. refresh, true</h3><p>a note about dynamic tiles &amp; caching</p></a></li>
-        <li><a href="http://jsbin.com/utuYaj/4" rel="external"><h3>lon, lat vs. x, y</h3><p>projecting &amp; $.geo.proj</p></a></li>
-      </ul>
+      <div class="list-group" data-inset=true>
+        <a class="list-group-item" href="http://jsbin.com/iBICOno/1" rel="external"><h3>a simple map</h3><p>one function call to create a map</p></a>
+        <a class="list-group-item" href="http://jsbin.com/OqEFUtU/4" rel="external"><h3>a complicated map</h3><p>attempt to fit many features of jQuery Geo onto one page</p></a>
+        <a class="list-group-item" href="http://jsbin.com/OGUGaxO/3" rel="external">$.geo's bbox functions</a>
+        <a class="list-group-item" href="http://jsbin.com/anusuy/3" rel="external">map popup with labels</a>
+        <a class="list-group-item" href="http://jsbin.com/acapay/4" rel="external">map popup with highlight shape</a>
+        <a class="list-group-item" href="http://jsbin.com/liven/4" rel="external">shape styles</a>
+        <a class="list-group-item" href="http://jsbin.com/eromeg/1" rel="external">interactive inset map</a>
+        <a class="list-group-item" href="http://jsbin.com/ejujas/4" rel="external">basemap switcher</a>
+        <a class="list-group-item" href="http://jsbin.com/ecequf/2" rel="external">jQuery Geo logos</a>
+        <a class="list-group-item" href="http://jsbin.com/zicam/2" rel="external">a trail drawn across four services</a>
+        <a class="list-group-item" href="http://jsbin.com/osehuj/2" rel="external">USA states</a>
+        <a class="list-group-item" href="http://jsbin.com/ojemed/3" rel="external">GPS tracking</a>
+        <a class="list-group-item" href="http://jsbin.com/efixip/3" rel="external">Hurricane tracking</a>
+        <a class="list-group-item" href="http://jsbin.com/alarah/2" rel="external">Olympic Volleyball GigaPan</a>
+        <a class="list-group-item" href="http://jsbin.com/OcuJikU/1" rel="external"><h3>refresh, false vs. refresh, true</h3><p>a note about dynamic tiles &amp; caching</p></a>
+        <a class="list-group-item" href="http://jsbin.com/utuYaj/4" rel="external"><h3>lon, lat vs. x, y</h3><p>projecting &amp; $.geo.proj</p></a>
+      </div>
 
       <h3 id="component-examples">component examples</h3>
 
       <p>This last set of examples attempts to test various components of jQuery Geo in an insolated way. They are the simplest examples.</p>
 
-      <ul data-role="listview" data-inset="true">
-        <li><a href="http://jsbin.com/voduq/1" rel="external">destroy</a></li>
-        <li><a href="http://jsbin.com/cunof/1" rel="external">simple inset map</a></li>
-        <li><a href="http://jsbin.com/mosul/1" rel="external">shingled (dynamic) services</a></li>
-        <li><a href="http://jsbin.com/tihof/1" rel="external">string service src</a></li>
-        <li><a href="http://jsbin.com/lapiq/1" rel="external">alternate tilingScheme</a></li>
-        <li><a href="http://jsbin.com/cuzuy/1" rel="external">opacity &amp; toggle</a></li>
-        <li><a href="http://jsbin.com/wawix/2" rel="external">events</a></li>
-        <li><a href="http://jsbin.com/radif/4" rel="external">append</a></li>
-        <li><a href="http://jsbin.com/ribah/1" rel="external">markers with CSS</a></li>
-        <li><a href="http://jsbin.com/gopux/1" rel="external">markers with canvas</a></li>
-        <li><a href="http://jsbin.com/vuduv/2" rel="external">KML points</a></li>
-        <li><a href="http://jsbin.com/savum/2" rel="external">find</a></li>
-        <li><a href="http://jsbin.com/xohug/2" rel="external">remove &amp; empty</a></li>
-        <li><a href="http://jsbin.com/segew/2" rel="external">draw modes</a></li>
-        <li><a href="http://jsbin.com/vexim/2" rel="external">drag modes</a></li>
-        <li><a href="http://jsbin.com/muzew/2" rel="external">measure modes</a></li>
-        <li><a href="http://jsbin.com/zacal/2" rel="external">shapeStyle option</a></li>
-        <li><a href="http://jsbin.com/zegix/2" rel="external">drawStyle option</a></li>
-        <li><a href="http://jsbin.com/siweh/2" rel="external">label</a></li>
-        <li><a href="http://jsbin.com/hiwoq/2" rel="external">geometry functions</a></li>
-        <li><a href="http://jsbin.com/ATEMiZo/5" rel="external">deferred tiles</a></li>
-      </ul>
+      <div class="list-group" data-inset="true">
+        <a class="list-group-item" href="http://jsbin.com/voduq/1" rel="external">destroy</a>
+        <a class="list-group-item" href="http://jsbin.com/cunof/1" rel="external">simple inset map</a>
+        <a class="list-group-item" href="http://jsbin.com/mosul/1" rel="external">shingled (dynamic) services</a>
+        <a class="list-group-item" href="http://jsbin.com/tihof/1" rel="external">string service src</a>
+        <a class="list-group-item" href="http://jsbin.com/lapiq/1" rel="external">alternate tilingScheme</a>
+        <a class="list-group-item" href="http://jsbin.com/cuzuy/1" rel="external">opacity &amp; toggle</a>
+        <a class="list-group-item" href="http://jsbin.com/wawix/2" rel="external">events</a>
+        <a class="list-group-item" href="http://jsbin.com/radif/4" rel="external">append</a>
+        <a class="list-group-item" href="http://jsbin.com/ribah/1" rel="external">markers with CSS</a>
+        <a class="list-group-item" href="http://jsbin.com/gopux/1" rel="external">markers with canvas</a>
+        <a class="list-group-item" href="http://jsbin.com/vuduv/2" rel="external">KML points</a>
+        <a class="list-group-item" href="http://jsbin.com/savum/2" rel="external">find</a>
+        <a class="list-group-item" href="http://jsbin.com/xohug/2" rel="external">remove &amp; empty</a>
+        <a class="list-group-item" href="http://jsbin.com/segew/2" rel="external">draw modes</a>
+        <a class="list-group-item" href="http://jsbin.com/vexim/2" rel="external">drag modes</a>
+        <a class="list-group-item" href="http://jsbin.com/muzew/2" rel="external">measure modes</a>
+        <a class="list-group-item" href="http://jsbin.com/zacal/2" rel="external">shapeStyle option</a>
+        <a class="list-group-item" href="http://jsbin.com/zegix/2" rel="external">drawStyle option</a>
+        <a class="list-group-item" href="http://jsbin.com/siweh/2" rel="external">label</a>
+        <a class="list-group-item" href="http://jsbin.com/hiwoq/2" rel="external">geometry functions</a>
+        <a class="list-group-item" href="http://jsbin.com/ATEMiZo/5" rel="external">deferred tiles</a>
+      </div>
 
       <h2>internals</h2>
 
       <p>Lastly, short of looking through the source code you can read a bit about the internal design decisions we made in the following section.</p>
 
-      <ul data-role="listview" data-inset=true>
-        <li><a href="internals/index.html">internals</a></li>
-      </ul>
+      <div class="list-group" data-inset=true>
+        <a class="list-group-item" href="internals/index.html">internals</a>
+      </div>
 
       <img src="images/bostonbuilt.png" alt="Boston Built badge"/>
     </div>
   </div> <!-- end of #container -->
 
-  <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
   <script src="http://code.jquerygeo.com/jquery.geo-1.0.0-b2.min.js"></script>
-  <script src="js/script.js"></script>
+  <script src="js/bootstrap.min.js"></script>
   
     
   <script>

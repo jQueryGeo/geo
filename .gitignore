@@ -2,6 +2,7 @@
 /web.config
 /update.bat
 node_modules
+docs/bower_components
 *.swp
 *.swo
 *.db
