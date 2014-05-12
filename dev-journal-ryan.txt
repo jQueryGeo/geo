@@ -315,6 +315,8 @@ Disease map
 ===examples===
 Actually finishing these up. And...of course, found a bug.
 
+Whelp, all the examples are on jsbin, now what? :)
+
 ==2014-03-29==
 ===disease===
 Rogers' disease map is online & looks good. He sent me a screenshot a while ago. I need to add that to the showcase.
