@@ -24,7 +24,7 @@
     <div data-role="content">
       <p>Once you have an HTML element to target, you can call the geographic map widget's function.</p>
 
-      <pre><code>.geomap( options )</code></pre>
+      <pre>.geomap( options )</pre>
 
       <h2>overview</h2>
 
@@ -38,7 +38,7 @@
 
       <p>After initializing a map with your first geomap call, you can get or set most of these options using the following syntax:</p>
 
-      <pre><code><span class="comment">// get the current value of a single option</span>
+      <pre><span class="comment">// get the current value of a single option</span>
 var optionValue = $( <i>map selector</i> ).geomap( &quot;option&quot;, <i>optionName</i> );
 
 <span class="comment">// set a new value for a single option</span>
@@ -48,7 +48,7 @@ $( <i>map selector</i> ).geomap( &quot;option&quot;, <i>optionName</i>, <i>newVa
 $( <i>map selector</i> ).geomap( &quot;option&quot;, {
   <i>optionName</i>: <i>newValue</i>,
   <i>optionName</i>: <i>newValue</i>
-} );</code></pre>
+} );</pre>
 
       <p>Two exceptions are pixelSize (which is read-only) and zoomFactor (which is init-only).</p>
 
@@ -187,7 +187,7 @@ $( <i>map selector</i> ).geomap( &quot;option&quot;, {
       <div class="list-group" data-inset="true">
         <a class="list-group-item" href="find.html">find</a>
       </div>
-      <h2>style</h2>
+      <h2 id="geomap-style">style</h2>
       <p>A geomap style is an object whose properties follow a subset of <a href="http://www.w3.org/TR/SVG/styling.html">SVG styling</a> properties. The specific styles that geomap recognizes and to which geometry they apply are listed below.</p>
       <p>Use the drawStyle option of the geomap widget to define the style used on incomplete lines and polygons as they are being drawn when mode is drawLineString or drawPolygon.</p>
       <p>Use the shapeStyle option to define the style of shapes drawn after being appended to the map via the append method.</p>

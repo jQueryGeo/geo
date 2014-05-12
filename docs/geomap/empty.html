@@ -33,8 +33,8 @@
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>$( <i>map or service selector</i> ).geomap( &quot;empty&quot; )
-$( <i>map or service selector</i> ).geomap( &quot;empty&quot;, false )</code></pre></td>
+          <td><pre>$( <i>map or service selector</i> ).geomap( &quot;empty&quot; )
+$( <i>map or service selector</i> ).geomap( &quot;empty&quot;, false )</pre></td>
         </tr>
       </table>
       <p>The empty method removes all shapes previously added with the append method.</p>
@@ -44,11 +44,11 @@ $( <i>map or service selector</i> ).geomap( &quot;empty&quot;, false )</code></p
       <h2>service-level shapes</h2>
       <p>Similar to how you can remove shapes from specific services, you can empty specific services of all shapes as well.</p>
       <p>You do this by targeting a service inside a map instead of the map itself for your call to geomap's empty method. For example, the default map service has the CSS class: osm. We can remove all shapes from that service specifically by using jQuery to target the service:</p>
-      <pre><code>$( &quot;#map .osm&quot; ).geomap( &quot;empty&quot; );</code></pre>
+      <pre>$( &quot;#map .osm&quot; ).geomap( &quot;empty&quot; );</pre>
       <p>Calling empty on the map widget will not remove shapes that have been appended to services.</p>
       <p>To remove all shapes from the map and all services, you can use the comma selector and the built-in geo-service CSS class:</p>
-      <pre><code><span class="comment">// empty the map widget and any services</span>
-$( &quot;#map,#map .geo-service&quot; ).geomap( &quot;empty&quot; );</code></pre>
+      <pre><span class="comment">// empty the map widget and any services</span>
+$( &quot;#map,#map .geo-service&quot; ).geomap( &quot;empty&quot; );</pre>
     </div>
   </div> <!-- end of #container -->
 

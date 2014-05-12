@@ -34,7 +34,7 @@
 
       <p>To convert a WKT string into a GeoJSON formatted JavaScript object, you can pass the WKT string into the $.geo.WKT.parse( ) function:</p>
 
-      <pre><code>var geojsonObject = $.geo.WKT.parse( 'POINT (-71.070554128125 42.36859979580157)' );</code></pre>
+      <pre>var geojsonObject = $.geo.WKT.parse( 'POINT (-71.070554128125 42.36859979580157)' );</pre>
 
       <p>jQuery Geo supports parsing on all geometry types from Point to GeometryCollection.</p>
 
@@ -42,24 +42,24 @@
 
       <p>To convert a GeoJSON formatted object into a WKT string, pass the object to the $.geo.WKT.stringify( ) function:</p>
 
-      <pre><code>var wkt = $.geo.WKT.stringify( {
+      <pre>var wkt = $.geo.WKT.stringify( {
   type: 'Point',
   coordinates: [ -71.070554128125, 42.36859979580157 ]
-} );</code></pre>
+} );</pre>
 
       <p>Since all geometry-based arguments in jQuery Geo are GeoJSON formatted JavaScript objects, you can convert them directly in a callback function. For example, if you are handling the <a href="../geomap/geomapclick.html">click event</a>:</p>
 
-      <pre><code>$( '#map' ).geomap( {
+      <pre>$( '#map' ).geomap( {
   click: function( e, geo ) {
     alert( $.geo.WKT.stringify( geo ) );
   }
-} );</code></pre>
+} );</pre>
 
       <h2>patterned after JSON</h2>
 
       <p>The $.geo.WKT object's function names are the same as the native JSON object you find in modern web browsers. Therefore, you can write a geometry object serialization function that takes either:</p>
 
-      <pre><code>function geoToString( geo, serializer ) {
+      <pre>function geoToString( geo, serializer ) {
   return serializer.stringify( geo );
 }
 
@@ -67,7 +67,7 @@
 console.log( geoToString( geo, JSON ) );
 
 // log WKT
-console.log( geoToString( geo, $.geo.WKT ) );</code></pre>
+console.log( geoToString( geo, $.geo.WKT ) );</pre>
 
       <p>This limited example is not terribly useful but hints at what can be done.</p> 
     </div>

@@ -29,7 +29,7 @@
         </tr>
         <tr>
           <th>default</th>
-          <td><pre><code>{
+          <td><pre>{
   borderRadius: &quot;8px&quot;,
   color: &quot;#7f0000&quot;,
   fillOpacity: .2,
@@ -39,26 +39,26 @@
   strokeWidth: &quot;2px&quot;,
   visibility: &quot;visible&quot;,
   width: &quot;8px&quot;
-}</code></pre>
+}</pre>
           </td>
         </tr>
         <tr>
           <th>init</th>
-          <td><pre><code>$( <i>map selector</i> ).geomap( { drawStyle: { color: &quot;green&quot; } } );</code></pre></td>
+          <td><pre>$( <i>map selector</i> ).geomap( { drawStyle: { color: &quot;green&quot; } } );</pre></td>
         </tr>
         <tr>
           <th>get</th>
-          <td><pre><code>var drawStyle = $( <i>map selector</i> ).geomap( &quot;option&quot;, &quot;drawStyle&quot; );</code></pre></td>
+          <td><pre>var drawStyle = $( <i>map selector</i> ).geomap( &quot;option&quot;, &quot;drawStyle&quot; );</pre></td>
         </tr>
         <tr>
           <th>set</th>
-          <td><pre><code>$( <i>map selector</i> ).geomap( &quot;option&quot;, &quot;drawStyle&quot;, { strokeWidth: &quot;4px&quot; } );</code></pre></td>
+          <td><pre>$( <i>map selector</i> ).geomap( &quot;option&quot;, &quot;drawStyle&quot;, { strokeWidth: &quot;4px&quot; } );</pre></td>
         </tr>
       </table>
       <p>The drawStyle option retrieves or updates the style of incomplete lines and polygons <b>as they are being drawn</b>. This differs from the shapeStyle option which updates the style of shapes that you've appended to the map.</p>
       <p>This option affects both the draw modes (drawPoint, drawLineString, and drawPolygon) and the measure modes (measureLength, and measureArea).</p>
       <p>This option changes specific properties of the internal style object. If you init or set an incomplete style object, only the style properties you reference are updated.</p>
-      <p>Please see the style section at the bottom of the <a href="#" onclick="javascript:window.history.back();">geomap widget</a> page for more information about the style object.</p>
+      <p>Please see the style section at the bottom of the <a href="../geomap/index.html#geomap-style">geomap widget</a> page for more information about the style object.</p>
     </div>
   </div> <!-- end of #container -->
 

@@ -33,8 +33,8 @@
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>var pixelPos = $(&quot;#map&quot;).geomap( &quot;toPixel&quot;, [ -71.098709, 42.330322 ] )
-var pixelPositions = $(&quot;#map&quot;).geomap( &quot;toPixel&quot;, [ [ -71.098709, 42.330322 ], [ -71.072617, 42.351608 ] ] )</code></pre></td>
+          <td><pre>var pixelPos = $(&quot;#map&quot;).geomap( &quot;toPixel&quot;, [ -71.098709, 42.330322 ] )
+var pixelPositions = $(&quot;#map&quot;).geomap( &quot;toPixel&quot;, [ [ -71.098709, 42.330322 ], [ -71.072617, 42.351608 ] ] )</pre></td>
         </tr>
       </table>
       <p>The toPixel method takes a single GeoJSON position (Point.coordinates), an array of GeoJSON positions (MultiPoint.coordinates or LineString.coordinates), an array of arrays of positions (MultiLineString.coordinates or Polygon.coordinates) or an array of arrays of arrays of positions (MultiPolygon.coordinates). It returns the pixel coordinates for all of the map positions.</p>

@@ -33,14 +33,14 @@
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>var pointAlong = $.geo.pointAlong( {
+          <td><pre>var pointAlong = $.geo.pointAlong( {
       type: &quot;LineString&quot;,
       coordinates: [[
         [-75, 39.7],
         [-74.8, 39.3],
         [-75.2, 39.3]
       ]]
-}, .5 )</code></pre></td>
+}, .5 )</pre></td>
         </tr>
       </table>
       <p>The pointAlong method calculates a Point that lies a given fraction along the passed-in basic GeoJSON geometry object. The basic geometry types are Point, LineString and Polygon. A percentage of 0.0 returns the first Point; a percentage of 1.0 returns the last.</p>

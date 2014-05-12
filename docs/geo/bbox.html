@@ -33,16 +33,16 @@
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>var bbox = $.geo.bbox( {
+          <td><pre>var bbox = $.geo.bbox( {
   type: &quot;LineString&quot;, coordinates: [
     [ -71, 40 ], [ -70.5, 41 ]
   ]
-} )</code></pre></td>
+} )</pre></td>
         </tr>
       </table>
       <p>The bbox method calculates the smallest box that will contain all the positions in the passed-in shape. The shape can be any GeoJSON geometry object from Point to GeometryCollection.</p>
       <p>The GeoJSON spec allows for each geometry type to have a bbox property. The $.geo.bbox method will honor that property and assume it is accurate. It will return the value of that property before attempting to calculate the bbox itself. If you wish to force $.geo.bbox to calculate the bbox, you will have to manually delete the bbox property from the geometry object.</p>
-      <pre><code>var shape = {
+      <pre>var shape = {
   type: &quot;LineString&quot;, coordinates: [
     [ -71, 40 ], [ -70.5, 41 ]
   ],
@@ -51,7 +51,7 @@
 var bboxFromProperty = $.geo.bbox(shape);
 delete shape.bbox;
 var calculatedBbox = $.geo.bbox(shape);
-</code></pre>
+</pre>
       <p>If the argument is not a basic GeoJSON geometry object, this function returns undefined.</p>
       <!--<p>Due to the liberties taken by web mercator to display a round Earth on a single 
         flat plane, when working in geodetic (lon/lat) coordinates, the result of the 

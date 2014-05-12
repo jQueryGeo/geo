@@ -33,11 +33,11 @@
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>$(&quot;#map&quot;).geomap( &quot;refresh&quot; )
+          <td><pre>$(&quot;#map&quot;).geomap( &quot;refresh&quot; )
 
 $(&quot;#map&quot;).geomap( &quot;refresh&quot;, true )
 
-$(&quot;#map .my-dynamic-service&quot;).geomap( &quot;refresh&quot;, true )</code></pre></td>
+$(&quot;#map .my-dynamic-service&quot;).geomap( &quot;refresh&quot;, true )</pre></td>
         </tr>
       </table>
 
@@ -73,9 +73,9 @@ $(&quot;#map .my-dynamic-service&quot;).geomap( &quot;refresh&quot;, true )</cod
 
       <p>The first option is to use a function for the <a href="services.html">src property of your service object</a>. In that function, return a different URL every time even if all of the properties of the view object are the same as a previous call. If we were to use jQuery's implementation of the cache option in $.ajax as inspiration, our src function could look similar to:</p>
 
-      <pre><code>src: function( view ) {
+      <pre>src: function( view ) {
   return &quot;my.dynamic.tile.service/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png?_=&quot; + $.now( );
-}</code></pre>
+}</pre>
 
       <p>The _ input in the query string will be a different number on every request, regardless of the value of zoom, column, and row. Most services will ignore extraneous query string inputs and the web browser will not be able to cache the image.</p>
 

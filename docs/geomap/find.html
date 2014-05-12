@@ -37,9 +37,9 @@
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>var existingShape = $( <i>map or service selector</i> ).geomap( &quot;find&quot;, { type: &quot;Point&quot;, coordinates: [ -71.098709, 42.330322 ] }, 8 )
+          <td><pre>var existingShape = $( <i>map or service selector</i> ).geomap( &quot;find&quot;, { type: &quot;Point&quot;, coordinates: [ -71.098709, 42.330322 ] }, 8 )
 
-var allShapes = $( <i>map or service selector</i> ).geomap( &quot;find&quot;, &quot;*&quot; )</code></pre></td>
+var allShapes = $( <i>map or service selector</i> ).geomap( &quot;find&quot;, &quot;*&quot; )</pre></td>
         </tr>
       </table>
       <p>The find method allows you to search for shapes appended to the map and/or services. There are two distinct ways to call this method.</p>
@@ -65,11 +65,11 @@ var allShapes = $( <i>map or service selector</i> ).geomap( &quot;find&quot;, &q
 
       <p>You do this by targeting a service inside a map instead of the map itself for your call to geomap's find method. For example, the default map service has the CSS class: osm. We can find a shape from that service specifically by using jQuery to target the service:</p>
 
-      <pre><code>var osmShapes = $( &quot;#map .osm&quot; ).geomap( &quot;find&quot;, [ -71, 42 ], 8 );</code></pre>
+      <pre>var osmShapes = $( &quot;#map .osm&quot; ).geomap( &quot;find&quot;, [ -71, 42 ], 8 );</pre>
 
       <p>However, unlike the other three shape methods, shapes appended to a specific service <b>will be</b> returned by calling find on the map itself. In this way, calling find on the map is a deep search for shapes on all services. For example, after this sequence the shapes variable will contain the shape even though it was appended to a service specifically:<p>
 
-      <pre><code>var point = {
+      <pre>var point = {
       type: &quot;Point&quot;,
       coordinates: [ -71, 42 ]
     };
@@ -78,28 +78,28 @@ var allShapes = $( <i>map or service selector</i> ).geomap( &quot;find&quot;, &q
 $( &quot;#map .osm&quot; ).geomap( &quot;append&quot;, point );
 
 <span class="comment">// use the original point to search for shapes on the map widget</span>
-var shapes = $( &quot;#map&quot; ).geomap( &quot;find&quot;, point, 3 );</code></pre>
+var shapes = $( &quot;#map&quot; ).geomap( &quot;find&quot;, point, 3 );</pre>
 
       <p>Another difference between the find method and the append, remove, and empty methods, is that the find method cannot currently be used on multiple targets simultaneously. For example, the return value of the following is undefined:</p>
 
-      <pre><code><span class="comment">// attempt to search the osm service and a second service at the same time</span>
-var shapes = $( &quot;#map .osm,#map .massgis&quot; ).geomap( &quot;find&quot;, point, 8 );</code></pre>
+      <pre><span class="comment">// attempt to search the osm service and a second service at the same time</span>
+var shapes = $( &quot;#map .osm,#map .massgis&quot; ).geomap( &quot;find&quot;, point, 8 );</pre>
 
       <p>To find shapes in two specific services without searching all services you should use two find calls:</p>
 
-      <pre><code><span class="comment">// find shapes on the default service and a second service</span>
+      <pre><span class="comment">// find shapes on the default service and a second service</span>
 var osmShapes = $( &quot;#map .osm&quot; ).geomap( &quot;find&quot;, point, 8 ),
-    massgisShapes = $( &quot;#map .massgis&quot; ).geomap( &quot;find&quot;, point, 8 );</code></pre>
+    massgisShapes = $( &quot;#map .massgis&quot; ).geomap( &quot;find&quot;, point, 8 );</pre>
 
       <p>The selector-based version also follows this requirement. You cannot target more than one element with the initial selector and you cannot use the shape selector to search services. A multi-service selector-based search would be the same as above but with &quot;*&quot; instead of: point, 8.</p>
 
-      <pre><code><span class="comment">// the following are invalid and their return value is undefined</span>
+      <pre><span class="comment">// the following are invalid and their return value is undefined</span>
 var multiTarget = $( &quot;#map .massgis,#map .osm&quot; ).geomap( &quot;find&quot;, &quot;*&quot; );
 var shapeSubSelector = $( &quot;#map&quot; ).geomap( &quot;find&quot;, &quot;.massgis *&quot; );
 
 <span class="comment">// proper way to get all shapes from multiple services</span>
 var osmShapes = $( &quot;#map .osm&quot; ).geomap( &quot;find&quot;, &quot;*&quot; ),
-    massgisShapes = $( &quot;#map .massgis&quot; ).geomap( &quot;find&quot;, &quot;*&quot; );</code></pre>
+    massgisShapes = $( &quot;#map .massgis&quot; ).geomap( &quot;find&quot;, &quot;*&quot; );</pre>
     </div>
   </div> <!-- end of #container -->
 

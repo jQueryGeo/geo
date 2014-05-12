@@ -33,7 +33,7 @@
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>var contains = $.geo.contains(
+          <td><pre>var contains = $.geo.contains(
   {
     type: "Polygon", coordinates: [[
       [-71.06, 42.3425],
@@ -44,7 +44,7 @@
     ]]
   },
   { type: &quot;Point&quot;, &quot;coordinates&quot;: [ -71, 40 ] }
-)</pre></code></td>
+)</pre></td>
         </tr>
       </table>
       <p>The contains method determines if the first basic GeoJSON geometry completely contains a second one. The basic shapes are Point, LineString and Polygon however Point and LineString geometries cannot contain other geometries so the only situation that has a possibility of returning true is when the first argument is a Polygon.</p>

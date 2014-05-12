@@ -33,15 +33,15 @@
         </tr>
         <tr>
           <th>init</th>
-          <td><pre><code>$( <i>selector</i> ).geomap( { mode: &quot;pan&quot; } );</code></pre></td>
+          <td><pre>$( <i>selector</i> ).geomap( { mode: &quot;pan&quot; } );</pre></td>
         </tr>
         <tr>
           <th>get</th>
-          <td><pre><code>var mode = $( <i>selector</i> ).geomap( &quot;option&quot;, &quot;mode&quot; );</code></pre></td>
+          <td><pre>var mode = $( <i>selector</i> ).geomap( &quot;option&quot;, &quot;mode&quot; );</pre></td>
         </tr>
         <tr>
           <th>set</th>
-          <td><pre><code>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;mode&quot;, &quot;drawPoint&quot; );</code></pre></td>
+          <td><pre>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;mode&quot;, &quot;drawPoint&quot; );</pre></td>
         </tr>
       </table>
 
@@ -56,53 +56,53 @@
 
       <p>Basic modes are most common to what people expect to be able to do with a map: drag it around, zoom it in and out, or just have it sit there an look pretty.</p>
 
-      <ul>
-        <li>static</li>
-        <li>pan</li>
-        <li>zoom</li>
-        <li>click</li>
+      <ul class="list-group">
+        <li class="list-group-item">static</li>
+        <li class="list-group-item">pan</li>
+        <li class="list-group-item">zoom</li>
+        <li class="list-group-item">click</li>
       </ul>
 
       <h3>drag</h3>
 
       <p>Drag modes disable panning and turn single swipes into shape events.</p>
 
-      <ul>
-        <li>dragBox</li>
+      <ul class="list-group">
+        <li class="list-group-item">dragBox</li>
       </ul>
 
       <h3>draw</h3>
 
       <p>Draw modes turn user clicks into shape events, panning is allowed.</p>
 
-      <ul>
-        <li>drawPoint</li>
-        <li>drawLineString</li>
-        <li>drawPolygon</li>
+      <ul class="list-group">
+        <li class="list-group-item">drawPoint</li>
+        <li class="list-group-item">drawLineString</li>
+        <li class="list-group-item">drawPolygon</li>
       </ul>
 
       <h3>measure</h3>
 
       <p>Measure modes display length and area based on clicks and drags.</p>
 
-      <ul>
-        <li>measureLength</li>
-        <li>measureArea</li>
+      <ul class="list-group">
+        <li class="list-group-item">measureLength</li>
+        <li class="list-group-item">measureArea</li>
       </ul>
 
-      <p>You are free to set mode to any other string, this is called <a href="javascript:document.getElementById('custom-modes').scrollIntoView();" rel="external">custom modes</a> in jQuery Geo and described at the end of this page.</p>
+      <p>You are free to set mode to any other string, this is called <a href="#custom-modes">custom modes</a> in jQuery Geo and described at the end of this page.</p>
 
       <h2>related options</h2>
 
       <p>Each mode has a matching property on the <a href="cursors.html">cursors</a> option. For example, to change the cursor for drawPoint mode to an I-beam, you can initialize the geomap widget like this:</p>
 
-      <pre><code>$( <i>selector</i> ).geomap( { cursors: { drawPoint: &quot;text&quot; } } )</code></pre>
+      <pre>$( <i>selector</i> ).geomap( { cursors: { drawPoint: &quot;text&quot; } } )</pre>
 
       <p>The <a href="drawStyle.html">drawStyle</a> option determines how shapes look while being drawn in all of the draw, drag, and measure modes.</p>
 
       <p>The <a href="measureLabels.html">measureLabels</a> option determines how the text is formatted while using the measure modes.</p>
 
-      <p>You can remove a user's ability to pan the map by setting the <a href="panning.html">panning</a> option to false. Yes, you can disable panning even when mode is set to &quot;pan&quot;.<p>
+      <p>You can remove a user's ability to pan the map by setting the <a href="pannable.html">pannable</a> option to false. Yes, you can disable panning even when mode is set to &quot;pan&quot;.<p>
 
       <p>You can shut off mouse wheel scroll in any mode by setting the <a href="scroll.html">scroll</a> option to &quot;off&quot;.</p>
 
@@ -111,7 +111,7 @@
       <h2>style</h2>
       <p>The label containing the measure length or area text has the geo-measure-label CSS class. To change how the measure text looks, you can update properties in that rule:</p>
 
-      <pre><code>.geo-measure-label { font-size: 1.5em; }</code></pre>
+      <pre>.geo-measure-label { font-size: 1.5em; }</pre>
 
       <h2>static</h2>
 
@@ -135,11 +135,11 @@
 
       <h3>events</h3>
       <p>In pan mode, the geomap widget triggers the following events on the original map div.</p>
-      <ul>
-        <li>move &ndash; when the user moves the mouse above the map but is not actively panning</li>
-        <li>click &ndash; when the user clicks or taps a point on the map without initiating a pan, i.e., they let go of the map at the same point and within a short time threshold</li>
-        <li>dblclick &ndash; when the user double-clicks or double-taps a point on the map</li>
-        <li>bboxchange &ndash; when the user changes the bbox by panning or zooming</li>
+      <ul class="list-group">
+        <li class="list-group-item">move &ndash; when the user moves the mouse above the map but is not actively panning</li>
+        <li class="list-group-item">click &ndash; when the user clicks or taps a point on the map without initiating a pan, i.e., they let go of the map at the same point and within a short time threshold</li>
+        <li class="list-group-item">dblclick &ndash; when the user double-clicks or double-taps a point on the map</li>
+        <li class="list-group-item">bboxchange &ndash; when the user changes the bbox by panning or zooming</li>
       </ul>
 
       <h2>zoom</h2>
@@ -154,11 +154,11 @@
 
       <h3>events</h3>
       <p>In zoom mode the geomap widget triggers the following events on the original map div.</p>
-      <ul>
-        <li>move &ndash; when the user moves the mouse above the map but is not actively performing a marquee zoom</li>
-        <li>click &ndash; when the user clicks or taps a point on the map without initiating a marquee zoom, i.e., they let go of the map at the same point and within a short time threshold</li>
-        <li>dblclick &ndash; when the user double-clicks or double-taps a point on the map</li>
-        <li>bboxchange &ndash; when the user changes the bbox by zooming</li>
+      <ul class="list-group">
+        <li class="list-group-item">move &ndash; when the user moves the mouse above the map but is not actively performing a marquee zoom</li>
+        <li class="list-group-item">click &ndash; when the user clicks or taps a point on the map without initiating a marquee zoom, i.e., they let go of the map at the same point and within a short time threshold</li>
+        <li class="list-group-item">dblclick &ndash; when the user double-clicks or double-taps a point on the map</li>
+        <li class="list-group-item">bboxchange &ndash; when the user changes the bbox by zooming</li>
       </ul>
 
       <h2>click</h2>
@@ -172,11 +172,11 @@
 
       <h3>events</h3>
       <p>In click mode, the geomap widget triggers the following events on the original map div.</p>
-      <ul>
-        <li>move &ndash; when the user moves the mouse above the map but is not actively panning</li>
-        <li>click &ndash; when the user clicks or taps a point on the map without initiating a pan, i.e., they let go of the map at the same point and within a short time threshold</li>
-        <li>dblclick &ndash; when the user double-clicks or double-taps a point on the map</li>
-        <li>bboxchange &ndash; when the user changes the bbox by panning or zooming</li>
+      <ul class="list-group">
+        <li class="list-group-item">move &ndash; when the user moves the mouse above the map but is not actively panning</li>
+        <li class="list-group-item">click &ndash; when the user clicks or taps a point on the map without initiating a pan, i.e., they let go of the map at the same point and within a short time threshold</li>
+        <li class="list-group-item">dblclick &ndash; when the user double-clicks or double-taps a point on the map</li>
+        <li class="list-group-item">bboxchange &ndash; when the user changes the bbox by panning or zooming</li>
       </ul>
 
       <h2>dragBox</h2>
@@ -194,11 +194,11 @@
 
       <h3>events</h3>
       <p>In dragBox mode the geomap widget triggers the following events on the original map div.</p>
-      <ul>
-        <li>move &ndash; when the user moves the mouse above the map but is not actively dragging a bbox</li>
-        <li>dblclick &ndash; when the user double-clicks or double-taps a point on the map</li>
-        <li>bboxchange &ndash; when the user changes the bbox by zooming</li>
-        <li>shape &ndash; when the user lets go of the mouse after dragging to make a bbox, jQuery Geo will send a GeoJSON Polygon object to the developer; this Polygon object has a bbox property which is set to the bbox of the rectangle drawn</li>
+      <ul class="list-group">
+        <li class="list-group-item">move &ndash; when the user moves the mouse above the map but is not actively dragging a bbox</li>
+        <li class="list-group-item">dblclick &ndash; when the user double-clicks or double-taps a point on the map</li>
+        <li class="list-group-item">bboxchange &ndash; when the user changes the bbox by zooming</li>
+        <li class="list-group-item">shape &ndash; when the user lets go of the mouse after dragging to make a bbox, jQuery Geo will send a GeoJSON Polygon object to the developer; this Polygon object has a bbox property which is set to the bbox of the rectangle drawn</li>
       </ul>
 
       <h2>dragCircle</h2>
@@ -216,11 +216,11 @@
 
       <h3>events</h3>
       <p>In dragCircle mode the geomap widget triggers the following events on the original map div.</p>
-      <ul>
-        <li>move &ndash; when the user moves the mouse above the map but is not actively dragging a circle</li>
-        <li>dblclick &ndash; when the user double-clicks or double-taps a point on the map</li>
-        <li>bboxchange &ndash; when the user changes the bbox by zooming</li>
-        <li>shape &ndash; when the user lets go of the mouse after dragging to make a circle, jQuery Geo will send a GeoJSON Polygon object to the developer; this Polygon object has a bbox property which is set to the bbox of the circle drawn</li>
+      <ul class="list-group">
+        <li class="list-group-item">move &ndash; when the user moves the mouse above the map but is not actively dragging a circle</li>
+        <li class="list-group-item">dblclick &ndash; when the user double-clicks or double-taps a point on the map</li>
+        <li class="list-group-item">bboxchange &ndash; when the user changes the bbox by zooming</li>
+        <li class="list-group-item">shape &ndash; when the user lets go of the mouse after dragging to make a circle, jQuery Geo will send a GeoJSON Polygon object to the developer; this Polygon object has a bbox property which is set to the bbox of the circle drawn</li>
       </ul>
 
       <h2>drawPoint</h2>
@@ -236,11 +236,11 @@
 
       <h3>events</h3>
       <p>In drawPoint mode, the geomap widget triggers the following events on the original map div. Note that the shape event replaces the click event.</p>
-      <ul>
-        <li>move &ndash; when the user moves the mouse above the map but is not actively panning</li>
-        <li>dblclick &ndash; when the user double-clicks or double-taps a point on the map</li>
-        <li>bboxchange &ndash; when the user changes the bbox by panning or zooming</li>
-        <li>shape &ndash; when the user clicks or taps a point on the map, this action will send a GeoJSON Point object to the developer</li>
+      <ul class="list-group">
+        <li class="list-group-item">move &ndash; when the user moves the mouse above the map but is not actively panning</li>
+        <li class="list-group-item">dblclick &ndash; when the user double-clicks or double-taps a point on the map</li>
+        <li class="list-group-item">bboxchange &ndash; when the user changes the bbox by panning or zooming</li>
+        <li class="list-group-item">shape &ndash; when the user clicks or taps a point on the map, this action will send a GeoJSON Point object to the developer</li>
       </ul>
 
       <h2>drawLineString</h2>
@@ -258,12 +258,12 @@
 
       <h3>events</h3>
       <p>In drawLineString mode, the geomap widget triggers the following events on the original map div.</p>
-      <ul>
-        <li>move &ndash; when the user moves the mouse above the map but is not actively panning, this event triggers even while drawing a shape</li>
-        <li>click &ndash; when the user clicks or taps a point on the map without initiating a pan, this event triggers even while drawing a shape</li>
-        <li>dblclick &ndash; when the user double-clicks or double-taps a point on the map but is not actively drawing</li>
-        <li>bboxchange &ndash; when the user changes the bbox by panning or zooming</li>
-        <li>shape &ndash; when the user double-clicks or taps a point on the map after beginning a drawing operation with a single click, this action will send a GeoJSON LineString object to the developer</li>
+      <ul class="list-group">
+        <li class="list-group-item">move &ndash; when the user moves the mouse above the map but is not actively panning, this event triggers even while drawing a shape</li>
+        <li class="list-group-item">click &ndash; when the user clicks or taps a point on the map without initiating a pan, this event triggers even while drawing a shape</li>
+        <li class="list-group-item">dblclick &ndash; when the user double-clicks or double-taps a point on the map but is not actively drawing</li>
+        <li class="list-group-item">bboxchange &ndash; when the user changes the bbox by panning or zooming</li>
+        <li class="list-group-item">shape &ndash; when the user double-clicks or taps a point on the map after beginning a drawing operation with a single click, this action will send a GeoJSON LineString object to the developer</li>
       </ul>
 
       <h2>drawPolygon</h2>
@@ -281,12 +281,12 @@
 
       <h3>events</h3>
       <p>In drawPolygon mode, the geomap widget triggers the following events on the original map div.</p>
-      <ul>
-        <li>move &ndash; when the user moves the mouse above the map but is not actively panning, this event triggers even while drawing a shape</li>
-        <li>click &ndash; when the user clicks or taps a point on the map without initiating a pan, this event triggers even while drawing a shape</li>
-        <li>dblclick &ndash; when the user double-clicks or double-taps a point on the map but is not actively drawing</li>
-        <li>bboxchange &ndash; when the user changes the bbox by panning or zooming</li>
-        <li>shape &ndash; when the user double-clicks or taps a point on the map after beginning a drawing operation with a single click, this action will send a GeoJSON Polygon object to the developer</li>
+      <ul class="list-group">
+        <li class="list-group-item">move &ndash; when the user moves the mouse above the map but is not actively panning, this event triggers even while drawing a shape</li>
+        <li class="list-group-item">click &ndash; when the user clicks or taps a point on the map without initiating a pan, this event triggers even while drawing a shape</li>
+        <li class="list-group-item">dblclick &ndash; when the user double-clicks or double-taps a point on the map but is not actively drawing</li>
+        <li class="list-group-item">bboxchange &ndash; when the user changes the bbox by panning or zooming</li>
+        <li class="list-group-item">shape &ndash; when the user double-clicks or taps a point on the map after beginning a drawing operation with a single click, this action will send a GeoJSON Polygon object to the developer</li>
       </ul>
 
       <h2>measureLength</h2>
@@ -305,12 +305,12 @@
       <p>By default the unit of measurment is meters because the default projection is web mercator meters. If you change the tilingScheme (on tiled services) or switch to a shingled service, the unit of measurment will be based on your new service's units.</p>
       <h3>events</h3>
       <p>In measureLength mode, the geomap widget triggers the following events on the original map div.</p>
-      <ul>
-        <li>move &ndash; when the user moves the mouse above the map but is not actively panning, this event triggers even while measuring</li>
-        <li>click &ndash; when the user clicks or taps a point on the map without initiating a pan, this event triggers even while measuring</li>
-        <li>dblclick &ndash; when the user double-clicks or double-taps a point on the map but is not actively measuring</li>
-        <li>bboxchange &ndash; when the user changes the bbox by panning or zooming</li>
-        <li>shape &ndash; when the user double-clicks or taps a point on the map after beginning a measure operation with a single click, this action will send a GeoJSON LineString object to the developer</li>
+      <ul class="list-group">
+        <li class="list-group-item">move &ndash; when the user moves the mouse above the map but is not actively panning, this event triggers even while measuring</li>
+        <li class="list-group-item">click &ndash; when the user clicks or taps a point on the map without initiating a pan, this event triggers even while measuring</li>
+        <li class="list-group-item">dblclick &ndash; when the user double-clicks or double-taps a point on the map but is not actively measuring</li>
+        <li class="list-group-item">bboxchange &ndash; when the user changes the bbox by panning or zooming</li>
+        <li class="list-group-item">shape &ndash; when the user double-clicks or taps a point on the map after beginning a measure operation with a single click, this action will send a GeoJSON LineString object to the developer</li>
       </ul>
 
       <h2>measureArea</h2>
@@ -331,37 +331,37 @@
       <h3>events</h3>
 
       <p>In measureArea mode, the geomap widget triggers the following events on the original map div.</p>
-      <ul>
-        <li>move &ndash; when the user moves the mouse above the map but is not actively panning, this event triggers even while measuring</li>
-        <li>click &ndash; when the user clicks or taps a point on the map without initiating a pan, this event triggers even while measuring</li>
-        <li>dblclick &ndash; when the user double-clicks or double-taps a point on the map but is not actively measuring</li>
-        <li>bboxchange &ndash; when the user changes the bbox by panning or zooming</li>
-        <li>shape &ndash; when the user double-clicks or taps a point on the map after beginning a measure operation with a single click, this action will send a GeoJSON Polygon object to the developer</li>
+      <ul class="list-group">
+        <li class="list-group-item">move &ndash; when the user moves the mouse above the map but is not actively panning, this event triggers even while measuring</li>
+        <li class="list-group-item">click &ndash; when the user clicks or taps a point on the map without initiating a pan, this event triggers even while measuring</li>
+        <li class="list-group-item">dblclick &ndash; when the user double-clicks or double-taps a point on the map but is not actively measuring</li>
+        <li class="list-group-item">bboxchange &ndash; when the user changes the bbox by panning or zooming</li>
+        <li class="list-group-item">shape &ndash; when the user double-clicks or taps a point on the map after beginning a measure operation with a single click, this action will send a GeoJSON Polygon object to the developer</li>
       </ul>
 
       <h2 id="custom-modes">custom modes</h2>
 
       <p>As mentioned above, you can also set mode to any other string. It will behave exactly like pan mode. However, you can set a different cursor:</p>
 
-      <pre><code>var map = $( &quot;#map&quot; ).geomap( {
+      <pre>var map = $( &quot;#map&quot; ).geomap( {
   mode: &quot;click&quot;,
   cursors: { click: &quot;crosshair&quot; }
-} );</code></pre>
+} );</pre>
 
       <p>The above example creates a new custom mode, click, and sets the geomap widget to that mode during initialization. When the widget is in this mode, it will behave exactly like pan, but have a crosshair. This means you will get all the same events as pan: move, click, dblclick &amp; bboxchange. A mode like this is useful if you want to give users more accuracy when clicking the map.</p>
 
       <p>Custom modes will still allow panning. While panning, the cursor will temporarily switch to the pan cursor. You can disable panning for your mode by setting the widget's panning option to false whenever you change the mode option.</p>
 
-      <pre><code>function setMode( mode ) {
+      <pre>function setMode( mode ) {
   map.geomap( &quot;option&quot;, {
     mode: mode,
     panning: mode !== &quot;click&quot;
   } );
-}</code></pre>
+}</pre>
 
       <p>In this last example, we create a new map with two modes, find and remove. They both trigger the click event so we can check our current mode and behave differently depending on which one is set, or do nothing if we're not in find or remove mode.</p>
 
-      <pre><code>var map = $( &quot;#map&quot; ).geomap( {
+      <pre>var map = $( &quot;#map&quot; ).geomap( {
   mode: &quot;drawPoint&quot;,
   cursors: {
     find: &quot;crosshair&quot;,
@@ -394,7 +394,7 @@
         break;
     }
   }
-} );</code></pre>
+} );</pre>
 
     </div>
   </div> <!-- end of #container -->

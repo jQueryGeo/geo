@@ -29,14 +29,14 @@
         </tr>
         <tr>
           <th>init</th>
-          <td><code><pre>$( <i>selector</i> ).geomap( {
+          <td><pre>$( <i>selector</i> ).geomap( {
   bboxchange: function( e, geo ) { }
-} );</pre></code></td>
+} );</pre></td>
         </tr>
         <tr>
           <th>bind</th>
-          <td><code><pre>$( <i>selector</i> ).bind( &quot;geomapbboxchange&quot;, function( e, geo ) { } );
-} );</pre></code></td>
+          <td><pre>$( <i>selector</i> ).bind( &quot;geomapbboxchange&quot;, function( e, geo ) { } );
+} );</pre></td>
         </tr>
       </table>
       <p>The bboxchange event triggers any time user interaction causes a change in the current bbox of the map widget. This includes pan, wheel zoom, double-click zoom, etc. The geomap does not trigger this event when you update the bbox programmatically.</p>

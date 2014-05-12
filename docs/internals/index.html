@@ -26,7 +26,7 @@
       <p>We keep some plugin design decisions here.</p>
       <h2>jQuery UI widget factory</h2>
       <p>The geomap widget uses the same widget factory that all other jQuery UI and jQuery Mobile widgets use. Like jQuery Mobile, we include a copy of jquery.ui.widget.js in the project. While this adds 3k to the final compressed build it allows us to easilly follow the patterns designed by UI and better integrate into the jQuery plugin community.</p>
-      <pre><code>$.widget( "geo.geomap", { } );</code></pre>
+      <pre>$.widget( "geo.geomap", { } );</pre>
       <h2>Virtual state</h2>
       <p>The public properties bbox, bboxMax and center do not always match the internal state of the map widget. In fact internally, geomap only tracks center and pixelSize. The bbox and bboxMax properties are calculated based on the current or max center and pixelSize. In the code, you will see two properties each for each of these. One is public, the other is private. For center, the internal position (_center) is always in internal map units (web mercator meters by default) even if the developer sets the public bbox or center by longitude &amp; latitude.</p>
       <h2>Initialization options</h2>
@@ -34,14 +34,14 @@
       <h2>bbox cache</h2>
       <p>When you append a shape to the map, the geomap widget will cache the shape&#39;s bounding box (in non-geodetic 
         coordinates) for faster searches when you call find. When you remove a shape from the map, the cache will be cleared. When you use the $.geo.bbox method on a shape after it has been appended to the map, the cached bounding box will be returned.</p>
-      <pre><code><span class="comment">// the bbox of an appended shape is cached while it is on the map</span>
+      <pre><span class="comment">// the bbox of an appended shape is cached while it is on the map</span>
 var calculatedBbox = $.geo.bbox(shape);
 $(&quot;#map&quot;).geomap(&quot;append&quot;, shape);
 var cachedBbox = $.geo.bbox(shape);
 $(&quot;#map&quot;).geomap(&quot;remove&quot;, shape);
-var calculatedAgain = $.geo.bbox(shape);</code></pre>
+var calculatedAgain = $.geo.bbox(shape);</pre>
       <p>jQuery Geo caches the bbox using jQuery's data function under the name geoBbox. Though I can&#39;t think of a reason to do so, you can remove this cache by calling removeData directly on the shape object:</p>
-      <pre><code>$.removeData(shape, &quot;geoBbox&quot;);</code></pre>
+      <pre>$.removeData(shape, &quot;geoBbox&quot;);</pre>
       <p>jQuery Geo's caching will not alter your geometry object so you don't have to worry about unintentionally storing or sending extra data to a server.</p>
       <h2>External libraries</h2>
       <p>Apart from the jQuery UI widget factory, geomap includes a couple external libraries.</p>
@@ -55,7 +55,7 @@ var calculatedAgain = $.geo.bbox(shape);</code></pre>
       <p>jQuery Geo includes a snapshot of jsRender, the next-generation templating engine from the jQuery team. This is used for measure text templates and src string templates.</p>
       <h2>Service types</h2>
       <p>Developers can set the services array used by the geomap widget. When it comes time to draw map images, the geomap widget uses an internal _serviceTypes object. The object contains one property for each service type geomap supports, e.g., tiled and shingled. The type property on each service object determines which serviceType object geomap uses to refresh the service. The following code snippet is a simplification of the relationship.</p>
-      <pre><code>options: {
+      <pre>options: {
   services: [
     {
       &quot;class&quot;: &quot;osm&quot;,
@@ -71,7 +71,7 @@ _serviceTypes: {
     }
     /* ,... */
   }
-}</code></pre>
+}</pre>
       <p>In the future the _serviceTypes property will be public and developers can extend the service types geomap supports.</p>
     </div>
   </div> <!-- end of #container -->

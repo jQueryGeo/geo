@@ -33,19 +33,19 @@
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>$(&quot;#map&quot;).geomap( &quot;zoom&quot;, 1 )
-$(&quot;#map&quot;).geomap( &quot;zoom&quot;, -2 )</code></pre></td>
+          <td><pre>$(&quot;#map&quot;).geomap( &quot;zoom&quot;, 1 )
+$(&quot;#map&quot;).geomap( &quot;zoom&quot;, -2 )</pre></td>
         </tr>
       </table>
       <p>The zoom method can zoom the map in or out by a given number of zoom levels. Positive values zoom the map in, negative values zoom the map out.</p>
       <p>This method will not zoom out beyond zoom level 0. If you are using a tiling scheme, this method will not zoom in past the maximum number of zoom levels defined in the tilingScheme property.</p>
       <p>This method accepts values <b>relative</b> to the map's current zoom level. This is different than the zoom property, which <b>is</b> the map's current zoom level.
         It might be useful to add an explicit plus sign when using this zoom method.</p>
-      <pre><code>// set the map to zoom level 2
+      <pre>// set the map to zoom level 2
 $(&quot;#map&quot;).geomap( &quot;option&quot;, &quot;zoom&quot;, 2 );
 
 // zoom the map in 2 levels from its current zoom
-$(&quot;#map&quot;).geomap( &quot;zoom&quot;, +2 );</code></pre>
+$(&quot;#map&quot;).geomap( &quot;zoom&quot;, +2 );</pre>
       <p>This method does not trigger events, not even bboxchange.</p>
       <p>There is no default value. Passing null or undefined will not change the map's zoom.</p>
     </div>
