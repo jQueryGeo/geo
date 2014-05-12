@@ -11,12 +11,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+  <link rel="stylesheet" href="../css/bootstrap.min.css" /><link rel="stylesheet" href="../css/bootstrap-theme.min.css" />
 </head>
 
 <body>
 
-  <div id="scaleBy" data-role="page">
+  <div id="scaleBy" class="container">
     <div data-role="header" data-theme="b">
       <h1>scaleBy</h1>
     </div>
@@ -33,7 +33,7 @@
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>var twiceAsBig = $.geo.scaleBy( bbox, 2 )</code></pre></td>
+          <td><pre>var twiceAsBig = $.geo.scaleBy( bbox, 2 )</pre></td>
         </tr>
       </table>
       <p>The scaleBy method creates a new bbox with the same center as the original but having a width and height that are both multiplied by the scale argument.</p>
@@ -43,10 +43,10 @@
     </div>
   </div> <!-- end of #container -->
 
-  <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
-  <script src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>
-  <script src="../js/script.js"></script>
-  <script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0.0-b2.min.js"></script>
+  <script src="../js/bootstrap.min.js"></script>
+  
 </body>
 </html>
 

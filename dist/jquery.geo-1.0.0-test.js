@@ -1,6 +1,6 @@
-/*! jQuery Geo - v1.0.0-test - 2013-07-07
+/*! jQuery Geo - v1.0.0-test - 2014-03-01
 * http://jquerygeo.com
-* Copyright (c) 2013 Ryan Westphal; Licensed MIT, GPL */
+* Copyright (c) 2014 Ryan Westphal; Licensed MIT */
 // Copyright 2006 Google Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -3220,8 +3220,39 @@ $.Widget.prototype = {
     // feature
     //
 
-    _flatten: function (geom) {
+    _basic: function( geom ) {
       // return an array of all basic geometries
+      // e.g., MultiPolygons become multiple Polygons
+      // coordinate arrays are kept as references for speed & should not be altered
+      // not in JTS
+      var geometries = [ ];
+      var multiType;
+      var i = 0;
+      var j;
+
+      var flat = this._flatten( geom );
+
+      for ( ; i < flat.length; i++ ) {
+        if ( flat[ i ].type.substring( 0, 5 ) === "Multi" ) {
+          multiType = flat[ i ].type.substring( 5 );
+
+          for ( j = 0; j < flat[ i ].coordinates.length; j++ ) {
+            geometries.push( {
+              type: multiType,
+              coordinates: flat[ i ].coordinates[ j ]
+            } );
+          }
+        } else {
+          geometries.push( flat[ i ] );
+        }
+      }
+
+      return geometries;
+    },
+
+    _flatten: function (geom) {
+      // return an array of only geometries
+      // will extract geometries from Feature, FeatureCollection, & GeometryCollection
       // not in JTS
       var geometries = [],
           curGeom = 0;
@@ -3924,8 +3955,8 @@ $.Widget.prototype = {
 
         // create our front & back buffers
         // though, at any time either one can be in front
-        this._$canvasSceneFront = $( window.toStaticHTML( '<img id="scene0" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ).load($.proxy(this._canvasSceneLoad, this));
-        this._$canvasSceneBack = $( window.toStaticHTML( '<img id="scene1" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ).load($.proxy(this._canvasSceneLoad, this));
+        this._$canvasSceneFront = $( window.toStaticHTML( '<img id="scene0" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ); //.load($.proxy(this._canvasSceneLoad, this));
+        this._$canvasSceneBack = $( window.toStaticHTML( '<img id="scene1" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ); //.load($.proxy(this._canvasSceneLoad, this));
 
       } else if (_ieVersion <= 8) {
         this._trueCanvas = false;
@@ -4220,9 +4251,10 @@ $.Widget.prototype = {
       if ( this._trueCanvas ) {
         if ( this._options.doubleBuffer && this._trueDoubleBuffer ) {
 
+          var geographics = this;
 
           if ( this._requireFlip ) {
-            var geographics = this;
+            geographics._requireFlip = false;
 
             var oldCanvasScene = geographics._$canvasSceneFront;
 
@@ -4233,9 +4265,7 @@ $.Widget.prototype = {
               height: geographics._height
             } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) ).prependTo( geographics._$elem );
 
-            geographics._$canvasSceneBack = oldCanvasScene.detach();
-
-            geographics._requireFlip = false;
+            geographics._$canvasSceneBack = oldCanvasScene.prop( "src", ""  ).detach();
           }
 
           // transform a finished scene, can assume no drawing during these calls
@@ -4274,7 +4304,7 @@ $.Widget.prototype = {
           height: geographics._height
         } ).prependTo( geographics._$elem );
 
-        geographics._$canvasSceneBack = oldCanvasScene.detach();
+        geographics._$canvasSceneBack = oldCanvasScene.prop( "src", "" ).detach();
       }
     },
 
@@ -4288,6 +4318,7 @@ $.Widget.prototype = {
 
       if ( geographics._trueCanvas && geographics._options.doubleBuffer && geographics._trueDoubleBuffer ) {
         geographics._$canvasSceneBack.prop( "src", geographics._$canvas[ 0 ].toDataURL( ) );
+        this._canvasSceneLoad( );
       }
 
 
@@ -4305,7 +4336,7 @@ $.Widget.prototype = {
         top: 0,
         width: geographics._width,
         height: geographics._height
-      } ).prependTo( geographics._$elem );
+      } ).appendTo( geographics._$elem );
 
       geographics._$labelsContainerBack = oldLabelsContainer.detach();
 
@@ -4386,7 +4417,7 @@ $.Widget.prototype = {
 }(jQuery, window));
 
 
-                       (function ($, window, undefined) {
+(function ($, window, undefined) {
   var _widgetIdSeed = 0,
       _ieVersion = ( function () {
         var v = 5, div = document.createElement("div"), a = div.all || [];
@@ -4590,8 +4621,8 @@ $.Widget.prototype = {
           this._isTap =
           this._isDbltap = false;
 
-      this._anchor = [ 0, 0 ];
-      this._current = [ 0, 0 ];
+      this._anchor = [ 0, 0 ]; /* mouse down */
+      this._current = [ 0, 0 ]; /* mouse move no matter what */
       this._lastMove = [ 0, 0 ];
       this._lastDrag = [ 0, 0 ];
       this._velocity = [ 0, 0 ];
@@ -5123,7 +5154,7 @@ $.Widget.prototype = {
                 };
 
             if ( $.geo.distance( bboxPolygon, projectedPoint, true ) <= mapTol ) {
-              geometries = $.geo._flatten( graphicShape.shape );
+              geometries = $.geo._basic( graphicShape.shape );
               for ( curGeom = 0; curGeom < geometries.length; curGeom++ ) {
                 if ( $.geo.distance( geometries[ curGeom ], selector ) <= mapTol ) {
                   result.push( graphicShape.shape );
@@ -6213,6 +6244,9 @@ $.Widget.prototype = {
             this._setInteractiveTimeout( true );
           }
           return false;
+        } else {
+          // fixes: [bug] highlight pop
+          return false;
         }
       }
 
@@ -6764,11 +6798,11 @@ $.Widget.prototype = {
               loadImageDeferredDone = function( url ) {
                 // when a Deferred call is done, add the image to the map
                 // a reference to the correct img element is on the Deferred object itself
-                serviceObj._loadImage( $.data( this, "img" ), url, pixelSize, map, serviceState, opacity );
+                serviceObj._loadImage( this.img, url, pixelSize, map, serviceState, opacity );
               },
 
               loadImageDeferredFail = function( ) {
-                $.data( this, "img" ).remove( );
+                delete this.img;
                 serviceState.loadCount--;
                 map._requestComplete();
               };
@@ -6865,9 +6899,9 @@ $.Widget.prototype = {
 
                 if ( typeof imageUrl === "string" ) {
                   serviceObj._loadImage( $img, imageUrl, pixelSize, map, serviceState, opacity );
-                } else if ( imageUrl ) {
+                } else if ( imageUrl && $.isFunction( imageUrl.promise ) ) {
                   // assume Deferred
-                  $.data( imageUrl, "img", $img );
+                  $.extend( imageUrl.promise( ), { img: $img } );
                   imageUrl.done( loadImageDeferredDone ).fail( loadImageDeferredFail );
                 } else {
                   $img.remove( );

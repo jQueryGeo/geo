@@ -129,11 +129,11 @@
               loadImageDeferredDone = function( url ) {
                 // when a Deferred call is done, add the image to the map
                 // a reference to the correct img element is on the Deferred object itself
-                serviceObj._loadImage( $.data( this, "img" ), url, pixelSize, map, serviceState, opacity );
+                serviceObj._loadImage( this.img, url, pixelSize, map, serviceState, opacity );
               },
 
               loadImageDeferredFail = function( ) {
-                $.data( this, "img" ).remove( );
+                delete this.img;
                 serviceState.loadCount--;
                 map._requestComplete();
               };
@@ -230,9 +230,9 @@
 
                 if ( typeof imageUrl === "string" ) {
                   serviceObj._loadImage( $img, imageUrl, pixelSize, map, serviceState, opacity );
-                } else if ( imageUrl ) {
+                } else if ( imageUrl && $.isFunction( imageUrl.promise ) ) {
                   // assume Deferred
-                  $.data( imageUrl, "img", $img );
+                  $.extend( imageUrl.promise( ), { img: $img } );
                   imageUrl.done( loadImageDeferredDone ).fail( loadImageDeferredFail );
                 } else {
                   $img.remove( );

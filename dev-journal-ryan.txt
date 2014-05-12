@@ -1,9 +1,9 @@
 ﻿== to do ==
-
-=== b2 ===
-* geomap - [bug] touchpad zoom not keeping center
+* bug - $.distance returns positive value for polygons that intersect
 
 ===bug fixing process===
+insert the following above line 288 in autoload\htmlcomplete.vim:
+let classlines = []
 1. browse to the jQuery Geo release template: http://jsbin.com/uhabox/19/edit
 2. clone it
 3. reproduce bug
@@ -24,12 +24,15 @@ http://jsbin.com/uhabox/19/edit
 * posts - SQL Server to jQuery Geo
 * posts - WKT object
 
+=== showcase ====
+Trail - http://www.mytrailapp.com/index.php
+Disease map
+
 === examples ===
 * sea monsters image from Slate
 ** http://www.slate.com/articles/technology/future_tense/2013/09/olaus_magnus_carta_marina_sea_monsters_on_a_gorgeous_renaissance_map.html
 * forecast.io skycons on jQuery Geo map
 * location based notes/to do list
-* disease map
 ** http://jsfiddle.net/ryanttb/gU7wS/14/
 * Windows Store app
 * 3d heatmap
@@ -64,8 +67,10 @@ http://jsbin.com/uhabox/19/edit
 * crowd
 * gis
 * embed
+* draw
 
 === future ===
+* geomap - [bug] touchpad zoom not keeping center
 * geographics - [bug] doubleBuffer is choppy
 ** especially noticeable in Firefox
 ** pretty bad with the USA demo: http://jsfiddle.net/ryanttb/8TvMB/2/
@@ -305,6 +310,56 @@ http://jsbin.com/uhabox/19/edit
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+
+==2014-05-11==
+===examples===
+Actually finishing these up. And...of course, found a bug.
+
+Whelp, all the examples are on jsbin, now what? :)
+
+===MapGeo===
+No more jQuery Geo in MapGeo, I guess :'(
+
+===Twheat===
+Also, Twheat is broken. I really need to add jQuery BBQ so that I don't have to refresh the page everytime someone zooms in.
+
+==2014-03-29==
+===disease===
+Rogers' disease map is online & looks good. He sent me a screenshot a while ago. I need to add that to the showcase.
+
+==2014-03-05==
+===trail===
+One more issue with the trail app on GitHub.
+
+Did what I could based on input, need a live example.
+
+===examples===
+Where was I?
+
+==2014-03-05==
+===trail===
+Helping someone with some issues on GitHub for their project: Trail ( http://www.mytrailapp.com/index.php )
+
+===examples===
+Keep going.
+
+==2014-03-01==
+===new year?===
+Apart from answering a few questions on GitHub, I haven't done much to the project in five months or so :/ It's pretty stable but still, time to pull up the sleeves again and actually get 1.0 out.
+
+===defer===
+The defer example still does not work. Maybe a change in jQuery I have to handle? I'm sure I made the example with 1.8 so there shouldn't be a problem in 1.9.
+
+It's just cross origin stuff plus I think data URI code happens too fast & we get the loadImageDeferredDone gets called with a promise object we're not expecting.
+
+Yeah, something's changed. The example works fine with jQuery 1.8.3 but not with 1.9.1. Yep, the callback context is the promise now, not the Deferred object http://bugs.jquery.com/ticket/14086 . After this change, I will have to require jQuery 1.9. I'm fine with that considering they're on 1.11 now.
+
+It works, I'm extending the Deferred object's promise now. Phew!
+
+Note that this is only a problem for tiled services as shingled services only have the one image and we don't need to store any additional data.
+
+===destroy===
+Next on the list of samples to move to jsbin: destroy.
 
 ==2013-10-04==
 ===highlight pop===

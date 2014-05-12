@@ -11,12 +11,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+  <link rel="stylesheet" href="../css/bootstrap.min.css" /><link rel="stylesheet" href="../css/bootstrap-theme.min.css" />
 </head>
 
 <body>
 
-  <div id="services" data-role="page">
+  <div id="services" class="container">
     <div data-role="header" data-theme="f">
       <h1>services</h1>
     </div>
@@ -31,20 +31,20 @@
           <th>default</th>
         </tr>
         <tr>
-          <td colspan=2><code><pre>[ {
+          <td colspan=2><pre>[ {
   &quot;class&quot;: &quot;osm&quot;,
   type: &quot;tiled&quot;,
   src: function( view ) {
     return &quot;http://otile&quot; + ((view.index % 4) + 1) + &quot;.mqcdn.com/tiles/1.0.0/osm/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png&quot;;
   },
   attr: &quot;&lt;p&gt;Tiles Courtesy of &lt;a href='http://www.mapquest.com/' target='_blank'&gt;MapQuest&lt;/a&gt; &lt;img src='http://developer.mapquest.com/content/osm/mq_logo.png'&gt;&lt;/p&gt;&quot;
-} ] );</code></pre></td>
+} ] );</pre></td>
         </tr>
         <tr>
           <th>init</th>
         </tr>
         <tr>
-          <td colspan=2><pre><code>$( <i>selector</i> ).geomap( { services: [ {
+          <td colspan=2><pre>$( <i>selector</i> ).geomap( { services: [ {
   &quot;class&quot;: &quot;osm&quot;,
   type: &quot;tiled&quot;,
   src: function( view ) {
@@ -55,24 +55,24 @@
     visibility: &quot;visible&quot;,
     opacity: 1.0
   }
-} ] } );</code></pre></td>
+} ] } );</pre></td>
         </tr>
         <tr>
           <th>get</th>
-          <td><pre><code>var services = $( <i>selector</i> ).geomap( &quot;option&quot;, &quot;services&quot; );</code></pre></td>
+          <td><pre>var services = $( <i>selector</i> ).geomap( &quot;option&quot;, &quot;services&quot; );</pre></td>
         </tr>
         <tr>
           <th>set</th>
         </tr>
         <tr>
-          <td colspan=2><pre><code>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;services&quot;, [ {
+          <td colspan=2><pre>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;services&quot;, [ {
   id: &quot;openstreetmap&quot;,
   type: &quot;tiled&quot;,
   src: function( view ) {
     return &quot;http://tile.openstreetmap.org/&quot; + view.zoom + &quot;/&quot; + view.tile.column + &quot;/&quot; + view.tile.row + &quot;.png&quot;;
   },
   attr: &quot;&amp;copy; OpenStreetMap &amp;amp; contributors, CC-BY-SA&quot;
-} ]</pre></code></td>
+} ]</pre></td>
         </tr>
       </table>
 
@@ -122,14 +122,14 @@
       </table>
       <p>You can use the properties of this argument to build and return a URL (or initiate an AJAX request and return a Promise).</p>
       <p>For more infomration about returning a jQuery Promise, please read the section on <a href="http://api.jquery.com/category/deferred-object/" rel="external">Deferred Objects</a> in the jQuery API documentation. It might useful to know that, as of jQuery 1.5, the <a href="http://api.jquery.com/jQuery.ajax/" rel="external">$.ajax method</a> returns a Promise object. If your ajax call returns a URL to an image, your src function can look something like this:</p>
-      <pre><code>src: function ( view ) { return $.ajax( { ... } ); }</code></pre>
+      <pre>src: function ( view ) { return $.ajax( { ... } ); }</pre>
       <p>When src is a string, those same properties can be used in the template by surrounding each property with: {{:propertyName}}.</p>
 
       <p>The default value for src is a function because it is slightly faster than rendering a template and we have better control of the view.index property. However, as an example, we can rewrite the default src function as a template string:</p>
 
       <p><b>Note: Alpha releases used a {{= }} syntax but there is a breaking change in the beta version due to <a href="http://www.borismoore.com/2012/03/approaching-beta-whats-changing-in_06.html" rel="external">changes in jsRender</a>. Please use the new {{: }} syntax.</b></p>
 
-      <pre><code>src: &quot;http://otile1.mqcdn.com/tiles/1.0.0/osm/{{:zoom}}/{{:tile.column}}/{{:tile.row}}.png&quot;</code></pre>
+      <pre>src: &quot;http://otile1.mqcdn.com/tiles/1.0.0/osm/{{:zoom}}/{{:tile.column}}/{{:tile.row}}.png&quot;</pre>
 
       <p>A couple advantages of using a string are that it is more concise and, unlike a function, can be stored as JSON.</p>
 
@@ -154,7 +154,7 @@
 
       <p><b>Note: It is always better to set the services option once, during init, rather than adding or modifying services after the map has been created.</b> Some of the following samples show that it is possible to modify the services option after map initialization through the services option even though it's not recommended.</p>
 
-      <pre><code><span class="comment">// create a map</span>
+      <pre><span class="comment">// create a map</span>
 var map = $( &quot;#map&quot; ).geomap( );
 
 <span class="comment">// get the current services array</span>
@@ -174,11 +174,11 @@ services.push( {
 services[ 0 ].style.visibility = &quot;hidden&quot;;
 
 <span class="comment">// re-set the services option</span>
-map.geomap( &quot;option&quot;, &quot;services&quot;, services );</code></pre>
+map.geomap( &quot;option&quot;, &quot;services&quot;, services );</pre>
 
       <p>The following code is more efficient than the last sample:</p>
 
-      <pre><code><span class="comment">// build an array of service objects ahead of time</span>
+      <pre><span class="comment">// build an array of service objects ahead of time</span>
 var services = [ {
   id: &quot;OSM&quot;,
   type: &quot;tiled&quot;,
@@ -195,16 +195,16 @@ var services = [ {
 } ];
 
 <span class="comment">// create a map with all services in place</span>
-var map = $( &quot;#map&quot; ).geomap( { services: services } );</code></pre>
+var map = $( &quot;#map&quot; ).geomap( { services: services } );</pre>
 
       <p>To change visibility or opacity of a service after you have created the map, you should use the <a href="toggle.html">toggle</a> or <a href="opacity.html">opacity</a> methods.
     </div>
   </div> <!-- end of #container -->
 
-  <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
-  <script src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>
-  <script src="../js/script.js"></script>
-  <script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0.0-b2.min.js"></script>
+  <script src="../js/bootstrap.min.js"></script>
+  
 </body>
 </html>
 

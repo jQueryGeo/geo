@@ -11,12 +11,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+  <link rel="stylesheet" href="../css/bootstrap.min.css" /><link rel="stylesheet" href="../css/bootstrap-theme.min.css" />
 </head>
 
 <body>
 
-  <div id="height" data-role="page">
+  <div id="height" class="container">
     <div data-role="header" data-theme="b">
       <h1>height</h1>
     </div>
@@ -33,7 +33,7 @@
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>var height = $.geo.height( [ -71.1, 42.3, -71.0, 42.4 ] )</pre></code></td>
+          <td><pre>var height = $.geo.height( [ -71.1, 42.3, -71.0, 42.4 ] )</pre></td>
         </tr>
       </table>
       <p>The height method returns the true height of a bbox in non-geodetic map units. If you are using geomap with its default map service, the height is in meters because the default projection is web mercator meters.</p>
@@ -41,10 +41,10 @@
     </div>
   </div> <!-- end of #container -->
 
-  <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
-  <script src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>
-  <script src="../js/script.js"></script>
-  <script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0.0-b2.min.js"></script>
+  <script src="../js/bootstrap.min.js"></script>
+  
 </body>
 </html>
 

@@ -11,12 +11,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+  <link rel="stylesheet" href="../css/bootstrap.min.css" /><link rel="stylesheet" href="../css/bootstrap-theme.min.css" />
 </head>
 
 <body>
 
-  <div id="shapeStyle" data-role="page">
+  <div id="shapeStyle" class="container">
     <div data-role="header" data-theme="f">
       <h1>shapeStyle</h1>
     </div>
@@ -29,7 +29,7 @@
         </tr>
         <tr>
           <th>default</th>
-          <td><pre><code>{
+          <td><pre>{
   borderRadius: &quot;8px&quot;,
   color: &quot;#7f0000&quot;,
   fillOpacity: .2,
@@ -39,20 +39,20 @@
   strokeWidth: &quot;2px&quot;,
   visibility: &quot;visible&quot;,
   width: &quot;8px&quot;
-}</code></pre>
+}</pre>
           </td>
         </tr>
         <tr>
           <th>init</th>
-          <td><pre><code>$( <i>map or service selector</i> ).geomap( { shapeStyle: { color: &quot;green&quot; } } );</code></pre></td>
+          <td><pre>$( <i>map or service selector</i> ).geomap( { shapeStyle: { color: &quot;green&quot; } } );</pre></td>
         </tr>
         <tr>
           <th>get</th>
-          <td><pre><code>var shapeStyle = $( <i>map or service selector</i> ).geomap( &quot;option&quot;, &quot;shapeStyle&quot; );</code></pre></td>
+          <td><pre>var shapeStyle = $( <i>map or service selector</i> ).geomap( &quot;option&quot;, &quot;shapeStyle&quot; );</pre></td>
         </tr>
         <tr>
           <th>set</th>
-          <td><pre><code>$( <i>map or service selector</i> ).geomap( &quot;option&quot;, &quot;shapeStyle&quot;, { strokeWidth: &quot;4px&quot; } );</code></pre></td>
+          <td><pre>$( <i>map or service selector</i> ).geomap( &quot;option&quot;, &quot;shapeStyle&quot;, { strokeWidth: &quot;4px&quot; } );</pre></td>
         </tr>
       </table>
       <p>The shapeStyle option retrieves or updates the <i>base</i> style of shapes appended to the map.</p>
@@ -64,19 +64,19 @@
       <ol>
         <li>
           <span>the base shapeStyle starts with its initial style having a red stroke color and strokeWidth of 2px</span>
-          <pre><code>$( &quot;#map&quot; ).geomap( );</code></pre>
+          <pre>$( &quot;#map&quot; ).geomap( );</pre>
         </li>
         <li>
           <span>you call append with a style that increases the stroke width to 4px but does not supply a stroke color</span>
-          <pre><code>$( &quot;#map&quot; ).geomap(
+          <pre>$( &quot;#map&quot; ).geomap(
   &quot;append&quot;,
   { type: &quot;Point&quot;, coordinates: [ -71, 42 ] },
   { strokeWidth: &quot;4px&quot; }
-);</code></pre>
+);</pre>
         </li>
         <li>
           <span>you later change the base shapeStyle's stroke color to blue</span>
-          <pre><code>$( &quot;#map&quot; ).geomap( &quot;option&quot;, &quot;shapeStyle&quot;, { stroke: &quot;#00f&quot; } );</code></pre>
+          <pre>$( &quot;#map&quot; ).geomap( &quot;option&quot;, &quot;shapeStyle&quot;, { stroke: &quot;#00f&quot; } );</pre>
         </li>
       </ol>
       <p>The shape described in the above example will draw with a blue stroke color and a strokeWidth of 4px.</p>
@@ -84,14 +84,14 @@
       <ol start="4">
         <li>
           <span>you change the shapeStyle option of the default service specifically so that points are twice as long as usual; the default service has the CSS class: osm</span>
-          <pre><code>$( &quot;#map .osm&quot; ).geomap( &quot;option&quot;, &quot;shapeStyle&quot;, { width: &quot;16px&quot; } )</code></pre>
+          <pre>$( &quot;#map .osm&quot; ).geomap( &quot;option&quot;, &quot;shapeStyle&quot;, { width: &quot;16px&quot; } )</pre>
         </li>
         <li>
           <span>you append a second point directly to the default .osm service</span>
-          <pre><code>$( &quot;#map .osm&quot; ).geomap( 
+          <pre>$( &quot;#map .osm&quot; ).geomap( 
   &quot;append&quot;,
   { type: &quot;Point&quot;, coordinates: [ -70.5, 42.5 ] }
-);</code></pre>
+);</pre>
         </li>
       </ol>
       <p>This second point will:</p>
@@ -102,14 +102,14 @@
       </ul>
       <p>This is the only option that can be applied to services. All other options require a reference to the original map element.</p>
       <p>When called with a second argument to set the shapeStyle, the jQuery UI widget factory returns the original jQuery collection to maintain call chaining.</p>
-      <p>Please see the style section at the bottom of the <a href="#" onclick="javascript:window.history.back();">geomap widget</a> page for more information about the style object.</p>
+      <p>Please see the style section at the bottom of the <a href="../geomap/index.html#geomap-style">geomap widget</a> page for more information about the style object.</p>
     </div>
   </div> <!-- end of #container -->
 
-  <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
-  <script src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>
-  <script src="../js/script.js"></script>
-  <script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0.0-b2.min.js"></script>
+  <script src="../js/bootstrap.min.js"></script>
+  
 </body>
 </html>
 

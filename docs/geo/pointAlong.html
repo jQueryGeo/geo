@@ -11,12 +11,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+  <link rel="stylesheet" href="../css/bootstrap.min.css" /><link rel="stylesheet" href="../css/bootstrap-theme.min.css" />
 </head>
 
 <body>
 
-  <div id="pointAlong" data-role="page">
+  <div id="pointAlong" class="container">
     <div data-role="header" data-theme="b">
       <h1>pointAlong</h1>
     </div>
@@ -33,14 +33,14 @@
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>var pointAlong = $.geo.pointAlong( {
+          <td><pre>var pointAlong = $.geo.pointAlong( {
       type: &quot;LineString&quot;,
       coordinates: [[
         [-75, 39.7],
         [-74.8, 39.3],
         [-75.2, 39.3]
       ]]
-}, .5 )</code></pre></td>
+}, .5 )</pre></td>
         </tr>
       </table>
       <p>The pointAlong method calculates a Point that lies a given fraction along the passed-in basic GeoJSON geometry object. The basic geometry types are Point, LineString and Polygon. A percentage of 0.0 returns the first Point; a percentage of 1.0 returns the last.</p>
@@ -50,10 +50,10 @@
      </div>
   </div> <!-- end of #container -->
 
-  <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
-  <script src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>
-  <script src="../js/script.js"></script>
-  <script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0.0-b2.min.js"></script>
+  <script src="../js/bootstrap.min.js"></script>
+  
 </body>
 </html>
 

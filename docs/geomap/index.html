@@ -11,12 +11,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+  <link rel="stylesheet" href="../css/bootstrap.min.css" /><link rel="stylesheet" href="../css/bootstrap-theme.min.css" />
 </head>
 
 <body>
 
-  <div id="geomap" data-role="page">
+  <div id="geomap" class="container">
     <div data-role="header" data-theme="d">
       <h1>geomap widget</h1>
     </div>
@@ -24,7 +24,7 @@
     <div data-role="content">
       <p>Once you have an HTML element to target, you can call the geographic map widget's function.</p>
 
-      <pre><code>.geomap( options )</code></pre>
+      <pre>.geomap( options )</pre>
 
       <h2>overview</h2>
 
@@ -38,7 +38,7 @@
 
       <p>After initializing a map with your first geomap call, you can get or set most of these options using the following syntax:</p>
 
-      <pre><code><span class="comment">// get the current value of a single option</span>
+      <pre><span class="comment">// get the current value of a single option</span>
 var optionValue = $( <i>map selector</i> ).geomap( &quot;option&quot;, <i>optionName</i> );
 
 <span class="comment">// set a new value for a single option</span>
@@ -48,33 +48,33 @@ $( <i>map selector</i> ).geomap( &quot;option&quot;, <i>optionName</i>, <i>newVa
 $( <i>map selector</i> ).geomap( &quot;option&quot;, {
   <i>optionName</i>: <i>newValue</i>,
   <i>optionName</i>: <i>newValue</i>
-} );</code></pre>
+} );</pre>
 
       <p>Two exceptions are pixelSize (which is read-only) and zoomFactor (which is init-only).</p>
 
       <p>The map view refreshes when you change these options: bbox, center, services, tilingScheme, bboxMax, &amp; zoom.</p>
 
-      <ul data-role="listview" data-inset="true">
-        <li><a href="bbox.html"><h3>bbox</h3><p>bounds of the currently visible viewport</p></a></li>
-        <li><a href="bboxMax.html"><h3>bboxMax</h3><p>bounds of maximum viewport for non-tiled maps</p></a></li>
-        <li><a href="center.html"><h3>center</h3><p>center of the currently visible viewport</p></a></li>
-        <li><a href="zoom.html"><h3>zoom</h3><p>zoom level of the currently visible viewport</p></a></li>
-        <li><a href="zoomMin.html"><h3>zoomMin</h3><p>minimum zoom level for all services in the map</p></a></li>
-        <li><a href="zoomMax.html"><h3>zoomMax</h3><p>maximum zoom level for all services in the map</p></a></li>
-        <li><a href="zoomFactor.html"><h3>zoomFactor</h3><p>determines how the map handles tiled zoom interactions</p></a></li>
-        <li><a href="pixelSize.html"><h3>pixelSize</h3><p>read-only Earth-size of a pixel in the current map viewport</p></a></li>
-        <li><a href="mode.html"><h3>mode</h3><p class="ui-li-desc">determines how the map, user, &amp; developer interact</p></a></li>
-        <li><a href="pannable.html"><h3>pannable</h3><p class="ui-li-desc">allow or prohit map panning</p></a>
-        <li><a href="scroll.html"><h3>scroll</h3><p class="ui-li-desc">determines how the map reacts to a mouse wheel</p></a>
-        <li><a href="shift.html"><h3>shift</h3><p class="ui-li-desc">determines how holding the shift key affects the map</p></a>
-        <li><a href="cursors.html"><h3>cursors</h3><p>cursors to display for each mode</p></a></li>
-        <li><a href="measureLabels.html"><h3>measureLabels</h3><p>format to apply to label while measuring</p></a></li>
-        <li><a href="drawStyle.html"><h3>drawStyle</h3><p>when drawing shapes, defines how they look during drawing</p></a></li>
-        <li><a href="shapeStyle.html"><h3>shapeStyle</h3><p>defines how geomap draws shapes added via the append method</p></a></li>
-        <li><a href="services.html"><h3>services</h3><p>determine the content of the map</p></a></li>
-        <li><a href="tilingScheme.html"><h3>tilingScheme</h3><p>defines how tiles are placed in the viewport</p></a></li>
-        <li><a href="axisLayout.html"><h3>axisLayout</h3><p>&quot;map&quot; or &quot;image&quot;</p></a></li>
-      </ul>
+      <div class="list-group" data-inset="true">
+        <a class="list-group-item" href="bbox.html"><h3>bbox</h3><p>bounds of the currently visible viewport</p></a>
+        <a class="list-group-item" href="bboxMax.html"><h3>bboxMax</h3><p>bounds of maximum viewport for non-tiled maps</p></a>
+        <a class="list-group-item" href="center.html"><h3>center</h3><p>center of the currently visible viewport</p></a>
+        <a class="list-group-item" href="zoom.html"><h3>zoom</h3><p>zoom level of the currently visible viewport</p></a>
+        <a class="list-group-item" href="zoomMin.html"><h3>zoomMin</h3><p>minimum zoom level for all services in the map</p></a>
+        <a class="list-group-item" href="zoomMax.html"><h3>zoomMax</h3><p>maximum zoom level for all services in the map</p></a>
+        <a class="list-group-item" href="zoomFactor.html"><h3>zoomFactor</h3><p>determines how the map handles tiled zoom interactions</p></a>
+        <a class="list-group-item" href="pixelSize.html"><h3>pixelSize</h3><p>read-only Earth-size of a pixel in the current map viewport</p></a>
+        <a class="list-group-item" href="mode.html"><h3>mode</h3><p class="ui-li-desc">determines how the map, user, &amp; developer interact</p></a>
+        <a class="list-group-item" href="pannable.html"><h3>pannable</h3><p class="ui-li-desc">allow or prohit map panning</p></a>
+        <a class="list-group-item" href="scroll.html"><h3>scroll</h3><p class="ui-li-desc">determines how the map reacts to a mouse wheel</p></a>
+        <a class="list-group-item" href="shift.html"><h3>shift</h3><p class="ui-li-desc">determines how holding the shift key affects the map</p></a>
+        <a class="list-group-item" href="cursors.html"><h3>cursors</h3><p>cursors to display for each mode</p></a>
+        <a class="list-group-item" href="measureLabels.html"><h3>measureLabels</h3><p>format to apply to label while measuring</p></a>
+        <a class="list-group-item" href="drawStyle.html"><h3>drawStyle</h3><p>when drawing shapes, defines how they look during drawing</p></a>
+        <a class="list-group-item" href="shapeStyle.html"><h3>shapeStyle</h3><p>defines how geomap draws shapes added via the append method</p></a>
+        <a class="list-group-item" href="services.html"><h3>services</h3><p>determine the content of the map</p></a>
+        <a class="list-group-item" href="tilingScheme.html"><h3>tilingScheme</h3><p>defines how tiles are placed in the viewport</p></a>
+        <a class="list-group-item" href="axisLayout.html"><h3>axisLayout</h3><p>&quot;map&quot; or &quot;image&quot;</p></a>
+      </div>
 
       <h2>projection</h2>
 
@@ -117,27 +117,20 @@ $( <i>map selector</i> ).geomap( &quot;option&quot;, {
 
       <p>The geo argument to your callback is a true GeoJSON object and you can pass this object directly to the append method. You can also send it directly to a database for storage knowing that there are no non-GeoJSON properties wasting space.</p>
 
-      <ul data-role="listview" data-inset="true">
-        <li>
-          <a href="geomapmove.html">move</a>
-        </li>
-        <li>
-          <a href="geomapclick.html">click</a>
-        </li>
-        <li>
-          <a href="geomapdblclick.html">dblclick</a>
-        </li>
-      </ul>
+      <div class="list-group" data-inset="true">
+        <a class="list-group-item" href="geomapmove.html">move</a>
+        <a class="list-group-item" href="geomapclick.html">click</a>
+        <a class="list-group-item" href="geomapdblclick.html">dblclick</a>
+        </a>
+      </div>
 
       <h3>bbox events</h3>
 
       <p>With bbox events the geo argument to your callback is an object with single property, bbox, which is a <a href="http://geojson.org/geojson-spec.html#bounding-boxes" rel="external">GeoJSON bounding box</a>.</p>
 
-      <ul data-role="listview" data-inset="true">
-        <li>
-          <a href="geomapbbox.html">bboxchange</a>
-        </li>
-      </ul>
+      <div class="list-group" data-inset="true">
+        <a class="list-group-item" href="geomapbbox.html">bboxchange</a>
+      </div>
 
       <h3>shape events</h3>
 
@@ -145,24 +138,18 @@ $( <i>map selector</i> ).geomap( &quot;option&quot;, {
 
       <p>The geo argument to your callback is a true GeoJSON object and you can pass this object directly to the append method. You can also send it directly to a database for storage knowing that there are no non-GeoJSON properties wasting space.</p>
 
-      <ul data-role="listview" data-inset="true">
-        <li>
-          <a href="geomapshape.html">shape</a>
-        </li>
-      </ul>
+      <div class="list-group" data-inset="true">
+        <a class="list-group-item" href="geomapshape.html">shape</a>
+      </div>
 
       <h3>load events</h3>
 
       <p>With load events, the geo argument is currently undefined. You can add the argument to your handler's argument list if you wish but attempting to access any property on it will cause a JavaScript error.</p>
 
-      <ul data-role="listview" data-inset="true">
-        <li>
-          <a href="geomaploadstart.html">loadstart</a>
-        </li>
-        <li>
-          <a href="geomaploadend.html">loadend</a>
-        </li>
-      </ul>
+      <div class="list-group" data-inset="true">
+        <a class="list-group-item" href="geomaploadstart.html">loadstart</a>
+        <a class="list-group-item" href="geomaploadend.html">loadend</a>
+      </div>
 
       <h2>methods</h2>
 
@@ -171,58 +158,43 @@ $( <i>map selector</i> ).geomap( &quot;option&quot;, {
       <h3>unit conversion</h3>
 
       <p>Convert positions between pixel and map coordinates.</p>
-      <ul data-role="listview" data-inset="true">
-        <li>
-          <a href="toMap.html">toMap</a>
-        </li>
-        <li>
-          <a href="toPixel.html">toPixel</a>
-        </li>
-      </ul>
+      <div class="list-group" data-inset="true">
+        <a class="list-group-item" href="toMap.html">toMap</a>
+        <a class="list-group-item" href="toPixel.html">toPixel</a>
+      </div>
       <h3>map methods</h3>
       <p>These methods update the map widget as a whole.</p>
-      <ul data-role="listview" data-inset="true">
-        <li>
-          <a href="zoomMethod.html">zoom</a>
-        </li>
-        <li>
-          <a href="refresh.html">refresh</a>
-        </li>
-        <li>
-          <a href="resize.html">resize</a>
-        </li>
-        <li>
-          <a href="destroy.html">destroy</a>
-        </li>
-      </ul>
+      <div class="list-group" data-inset="true">
+        <a class="list-group-item" href="zoomMethod.html">zoom</a>
+        <a class="list-group-item" href="refresh.html">refresh</a>
+        <a class="list-group-item" href="resize.html">resize</a>
+        <a class="list-group-item" href="destroy.html">destroy</a>
+      </div>
       <h3>service modification</h3>
       <p>Methods that help update objects in the services array.</p>
-      <ul data-role="listview" data-inset="true">
-        <li>
-          <a href="toggle.html">toggle</a>
-        </li>
-        <li>
-          <a href="opacity.html">opacity</a>
-        </li>
-      </ul>
+      <div class="list-group" data-inset="true">
+        <a class="list-group-item" href="toggle.html">toggle</a>
+        <a class="list-group-item" href="opacity.html">opacity</a>
+      </div>
       <h3>shapes</h3>
       <p>These methods manage geometry or features drawn on the geomap widget itself or on individual servies within the map.</p>
-      <ul data-role="listview" data-inset="true">
-        <li><a href="append.html">append</a></li>
-        <li><a href="remove.html">remove</a></li>
-        <li><a href="empty.html">empty</a></li>
-      </ul>
+      <div class="list-group" data-inset="true">
+        <a class="list-group-item" href="append.html">append</a>
+        <a class="list-group-item" href="remove.html">remove</a>
+        <a class="list-group-item" href="empty.html">empty</a>
+      </div>
       <p>The find method allows you to search for shapes appended to the map. Its syntax and service-level operation is slightly different than the other three shape methods so the link is visually broken out from the rest.</p>
-      <ul data-role="listview" data-inset="true">
-        <li><a href="find.html">find</a></li>
-      </ul>
-      <h2>style</h2>
+      <div class="list-group" data-inset="true">
+        <a class="list-group-item" href="find.html">find</a>
+      </div>
+      <h2 id="geomap-style">style</h2>
       <p>A geomap style is an object whose properties follow a subset of <a href="http://www.w3.org/TR/SVG/styling.html">SVG styling</a> properties. The specific styles that geomap recognizes and to which geometry they apply are listed below.</p>
       <p>Use the drawStyle option of the geomap widget to define the style used on incomplete lines and polygons as they are being drawn when mode is drawLineString or drawPolygon.</p>
       <p>Use the shapeStyle option to define the style of shapes drawn after being appended to the map via the append method.</p>
       <p>Please note that in drawPoint mode, the shape event is triggered immediately and so no shape will appear until you append a point to the map at which time the shapeStyle will be used.</p>
       <h3>geomap style properties</h3>
-      <table class="objectProperties">
+      <div class="panel panel-default">
+      <table class="table objectProperties">
         <tr>
           <th>property</th>
           <th>default</th>
@@ -284,14 +256,15 @@ $( <i>map selector</i> ).geomap( &quot;option&quot;, {
           <td>The width of a rounded rectangle drawn around Point shapes. Currently only pixel values are allowed. If either width or height are zero, no shape is drawn for the Point.</td>
         </tr>
       </table>
+      </div>
       <p>All properties apply to Point shapes which means that you can adjust the stroke and fill of the box surrounding the point location.</p>
     </div>
   </div> <!-- end of #container -->
 
-  <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
-  <script src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>
-  <script src="../js/script.js"></script>
-  <script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0.0-b2.min.js"></script>
+  <script src="../js/bootstrap.min.js"></script>
+  
 </body>
 </html>
 

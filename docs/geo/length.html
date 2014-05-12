@@ -11,12 +11,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+  <link rel="stylesheet" href="../css/bootstrap.min.css" /><link rel="stylesheet" href="../css/bootstrap-theme.min.css" />
 </head>
 
 <body>
 
-  <div id="length" data-role="page">
+  <div id="length" class="container">
     <div data-role="header" data-theme="b">
       <h1>length</h1>
     </div>
@@ -33,14 +33,14 @@
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>var length = $.geo.length( {
+          <td><pre>var length = $.geo.length( {
       type: &quot;LineString&quot;,
       coordinates: [[
         [-75, 39.7],
         [-74.8, 39.3],
         [-75.2, 39.3]
       ]]
-} )</pre></code></td>
+} )</pre></td>
         </tr>
       </table>
       <p>The length method calculates the length of a basic GeoJSON geometry object and returns it in non-geodetic units. The basic shapes are Point, LineString and Polygon. If you are using geomap with its default map service, the length is in meters because the default projection is web mercator meters.</p>
@@ -50,10 +50,10 @@
     </div>
   </div> <!-- end of #container -->
 
-  <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
-  <script src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>
-  <script src="../js/script.js"></script>
-  <script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0.0-b2.min.js"></script>
+  <script src="../js/bootstrap.min.js"></script>
+  
 </body>
 </html>
 

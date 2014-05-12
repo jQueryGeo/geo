@@ -11,12 +11,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+  <link rel="stylesheet" href="../css/bootstrap.min.css" /><link rel="stylesheet" href="../css/bootstrap-theme.min.css" />
 </head>
 
 <body>
 
-  <div id="cursors" data-role="page">
+  <div id="cursors" class="container">
     <div data-role="header" data-theme="f">
       <h1>cursors</h1>
     </div>
@@ -29,7 +29,7 @@
         </tr>
         <tr>
           <th>default</th>
-          <td><pre><code>{
+          <td><pre>{
   static: &quot;default&quot;,
   pan: &quot;move&quot;,
   zoom: &quot;crosshair&quot;,
@@ -38,19 +38,19 @@
   drawPolygon: &quot;crosshair&quot;,
   measureLength: &quot;crosshair&quot;,
   measureArea: &quot;crosshair&quot;
-}</code></pre></td>
+}</pre></td>
         </tr>
         <tr>
           <th>init</th>
-          <td><code><pre>$( <i>selector</i> ).geomap( { cursors: { pan: &quot;move&quot; } } );</pre></code></td>
+          <td><pre>$( <i>selector</i> ).geomap( { cursors: { pan: &quot;move&quot; } } );</pre></td>
         </tr>
         <tr>
           <th>get</th>
-          <td><code><pre>var cursors = $( <i>selector</i> ).geomap( &quot;option&quot;, &quot;cursors&quot; );</pre></code></td>
+          <td><pre>var cursors = $( <i>selector</i> ).geomap( &quot;option&quot;, &quot;cursors&quot; );</pre></td>
         </tr>
         <tr>
           <th>set</th>
-          <td><code><pre>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;cursors&quot;, { pan: &quot;pointer&quot; } );</pre></code></td>
+          <td><pre>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;cursors&quot;, { pan: &quot;pointer&quot; } );</pre></td>
         </tr>
       </table>
       <p>The cursors property controls which cursors appear when users move the mouse over the geomap div in any given mode. <!--For example, if the developer switches the map widget to zoom mode the cursor will turn into a crosshair by default.--></p>
@@ -59,10 +59,10 @@
     </div>
   </div> <!-- end of #container -->
 
-  <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
-  <script src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>
-  <script src="../js/script.js"></script>
-  <script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0.0-b2.min.js"></script>
+  <script src="../js/bootstrap.min.js"></script>
+  
 </body>
 </html>
 

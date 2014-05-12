@@ -11,12 +11,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+  <link rel="stylesheet" href="../css/bootstrap.min.css" /><link rel="stylesheet" href="../css/bootstrap-theme.min.css" />
 </head>
 
 <body>
 
-  <div id="append" data-role="page">
+  <div id="append" class="container">
     <div data-role="header" data-theme="e">
       <h1>append</h1>
     </div>
@@ -33,7 +33,7 @@
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code><span class="comment">// a single point, no style, no label, refresh immediately</span>
+          <td><pre><span class="comment">// a single point, no style, no label, refresh immediately</span>
 $(<i>map or service selector</i>).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] } )
 
 <span class="comment">// a single line, don't refresh yet</span>
@@ -94,7 +94,7 @@ $(<i>map or service selector</i>).geomap( &quot;append&quot;, {
   { color: &quot;#00f&quot; },
   '&lt;span style=&quot;color: #44f;&quot;&gt;Blue Point&lt;/span&gt;',
   false
-)</code></pre></td>
+)</pre></td>
         </tr>
       </table>
 
@@ -119,17 +119,17 @@ $(<i>map or service selector</i>).geomap( &quot;append&quot;, {
       <ul>
         <li>
           <span>you append a Point shape setting its style to have zero for width and height:</span>
-          <pre><code>{ width: &quot;0px&quot;, height: &quot;0px&quot; }</code></pre>
+          <pre>{ width: &quot;0px&quot;, height: &quot;0px&quot; }</pre>
         </li>
 
         <li>
           <span>you also supply a label of nothing more than a div element with a class:</span>
-          <pre><code>'&lt;div class=&quot;marker&quot;&gt;&lt;/div&gt;'</code></pre>
+          <pre>'&lt;div class=&quot;marker&quot;&gt;&lt;/div&gt;'</pre>
         </li>
 
         <li>
           <span>in a CSS style sheet, you give the marker class a width, height, background image and negative relative position:</span>
-          <pre><code>.marker
+          <pre>.marker
 {
   width: 8px;
   height: 8px;
@@ -137,7 +137,7 @@ $(<i>map or service selector</i>).geomap( &quot;append&quot;, {
   position: relative;
   left: -4px;
   top: -4px;
-}</code></pre>
+}</pre>
         </li>
       </ul>
 
@@ -149,20 +149,20 @@ $(<i>map or service selector</i>).geomap( &quot;append&quot;, {
 
       <h3>JavaScript</h3>
 
-      <pre><code><span class="comment">/* add a point to the map itself */</span>
+      <pre><span class="comment">/* add a point to the map itself */</span>
 $( &quot;#map&quot; ).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, &quot;map point&quot; );
 
 <span class="comment">/* add a point to the default map service */</span>
 $( &quot;#map .osm&quot; ).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -70, 40 ] }, &quot;service point&quot; );
-</code></pre>
+</pre>
 
       <h3>CSS</h3>
 
-      <pre><code><span class="comment">/* turn the color of all labels blue */</span>
+      <pre><span class="comment">/* turn the color of all labels blue */</span>
 #map .geo-label { color: blue; }
 
 <span class="comment">/* make labels on the default basemap service bold */</span>
-#map .osm .geo-label { font-weight: bold; }</code></pre>
+#map .osm .geo-label { font-weight: bold; }</pre>
 
       <p>One caveat is that, to keep performance high, jQuery Geo will not create the .geo-label container if you do not at least pass an empty string as the label. So, if you want to do something similar to the marker example above, but using the already provided .geo-label div, you will need to pass an empty string as the label.</p>
       
@@ -174,11 +174,11 @@ $( &quot;#map .osm&quot; ).geomap( &quot;append&quot;, { type: &quot;Point&quot;
 
       <p>Due to browser inconsistencies, sometimes links in service-level shape labels can be clicked. However, since this behavior is not consistent, you should not rely on it.</p>
 
-      <pre><code><span class="comment">// users can click the link in this shape's label</span>
+      <pre><span class="comment">// users can click the link in this shape's label</span>
 $( &quot;#map&quot; ).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, &quot;&lt;a href='info.html'&gt;More info&lt;/a&gt;&quot; );
 
 <span class="comment">// users cannot click the link in this service-level shape's label</span>
-$( &quot;#map .osm&quot; ).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, &quot;&lt;a href='info.html'&gt;More info&lt;/a&gt;&quot; );</code></pre>
+$( &quot;#map .osm&quot; ).geomap( &quot;append&quot;, { type: &quot;Point&quot;, coordinates: [ -71, 40 ] }, &quot;&lt;a href='info.html'&gt;More info&lt;/a&gt;&quot; );</pre>
 
       <p><b>Note:</b> If you display non-map content over the map div, links in the shape labels will show through that content unless you give your overlay content a z-index greater than 1.</p>
 
@@ -187,7 +187,7 @@ $( &quot;#map .osm&quot; ).geomap( &quot;append&quot;, { type: &quot;Point&quot;
       <p>The optional refresh argument determines if geomap refreshes the map graphics after this call to append. It defaults to true. If you pass false, geomap will add the shape internally but not immediately redraw the graphics. The changes will display if the user moves the map or you call geomap's refresh method.</p>
       <h2>service-level shapes</h2>
       <p>The geomap widget allows you to append a shape to a specific service. You do this by targeting a service inside a map instead of the map itself for your call to geomap's append method. For example, the default map service has the CSS class: osm. We can append a shape to that service specifically by using jQuery to target the service:</p>
-      <pre><code>$( &quot;#map .osm&quot; ).geomap( &quot;append&quot;, shape );</code></pre>
+      <pre>$( &quot;#map .osm&quot; ).geomap( &quot;append&quot;, shape );</pre>
       <p>Some of the important advantages with this syntax are:</p>
       <ul>
         <li>you can show or hide shapes as you toggle a service because shapes attached to a service are only visible if the service is visible</li>
@@ -198,21 +198,21 @@ $( &quot;#map .osm&quot; ).geomap( &quot;append&quot;, { type: &quot;Point&quot;
       <h2>duplicate shapes</h2>
       <p>You can add the same GeoJSON object to more than one service, which allows you to give the same object two different styles at the same time. To do this, call append twice with the same object. Once on one service (or the map itself) and a second time on a different service.</p>
       <p>You can also do this at the same time by using the comma selector in one call to append:</p>
-      <pre><code><span class="comment">// set the basemap service's shapeStyle option to a white halo effect</span>
+      <pre><span class="comment">// set the basemap service's shapeStyle option to a white halo effect</span>
 $( &quot;#map .osm&quot; ).geomap( &quot;option&quot;, &quot;shapeStyle&quot;, { strokeWidth: &quot;8px&quot;, color: &quot;#dedede&quot; } );
 
 <span class="comment">// append the shape to both the map widget and basemap service</span>
-$( &quot;#map,#map .osm&quot; ).geomap( &quot;append&quot;, shape );</code></pre>
+$( &quot;#map,#map .osm&quot; ).geomap( &quot;append&quot;, shape );</pre>
       <h2>updating</h2>
       <p>If you attempt to add a shape to the map or a service where it already exists, the shape will remain but you will update (or remove) the shape's style or label.</p>
-      <pre><code><span class="comment">// add the shape with a green color</span>
+      <pre><span class="comment">// add the shape with a green color</span>
 $( &quot;#map&quot; ).append( shape, { color: &quot;green&quot; } );
 
 <span class="comment">// change the color to blue (shape is the same object as before in this case)</span>
-$( &quot;#map&quot; ).append( shape, { color: &quot;blue&quot; } );</code></pre>
+$( &quot;#map&quot; ).append( shape, { color: &quot;blue&quot; } );</pre>
       <p>Changing the type of geometry, e.g., from Point to LineString, or coordinates of a shape you have appended is not recommended and geomap's behavior is currently undefined. If you wish to do either of these, you should first call remove on the original object and append on a new one.</p>
       <!--<p>The following odd example will move the first coordinate of any clicked LineString 10 meters to the left. Notice it first removes the shape, then updates the first coordinate and finally appends the new shape.</p>
-      <pre><code>var map = $( &quot;#map&quot; ).geomap( {
+      <pre>var map = $( &quot;#map&quot; ).geomap( {
   click: function(e, geo) {
     <span class="comment">// find any shapes within 4 pixels of the clicked point</span>
     var shapes = map.geomap(&quot;find&quot;, geo, 4);
@@ -231,15 +231,15 @@ $( &quot;#map&quot; ).append( shape, { color: &quot;blue&quot; } );</code></pre>
       map.geomap( &quot;append&quot;, shapes[0] );
     }
   }
-} );</code></pre>-->
+} );</pre>-->
  
     </div>
   </div> <!-- end of #container -->
 
-  <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
-  <script src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>
-  <script src="../js/script.js"></script>
-  <script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0.0-b2.min.js"></script>
+  <script src="../js/bootstrap.min.js"></script>
+  
 </body>
 </html>
 

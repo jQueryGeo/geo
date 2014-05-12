@@ -11,23 +11,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+  <link rel="stylesheet" href="../css/bootstrap.min.css" /><link rel="stylesheet" href="../css/bootstrap-theme.min.css" />
 </head>
 
 <body>
 
-  <div id="geo" data-role="page">
+  <div id="geo" class="container">
     <div data-role="header" data-theme="d">
       <h1>geometry functions &amp; more!</h1>
     </div>
     
     <div data-role="content">
-      <p>Apart from the geomap widget, jQuery Geo comes bundled with functions to perform various operations on bounding boxes (a.k.a, bbox, the rectangle surrounding any geometry) and the geometries themselves. These functions (and two objects: <a href="javascript:document.getElementById('wkt').scrollIntoView();" data-ajax="false">WKT</a> &amp; <a href="javascript:document.getElementById('proj').scrollIntoView();" data-ajax="false">proj</a>) are all contained in the $.geo namespace.</p>
+      <p>Apart from the geomap widget, jQuery Geo comes bundled with functions to perform various operations on bounding boxes (a.k.a, bbox, the rectangle surrounding any geometry) and the geometries themselves. These functions (and two objects: <a href="#wkt">WKT</a> &amp; <a href="#proj">proj</a>) are all contained in the $.geo namespace.</p>
 
       <h2>geometry operations</h2>
       <p>Geometry isn't much fun if you can't do anything with it. These functions help you analyze and manipulate bounding boxes and GeoJSON geometry objects. You call them directly from the $.geo namespace, e.g.,:</p>
 
-      <pre><code>$.geo.distance( point1, point2 )</code></pre>
+      <pre>$.geo.distance( point1, point2 )</pre>
 
       <p>Except for a few name changes and switching from an object-oriented API to a function-based one, jQuery Geo attempts to follow the names and behavior of the <a href="http://www.vividsolutions.com/jts/jtshome.htm">Java Topology Suite</a> (JTS), which is the de-facto standard for geometry library APIs. JTS itself is an implementation of the <a href="http://www.opengis.org/techno/specs.htm">OGC Simple Features</a> specification but has made design decisions that improve the API for developers. The most notable of which is having Envelope (called bbox in jQuery Geo and GeoJSON) be its own class type.</p>
       <h3>bbox functions</h3>
@@ -39,32 +39,32 @@
         <li>maximum y/latitude</li>
       </ul>
 
-      <ul data-role="listview" data-inset="true">
-        <li><a href="center.html">center</a></li>
-        <li><a href="height.html">height</a></li>
-        <li><a href="width.html">width</a></li>
-        <li><a href="expandBy.html">expandBy</a></li>
-        <li><a href="scaleBy.html">scaleBy</a></li>
-        <li><a href="include.html">include</a></li>
-        <li><a href="reaspect.html">reaspect</a></li>
-        <li><a href="recenter.html">recenter</a></li>
-        <li><a href="polygonize.html">polygonize</a></li>
-      </ul>
+      <div class="list-group">
+        <a class="list-group-item" href="center.html">center</a>
+        <a class="list-group-item" href="height.html">height</a>
+        <a class="list-group-item" href="width.html">width</a>
+        <a class="list-group-item" href="expandBy.html">expandBy</a>
+        <a class="list-group-item" href="scaleBy.html">scaleBy</a>
+        <a class="list-group-item" href="include.html">include</a>
+        <a class="list-group-item" href="reaspect.html">reaspect</a>
+        <a class="list-group-item" href="recenter.html">recenter</a>
+        <a class="list-group-item" href="polygonize.html">polygonize</a>
+      </div>
       <h3>geometry object functions</h3>
 
       <p>These functions operate on <a href="http://geojson.org/geojson-spec.html" rel="external">GeoJSON geometry objects</a>: Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon, and GeometryCollection. They do not operate on Feature or FeatureCollection objects, you have to call these functions on the geometry properties of Feature objects.</p>
 
       <p>The geometry functions allow you to analyze relationships between geometries such as their distance apart as well as obtain information about them such as bounding box and center point, called the centroid. This section will eventually expand to cover all of the important spatial operations available in the <a href="http://www.vividsolutions.com/jts/jtshome.htm">Java Topology Suite</a>.</p>
 
-      <ul data-role="listview" data-inset="true">
-        <li><a href="bbox.html">bbox</a></li>
-        <li><a href="distance.html">distance</a></li>
-        <li><a href="length.html">length</a></li>
-        <li><a href="area.html">area</a></li>
-        <li><a href="contains.html">contains</a></li>
-        <li><a href="centroid.html">centroid</a></li>
-        <li><a href="pointAlong.html">pointAlong</a></li>
-      </ul>
+      <div class="list-group">
+        <a class="list-group-item" href="bbox.html">bbox</a>
+        <a class="list-group-item" href="distance.html">distance</a>
+        <a class="list-group-item" href="length.html">length</a>
+        <a class="list-group-item" href="area.html">area</a>
+        <a class="list-group-item" href="contains.html">contains</a>
+        <a class="list-group-item" href="centroid.html">centroid</a>
+        <a class="list-group-item" href="pointAlong.html">pointAlong</a>
+      </div>
 
       <h2>WKT &amp; proj objects</h2>
 
@@ -76,25 +76,25 @@
 
       <p>While jQuery Geo uses JavaScript objects based on the GeoJSON spec, there are two commonly used formats to actually display those geometry objects as text: <a href="http://geojson.org/geojson-spec.html" rel="external">GeoJSON</a> (i.e., the notation itself) and <a href="http://en.wikipedia.org/wiki/Well-known_text" rel="external">well-known text</a> (WKT). The native JSON object helps you convert between JavaScript objects and GeoJSON. Our $.geo.WKT object helps you convert between JavaScript objects and WKT.</p>
 
-      <ul data-role="listview" data-inset="true">
-        <li><a href="wkt.html">$.geo.WKT</a></li>
-      </ul>
+      <div class="list-group">
+        <a class="list-group-item" href="wkt.html">$.geo.WKT</a>
+      </div>
 
       <h3 id="proj">projection</h3>
 
       <p>The $.geo namespace has a property named proj which is a JavaScript object having four functions: fromGeodetic, fromGeodeticPos, toGeodetic, and toGeodeticPos. These four functions allow all $.geo static bbox/geometry functions, geomap widget properties, geomap widget events &amp; geomap widget methods (collectively referred to as plugin functions from now on) to work in geodetic (lon, lat) coordinates.</p>
 
-      <ul data-role="listview" data-inset="true">
-        <li><a href="proj.html">$.geo.proj</a></li>
-      </ul>
+      <div class="list-group">
+        <a class="list-group-item" href="proj.html">$.geo.proj</a>
+      </div>
     </div> <!-- end of content -->
   </div> <!-- end of page -->
 
 
-  <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
-  <script src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>
-  <script src="../js/script.js"></script>
-  <script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0.0-b2.min.js"></script>
+  <script src="../js/bootstrap.min.js"></script>
+  
 </body>
 </html>
 

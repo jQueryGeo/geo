@@ -11,12 +11,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+  <link rel="stylesheet" href="../css/bootstrap.min.css" /><link rel="stylesheet" href="../css/bootstrap-theme.min.css" />
 </head>
 
 <body>
 
-  <div id="center" data-role="page">
+  <div id="center" class="container">
     <div data-role="header" data-theme="f">
       <h1>center</h1>
     </div>
@@ -33,15 +33,15 @@
         </tr>
         <tr>
           <th>init</th>
-          <td><code><pre>$( <i>selector</i> ).geomap( { center: [ 0, 0 ] } );</pre></code></td>
+          <td><pre>$( <i>selector</i> ).geomap( { center: [ 0, 0 ] } );</pre></td>
         </tr>
         <tr>
           <th>get</th>
-          <td><code><pre>var center = $( <i>selector</i> ).geomap( &quot;option&quot;, &quot;center&quot; );</pre></code></td>
+          <td><pre>var center = $( <i>selector</i> ).geomap( &quot;option&quot;, &quot;center&quot; );</pre></td>
         </tr>
         <tr>
           <th>set</th>
-          <td><code><pre>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;center&quot;, [ -71.037598, 42.363281 ] );</pre></code></td>
+          <td><pre>$( <i>selector</i> ).geomap( &quot;option&quot;, &quot;center&quot;, [ -71.037598, 42.363281 ] );</pre></td>
         </tr>
       </table>
       <p>The center property gets or sets the center point of the map. By default the value is in geodetic coordinates, e.g., longitude, latitude. You can change the default when you initialize the widget by passing projected coordinates as the center option.</p>
@@ -50,10 +50,10 @@
     </div>
   </div> <!-- end of #container -->
 
-  <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
-  <script src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>
-  <script src="../js/script.js"></script>
-  <script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0.0-b2.min.js"></script>
+  <script src="../js/bootstrap.min.js"></script>
+  
 </body>
 </html>
 

@@ -11,12 +11,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+  <link rel="stylesheet" href="../css/bootstrap.min.css" /><link rel="stylesheet" href="../css/bootstrap-theme.min.css" />
 </head>
 
 <body>
 
-  <div id="reaspect" data-role="page">
+  <div id="reaspect" class="container">
     <div data-role="header" data-theme="b">
       <h1>reaspect</h1>
     </div>
@@ -33,7 +33,7 @@
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>var widescreenBbox = $.geo.reaspect( bbox, 16 / 9 )</pre></code></td>
+          <td><pre>var widescreenBbox = $.geo.reaspect( bbox, 16 / 9 )</pre></td>
         </tr>
       </table>
       <p>The reaspect method creates a new bbox with the same center as the original but forcing the ratio of width to height to a specific value.</p>
@@ -42,10 +42,10 @@
     </div>
   </div> <!-- end of #container -->
 
-  <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
-  <script src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>
-  <script src="../js/script.js"></script>
-  <script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0.0-b2.min.js"></script>
+  <script src="../js/bootstrap.min.js"></script>
+  
 </body>
 </html>
 

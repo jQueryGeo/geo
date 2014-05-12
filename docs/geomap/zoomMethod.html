@@ -11,12 +11,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="../css/style.css?v=2">
-  <link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
+  <link rel="stylesheet" href="../css/bootstrap.min.css" /><link rel="stylesheet" href="../css/bootstrap-theme.min.css" />
 </head>
 
 <body>
 
-  <div id="zoomMethod" data-role="page">
+  <div id="zoomMethod" class="container">
     <div data-role="header" data-theme="e">
       <h1>zoom</h1>
     </div>
@@ -33,28 +33,28 @@
         </tr>
         <tr>
           <th>usage</th>
-          <td><pre><code>$(&quot;#map&quot;).geomap( &quot;zoom&quot;, 1 )
-$(&quot;#map&quot;).geomap( &quot;zoom&quot;, -2 )</code></pre></td>
+          <td><pre>$(&quot;#map&quot;).geomap( &quot;zoom&quot;, 1 )
+$(&quot;#map&quot;).geomap( &quot;zoom&quot;, -2 )</pre></td>
         </tr>
       </table>
       <p>The zoom method can zoom the map in or out by a given number of zoom levels. Positive values zoom the map in, negative values zoom the map out.</p>
       <p>This method will not zoom out beyond zoom level 0. If you are using a tiling scheme, this method will not zoom in past the maximum number of zoom levels defined in the tilingScheme property.</p>
       <p>This method accepts values <b>relative</b> to the map's current zoom level. This is different than the zoom property, which <b>is</b> the map's current zoom level.
         It might be useful to add an explicit plus sign when using this zoom method.</p>
-      <pre><code>// set the map to zoom level 2
+      <pre>// set the map to zoom level 2
 $(&quot;#map&quot;).geomap( &quot;option&quot;, &quot;zoom&quot;, 2 );
 
 // zoom the map in 2 levels from its current zoom
-$(&quot;#map&quot;).geomap( &quot;zoom&quot;, +2 );</code></pre>
+$(&quot;#map&quot;).geomap( &quot;zoom&quot;, +2 );</pre>
       <p>This method does not trigger events, not even bboxchange.</p>
       <p>There is no default value. Passing null or undefined will not change the map's zoom.</p>
     </div>
   </div> <!-- end of #container -->
 
-  <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
-  <script src="http://code.jquerygeo.com/jquery.geo-1.0b1.min.js"></script>
-  <script src="../js/script.js"></script>
-  <script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
+  <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="http://code.jquerygeo.com/jquery.geo-1.0.0-b2.min.js"></script>
+  <script src="../js/bootstrap.min.js"></script>
+  
 </body>
 </html>
 
