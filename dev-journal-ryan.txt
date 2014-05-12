@@ -317,6 +317,12 @@ Actually finishing these up. And...of course, found a bug.
 
 Whelp, all the examples are on jsbin, now what? :)
 
+===MapGeo===
+No more jQuery Geo in MapGeo, I guess :'(
+
+===Twheat===
+Also, Twheat is broken. I really need to add jQuery BBQ so that I don't have to refresh the page everytime someone zooms in.
+
 ==2014-03-29==
 ===disease===
 Rogers' disease map is online & looks good. He sent me a screenshot a while ago. I need to add that to the showcase.
