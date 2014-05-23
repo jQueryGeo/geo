@@ -311,6 +311,17 @@ Disease map
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2014-05-23==
+===disease===
+Also no longer using jQuery Geo I think. Rogers switched to Google.
+
+===boost===
+Hmm, there's a geomety library in boost c++.
+
+http://www.boost.org/doc/libs/1_55_0/libs/geometry/doc/html/index.html
+
+It follows the OGC Simple Features spec.
+
 ==2014-05-11==
 ===examples===
 Actually finishing these up. And...of course, found a bug.
@@ -318,7 +329,7 @@ Actually finishing these up. And...of course, found a bug.
 Whelp, all the examples are on jsbin, now what? :)
 
 ===MapGeo===
-No more jQuery Geo in MapGeo, I guess :'(
+No more jQuery Geo in MapGeo, I guess :'( They switched to leaflet.
 
 ===Twheat===
 Also, Twheat is broken. I really need to add jQuery BBQ so that I don't have to refresh the page everytime someone zooms in.
