@@ -1,6 +1,6 @@
-/*! jQuery Geo - v1.0.0-b2 - 2013-10-04
+/*! jQuery Geo - v1.0.0-test - 2014-06-03
 * http://jquerygeo.com
-* Copyright (c) 2013 Ryan Westphal; Licensed MIT */
+* Copyright (c) 2014 Ryan Westphal; Licensed MIT */
 // Copyright 2006 Google Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -6798,11 +6798,11 @@ $.Widget.prototype = {
               loadImageDeferredDone = function( url ) {
                 // when a Deferred call is done, add the image to the map
                 // a reference to the correct img element is on the Deferred object itself
-                serviceObj._loadImage( $.data( this, "img" ), url, pixelSize, map, serviceState, opacity );
+                serviceObj._loadImage( this.img, url, pixelSize, map, serviceState, opacity );
               },
 
               loadImageDeferredFail = function( ) {
-                $.data( this, "img" ).remove( );
+                delete this.img;
                 serviceState.loadCount--;
                 map._requestComplete();
               };
@@ -6899,9 +6899,9 @@ $.Widget.prototype = {
 
                 if ( typeof imageUrl === "string" ) {
                   serviceObj._loadImage( $img, imageUrl, pixelSize, map, serviceState, opacity );
-                } else if ( imageUrl ) {
+                } else if ( imageUrl && $.isFunction( imageUrl.promise ) ) {
                   // assume Deferred
-                  $.data( imageUrl, "img", $img );
+                  $.extend( imageUrl.promise( ), { img: $img } );
                   imageUrl.done( loadImageDeferredDone ).fail( loadImageDeferredFail );
                 } else {
                   $img.remove( );
