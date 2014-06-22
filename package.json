@@ -29,8 +29,8 @@
     "jquery": "~1.9"
   },
   "devDependencies": {
-    "jquery": "~1.9",
-    "grunt": "~0.4.1"
+    "grunt": "^0.4.5",
+    "jquery": "~1.9"
   },
   "keywords": [
     "geo",
