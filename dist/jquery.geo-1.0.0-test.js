@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0.0-test - 2014-06-03
+/*! jQuery Geo - v1.0.0-test - 2014-07-02
 * http://jquerygeo.com
 * Copyright (c) 2014 Ryan Westphal; Licensed MIT */
 // Copyright 2006 Google Inc.
@@ -6932,6 +6932,12 @@ $.Widget.prototype = {
         var serviceState = $.data( service, "geoServiceState" );
 
         if (serviceState && serviceState.loadCount > 0) {
+          if ( window.stop !== undefined ) {
+            window.stop();
+          } else if( document.execCommand !== undefined ) {
+            document.execCommand("Stop", false);
+          }
+
           serviceState.serviceContainer.find("img:hidden").remove();
           while (serviceState.loadCount > 0) {
             serviceState.loadCount--;
