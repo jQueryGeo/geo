@@ -1219,8 +1219,12 @@
     _getZoomCenterAndSize: function ( anchor, zoomDelta, full ) {
       var zoomFactor = ( full ? this._fullZoomFactor : this._partialZoomFactor ),
           scale = Math.pow( zoomFactor, -zoomDelta ),
-          pixelSize = this._pixelSizeInteractive * scale,
-          zoom = this._getZoom(this._centerInteractive, pixelSize);
+          pixelSize = this._pixelSizeInteractive * scale;
+
+      // clamp to min/max pixelSize
+      pixelSize = Math.min( Math.max( pixelSize, this._pixelSizeMin ), this._pixelSizeMax );
+
+      var zoom = this._getZoom(this._centerInteractive, pixelSize);
 
       // clamp to zoom
       if ( full && this._options[ "tilingScheme" ] ) {

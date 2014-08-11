@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0.0-test - 2014-07-02
+/*! jQuery Geo - v1.0.0-test - 2014-08-11
 * http://jquerygeo.com
 * Copyright (c) 2014 Ryan Westphal; Licensed MIT */
 // Copyright 2006 Google Inc.
@@ -4514,6 +4514,7 @@ $.Widget.prototype = {
     _pixelSize: undefined,
     _centerMax: undefined,
     _pixelSizeMax: undefined,
+    _pixelSizeMin: undefined,
 
     _userGeodetic: true,
 
@@ -4612,6 +4613,7 @@ $.Widget.prototype = {
       this._centerInteractive = [ 0, 0 ];
 
       this.options["pixelSize"] = this._pixelSize = this._pixelSizeMax = 156543.03392799936;
+      this._pixelSizeMin = this._pixelSizeMax / Math.pow( 2, 17 );
 
       this._mouseDown =
           this._inOp =
@@ -4869,6 +4871,7 @@ $.Widget.prototype = {
         case "tilingScheme":
           if ( value !== null ) {
             this._pixelSizeMax = this._getPixelSize( 0 );
+            this._pixelSizeMin = this._getPixelSize( value.pixelSizes ? value.pixelSizes.length - 1 : value.levels - 1 );
             this._centerMax = [
               value.origin[ 0 ] + this._pixelSizeMax * value.tileWidth / 2,
               value.origin[ 1 ] + this._pixelSizeMax * value.tileHeight / 2
@@ -4885,6 +4888,7 @@ $.Widget.prototype = {
 
           this._centerMax = $.geo.center( bbox );
           this._pixelSizeMax = Math.max( $.geo.width( bbox, true ) / this._contentBounds.width, $.geo.height( bbox, true ) / this._contentBounds.height );
+          this._pixelSizeMin = 1;
           break;
 
         case "services":
@@ -5634,8 +5638,12 @@ $.Widget.prototype = {
     _getZoomCenterAndSize: function ( anchor, zoomDelta, full ) {
       var zoomFactor = ( full ? this._fullZoomFactor : this._partialZoomFactor ),
           scale = Math.pow( zoomFactor, -zoomDelta ),
-          pixelSize = this._pixelSizeInteractive * scale,
-          zoom = this._getZoom(this._centerInteractive, pixelSize);
+          pixelSize = this._pixelSizeInteractive * scale;
+
+      // clamp to min/max pixelSize
+      pixelSize = Math.min( Math.max( pixelSize, this._pixelSizeMin ), this._pixelSizeMax );
+
+      var zoom = this._getZoom(this._centerInteractive, pixelSize);
 
       // clamp to zoom
       if ( full && this._options[ "tilingScheme" ] ) {
