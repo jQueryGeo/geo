@@ -1402,9 +1402,10 @@
         }
       }
 
-      this._center[ 0 ] = center[ 0 ];
-      this._center[ 1 ] = center[ 1 ];
       this._options["pixelSize"] = this._pixelSize = pixelSize;
+
+      this._centerInteractive[ 0 ] = this._center[ 0 ] = center[ 0 ];
+      this._centerInteractive[ 1 ] = this._center[ 1 ] = center[ 1 ];
 
       if ( this._userGeodetic ) {
         this._options["bbox"] = $.geo.proj.toGeodetic( this._getBbox() );
@@ -1412,6 +1413,11 @@
       } else {
         this._options["bbox"] = this._getBbox();
         this._options["center"] = $.merge( [ ], center );
+      }
+
+      if ( this._created ) {
+        // one last interactiveTransform to put pinched map into place
+        this._interactiveTransform( );
       }
 
       this._options["zoom"] = zoom;

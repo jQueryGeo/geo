@@ -125,6 +125,7 @@ Unless you have downloaded a tagged release, grunt will create a test version of
 * geomap - [bug] sometimes interaction with other elements doesn't work right on a page with a map
 * geographics - don't empty labels on map interaction
 * geomap - allow label links to be clicked
+* geomap - [bug] map doesn't refresh to correct pixelSize after pinch zoom that doesn't break zoom level boundaries
 
 ### 1.0b1.1 (2012-08-24)
 * geomap - [bug] shingled deferred services lose img elements when changing scales slowly

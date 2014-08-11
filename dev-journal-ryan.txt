@@ -317,12 +317,18 @@ So, for the longest time, I hadn't had the latest build of b2 out on the CDN and
 
 It's updated as of two months ago but...sheesh.
 
-===apple zooming===
+===pinch zooming===
 iPads & new mac trackpads (maybe it's just he latest OSX?) overstep the interactive zoom max & min zoom and make things mostly unusable. This needs to be fixes & should be simpler than the graphics blitting/timing issue.
 
 This is GitHub issue #123 BTW: https://github.com/AppGeo/geo/issues/123
 
 I think I got it. I'm tracking pixelSizeMin & clamping pixelSize to min/max before clamping to requested zoom level.
+
+Well, I got it for pinch zooms. I'm not sure if there's something else wrong with the trackpads.
+
+There's still a slightly different issue when you pinch zoom but don't break zoom level boundaries.
+
+Fixed that, too!
 
 ==2014-05-23==
 ===disease===
