@@ -112,6 +112,7 @@ Unless you have downloaded a tagged release, grunt will create a test version of
 * geomap - [bug] leaving the map page and then going 'back' in the browser does not refresh shape only maps
 * geomap - [bug] zoom on shingled graphics service briefly renders wrong shapes
 * geomap - [bug] links in labels can't be clicked with doubleBuffer canvas
+* geomap - [bug] #123 browsers can pinch past min/max zoom levels
 
 ### 1.0.0-b1.5 (2013-01-17)
 * examples - drawing markers
