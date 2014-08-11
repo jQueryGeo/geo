@@ -95,6 +95,7 @@
     _pixelSize: undefined,
     _centerMax: undefined,
     _pixelSizeMax: undefined,
+    _pixelSizeMin: undefined,
 
     _userGeodetic: true,
 
@@ -193,6 +194,7 @@
       this._centerInteractive = [ 0, 0 ];
 
       this.options["pixelSize"] = this._pixelSize = this._pixelSizeMax = 156543.03392799936;
+      this._pixelSizeMin = this._pixelSizeMax / Math.pow( 2, 17 );
 
       this._mouseDown =
           this._inOp =
@@ -450,6 +452,7 @@
         case "tilingScheme":
           if ( value !== null ) {
             this._pixelSizeMax = this._getPixelSize( 0 );
+            this._pixelSizeMin = this._getPixelSize( value.pixelSizes ? value.pixelSizes.length - 1 : value.levels - 1 );
             this._centerMax = [
               value.origin[ 0 ] + this._pixelSizeMax * value.tileWidth / 2,
               value.origin[ 1 ] + this._pixelSizeMax * value.tileHeight / 2
@@ -466,6 +469,7 @@
 
           this._centerMax = $.geo.center( bbox );
           this._pixelSizeMax = Math.max( $.geo.width( bbox, true ) / this._contentBounds.width, $.geo.height( bbox, true ) / this._contentBounds.height );
+          this._pixelSizeMin = 1;
           break;
 
         case "services":
