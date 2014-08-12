@@ -40,9 +40,9 @@
               "class": "osm",
               type: "tiled",
               src: function (view) {
-                return "http://otile" + ((view.index % 4) + 1) + ".mqcdn.com/tiles/1.0.0/osm/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
+                return "//otile" + ((view.index % 4) + 1) + ((location.protocol === 'https:') ? "-s" : "") + ".mqcdn.com/tiles/1.0.0/osm/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
               },
-              attr: "Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='http://developer.mapquest.com/content/osm/mq_logo.png'>"
+              attr: "Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='//developer.mapquest.com/content/osm/mq_logo.png'>"
             }
           ],
         tilingScheme: {
