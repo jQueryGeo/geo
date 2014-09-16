@@ -84,7 +84,6 @@ Unless you have downloaded a tagged release, grunt will create a test version of
 ## Release History
 
 ### 1.0.0-b2
-* geographics - [bug] 
 * project - update jQuery dependency to 1.9 in package 
 * geomap - [bug] deferred src functions no longer work
 * geomap - [bug] map does not always redraw shapes after interactiveTransform, a pan will fix them
