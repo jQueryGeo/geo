@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0.0-b2 - 2014-08-11
+/*! jQuery Geo - v1.0.0-b2 - 2014-09-16
 * http://jquerygeo.com
 * Copyright (c) 2014 Ryan Westphal; Licensed MIT */
 // Copyright 2006 Google Inc.
@@ -4459,9 +4459,9 @@ $.Widget.prototype = {
               "class": "osm",
               type: "tiled",
               src: function (view) {
-                return "http://otile" + ((view.index % 4) + 1) + ".mqcdn.com/tiles/1.0.0/osm/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
+                return "//otile" + ((view.index % 4) + 1) + ((location.protocol === 'https:') ? "-s" : "") + ".mqcdn.com/tiles/1.0.0/osm/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
               },
-              attr: "Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='http://developer.mapquest.com/content/osm/mq_logo.png'>"
+              attr: "Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='//developer.mapquest.com/content/osm/mq_logo.png'>"
             }
           ],
         tilingScheme: {
@@ -5821,10 +5821,19 @@ $.Widget.prototype = {
         }
       }
 
+      this._centerInteractive[ 0 ] = center[ 0 ];
+      this._centerInteractive[ 1 ] = center[ 1 ];
+
+      if ( this._created ) {
+        // one last interactiveTransform to put pinched map into place
+        this._interactiveTransform( );
+      }
+
       this._options["pixelSize"] = this._pixelSize = pixelSize;
 
-      this._centerInteractive[ 0 ] = this._center[ 0 ] = center[ 0 ];
-      this._centerInteractive[ 1 ] = this._center[ 1 ] = center[ 1 ];
+      this._center[ 0 ] = center[ 0 ];
+      this._center[ 1 ] = center[ 1 ];
+
 
       if ( this._userGeodetic ) {
         this._options["bbox"] = $.geo.proj.toGeodetic( this._getBbox() );
@@ -5832,11 +5841,6 @@ $.Widget.prototype = {
       } else {
         this._options["bbox"] = this._getBbox();
         this._options["center"] = $.merge( [ ], center );
-      }
-
-      if ( this._created ) {
-        // one last interactiveTransform to put pinched map into place
-        this._interactiveTransform( );
       }
 
       this._options["zoom"] = zoom;
