@@ -311,6 +311,12 @@ Disease map
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
 
+==2014-09-16==
+===pinch vs drag===
+I may have found the culprit to that shape ghosting when you move a graphics layer. I was doing an interactiveTransform during setCenter but was doing it with the new "real" center already set. I wonder if pinch zoom still looks ok/is locked to zoom levels.
+
+New code seems to work for both mouse moving, mac trackpads, & pinch zoom.
+
 ==2014-08-11==
 ===no b2===
 So, for the longest time, I hadn't had the latest build of b2 out on the CDN and I was pointing every example in jsbin to it. The latest build was actually test.js.

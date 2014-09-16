@@ -84,6 +84,7 @@ Unless you have downloaded a tagged release, grunt will create a test version of
 ## Release History
 
 ### 1.0.0-b2
+* geographics - [bug] 
 * project - update jQuery dependency to 1.9 in package 
 * geomap - [bug] deferred src functions no longer work
 * geomap - [bug] map does not always redraw shapes after interactiveTransform, a pan will fix them
@@ -113,6 +114,7 @@ Unless you have downloaded a tagged release, grunt will create a test version of
 * geomap - [bug] zoom on shingled graphics service briefly renders wrong shapes
 * geomap - [bug] links in labels can't be clicked with doubleBuffer canvas
 * geomap - [bug] #123 browsers can pinch past min/max zoom levels
+* geomap - [bug] map doesn't refresh to correct pixelSize after pinch zoom that doesn't break zoom level boundaries
 
 ### 1.0.0-b1.5 (2013-01-17)
 * examples - drawing markers
@@ -125,7 +127,6 @@ Unless you have downloaded a tagged release, grunt will create a test version of
 * geomap - [bug] sometimes interaction with other elements doesn't work right on a page with a map
 * geographics - don't empty labels on map interaction
 * geomap - allow label links to be clicked
-* geomap - [bug] map doesn't refresh to correct pixelSize after pinch zoom that doesn't break zoom level boundaries
 
 ### 1.0b1.1 (2012-08-24)
 * geomap - [bug] shingled deferred services lose img elements when changing scales slowly
