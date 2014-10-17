@@ -310,6 +310,8 @@ Disease map
 * geomap - drawStop
 * geomap - use profiling to improve pan performance
 * geo - potentially add address cracking
+* geomap - navigation timing API to help? http://developer.telerik.com/featured/introduction-navigation-timing-api/
+* geographics - WebGL if available
 
 ==2014-09-16==
 ===pinch vs drag===
