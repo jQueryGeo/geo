@@ -69,7 +69,8 @@ Disease map
 * draw
 
 === future ===
-* bug - [bug] $.distance returns positive value for polygons that intersect
+* geographics - [bug] updating graphics during mouse move events while panning causes graphics to jump after panning has finished
+* geo - [bug] $.distance returns positive value for polygons that intersect
 * geomap - [bug] touchpad zoom not keeping center
 * geographics - [bug] doubleBuffer is choppy
 ** especially noticeable in Firefox
@@ -312,6 +313,12 @@ Disease map
 * geo - potentially add address cracking
 * geomap - navigation timing API to help? http://developer.telerik.com/featured/introduction-navigation-timing-api/
 * geographics - WebGL if available
+
+==2015-02-10==
+===b2===
+I need to release this. Hopefully, as-is will be acceptable.
+
+There's definitly some things that can be improved upon (updating graphics during mouse move events while panning)
 
 ==2014-09-16==
 ===pinch vs drag===

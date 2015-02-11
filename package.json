@@ -2,7 +2,7 @@
   "name": "jquery.geo",
   "title": "jQuery Geo",
   "description": "An interactive mapping widget and geo-spatial API built on open source and open data (*NOT* a wrapper of other APIs, such as Google Maps)",
-  "version": "1.0.0-test",
+  "version": "1.0.0-b2",
   "homepage": "http://jquerygeo.com",
   "docs": "http://docs.jquerygeo.com",
   "demo": "http://docs.jquerygeo.com",
@@ -29,7 +29,12 @@
     "jquery": "~1.9"
   },
   "devDependencies": {
-    "grunt": "^0.4.5",
+    "grunt": "~0.4.5",
+    "grunt-contrib-clean": "~0.4.1",
+    "grunt-contrib-concat": "~0.4.0",
+    "grunt-contrib-uglify": "~0.5.0",
+    "grunt-contrib-qunit": "~0.5.2",
+    "grunt-contrib-jshint": "~0.10.0",
     "jquery": "~1.9"
   },
   "keywords": [

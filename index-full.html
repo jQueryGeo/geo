@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>jQuery Geo</title>
-  <meta name="description" content="jQuery Geo - A spatial mapping plugin for jQuery" />
+  <title>jQuery Geo - JavaScript mapping API</title>
+  <meta name="description" content="jQuery Geo - A JavaScript mapping and spatial API as a jQuery plugin" />
   <meta name="author" content="Ryan Westphal" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/blitzer/jquery-ui.css" />
@@ -129,11 +129,11 @@
   <div class="container">
     <div class="main" role="main">
       <div class="nav project-links">
-        <a href="http://jquerygeo.com/1.0b1/" title="Documentation and demos">Docs &amp; Demos</a>
+        <a href="http://docs.jquerygeo.com" title="Documentation and demos">Docs &amp; Demos</a>
         <a href="https://github.com/AppGeo/geo/" title="Source code on GitHub">GitHub</a>
       </div>
 
-      <h2>jQuery Geo - an interactive mapping plugin</h2>
+      <h2>jQuery Geo - A JavaScript mapping API</h2>
 
       <p>jQuery Geo, an open-source geospatial mapping project from Applied Geographics, provides a streamlined JavaScript API for a large percentage of your online mapping needs. Whether you just want to display a map on a web page as quickly as possible or you are a more advanced GIS user, jQuery Geo can help!</p>
       
@@ -142,12 +142,89 @@
       <h2>Download</h2>
 
       <p>Using jQuery Geo requires adding one element, including one script (apart from jQuery itself) and calling one function. The following copy-and-paste snippet will help you get started.</p>
+
       <pre>&lt;div id=&quot;map&quot; style=&quot;height: 320px;&quot;&gt;&lt;/div&gt;
-&lt;script src=&quot;http://code.jquery.com/jquery-1.8.3.min.js&quot;&gt;&lt;/script&gt;
-&lt;script src=&quot;http://code.jquerygeo.com/jquery.geo-1.0.0-b1.5.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;http://code.jquery.com/jquery-1.9.1.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;http://code.jquerygeo.com/jquery.geo-1.0.0-b2.min.js&quot;&gt;&lt;/script&gt;
 &lt;script&gt;$(function() { $( &quot;#map&quot; ).geomap( ); });&lt;/script&gt;</pre>
 
       <p>code.jquerygeo.com is on the CloudFlare Content Delivery Network (CDN) so our minified, gzipped library will get to your client as fast as possible!</p>
+
+      <h2>Beta 2 released!</h2>
+      <time>2015-02-10</time>
+
+      <p>After almost 150 commits to our first beta and many months of testing &amp; usage, we are happy to announce jQuery Geo 1.0.0 beta 2! This beta was actually built last September but the release has been delayed due to the lead developer's wedding that very month :)</p>
+
+      <h3>Jumpy shapes &amp; zoom levels</h3>
+
+      <p>The area which got the most treatment before this release was shape drawing, specifically when panning or zooming. Releated, pinch-zoom on mobile devices and laptop touchpads have improved for tiled services.</p>
+
+      <h3>jQuery 1.9 required</h3>
+
+      <p>Deferred objects changed in jQuery 1.9 and, instead of continuing to support the older functionality, we're making jQuery 1.9 the required minimum version.</p>
+
+      <h3>No more betas</h3>
+
+      <p>The API hasn't changed much since the last beta a year ago. Our next release will be an RC.</p>
+
+      <h3>Full changelog</h3>
+<pre>* project - update jQuery dependency to 1.9 in package 
+* geomap - [bug] deferred src functions no longer work
+* geomap - [bug] map does not always redraw shapes after interactiveTransform, a pan will fix them
+* docs - geomap - make zoomFactor an init-only public option
+* geomap - make zoomFactor an init-only public, option
+* geomap - support touch/mouse events on hybrid devices
+* docs - geomap - top-level map label links are clickable
+* docs - geomap - click mode
+* geomap - click mode
+* geomap - decrease z-index from attr &amp; shape label links &amp; document how to hide them behind non-map conent
+* geomap - [bug] removing a shape from one service that has been appended to two services causes an error in the second service
+* geographics - [bug] graphics stretch after resize
+* project - upgrade to gruntjs 0.4.1
+* geomap - support Windows 8 Store apps
+* geomap - [bug] #93 mac and some pc touchpads zoom too quickly
+* geomap - [bug] static string urls for service object src do not work with jQuery &gt; 1.7
+* geomap - [bug] append can ignore style
+* geomap - [bug] polygon not displayed when a longitude is -180.0
+* geomap - [bug] can't use $.geo.include with $.geo.proj = null
+* geomap - [bug] exception thrown when appending a labeled shape where centroid cannot be calculated
+* geomap - [bug] labels for non-basic shapes do not show
+* docs - geo - $.geo.WKT object
+* geo - $.geo.WKT object
+* geomap - Chrome - [bug] after remove, shapes are not refreshed
+* geomap - [bug] find method does not work on all Multi* geometries
+* geomap - [bug] leaving the map page and then going 'back' in the browser does not refresh shape only maps
+* geomap - [bug] zoom on shingled graphics service briefly renders wrong shapes
+* geomap - [bug] links in labels can't be clicked with doubleBuffer canvas
+* geomap - [bug] #123 browsers can pinch past min/max zoom levels
+* geomap - [bug] map doesn't refresh to correct pixelSize after pinch zoom that doesn't break zoom level boundaries</pre>
+
+      <h2>Beta 1.5 released!</h2>
+      <time>2013-01-17</time>
+
+      <p>This release includes more support for integrating with other elements on the page. There were also improvements with shapes &amp; labels while interacting with the map.</p>
+      
+      <h3>Full changelog</h3>
+
+<pre>* examples - drawing markers
+* geomap - ie8 - [bug] graphics do not resize with window
+* examples - kml points
+* docs - geomap - default action for shift option should be dragBox in dragBox mode
+* geomap - default action for shift option should be dragBox in dragBox mode
+* geomap - don't empty graphics on map interaction
+* geographics - build labels in background, replace html once
+* geomap - [bug] sometimes interaction with other elements doesn't work right on a page with a map
+* geographics - don't empty labels on map interaction
+* geomap - allow label links to be clicked</pre>
+      
+      <h2>Beta 1.1 released!</h2>
+      <time>2012-08-24</time>
+
+      <p>This was a silent release, the JavaScript files on code.jquerygeo.com were replace with a few important bug fixes.</p>
+
+<pre>* geomap - [bug] shingled deferred services lose img elements when changing scales slowly
+* geomap - [bug] shapes don't render on smaller windows when zoomed in
+* geomap - [bug] changing the zoom &amp; center options at the same time does not zoom to the correct location</pre>
 
       <h2>Beta 1 released!</h2>
       <time>2012-07-30</time>
@@ -196,7 +273,7 @@
 
       <p>Here's the full changelog:</p>
 
-      <pre>* geographics - use canvas compositing for Polygons with holes
+<pre>* geographics - use canvas compositing for Polygons with holes
 * geographics - [bug] on polygons with holes, stroke draws a line from exterior ring to interior one
 * docs - geomap - trigger a shape event when a user finishes measuring
 * geomap - trigger a shape event when a user finishes measuring
@@ -435,7 +512,7 @@
 
       <h2>Edge</h2>
       <p>The links above will always point to the latest stable release. However, you can test the most recently committed docs, code &amp; demos by heading over to the test release.</p>
-      <a data-role="button" href="http://jquerygeo.com/test/" title="jQuery Geo test build">Test docs &amp; demos</a>
+      <a data-role="button" href="http://test.jquerygeo.com" title="jQuery Geo test build">Test docs &amp; demos</a>
 
       <h2>Thanks!</h2>
 
