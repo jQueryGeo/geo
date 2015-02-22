@@ -1,0 +1,28 @@
+RewriteEngine On
+
+RewriteCond %{REQUEST_URI} utah
+RewriteRule ^(.*)$ http://utah.jquerygeo.com
+
+RewriteCond %{REQUEST_URI} 1.0a3/examples
+RewriteRule ^(.*)$ http://docs.jquerygeo.com
+
+RewriteCond %{REQUEST_URI} 1.0a3
+RewriteRule ^1.0a3/(.*)$ http://docs.jquerygeo.com/$1
+
+RewriteCond %{REQUEST_URI} 1.0a4/examples
+RewriteRule ^(.*)$ http://docs.jquerygeo.com
+
+RewriteCond %{REQUEST_URI} 1.0a4
+RewriteRule ^1.0a4/(.*)$ http://docs.jquerygeo.com/$1
+
+RewriteCond %{REQUEST_URI} 1.0b1/examples
+RewriteRule ^(.*)$ http://docs.jquerygeo.com
+
+RewriteCond %{REQUEST_URI} 1.0b1
+RewriteRule ^1.0b1/(.*)$ http://docs.jquerygeo.com/$1
+
+RewriteCond %{REQUEST_URI} test/examples
+RewriteRule ^(.*)$ http://test.jquerygeo.com
+
+RewriteCond %{REQUEST_URI} test
+RewriteRule ^test/(.*)$ http://test.jquerygeo.com/$1
