@@ -8,7 +8,7 @@ Using jQuery Geo requires adding one element, including one script (apart from j
 ```html
 <div id="map" style="height: 320px;"></div>
 <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-<script src="http://code.jquerygeo.com/jquery.geo-1.0.0-b1.5.min.js"></script>
+<script src="http://code.jquerygeo.com/jquery.geo-1.0.0-b2.min.js"></script>
 <script>
   $(function() {
     $( "#map" ).geomap( ); // you've got a map!
@@ -18,8 +18,8 @@ Using jQuery Geo requires adding one element, including one script (apart from j
 
 You can also download the latest release as a [minified JavaScript file][min] or a [full, uncompressed one][max].
 
-[min]: http://code.jquerygeo.com/jquery.geo-1.0.0-b1.5.min.js
-[max]: http://code.jquerygeo.com/jquery.geo-1.0.0-b1.5.js
+[min]: http://code.jquerygeo.com/jquery.geo-1.0.0-b2.min.js
+[max]: http://code.jquerygeo.com/jquery.geo-1.0.0-b2.js
 
 ## Documentation
 The latest docs are hosted at: http://docs.jquerygeo.com
@@ -83,7 +83,7 @@ Unless you have downloaded a tagged release, grunt will create a test version of
 
 ## Release History
 
-### 1.0.0-b2
+### 1.0.0-b2 (2015-02-10)
 * project - update jQuery dependency to 1.9 in package 
 * geomap - [bug] deferred src functions no longer work
 * geomap - [bug] map does not always redraw shapes after interactiveTransform, a pan will fix them
