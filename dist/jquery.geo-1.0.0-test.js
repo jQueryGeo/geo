@@ -1,6 +1,6 @@
-/*! jQuery Geo - v1.0.0-test - 2014-09-16
+/*! jQuery Geo - v1.0.0-test - 2015-02-22
 * http://jquerygeo.com
-* Copyright (c) 2014 Ryan Westphal; Licensed MIT */
+* Copyright (c) 2015 Ryan Westphal; Licensed MIT */
 // Copyright 2006 Google Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -5123,6 +5123,10 @@ $.Widget.prototype = {
     },
 
     find: function ( selector, pixelTolerance ) {
+      if ( this._timeoutInteractive ) {
+        return [];
+      }
+
       var isPoint = $.isPlainObject( selector ),
           //searchPixel = isPoint ? this._map.toPixel( selector.coordinates ) : undefined,
           mapTol = this._map._pixelSize * pixelTolerance,

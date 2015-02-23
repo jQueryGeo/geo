@@ -704,6 +704,10 @@
     },
 
     find: function ( selector, pixelTolerance ) {
+      if ( this._timeoutInteractive ) {
+        return [];
+      }
+
       var isPoint = $.isPlainObject( selector ),
           //searchPixel = isPoint ? this._map.toPixel( selector.coordinates ) : undefined,
           mapTol = this._map._pixelSize * pixelTolerance,

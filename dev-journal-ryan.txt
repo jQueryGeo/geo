@@ -314,6 +314,22 @@ Disease map
 * geomap - navigation timing API to help? http://developer.telerik.com/featured/introduction-navigation-timing-api/
 * geographics - WebGL if available
 
+==2015-02-22==
+===rc1===
+Time to work on this, I guess. I'm going to use GitHub for all issues, I think. It's time to finally get things into there from this list.
+
+===nodeName error===
+There's a JavaScript error where clicking on the map return null when we look for A elements. First bug of rc1...nope! jquerygeo.com was still usinb b1.5. Apparently, I fixed this issue in b2 already.
+
+===mousemove after pan===
+The mousemove event is getting the wrong coordinates (or the .find function is searching the wrong spot) because if you move after panning and draw on your move event, shapes can draw even if you're not ohovering over a source shape. Hard to describe, seen IM https://thenetmonitor.org/map
+
+If you pan while not hovering over a country, then move slightly but still not onto a country, a nearby country's highlight shape appears.
+
+It's because there's interactiveTimeout...but find gets called before the timeout completes...I think.
+
+Return an empty array while in interactiveTimeout! First fix of rc1!
+
 ==2015-02-10==
 ===b2===
 I need to release this. Hopefully, as-is will be acceptable.
