@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0.0-test - 2015-02-22
+/*! jQuery Geo - v1.0.0-test - 2015-02-25
 * http://jquerygeo.com
 * Copyright (c) 2015 Ryan Westphal; Licensed MIT */
 // Copyright 2006 Google Inc.
@@ -4094,6 +4094,7 @@ $.Widget.prototype = {
         }
 
         style = this._getGraphicStyle(style);
+        this._blitcontext.globalCompositeOperation = "copy";
 
         var pixelBbox, i, j;
 
@@ -4106,16 +4107,20 @@ $.Widget.prototype = {
               this._blitcontext.globalCompositeOperation = "source-out";
               this._blitcontext.globalAlpha = 1;
 
+              this._blitcontext.beginPath();
+
               for ( i = 1; i < coordinates.length; i++ ) {
-                this._blitcontext.beginPath();
+                // start drawing inner rings, i
                 this._blitcontext.moveTo( coordinates[ i ][ 0 ][ 0 ], coordinates[ i ][ 0 ][ 1 ] );
-                for ( j = 1; j < coordinates[ i ].length; j++ ) {
+
+                for ( j = 0; j < coordinates[ i ].length; j++ ) {
                   this._blitcontext.lineTo( coordinates[ i ][ j ][ 0 ], coordinates[ i ][ j ][ 1 ] );
                 }
-                this._blitcontext.closePath();
-
-                this._blitcontext.fill( );
               }
+
+              this._blitcontext.closePath();
+
+              this._blitcontext.fill( );
             }
           }
 
@@ -4136,7 +4141,6 @@ $.Widget.prototype = {
 
           this._blitcontext.closePath();
 
-          this._blitcontext.globalCompositeOperation = "source-out";
           if ( style.doFill ) {
             // fill outer ring
             this._blitcontext.fillStyle = style.fill;
