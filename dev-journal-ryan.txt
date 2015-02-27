@@ -314,6 +314,12 @@ Disease map
 * geomap - navigation timing API to help? http://developer.telerik.com/featured/introduction-navigation-timing-api/
 * geographics - WebGL if available
 
+==2015-02-26==
+===rc1===
+Two bugs in b2 fixed already! I got an issue on GitHub that our rendering of polygons with multiple holes wasn't right (filling all but the last hole). Turns out, I just needed to stencil all holes in one stroke.
+
+Only two broken examples & it's because of missing source data, not jQuery Geo.
+
 ==2015-02-22==
 ===rc1===
 Time to work on this, I guess. I'm going to use GitHub for all issues, I think. It's time to finally get things into there from this list.
