@@ -132,6 +132,7 @@
     _velocity: undefined,
     _friction: undefined,
 
+    _pointerEvents: undefined,
     _supportTouch: undefined,
     _softDblClick: undefined,
     _isTap: undefined,
@@ -169,7 +170,8 @@
       this._tmplAreaId = "geoMeasureArea" + this._widgetId;
 
       this._$elem.addClass("geo-map").css( {
-        webkitTransform: "translateZ(0)"
+        webkitTransform: "translateZ(0)",
+        touchAction: 'none'
       } );
         
 
@@ -235,13 +237,17 @@
 
       this._map = this;
 
-      this._supportTouch = "ontouchend" in document;
+      this._pointerEvents = window.PointerEvent;
+      if ( this._pointerEvents ) {
+        console.log( 'pointer events!' );
+      }
+      this._supportTouch = ("ontouchend" in document);
       this._softDblClick = this._supportTouch || _ieVersion === 7;
 
       var geomap = this,
-          touchStartEvent = this._supportTouch ? "touchstart mousedown" : "mousedown",
-          touchStopEvent = this._supportTouch ? "touchend touchcancel mouseup" : "mouseup",
-          touchMoveEvent = this._supportTouch ? "touchmove mousemove" : "mousemove";
+          touchStartEvent = this._pointerEvents ? 'pointerdown' : ( this._supportTouch ? "touchstart mousedown" : "mousedown" ),
+          touchStopEvent = this._pointerEvents ? 'pointerup' : ( this._supportTouch ? "touchend touchcancel mouseup" : "mouseup" ),
+          touchMoveEvent = this._pointerEvents ? 'pointermove' : ( this._supportTouch ? "touchmove mousemove" : "mousemove" );
 
       $(document).keydown($.proxy(this._document_keydown, this));
 
@@ -1594,6 +1600,11 @@
         return;
       }
 
+      if ( this._pointerEvents ) {
+        console.log( 'PointerEvent dblclick' );
+        return false;
+      }
+
       if (this._drawTimeout) {
         window.clearTimeout(this._drawTimeout);
         this._drawTimeout = null;
@@ -1655,6 +1666,11 @@
 
       if ( mode === "static" ) {
         return;
+      }
+
+      if ( this._pointerEvents ) {
+        console.log( 'PointerEvent touchstart' );
+        return false;
       }
 
       if ( !this._supportTouch && e.which !== 1 ) {
@@ -1752,6 +1768,11 @@
     _dragTarget_touchmove: function (e) {
       if ( this._options[ "mode" ] === "static" ) {
         return;
+      }
+
+      if ( this._pointerEvents ) {
+        console.log( 'PointerEvent touchmove' );
+        return false;
       }
 
       var doInteractiveTimeout = false;
@@ -1958,6 +1979,11 @@
     _dragTarget_touchstop: function (e) {
       if ( this._options[ "mode" ] === "static" ) {
         return;
+      }
+
+      if ( this._pointerEvents ) {
+        console.log( 'PointerEvent touchstop' );
+        return false;
       }
 
       if ( !this._mouseDown ) {

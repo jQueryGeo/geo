@@ -315,6 +315,13 @@ Disease map
 * geographics - WebGL if available
 
 ==2015-02-26==
+===b3===
+I'm going to wait on calling the next release rc1, I want a couple new features so that's still beta.
+
+===pointer events===
+This is going to be tricky. There's going to be a lot of code duplication initially, unless I want to switch completely over to hand.js, which I don't want to do. The point is that pointer events replace both touch events and mouse events, code which already exists in jQuery Geo. So, initially, there are going to be two separate tracts.
+
+==2015-02-26==
 ===rc1===
 Two bugs in b2 fixed already! I got an issue on GitHub that our rendering of polygons with multiple holes wasn't right (filling all but the last hole). Turns out, I just needed to stencil all holes in one stroke.
 
