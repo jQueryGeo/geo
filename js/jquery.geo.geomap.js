@@ -600,7 +600,7 @@
         this._$elem.closest( ".geo-map" ).geomap( "refresh", force, this._$elem );
       } else {
         this._refresh( force, _serviceContainer );
-        this._refreshAllShapes( );
+        this._refreshAllShapes( _serviceContainer );
       }
     },
 
@@ -1073,7 +1073,7 @@
       this._$measureLabel.hide();
     },
 
-    _refreshAllShapes: function ( ) {
+    _refreshAllShapes: function ( _serviceContainer ) {
       this._timeoutRefreshShapes = null;
 
       var service,
@@ -1082,17 +1082,20 @@
 
       for ( ; i < this._currentServices.length; i++ ) {
         service = this._currentServices[ i ];
-        geoService = service.serviceContainer.data( "geoService" );
 
-        if ( geoService._createdGraphics ) {
-          geoService._$shapesContainer.geographics( "clear" );
-          if ( geoService._graphicShapes.length > 0 ) {
-            geoService._refreshShapes( geoService._$shapesContainer, geoService._graphicShapes, geoService._graphicShapes, geoService._graphicShapes );
+        if ( !_serviceContainer || service.serviceContainer[ 0 ] === _serviceContainer[ 0 ] ) {
+          geoService = service.serviceContainer.data( "geoService" );
+
+          if ( geoService._createdGraphics ) {
+            geoService._$shapesContainer.geographics( "clear" );
+            if ( geoService._graphicShapes.length > 0 ) {
+              geoService._refreshShapes( geoService._$shapesContainer, geoService._graphicShapes, geoService._graphicShapes, geoService._graphicShapes );
+            }
           }
         }
       }
 
-      if ( this._createdGraphics ) {
+      if ( this._createdGraphics && !_serviceContainer ) {
         this._$shapesContainer.geographics( "clear" );
         if ( this._graphicShapes.length > 0 ) {
           this._refreshShapes( this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes );
