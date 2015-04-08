@@ -596,11 +596,13 @@
     },
 
     refresh: function ( force, _serviceContainer ) {
-      if ( this._$elem.is( ".geo-service" ) ) {
-        this._$elem.closest( ".geo-map" ).geomap( "refresh", force, this._$elem );
-      } else {
-        this._refresh( force, _serviceContainer );
-        this._refreshAllShapes( _serviceContainer );
+      if ( !this._panning ) {
+        if ( this._$elem.is( ".geo-service" ) ) {
+          this._$elem.closest( ".geo-map" ).geomap( "refresh", force, this._$elem );
+        } else {
+          this._refresh( force, _serviceContainer );
+          this._refreshAllShapes( _serviceContainer );
+        }
       }
     },
 
