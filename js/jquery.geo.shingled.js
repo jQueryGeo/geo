@@ -68,7 +68,7 @@
         }
       },
 
-      refresh: function (map, service) {
+      refresh: function (map, service, force) {
         var serviceState = $.data(service, "geoServiceState");
 
         this._cancelUnloaded(map, service);
@@ -91,7 +91,7 @@
 
               $img;
 
-          if (opacity < 1) {
+          if (opacity < 1 || force) {
             serviceContainer.find("img").attr("data-keep-alive", "0");
           }
 
