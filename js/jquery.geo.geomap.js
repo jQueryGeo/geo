@@ -238,9 +238,6 @@
       this._map = this;
 
       this._pointerEvents = window.PointerEvent;
-      if ( this._pointerEvents ) {
-        console.log( 'pointer events!' );
-      }
       this._supportTouch = ("ontouchend" in document);
       this._softDblClick = this._supportTouch || _ieVersion === 7;
 
@@ -1669,7 +1666,7 @@
       }
 
       if ( this._pointerEvents ) {
-        console.log( 'PointerEvent touchstart' );
+        console.log( 'PointerEvent touchstart ' ); // + JSON.stringify( e ) );
         return false;
       }
 
@@ -1771,7 +1768,7 @@
       }
 
       if ( this._pointerEvents ) {
-        console.log( 'PointerEvent touchmove' );
+        console.log( 'PointerEvent touchmove'  ); //+ JSON.stringify( e ) );
         return false;
       }
 
@@ -1982,7 +1979,7 @@
       }
 
       if ( this._pointerEvents ) {
-        console.log( 'PointerEvent touchstop' );
+        console.log( 'PointerEvent touchstop'  ); //+ JSON.stringify( e ) );
         return false;
       }
 
