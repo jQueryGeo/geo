@@ -1,8 +1,6 @@
 ﻿== to do ==
 
 ===bug fixing process===
-insert the following above line 288 in autoload\htmlcomplete.vim:
-let classlines = []
 1. browse to the jQuery Geo release template: http://jsbin.com/uhabox/19/edit
 2. clone it
 3. reproduce bug
@@ -313,6 +311,25 @@ Disease map
 * geo - potentially add address cracking
 * geomap - navigation timing API to help? http://developer.telerik.com/featured/introduction-navigation-timing-api/
 * geographics - WebGL if available
+
+==2015-04-12==
+===questions===
+I got a few questions via email.
+
+1. can I get coords with right click?
+2. after draw a line or polygon can i edit drawn lines or points?
+3. in measureLength how can pass length value on line drawn?
+
+The first one can be done & I made an example. The third one can be done according to the docs but wasn't implemented, except for the very last point (dblclick).
+
+The second one can be currently done only by a lot of code from the developer.
+
+==2015-04-09==
+===perf fixes===
+I found & fixed two peformance issues while working on Curarium. We now ignore refresh calls while panning. Also, refresh on a specific service no longer refreshes the global shapes which means no swapping schenes for no reason.
+
+===pointer events===
+We will have to decide soon to use the jQuery pointer events polyfill ( https://github.com/jquery/PEP ) or do it ourselves. Currently, the thought is to use the polyfill. We can keep the mousewheel plugin, I think.
 
 ==2015-02-26==
 ===b3===

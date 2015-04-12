@@ -2187,18 +2187,22 @@
             if (wasToolPan) {
               this._panFinalize();
             } else {
-              i = (this._drawCoords.length === 0 ? 0 : this._drawCoords.length - 1);
+              this._trigger("click", e, { type: "Point", coordinates: this.toMap(current) });
 
-              this._drawCoords[i] = this._toMap(current);
-              this._drawPixels[i] = current;
+              if (!e.isDefaultPrevented()) {
+                i = (this._drawCoords.length === 0 ? 0 : this._drawCoords.length - 1);
 
-              if (i < 2 || !(this._drawCoords[i][0] === this._drawCoords[i-1][0] &&
-                             this._drawCoords[i][1] === this._drawCoords[i-1][1])) {
-                this._drawCoords[i + 1] = this._toMap( current, this._centerInteractive, this._pixelSizeInteractive );
-                this._drawPixels[i + 1] = current;
+                this._drawCoords[i] = this._toMap(current);
+                this._drawPixels[i] = current;
+
+                if (i < 2 || !(this._drawCoords[i][0] === this._drawCoords[i-1][0] &&
+                               this._drawCoords[i][1] === this._drawCoords[i-1][1])) {
+                  this._drawCoords[i + 1] = this._toMap( current, this._centerInteractive, this._pixelSizeInteractive );
+                  this._drawPixels[i + 1] = current;
+                }
+
+                this._refreshDrawing();
               }
-
-              this._refreshDrawing();
             }
             break;
 
