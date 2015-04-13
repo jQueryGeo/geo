@@ -261,7 +261,10 @@
       <p>In drawLineString mode, the geomap widget triggers the following events on the original map div.</p>
       <ul class="list-group">
         <li class="list-group-item">move &ndash; when the user moves the mouse above the map but is not actively panning, this event triggers even while drawing a shape</li>
-        <li class="list-group-item">click &ndash; when the user clicks or taps a point on the map without initiating a pan, this event triggers even while drawing a shape</li>
+        <li class="list-group-item">
+          <h4 class="list-group-item-heading">click</h4>
+          <p class="list-group-item-text">When the user clicks or taps a point on the map without initiating a pan, this event triggers even while drawing a shape.<br>You can choose to cancel any point while a user is drawing a line by calling e.preventDefault() in your event handler.</p>
+        </li>
         <li class="list-group-item">dblclick &ndash; when the user double-clicks or double-taps a point on the map but is not actively drawing</li>
         <li class="list-group-item">bboxchange &ndash; when the user changes the bbox by panning or zooming</li>
         <li class="list-group-item">shape &ndash; when the user double-clicks or taps a point on the map after beginning a drawing operation with a single click, this action will send a GeoJSON LineString object to the developer</li>
@@ -284,7 +287,10 @@
       <p>In drawPolygon mode, the geomap widget triggers the following events on the original map div.</p>
       <ul class="list-group">
         <li class="list-group-item">move &ndash; when the user moves the mouse above the map but is not actively panning, this event triggers even while drawing a shape</li>
-        <li class="list-group-item">click &ndash; when the user clicks or taps a point on the map without initiating a pan, this event triggers even while drawing a shape</li>
+        <li class="list-group-item">
+          <h4 class="list-group-item-heading">click</h4>
+          <p class="list-group-item-text">When the user clicks or taps a point on the map without initiating a pan, this event triggers even while drawing a shape.<br>You can choose to cancel any point while a user is drawing a line by calling e.preventDefault() in your event handler.</p>
+        </li>
         <li class="list-group-item">dblclick &ndash; when the user double-clicks or double-taps a point on the map but is not actively drawing</li>
         <li class="list-group-item">bboxchange &ndash; when the user changes the bbox by panning or zooming</li>
         <li class="list-group-item">shape &ndash; when the user double-clicks or taps a point on the map after beginning a drawing operation with a single click, this action will send a GeoJSON Polygon object to the developer</li>
@@ -308,7 +314,10 @@
       <p>In measureLength mode, the geomap widget triggers the following events on the original map div.</p>
       <ul class="list-group">
         <li class="list-group-item">move &ndash; when the user moves the mouse above the map but is not actively panning, this event triggers even while measuring</li>
-        <li class="list-group-item">click &ndash; when the user clicks or taps a point on the map without initiating a pan, this event triggers even while measuring</li>
+        <li class="list-group-item">
+          <h4 class="list-group-item-heading">click</h4>
+          <p class="list-group-item-text">When the user clicks or taps a point on the map without initiating a pan, this event triggers even while measuring.<br>You can choose to cancel any point while a user is drawing a line by calling e.preventDefault() in your event handler.</p>
+        </li>
         <li class="list-group-item">dblclick &ndash; when the user double-clicks or double-taps a point on the map but is not actively measuring</li>
         <li class="list-group-item">bboxchange &ndash; when the user changes the bbox by panning or zooming</li>
         <li class="list-group-item">shape &ndash; when the user double-clicks or taps a point on the map after beginning a measure operation with a single click, this action will send a GeoJSON LineString object to the developer</li>
@@ -334,7 +343,10 @@
       <p>In measureArea mode, the geomap widget triggers the following events on the original map div.</p>
       <ul class="list-group">
         <li class="list-group-item">move &ndash; when the user moves the mouse above the map but is not actively panning, this event triggers even while measuring</li>
-        <li class="list-group-item">click &ndash; when the user clicks or taps a point on the map without initiating a pan, this event triggers even while measuring</li>
+        <li class="list-group-item">
+          <h4 class="list-group-item-heading">click</h4>
+          <p class="list-group-item-text">When the user clicks or taps a point on the map without initiating a pan, this event triggers even while measuring.<br>You can choose to cancel any point while a user is drawing a line by calling e.preventDefault() in your event handler.</p>
+        </li>
         <li class="list-group-item">dblclick &ndash; when the user double-clicks or double-taps a point on the map but is not actively measuring</li>
         <li class="list-group-item">bboxchange &ndash; when the user changes the bbox by panning or zooming</li>
         <li class="list-group-item">shape &ndash; when the user double-clicks or taps a point on the map after beginning a measure operation with a single click, this action will send a GeoJSON Polygon object to the developer</li>

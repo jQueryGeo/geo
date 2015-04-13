@@ -320,9 +320,12 @@ I got a few questions via email.
 2. after draw a line or polygon can i edit drawn lines or points?
 3. in measureLength how can pass length value on line drawn?
 
-The first one can be done & I made an example. The third one can be done according to the docs but wasn't implemented, except for the very last point (dblclick).
+The first one can be done & I made an example http://jsbin.com/watayo/1/edit?js%2coutput The third one can be done according to the docs but wasn't implemented, except for the very last point (dblclick). It's fixed in b3 http://jsbin.com/durake/2/edit?html%2cjs%2coutput
 
 The second one can be currently done only by a lot of code from the developer.
+
+===cancel draw/measure points===
+It was in the docs but not implemented. It's now implemented with the extra feature of being able to cancel individual clicks while making a shape or measuring something.
 
 ==2015-04-09==
 ===perf fixes===
