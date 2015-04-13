@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0.0-test - 2015-02-25
+/*! jQuery Geo - v1.0.0-test - 2015-04-12
 * http://jquerygeo.com
 * Copyright (c) 2015 Ryan Westphal; Licensed MIT */
 // Copyright 2006 Google Inc.
@@ -4658,7 +4658,7 @@ $.Widget.prototype = {
 
       this._map = this;
 
-      this._supportTouch = "ontouchend" in document;
+      this._supportTouch = ("ontouchend" in document);
       this._softDblClick = this._supportTouch || _ieVersion === 7;
 
       var geomap = this,
@@ -5013,11 +5013,13 @@ $.Widget.prototype = {
     },
 
     refresh: function ( force, _serviceContainer ) {
-      if ( this._$elem.is( ".geo-service" ) ) {
-        this._$elem.closest( ".geo-map" ).geomap( "refresh", force, this._$elem );
-      } else {
-        this._refresh( force, _serviceContainer );
-        this._refreshAllShapes( );
+      if ( !this._panning ) {
+        if ( this._$elem.is( ".geo-service" ) ) {
+          this._$elem.closest( ".geo-map" ).geomap( "refresh", force, this._$elem );
+        } else {
+          this._refresh( force, _serviceContainer );
+          this._refreshAllShapes( _serviceContainer );
+        }
       }
     },
 
@@ -5490,7 +5492,7 @@ $.Widget.prototype = {
       this._$measureLabel.hide();
     },
 
-    _refreshAllShapes: function ( ) {
+    _refreshAllShapes: function ( _serviceContainer ) {
       this._timeoutRefreshShapes = null;
 
       var service,
@@ -5499,17 +5501,20 @@ $.Widget.prototype = {
 
       for ( ; i < this._currentServices.length; i++ ) {
         service = this._currentServices[ i ];
-        geoService = service.serviceContainer.data( "geoService" );
 
-        if ( geoService._createdGraphics ) {
-          geoService._$shapesContainer.geographics( "clear" );
-          if ( geoService._graphicShapes.length > 0 ) {
-            geoService._refreshShapes( geoService._$shapesContainer, geoService._graphicShapes, geoService._graphicShapes, geoService._graphicShapes );
+        if ( !_serviceContainer || service.serviceContainer[ 0 ] === _serviceContainer[ 0 ] ) {
+          geoService = service.serviceContainer.data( "geoService" );
+
+          if ( geoService._createdGraphics ) {
+            geoService._$shapesContainer.geographics( "clear" );
+            if ( geoService._graphicShapes.length > 0 ) {
+              geoService._refreshShapes( geoService._$shapesContainer, geoService._graphicShapes, geoService._graphicShapes, geoService._graphicShapes );
+            }
           }
         }
       }
 
-      if ( this._createdGraphics ) {
+      if ( this._createdGraphics && !_serviceContainer ) {
         this._$shapesContainer.geographics( "clear" );
         if ( this._graphicShapes.length > 0 ) {
           this._refreshShapes( this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes );
@@ -6605,18 +6610,22 @@ $.Widget.prototype = {
             if (wasToolPan) {
               this._panFinalize();
             } else {
-              i = (this._drawCoords.length === 0 ? 0 : this._drawCoords.length - 1);
+              this._trigger("click", e, { type: "Point", coordinates: this.toMap(current) });
 
-              this._drawCoords[i] = this._toMap(current);
-              this._drawPixels[i] = current;
+              if (!e.isDefaultPrevented()) {
+                i = (this._drawCoords.length === 0 ? 0 : this._drawCoords.length - 1);
 
-              if (i < 2 || !(this._drawCoords[i][0] === this._drawCoords[i-1][0] &&
-                             this._drawCoords[i][1] === this._drawCoords[i-1][1])) {
-                this._drawCoords[i + 1] = this._toMap( current, this._centerInteractive, this._pixelSizeInteractive );
-                this._drawPixels[i + 1] = current;
+                this._drawCoords[i] = this._toMap(current);
+                this._drawPixels[i] = current;
+
+                if (i < 2 || !(this._drawCoords[i][0] === this._drawCoords[i-1][0] &&
+                               this._drawCoords[i][1] === this._drawCoords[i-1][1])) {
+                  this._drawCoords[i + 1] = this._toMap( current, this._centerInteractive, this._pixelSizeInteractive );
+                  this._drawPixels[i + 1] = current;
+                }
+
+                this._refreshDrawing();
               }
-
-              this._refreshDrawing();
             }
             break;
 
@@ -7074,7 +7083,7 @@ $.Widget.prototype = {
         }
       },
 
-      refresh: function (map, service) {
+      refresh: function (map, service, force) {
         var serviceState = $.data(service, "geoServiceState");
 
         this._cancelUnloaded(map, service);
@@ -7097,7 +7106,7 @@ $.Widget.prototype = {
 
               $img;
 
-          if (opacity < 1) {
+          if (opacity < 1 || force) {
             serviceContainer.find("img").attr("data-keep-alive", "0");
           }
 

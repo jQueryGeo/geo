@@ -117,11 +117,35 @@ $( <i>map selector</i> ).geomap( &quot;option&quot;, {
 
       <p>The geo argument to your callback is a true GeoJSON object and you can pass this object directly to the append method. You can also send it directly to a database for storage knowing that there are no non-GeoJSON properties wasting space.</p>
 
-      <div class="list-group" data-inset="true">
+      <p>The following events are position events:</p>
+
+      <div class="list-group">
         <a class="list-group-item" href="geomapmove.html">move</a>
         <a class="list-group-item" href="geomapclick.html">click</a>
         <a class="list-group-item" href="geomapdblclick.html">dblclick</a>
-        </a>
+      </div>
+
+      <h4>Simple modes which trigger position events</h4>
+
+      <p>The following <a href="mode.html">modes</a> will send a position event when a user clicks on the map without triggering other behavior.</p>
+
+      <div class="list-group">
+        <a class="list-group-item" href="mode.html#modePan">pan</a>
+        <a class="list-group-item" href="mode.html#modeZoom">zoom</a>
+        <a class="list-group-item" href="mode.html#modeClick">click</a>
+      </div>
+
+      <h4>Compound modes which trigger position events</h4>
+
+      <p>The following <a href="mode.html">modes</a> will send a position event when a user clicks on the map in the midst of performing a larger action, such as on each click while drawing a line.</p>
+
+      <p>Each click event while drawing &amp; measuring can be cancelled by calling e.preventDefault() in your click handler. This can be useful if, e.g., a user is drawing a polygon but attempts to add a point that's outside of a designated area, you can cancel that specific point being added to the shape and supply a warning.</p>
+
+      <div class="list-group">
+        <a class="list-group-item" href="mode.html#modeDrawLineString">drawLineString</a>
+        <a class="list-group-item" href="mode.html#modeDrawPolygon">drawPolygon</a>
+        <a class="list-group-item" href="mode.html#modeMeasureLength">measureLength</a>
+        <a class="list-group-item" href="mode.html#modeMeasureArea">measureArea</a>
       </div>
 
       <h3>bbox events</h3>
