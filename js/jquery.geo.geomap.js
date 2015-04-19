@@ -1681,22 +1681,44 @@
       if ( this._pointerEvents ) {
         e.currentTarget.setPointerCapture( e.originalEvent.pointerId );
 
-        this._multiTouchAnchor.push( e.originalEvent );
 
-        this._isMultiTouch = this._multiTouchAnchor.length > 1;
 
-        if ( this._isMultiTouch ) {
+
+
+
+
+
+        if ( !this._isMultiTouch && this._mouseDown && this._multiTouchAnchor.length > 0 && e.originalEvent.pointerId !== this._multiTouchAnchor[ 0 ].pointerId ) {
+          // switch to multitouch
+          this._isMultiTouch = true;
+          this._wheelLevel = 0;
+
+          this._multiTouchAnchor.push( e.originalEvent );
+
+
+
+
           this._multiTouchCurrentBbox = [
-            this._multiTouchAnchor[0].pageX - offset.left,
-            this._multiTouchAnchor[0].pageY - offset.top,
+            this._multiTouchCurrentBbox[ 0 ],
+            this._multiTouchCurrentBbox[ 1 ],
             this._multiTouchAnchor[1].pageX - offset.left,
             this._multiTouchAnchor[1].pageY - offset.top
           ];
 
           this._multiTouchAnchorBbox = $.merge( [ ], this._multiTouchCurrentBbox );
 
-          this._current = $.geo.center( this._multiTouchCurrentBbox, true );
+          this._anchor = $.geo.center( this._multiTouchCurrentBbox, true );
+          this._current = $.merge( [], this._anchor );
+
+
+          if ( doInteractiveTimeout ) {
+            this._setInteractiveTimeout( true );
+          }
+
+          return false;
         } else {
+          this._multiTouchAnchor.push( e.originalEvent );
+
           this._multiTouchCurrentBbox = [
             this._multiTouchAnchor[0].pageX - offset.left,
             this._multiTouchAnchor[0].pageY - offset.top,
@@ -1808,36 +1830,6 @@
       if ( this._pointerEvents ) {
 
 
-
-        if ( !this._isMultiTouch && this._mouseDown && this._multiTouchAnchor.length > 0 && e.originalEvent.pointerId !== this._multiTouchAnchor[ 0 ].pointerId ) {
-          // switch to multitouch
-          this._isMultiTouch = true;
-          this._wheelLevel = 0;
-
-          this._multiTouchAnchor.push( e.originalEvent );
-
-
-
-
-          this._multiTouchCurrentBbox = [
-            this._multiTouchCurrentBbox[ 0 ],
-            this._multiTouchCurrentBbox[ 1 ],
-            this._multiTouchAnchor[1].pageX - offset.left,
-            this._multiTouchAnchor[1].pageY - offset.top
-          ];
-
-          this._multiTouchAnchorBbox = $.merge( [ ], this._multiTouchCurrentBbox );
-
-          this._anchor = $.geo.center( this._multiTouchCurrentBbox, true );
-          this._current = $.merge( [], this._anchor );
-
-
-          if ( doInteractiveTimeout ) {
-            this._setInteractiveTimeout( true );
-          }
-
-          return false;
-        }
 
         if ( this._isMultiTouch ) {
 
