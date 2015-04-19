@@ -1867,6 +1867,15 @@
 
           current = $.geo.center( this._multiTouchCurrentBbox, true );
         } else {
+          this._multiTouchAnchor[ 0 ] = e.originalEvent;
+
+          this._multiTouchCurrentBbox = [
+            this._multiTouchAnchor[0].pageX - offset.left,
+            this._multiTouchAnchor[0].pageY - offset.top,
+            NaN,
+            NaN
+          ];
+
           current = [e.originalEvent.pageX - offset.left, e.originalEvent.pageY - offset.top];
         }
       } else if ( this._supportTouch && touches ) {

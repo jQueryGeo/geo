@@ -322,6 +322,8 @@ So close now...the only super noticable bug (apart from a slight general choppin
 
 There's a lot of redundant code here, I hope I can consolidate most of it into one, internal collection of function calls.
 
+It makes sense that pointer events should switch to multitouch on pointerdown (vs. touchmove with touch events), However, the zoom still jumps in IE11 Surface.
+
 ==2015-04-12==
 ===questions===
 I got a few questions via email.
