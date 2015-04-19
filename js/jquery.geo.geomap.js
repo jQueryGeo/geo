@@ -243,7 +243,7 @@
 
       var geomap = this,
           touchStartEvent = this._pointerEvents ? 'pointerdown' : ( this._supportTouch ? "touchstart mousedown" : "mousedown" ),
-          touchStopEvent = this._pointerEvents ? 'pointerup' : ( this._supportTouch ? "touchend touchcancel mouseup" : "mouseup" ),
+          touchStopEvent = this._pointerEvents ? 'pointerup pointercancel' : ( this._supportTouch ? "touchend touchcancel mouseup" : "mouseup" ),
           touchMoveEvent = this._pointerEvents ? 'pointermove' : ( this._supportTouch ? "touchmove mousemove" : "mousemove" );
 
       $(document).keydown($.proxy(this._document_keydown, this));
@@ -1679,6 +1679,8 @@
           touches = e.originalEvent.changedTouches;
 
       if ( this._pointerEvents ) {
+        e.currentTarget.setPointerCapture( e.originalEvent.pointerId );
+
         this._current = [e.pageX - offset.left, e.pageY - offset.top];
       } else if ( this._supportTouch && touches ) {
         this._multiTouchAnchor = $.merge( [ ], touches );
@@ -2015,6 +2017,8 @@
 
       if ( this._pointerEvents ) {
         current = [e.pageX - offset.left, e.pageY - offset.top];
+
+        e.currentTarget.releasePointerCapture( e.originalEvent.pointerId );
       } else if (this._supportTouch && e.originalEvent.changedTouches) {
         current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
         this._multiTouchAnchor = [];
