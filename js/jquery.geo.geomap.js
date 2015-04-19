@@ -1602,11 +1602,6 @@
         return;
       }
 
-      if ( this._pointerEvents ) {
-        console.log( 'PointerEvent dblclick' );
-        return false;
-      }
-
       if (this._drawTimeout) {
         window.clearTimeout(this._drawTimeout);
         this._drawTimeout = null;
