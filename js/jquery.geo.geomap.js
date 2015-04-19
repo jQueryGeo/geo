@@ -238,7 +238,7 @@
       this._map = this;
 
       this._pointerEvents = window.PointerEvent;
-      this._supportTouch = this._pointerEvents || ("ontouchend" in document);
+      this._supportTouch = ("ontouchend" in document);
       this._softDblClick = this._supportTouch || _ieVersion === 7;
 
       var geomap = this,
@@ -1665,12 +1665,12 @@
         return;
       }
 
-      if ( this._pointerEvents ) {
-        console.log( 'PointerEvent touchstart ' ); // + JSON.stringify( e ) );
+      if ( !this._pointerEvents && !this._supportTouch && e.which !== 1 ) {
+        return;
       }
 
-      if ( !this._supportTouch && e.which !== 1 ) {
-        return;
+      if ( this._pointerEvents ) {
+        console.log( 'PointerEvent touchstart' );
       }
 
       var doInteractiveTimeout = this._clearInteractiveTimeout( );
@@ -1678,7 +1678,9 @@
       var offset = $(e.currentTarget).offset(),
           touches = e.originalEvent.changedTouches;
 
-      if ( this._supportTouch && touches ) {
+      if ( this._pointerEvents ) {
+        this._current = [e.pageX - offset.left, e.pageY - offset.top];
+      } else if ( this._supportTouch && touches ) {
         this._multiTouchAnchor = $.merge( [ ], touches );
 
         this._isMultiTouch = this._multiTouchAnchor.length > 1;
@@ -1767,7 +1769,7 @@
       }
 
       if ( this._pointerEvents ) {
-        //console.log( 'PointerEvent touchmove'  ); //+ JSON.stringify( e ) );
+        //console.log( 'PointerEvent touchmove' );
       }
 
       var doInteractiveTimeout = false;
@@ -1781,7 +1783,9 @@
           current,
           i = 0;
 
-      if ( this._supportTouch && touches ) {
+      if ( this._pointerEvents ) {
+        current = [e.pageX - offset.left, e.pageY - offset.top];
+      } else if ( this._supportTouch && touches ) {
         if ( !this._isMultiTouch && this._mouseDown && this._multiTouchAnchor.length > 0 && touches[ 0 ].identifier !== this._multiTouchAnchor[ 0 ].identifier ) {
           // switch to multitouch
           this._mouseDown = false;
@@ -1977,7 +1981,7 @@
       }
 
       if ( this._pointerEvents ) {
-        console.log( 'PointerEvent touchstop'  ); //+ JSON.stringify( e ) );
+        console.log( 'PointerEvent touchstop' );
       }
 
       if ( !this._mouseDown ) {
@@ -2009,7 +2013,9 @@
         mode = ( shift === "default" ? defaultShift : shift );
       }
 
-      if (this._supportTouch && e.originalEvent.changedTouches) {
+      if ( this._pointerEvents ) {
+        current = [e.pageX - offset.left, e.pageY - offset.top];
+      } else if (this._supportTouch && e.originalEvent.changedTouches) {
         current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
         this._multiTouchAnchor = [];
         this._inOp = false;
