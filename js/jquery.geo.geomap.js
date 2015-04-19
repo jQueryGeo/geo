@@ -1794,10 +1794,6 @@
         return;
       }
 
-      if ( this._pointerEvents ) {
-        //console.log( 'PointerEvent touchmove' );
-      }
-
       var doInteractiveTimeout = false;
       if ( this._mouseDown ) {
         doInteractiveTimeout = this._clearInteractiveTimeout( );
@@ -1815,7 +1811,6 @@
 
         if ( !this._isMultiTouch && this._mouseDown && this._multiTouchAnchor.length > 0 && e.originalEvent.pointerId !== this._multiTouchAnchor[ 0 ].pointerId ) {
           // switch to multitouch
-          this._mouseDown = false;
           this._isMultiTouch = true;
           this._wheelLevel = 0;
 
@@ -1833,8 +1828,8 @@
 
           this._multiTouchAnchorBbox = $.merge( [ ], this._multiTouchCurrentBbox );
 
-          this._mouseDown = true;
-          this._anchor = this._current = $.geo.center( this._multiTouchCurrentBbox, true );
+          this._anchor = $.geo.center( this._multiTouchCurrentBbox, true );
+          this._current = $.merge( [], this._anchor );
 
 
           if ( doInteractiveTimeout ) {
@@ -1882,38 +1877,9 @@
         } else {
           current = [e.originalEvent.pageX - offset.left, e.originalEvent.pageY - offset.top];
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //current = [e.pageX - offset.left, e.pageY - offset.top];
       } else if ( this._supportTouch && touches ) {
         if ( !this._isMultiTouch && this._mouseDown && this._multiTouchAnchor.length > 0 && touches[ 0 ].identifier !== this._multiTouchAnchor[ 0 ].identifier ) {
           // switch to multitouch
-          this._mouseDown = false;
           this._isMultiTouch = true;
           this._wheelLevel = 0;
 
@@ -1931,7 +1897,6 @@
 
           this._multiTouchAnchorBbox = $.merge( [ ], this._multiTouchCurrentBbox );
 
-          this._mouseDown = true;
           this._anchor = this._current = $.geo.center( this._multiTouchCurrentBbox, true );
 
 
@@ -2143,6 +2108,9 @@
 
         this._inOp = false;
 
+        for ( var i = 0; i < this._multiTouchAnchor.length; i++ ) {
+          e.currentTarget.releasePointerCapture( this._multiTouchAnchor[ i ].pointerId );
+        }
         this._multiTouchAnchor = [];
       } else if (this._supportTouch && e.originalEvent.changedTouches) {
         current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
