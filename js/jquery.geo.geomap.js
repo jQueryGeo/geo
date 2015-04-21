@@ -717,9 +717,15 @@
           graphicShape,
           geometries,
           curGeom,
-          i = 0;
+          i;
 
-      for ( ; i < this._graphicShapes.length; i++ ) {
+      if ( this._$elem.is( ".geo-map" ) ) {
+        $( this._$elem.find( ".geo-service" ).get().reverse() ).each( function( ) {
+          result = $.merge( result, $( this ).geomap( "find", selector, pixelTolerance ) );
+        } );
+      }
+
+      for ( i = this._graphicShapes.length - 1; i >= 0; i-- ) {
         graphicShape = this._graphicShapes[ i ];
 
         if ( isPoint ) {
@@ -757,12 +763,6 @@
         } else {
           result.push( graphicShape.shape );
         }
-      }
-
-      if ( this._$elem.is( ".geo-map" ) ) {
-        this._$elem.find( ".geo-service" ).each( function( ) {
-          result = $.merge( result, $( this ).geomap( "find", selector, pixelTolerance ) );
-        } );
       }
 
       return result;
