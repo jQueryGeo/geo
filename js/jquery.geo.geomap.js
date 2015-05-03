@@ -2107,12 +2107,12 @@
       if ( this._pointerEvents ) {
         current = [e.pageX - offset.left, e.pageY - offset.top];
 
-        this._inOp = false;
-
         for ( var i = 0; i < this._multiTouchAnchor.length; i++ ) {
           e.currentTarget.releasePointerCapture( this._multiTouchAnchor[ i ].pointerId );
         }
+
         this._multiTouchAnchor = [];
+        this._inOp = false;
       } else if (this._supportTouch && e.originalEvent.changedTouches) {
         current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
         this._multiTouchAnchor = [];
