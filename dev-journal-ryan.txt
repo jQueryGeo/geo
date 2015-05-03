@@ -312,6 +312,18 @@ Disease map
 * geomap - navigation timing API to help? http://developer.telerik.com/featured/introduction-navigation-timing-api/
 * geographics - WebGL if available
 
+==2015-04-19==
+===pointer events===
+It does not seem that IE11 does implicit pointer capture ( http://www.w3.org/TR/pointerevents/#implicit-pointer-capture ). The gotpointercapture & lostpointercapture events are not triggered without calling setPointerCapture. This is true with both mouse manipulation on desktop & touch manipulation on the Surface Pro 3.
+
+Capturing the pointer thankfully routes pointerevents to the browser even when outside the browser window, like the old time setCapture method on IE6+. I was afraid I would actually lose that feature with pointerevents.
+
+So close now...the only super noticable bug (apart from a slight general choppiness) is that when you drop a second finger down well after the first, there's a huge jump. It seems to be related to if you move the first finger first. We don't change the anchor.
+
+There's a lot of redundant code here, I hope I can consolidate most of it into one, internal collection of function calls.
+
+It makes sense that pointer events should switch to multitouch on pointerdown (vs. touchmove with touch events), However, the zoom still jumps in IE11 Surface.
+
 ==2015-04-12==
 ===questions===
 I got a few questions via email.
