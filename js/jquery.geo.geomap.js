@@ -1825,11 +1825,14 @@
           drawCoordsLen = this._drawCoords.length,
           touches = e.originalEvent.changedTouches,
           current,
-          i = 0;
+          anchorDistance,
+          currentDistance,
+          wheelLevel,
+          delta,
+          pinchCenterAndSize,
+          i;
 
       if ( this._pointerEvents ) {
-
-
 
         if ( this._isMultiTouch ) {
 
@@ -1841,12 +1844,12 @@
             this._multiTouchCurrentBbox[ 3 ] = e.originalEvent.pageY - offset.top;
           }
 
-          var anchorDistance = $.geo._distancePointPoint( [ this._multiTouchAnchorBbox[ 0 ], this._multiTouchAnchorBbox[ 1 ] ], [ this._multiTouchAnchorBbox[ 2 ], this._multiTouchAnchorBbox[ 3 ] ] ),
-              currentDistance = $.geo._distancePointPoint( [ this._multiTouchCurrentBbox[ 0 ], this._multiTouchCurrentBbox[ 1 ] ], [ this._multiTouchCurrentBbox[ 2 ], this._multiTouchCurrentBbox[ 3 ] ] );
+          anchorDistance = $.geo._distancePointPoint( [ this._multiTouchAnchorBbox[ 0 ], this._multiTouchAnchorBbox[ 1 ] ], [ this._multiTouchAnchorBbox[ 2 ], this._multiTouchAnchorBbox[ 3 ] ] );
+          currentDistance = $.geo._distancePointPoint( [ this._multiTouchCurrentBbox[ 0 ], this._multiTouchCurrentBbox[ 1 ] ], [ this._multiTouchCurrentBbox[ 2 ], this._multiTouchCurrentBbox[ 3 ] ] );
 
           current = $.geo.center( this._multiTouchCurrentBbox, true );
 
-          var wheelLevel = ( ( currentDistance - anchorDistance ) / anchorDistance );
+          wheelLevel = ( ( currentDistance - anchorDistance ) / anchorDistance );
 
           if ( wheelLevel > 0 ) {
             wheelLevel *= 5;
@@ -1854,11 +1857,11 @@
             wheelLevel *= 10;
           }
 
-          var delta = wheelLevel - this._wheelLevel;
+          delta = wheelLevel - this._wheelLevel;
 
           this._wheelLevel = wheelLevel;
 
-          var pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, false );
+          pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, false );
 
           this._setInteractiveCenterAndSize( pinchCenterAndSize.center, pinchCenterAndSize.pixelSize );
           this._interactiveTransform( );
@@ -1909,7 +1912,7 @@
 
         if ( this._isMultiTouch ) {
 
-          for ( ; i < touches.length; i++ ) {
+          for ( i = 0; i < touches.length; i++ ) {
             if ( touches[ i ].identifier === this._multiTouchAnchor[ 0 ].identifier ) {
               this._multiTouchCurrentBbox[ 0 ] = touches[ i ].pageX - offset.left;
               this._multiTouchCurrentBbox[ 1 ] = touches[ i ].pageY - offset.top;
@@ -1919,12 +1922,12 @@
             }
           }
 
-          var anchorDistance = $.geo._distancePointPoint( [ this._multiTouchAnchorBbox[ 0 ], this._multiTouchAnchorBbox[ 1 ] ], [ this._multiTouchAnchorBbox[ 2 ], this._multiTouchAnchorBbox[ 3 ] ] ),
-              currentDistance = $.geo._distancePointPoint( [ this._multiTouchCurrentBbox[ 0 ], this._multiTouchCurrentBbox[ 1 ] ], [ this._multiTouchCurrentBbox[ 2 ], this._multiTouchCurrentBbox[ 3 ] ] );
+          anchorDistance = $.geo._distancePointPoint( [ this._multiTouchAnchorBbox[ 0 ], this._multiTouchAnchorBbox[ 1 ] ], [ this._multiTouchAnchorBbox[ 2 ], this._multiTouchAnchorBbox[ 3 ] ] );
+          currentDistance = $.geo._distancePointPoint( [ this._multiTouchCurrentBbox[ 0 ], this._multiTouchCurrentBbox[ 1 ] ], [ this._multiTouchCurrentBbox[ 2 ], this._multiTouchCurrentBbox[ 3 ] ] );
 
           current = $.geo.center( this._multiTouchCurrentBbox, true );
 
-          var wheelLevel = ( ( currentDistance - anchorDistance ) / anchorDistance );
+          wheelLevel = ( ( currentDistance - anchorDistance ) / anchorDistance );
 
           if ( wheelLevel > 0 ) {
             wheelLevel *= 5;
@@ -1932,11 +1935,11 @@
             wheelLevel *= 10;
           }
 
-          var delta = wheelLevel - this._wheelLevel;
+          delta = wheelLevel - this._wheelLevel;
 
           this._wheelLevel = wheelLevel;
 
-          var pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, false );
+          pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, false );
 
           this._setInteractiveCenterAndSize( pinchCenterAndSize.center, pinchCenterAndSize.pixelSize );
           this._interactiveTransform( );
@@ -2107,7 +2110,7 @@
       if ( this._pointerEvents ) {
         current = [e.pageX - offset.left, e.pageY - offset.top];
 
-        for ( var i = 0; i < this._multiTouchAnchor.length; i++ ) {
+        for ( i = 0; i < this._multiTouchAnchor.length; i++ ) {
           e.currentTarget.releasePointerCapture( this._multiTouchAnchor[ i ].pointerId );
         }
 
