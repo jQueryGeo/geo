@@ -38,11 +38,44 @@
   <!--<script src="../dist/jquery.geo-1.0.0-test.min.js"></script>-->
 
   <script>
+    $.geo.proj = null;
+
+    var haveImage = false;
+
+    var img = new Image();
+    img.onload = function( ) {
+      haveImage = true;
+      var bboxMax = [ 0, 0, img.width, img.height ];
+      $( '#map' ).geomap( 'option', 'bboxMax', bboxMax );
+      setTimeout( function( ) { $( '#map' ).geomap( 'option', 'bbox', bboxMax ); }, 30 );
+    };
+    img.crossOrigin = 'anonymous';
+    img.src = 'http://test.jquerygeo.com/stjames.jpg';
+
+    var viewCanvas = $( '<canvas width="128" height="128" />' );
+    var viewContext = viewCanvas[0].getContext( '2d' );
+
     $(function() {
       // create a map
       var map = $("#map").geomap({
-        center: [ -71.3595678, 42.3604823 ],
-        zoom: 8,
+        bboxMax: [ 0, 0, 128, 128 ],
+        axisLayout: 'image',
+        tilingScheme: null,
+        shinglesMax: 1,
+        services: [ {
+          type: 'shingled',
+          src: function( view ) {
+            if ( !haveImage ) {
+              return '';
+            }
+
+            viewContext.canvas.width = view.width;
+            viewContext.canvas.height = view.height; 
+            viewContext.drawImage( img, view.bbox[0], view.bbox[1], $.geo.width( view.bbox ), $.geo.height( view.bbox ), 0, 0, view.width, view.height );
+
+            return viewCanvas[0].toDataURL( 'image/png' );
+          }
+        } ]
       });
     });
   </script>
