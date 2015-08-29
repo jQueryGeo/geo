@@ -100,8 +100,7 @@
             scaleContainer = serviceContainer.children(":last");
           }
 
-          var urlProp = ( service.hasOwnProperty("src") ? "src" : "getUrl" ),
-              urlArgs = {
+          var urlArgs = {
                 bbox: bbox,
                 width: mapWidth,
                 height: mapHeight,
@@ -109,7 +108,7 @@
                 tile: null,
                 index: 0
               },
-              isFunc = $.isFunction( service[ urlProp ] ),
+              isFunc = $.isFunction( service[ 'src' ] ),
               imageUrl,
               imagePos = scaleContainer.position( );
 
@@ -117,13 +116,13 @@
           imagePos.top = - ( imagePos.top );
 
           if ( isFunc ) {
-            imageUrl = service[ urlProp ]( urlArgs );
+            imageUrl = service[ 'src' ]( urlArgs );
           } else {
-            if ( rTmplString.test( service[ urlProp ] ) ) {
-              $.templates( this._tmplGeoSrcId, service[ urlProp ] );
+            if ( rTmplString.test( service[ 'src' ] ) ) {
+              $.templates( this._tmplGeoSrcId, service[ 'src' ] );
               imageUrl = $.render[ this._tmplGeoSrcId ]( urlArgs );
             } else {
-              imageUrl = service[ urlProp ];
+              imageUrl = service[ 'src' ];
             }
           }
 
