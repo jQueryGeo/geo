@@ -472,7 +472,6 @@
 
           this._centerMax = $.geo.center( bbox );
           this._pixelSizeMax = Math.max( $.geo.width( bbox, true ) / this._contentBounds.width, $.geo.height( bbox, true ) / this._contentBounds.height );
-          this._pixelSizeMin = 1;
           break;
 
         case "services":
@@ -1233,8 +1232,10 @@
           scale = Math.pow( zoomFactor, -zoomDelta ),
           pixelSize = this._pixelSizeInteractive * scale;
 
-      // clamp to min/max pixelSize
-      pixelSize = Math.min( Math.max( pixelSize, this._pixelSizeMin ), this._pixelSizeMax );
+      if ( this._options[ "tilingScheme" ] ) {
+        // clamp to min/max pixelSize
+        pixelSize = Math.min( Math.max( pixelSize, this._pixelSizeMin ), this._pixelSizeMax );
+      }
 
       var zoom = this._getZoom(this._centerInteractive, pixelSize);
 
