@@ -134,7 +134,7 @@
 
           if ( typeof imageUrl === "string" ) {
             serviceObj._loadImage( $img, imageUrl, pixelSize, map, serviceState, opacity );
-          } else {
+          } else if ( imageUrl ) {
             // assume Deferred
             imageUrl.done( function( url ) {
               serviceObj._loadImage( $img, url, pixelSize, map, serviceState, opacity );
