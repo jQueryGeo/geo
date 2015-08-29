@@ -2166,19 +2166,12 @@
           case "dragBox":
             if ( dx !== 0 || dy !== 0 ) {
               var minSize = this._pixelSize * 6,
-                  bboxCoords = this._toMap( [ [
-                      Math.min( this._anchor[ 0 ], current[ 0 ] ),
-                      Math.max( this._anchor[ 1 ], current[ 1 ] )
-                    ], [
-                      Math.max( this._anchor[ 0 ], current[ 0 ] ),
-                      Math.min( this._anchor[ 1 ], current[ 1 ] )
-                    ]
-                  ] ),
+                  bboxCoords = this._toMap( [ this._anchor, current ] ),
                   bbox = [
-                    bboxCoords[0][0],
-                    bboxCoords[0][1],
-                    bboxCoords[1][0],
-                    bboxCoords[1][1]
+                    Math.min( bboxCoords[0][0], bboxCoords[1][0] ),
+                    Math.min( bboxCoords[0][1], bboxCoords[1][1] ),
+                    Math.max( bboxCoords[0][0], bboxCoords[1][0] ),
+                    Math.max( bboxCoords[0][1], bboxCoords[1][1] )
                   ];
 
               if ( mode === "zoom" ) {
