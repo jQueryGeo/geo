@@ -91,8 +91,10 @@
 
               $img;
 
-          if (opacity < 1 || force) {
+          if (opacity < 1 || force || service.shinglesMax === 1) {
             serviceContainer.find("img").attr("data-keep-alive", "0");
+          } else if ( service.shinglesMax > 1 ) {
+            serviceContainer.find("img").slice( 0, -( service.shinglesMax - 1 ) ).attr("data-keep-alive", "0");
           }
 
           if ( !scaleContainer.size() ) {

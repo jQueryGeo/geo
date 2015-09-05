@@ -61,9 +61,9 @@
         bboxMax: [ 0, 0, 128, 128 ],
         axisLayout: 'image',
         tilingScheme: null,
-        shinglesMax: 1,
         services: [ {
           type: 'shingled',
+          shinglesMax: 2,
           src: function( view ) {
             if ( !haveImage ) {
               return '';
