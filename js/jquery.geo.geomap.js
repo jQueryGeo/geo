@@ -3,7 +3,7 @@
       _ieVersion = ( function () {
         var v = 5, div = document.createElement("div"), a = div.all || [];
         do {
-          div.innerHTML = "<!--[if gt IE " + (++v) + "]><br><![endif]-->";
+          div.innerHTML = "<!--[if gt IE " + (++v) + "]><br/><![endif]-->";
         } while ( a[0] );
         return v > 6 ? v : !v;
       }() ),
@@ -42,7 +42,7 @@
               src: function (view) {
                 return "//otile" + ((view.index % 4) + 1) + ((location.protocol === 'https:') ? "-s" : "") + ".mqcdn.com/tiles/1.0.0/osm/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
               },
-              attr: "Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='//developer.mapquest.com/content/osm/mq_logo.png'>"
+              attr: 'Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="//developer.mapquest.com/content/osm/mq_logo.png" />'
             }
           ],
         tilingScheme: {
