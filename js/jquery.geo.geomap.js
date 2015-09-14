@@ -2368,19 +2368,14 @@
       }
 
       if (e.deltaY !== 0) {
-        var tiledFull = Math.abs( e.deltaY ) >= 1;
         this._clearInteractiveTimeout( );
 
-        if ( e.deltaY > 0 ) {
-          e.deltaY = Math.ceil( e.deltaY );
-        } else { 
-          e.deltaY = Math.floor( e.deltaY );
-        }
+        var delta = e.deltaY > 0 ? 1 : -1;
 
         var offset = $(e.currentTarget).offset();
         this._anchor = [e.pageX - offset.left, e.pageY - offset.top];
 
-        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, e.deltaY, this._options[ "tilingScheme" ] !== null ? tiledFull : false );
+        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, this._options[ "tilingScheme" ] !== null );
 
         this._setInteractiveCenterAndSize( wheelCenterAndSize.center, wheelCenterAndSize.pixelSize );
         this._interactiveTransform( );
