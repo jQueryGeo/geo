@@ -2356,7 +2356,7 @@
       }
     },
 
-    _eventTarget_mousewheel: function (e, delta) {
+    _eventTarget_mousewheel: function ( e ) {
       if ( this._options[ "mode" ] === "static" || this._options[ "scroll" ] === "off" ) {
         return;
       }
@@ -2367,20 +2367,20 @@
         return false;
       }
 
-      if (delta !== 0) {
-        var tiledFull = Math.abs( delta ) >= 1;
+      if (e.deltaY !== 0) {
+        var tiledFull = Math.abs( e.deltaY ) >= 1;
         this._clearInteractiveTimeout( );
 
-        if ( delta > 0 ) {
-          delta = Math.ceil( delta );
+        if ( e.deltaY > 0 ) {
+          e.deltaY = Math.ceil( e.deltaY );
         } else { 
-          delta = Math.floor( delta );
+          e.deltaY = Math.floor( e.deltaY );
         }
 
         var offset = $(e.currentTarget).offset();
         this._anchor = [e.pageX - offset.left, e.pageY - offset.top];
 
-        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, this._options[ "tilingScheme" ] !== null ? tiledFull : false );
+        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, e.deltaY, this._options[ "tilingScheme" ] !== null ? tiledFull : false );
 
         this._setInteractiveCenterAndSize( wheelCenterAndSize.center, wheelCenterAndSize.pixelSize );
         this._interactiveTransform( );
