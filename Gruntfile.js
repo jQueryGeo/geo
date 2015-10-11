@@ -44,9 +44,6 @@ module.exports = function(grunt) {
         dest: 'dist/jquery.<%= pkg.name %>-<%= pkg.version %>.min.js'
       }
     },
-    qunit: {
-      files: ['test/**/*.html']
-    },
     jshint: {
       gruntfile: {
         options: {
@@ -73,10 +70,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-qunit');
   grunt.loadNpmTasks('grunt-contrib-jshint');
 
   // Default task.
-  grunt.registerTask('default', ['jshint', /* 'qunit', */ 'clean', 'concat', 'uglify']);
+  grunt.registerTask('default', ['jshint', 'clean', 'concat', 'uglify']);
 
 };

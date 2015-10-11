@@ -312,6 +312,18 @@ Disease map
 * geomap - navigation timing API to help? http://developer.telerik.com/featured/introduction-navigation-timing-api/
 * geographics - WebGL if available
 
+==2015-08-29==
+===pixelSizeMin===
+So, I can't zoom shingled services in past pixelSize 1...I ask, why not? There must have been a reason to add pixelSizeMin.
+
+Ok, I added it a year ago to support pinch zoom...but that was because you could zoom in past the last tile...I remember that issue. This is shingled services though and that shouldn't be a problem. Possibly, only clamp if there's a tilingScheme?
+
+That seemed to fix it.
+
+==2015-08-21==
+===b3===
+I'm going to add the image source thing to b3 and release by the end of next month. Fingers crossed.
+
 ==2015-04-19==
 ===pointer events===
 It does not seem that IE11 does implicit pointer capture ( http://www.w3.org/TR/pointerevents/#implicit-pointer-capture ). The gotpointercapture & lostpointercapture events are not triggered without calling setPointerCapture. This is true with both mouse manipulation on desktop & touch manipulation on the Surface Pro 3.

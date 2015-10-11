@@ -3,7 +3,7 @@
       _ieVersion = ( function () {
         var v = 5, div = document.createElement("div"), a = div.all || [];
         do {
-          div.innerHTML = "<!--[if gt IE " + (++v) + "]><br><![endif]-->";
+          div.innerHTML = "<!--[if gt IE " + (++v) + "]><br/><![endif]-->";
         } while ( a[0] );
         return v > 6 ? v : !v;
       }() ),
@@ -42,7 +42,7 @@
               src: function (view) {
                 return "//otile" + ((view.index % 4) + 1) + ((location.protocol === 'https:') ? "-s" : "") + ".mqcdn.com/tiles/1.0.0/osm/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
               },
-              attr: "Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='//developer.mapquest.com/content/osm/mq_logo.png'>"
+              attr: 'Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="//developer.mapquest.com/content/osm/mq_logo.png" />'
             }
           ],
         tilingScheme: {
@@ -432,6 +432,7 @@
           break;
 
         case "zoom":
+          this._userGeodetic = this._options["axisLayout"] === "map" && $.geo.proj;
           if ( this._created ) {
             this._setZoom(value, false, refresh);
           } else {
@@ -472,7 +473,6 @@
 
           this._centerMax = $.geo.center( bbox );
           this._pixelSizeMax = Math.max( $.geo.width( bbox, true ) / this._contentBounds.width, $.geo.height( bbox, true ) / this._contentBounds.height );
-          this._pixelSizeMin = 1;
           break;
 
         case "services":
@@ -1233,8 +1233,10 @@
           scale = Math.pow( zoomFactor, -zoomDelta ),
           pixelSize = this._pixelSizeInteractive * scale;
 
-      // clamp to min/max pixelSize
-      pixelSize = Math.min( Math.max( pixelSize, this._pixelSizeMin ), this._pixelSizeMax );
+      if ( this._options[ "tilingScheme" ] ) {
+        // clamp to min/max pixelSize
+        pixelSize = Math.min( Math.max( pixelSize, this._pixelSizeMin ), this._pixelSizeMax );
+      }
 
       var zoom = this._getZoom(this._centerInteractive, pixelSize);
 
@@ -2166,19 +2168,12 @@
           case "dragBox":
             if ( dx !== 0 || dy !== 0 ) {
               var minSize = this._pixelSize * 6,
-                  bboxCoords = this._toMap( [ [
-                      Math.min( this._anchor[ 0 ], current[ 0 ] ),
-                      Math.max( this._anchor[ 1 ], current[ 1 ] )
-                    ], [
-                      Math.max( this._anchor[ 0 ], current[ 0 ] ),
-                      Math.min( this._anchor[ 1 ], current[ 1 ] )
-                    ]
-                  ] ),
+                  bboxCoords = this._toMap( [ this._anchor, current ] ),
                   bbox = [
-                    bboxCoords[0][0],
-                    bboxCoords[0][1],
-                    bboxCoords[1][0],
-                    bboxCoords[1][1]
+                    Math.min( bboxCoords[0][0], bboxCoords[1][0] ),
+                    Math.min( bboxCoords[0][1], bboxCoords[1][1] ),
+                    Math.max( bboxCoords[0][0], bboxCoords[1][0] ),
+                    Math.max( bboxCoords[0][1], bboxCoords[1][1] )
                   ];
 
               if ( mode === "zoom" ) {
@@ -2362,7 +2357,7 @@
       }
     },
 
-    _eventTarget_mousewheel: function (e, delta) {
+    _eventTarget_mousewheel: function ( e ) {
       if ( this._options[ "mode" ] === "static" || this._options[ "scroll" ] === "off" ) {
         return;
       }
@@ -2373,20 +2368,15 @@
         return false;
       }
 
-      if (delta !== 0) {
-        var tiledFull = Math.abs( delta ) >= 1;
+      if (e.deltaY !== 0) {
         this._clearInteractiveTimeout( );
 
-        if ( delta > 0 ) {
-          delta = Math.ceil( delta );
-        } else { 
-          delta = Math.floor( delta );
-        }
+        var delta = e.deltaY > 0 ? 1 : -1;
 
         var offset = $(e.currentTarget).offset();
         this._anchor = [e.pageX - offset.left, e.pageY - offset.top];
 
-        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, this._options[ "tilingScheme" ] !== null ? tiledFull : false );
+        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, this._options[ "tilingScheme" ] !== null );
 
         this._setInteractiveCenterAndSize( wheelCenterAndSize.center, wheelCenterAndSize.pixelSize );
         this._interactiveTransform( );

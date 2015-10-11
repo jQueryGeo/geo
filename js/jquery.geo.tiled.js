@@ -184,7 +184,6 @@
 
                     tileBbox = [bottomLeft[0], bottomLeft[1], topRight[0], topRight[1]],
 
-                    urlProp = ( service.hasOwnProperty( "src" ) ? "src" : "getUrl" ),
                     urlArgs = {
                       bbox: tileBbox,
                       width: tileWidth,
@@ -196,17 +195,17 @@
                       },
                       index: Math.abs(y + x)
                     },
-                    isFunc = $.isFunction( service[ urlProp ] ),
+                    isFunc = $.isFunction( service[ 'src' ] ),
                     imageUrl;
 
                 if ( isFunc ) {
-                  imageUrl = service[ urlProp ]( urlArgs );
+                  imageUrl = service[ 'src' ]( urlArgs );
                 } else {
-                  if ( rTmplString.test( service[ urlProp ] ) ) {
-                    $.templates( this._tmplGeoSrcId, service[ urlProp ] );
+                  if ( rTmplString.test( service[ 'src' ] ) ) {
+                    $.templates( this._tmplGeoSrcId, service[ 'src' ] );
                     imageUrl = $.render[ this._tmplGeoSrcId ]( urlArgs );
                   } else {
-                    imageUrl = service[ urlProp ];
+                    imageUrl = service[ 'src' ];
                   }
                 }
 
@@ -263,11 +262,15 @@
         var serviceState = $.data( service, "geoServiceState" );
 
         if (serviceState && serviceState.loadCount > 0) {
+          /*
+           * #193 - disabled until we can do this without canceling all AJAX requests
+           *
           if ( window.stop !== undefined ) {
             window.stop();
           } else if( document.execCommand !== undefined ) {
             document.execCommand("Stop", false);
           }
+          */
 
           serviceState.serviceContainer.find("img:hidden").remove();
           while (serviceState.loadCount > 0) {

@@ -91,8 +91,10 @@
 
               $img;
 
-          if (opacity < 1 || force) {
+          if (opacity < 1 || force || service.shinglesMax === 1) {
             serviceContainer.find("img").attr("data-keep-alive", "0");
+          } else if ( service.shinglesMax > 1 ) {
+            serviceContainer.find("img").slice( 0, -( service.shinglesMax - 1 ) ).attr("data-keep-alive", "0");
           }
 
           if ( !scaleContainer.size() ) {
@@ -100,8 +102,7 @@
             scaleContainer = serviceContainer.children(":last");
           }
 
-          var urlProp = ( service.hasOwnProperty("src") ? "src" : "getUrl" ),
-              urlArgs = {
+          var urlArgs = {
                 bbox: bbox,
                 width: mapWidth,
                 height: mapHeight,
@@ -109,7 +110,7 @@
                 tile: null,
                 index: 0
               },
-              isFunc = $.isFunction( service[ urlProp ] ),
+              isFunc = $.isFunction( service[ 'src' ] ),
               imageUrl,
               imagePos = scaleContainer.position( );
 
@@ -117,13 +118,13 @@
           imagePos.top = - ( imagePos.top );
 
           if ( isFunc ) {
-            imageUrl = service[ urlProp ]( urlArgs );
+            imageUrl = service[ 'src' ]( urlArgs );
           } else {
-            if ( rTmplString.test( service[ urlProp ] ) ) {
-              $.templates( this._tmplGeoSrcId, service[ urlProp ] );
+            if ( rTmplString.test( service[ 'src' ] ) ) {
+              $.templates( this._tmplGeoSrcId, service[ 'src' ] );
               imageUrl = $.render[ this._tmplGeoSrcId ]( urlArgs );
             } else {
-              imageUrl = service[ urlProp ];
+              imageUrl = service[ 'src' ];
             }
           }
 
@@ -135,7 +136,7 @@
 
           if ( typeof imageUrl === "string" ) {
             serviceObj._loadImage( $img, imageUrl, pixelSize, map, serviceState, opacity );
-          } else {
+          } else if ( imageUrl ) {
             // assume Deferred
             imageUrl.done( function( url ) {
               serviceObj._loadImage( $img, url, pixelSize, map, serviceState, opacity );
