@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0.0-test - 2015-05-03
+/*! jQuery Geo - v1.0.0-test - 2015-10-11
 * http://jquerygeo.com
 * Copyright (c) 2015 Ryan Westphal; Licensed MIT */
 // Copyright 2006 Google Inc.
@@ -2267,90 +2267,227 @@ setDelimiters( "{{", "}}" );
 
 })( this );
 
-/*! Copyright (c) 2011 Brandon Aaron (http://brandonaaron.net)
- * Licensed under the MIT License (LICENSE.txt).
+/*!
+ * jQuery Mousewheel 3.1.13
  *
- * Thanks to: http://adomas.org/javascript-mouse-wheel/ for some pointers.
- * Thanks to: Mathias Bank(http://www.mathias-bank.de) for a scope bug fix.
- * Thanks to: Seamus Leahy for adding deltaX and deltaY
- *
- * Version: 3.0.6
- * 
- * Requires: 1.2.2+
+ * Copyright jQuery Foundation and other contributors
+ * Released under the MIT license
+ * http://jquery.org/license
  */
 
-(function($) {
-
-var types = ['DOMMouseScroll', 'mousewheel'];
-
-if ($.event.fixHooks) {
-    for ( var i=types.length; i; ) {
-        $.event.fixHooks[ types[--i] ] = $.event.mouseHooks;
+(function (factory) {
+    if ( typeof define === 'function' && define.amd ) {
+        // AMD. Register as an anonymous module.
+        define(['jquery'], factory);
+    } else if (typeof exports === 'object') {
+        // Node/CommonJS style for Browserify
+        module.exports = factory;
+    } else {
+        // Browser globals
+        factory(jQuery);
     }
-}
+}(function ($) {
 
-$.event.special.mousewheel = {
-    setup: function() {
-        if ( this.addEventListener ) {
-            for ( var i=types.length; i; ) {
-                this.addEventListener( types[--i], handler, false );
-            }
-        } else {
-            this.onmousewheel = handler;
-        }
-    },
-    
-    teardown: function() {
-        if ( this.removeEventListener ) {
-            for ( var i=types.length; i; ) {
-                this.removeEventListener( types[--i], handler, false );
-            }
-        } else {
-            this.onmousewheel = null;
+    var toFix  = ['wheel', 'mousewheel', 'DOMMouseScroll', 'MozMousePixelScroll'],
+        toBind = ( 'onwheel' in document || document.documentMode >= 9 ) ?
+                    ['wheel'] : ['mousewheel', 'DomMouseScroll', 'MozMousePixelScroll'],
+        slice  = Array.prototype.slice,
+        nullLowestDeltaTimeout, lowestDelta;
+
+    if ( $.event.fixHooks ) {
+        for ( var i = toFix.length; i; ) {
+            $.event.fixHooks[ toFix[--i] ] = $.event.mouseHooks;
         }
     }
-};
 
-$.fn.extend({
-    mousewheel: function(fn) {
-        return fn ? this.bind("mousewheel", fn) : this.trigger("mousewheel");
-    },
-    
-    unmousewheel: function(fn) {
-        return this.unbind("mousewheel", fn);
+    var special = $.event.special.mousewheel = {
+        version: '3.1.12',
+
+        setup: function() {
+            if ( this.addEventListener ) {
+                for ( var i = toBind.length; i; ) {
+                    this.addEventListener( toBind[--i], handler, false );
+                }
+            } else {
+                this.onmousewheel = handler;
+            }
+            // Store the line height and page height for this particular element
+            $.data(this, 'mousewheel-line-height', special.getLineHeight(this));
+            $.data(this, 'mousewheel-page-height', special.getPageHeight(this));
+        },
+
+        teardown: function() {
+            if ( this.removeEventListener ) {
+                for ( var i = toBind.length; i; ) {
+                    this.removeEventListener( toBind[--i], handler, false );
+                }
+            } else {
+                this.onmousewheel = null;
+            }
+            // Clean up the data we added to the element
+            $.removeData(this, 'mousewheel-line-height');
+            $.removeData(this, 'mousewheel-page-height');
+        },
+
+        getLineHeight: function(elem) {
+            var $elem = $(elem),
+                $parent = $elem['offsetParent' in $.fn ? 'offsetParent' : 'parent']();
+            if (!$parent.length) {
+                $parent = $('body');
+            }
+            return parseInt($parent.css('fontSize'), 10) || parseInt($elem.css('fontSize'), 10) || 16;
+        },
+
+        getPageHeight: function(elem) {
+            return $(elem).height();
+        },
+
+        settings: {
+            adjustOldDeltas: true, // see shouldAdjustOldDeltas() below
+            normalizeOffset: true  // calls getBoundingClientRect for each event
+        }
+    };
+
+    $.fn.extend({
+        mousewheel: function(fn) {
+            return fn ? this.bind('mousewheel', fn) : this.trigger('mousewheel');
+        },
+
+        unmousewheel: function(fn) {
+            return this.unbind('mousewheel', fn);
+        }
+    });
+
+
+    function handler(event) {
+        var orgEvent   = event || window.event,
+            args       = slice.call(arguments, 1),
+            delta      = 0,
+            deltaX     = 0,
+            deltaY     = 0,
+            absDelta   = 0,
+            offsetX    = 0,
+            offsetY    = 0;
+        event = $.event.fix(orgEvent);
+        event.type = 'mousewheel';
+
+        // Old school scrollwheel delta
+        if ( 'detail'      in orgEvent ) { deltaY = orgEvent.detail * -1;      }
+        if ( 'wheelDelta'  in orgEvent ) { deltaY = orgEvent.wheelDelta;       }
+        if ( 'wheelDeltaY' in orgEvent ) { deltaY = orgEvent.wheelDeltaY;      }
+        if ( 'wheelDeltaX' in orgEvent ) { deltaX = orgEvent.wheelDeltaX * -1; }
+
+        // Firefox < 17 horizontal scrolling related to DOMMouseScroll event
+        if ( 'axis' in orgEvent && orgEvent.axis === orgEvent.HORIZONTAL_AXIS ) {
+            deltaX = deltaY * -1;
+            deltaY = 0;
+        }
+
+        // Set delta to be deltaY or deltaX if deltaY is 0 for backwards compatabilitiy
+        delta = deltaY === 0 ? deltaX : deltaY;
+
+        // New school wheel delta (wheel event)
+        if ( 'deltaY' in orgEvent ) {
+            deltaY = orgEvent.deltaY * -1;
+            delta  = deltaY;
+        }
+        if ( 'deltaX' in orgEvent ) {
+            deltaX = orgEvent.deltaX;
+            if ( deltaY === 0 ) { delta  = deltaX * -1; }
+        }
+
+        // No change actually happened, no reason to go any further
+        if ( deltaY === 0 && deltaX === 0 ) { return; }
+
+        // Need to convert lines and pages to pixels if we aren't already in pixels
+        // There are three delta modes:
+        //   * deltaMode 0 is by pixels, nothing to do
+        //   * deltaMode 1 is by lines
+        //   * deltaMode 2 is by pages
+        if ( orgEvent.deltaMode === 1 ) {
+            var lineHeight = $.data(this, 'mousewheel-line-height');
+            delta  *= lineHeight;
+            deltaY *= lineHeight;
+            deltaX *= lineHeight;
+        } else if ( orgEvent.deltaMode === 2 ) {
+            var pageHeight = $.data(this, 'mousewheel-page-height');
+            delta  *= pageHeight;
+            deltaY *= pageHeight;
+            deltaX *= pageHeight;
+        }
+
+        // Store lowest absolute delta to normalize the delta values
+        absDelta = Math.max( Math.abs(deltaY), Math.abs(deltaX) );
+
+        if ( !lowestDelta || absDelta < lowestDelta ) {
+            lowestDelta = absDelta;
+
+            // Adjust older deltas if necessary
+            if ( shouldAdjustOldDeltas(orgEvent, absDelta) ) {
+                lowestDelta /= 40;
+            }
+        }
+
+        // Adjust older deltas if necessary
+        if ( shouldAdjustOldDeltas(orgEvent, absDelta) ) {
+            // Divide all the things by 40!
+            delta  /= 40;
+            deltaX /= 40;
+            deltaY /= 40;
+        }
+
+        // Get a whole, normalized value for the deltas
+        delta  = Math[ delta  >= 1 ? 'floor' : 'ceil' ](delta  / lowestDelta);
+        deltaX = Math[ deltaX >= 1 ? 'floor' : 'ceil' ](deltaX / lowestDelta);
+        deltaY = Math[ deltaY >= 1 ? 'floor' : 'ceil' ](deltaY / lowestDelta);
+
+        // Normalise offsetX and offsetY properties
+        if ( special.settings.normalizeOffset && this.getBoundingClientRect ) {
+            var boundingRect = this.getBoundingClientRect();
+            offsetX = event.clientX - boundingRect.left;
+            offsetY = event.clientY - boundingRect.top;
+        }
+
+        // Add information to the event object
+        event.deltaX = deltaX;
+        event.deltaY = deltaY;
+        event.deltaFactor = lowestDelta;
+        event.offsetX = offsetX;
+        event.offsetY = offsetY;
+        // Go ahead and set deltaMode to 0 since we converted to pixels
+        // Although this is a little odd since we overwrite the deltaX/Y
+        // properties with normalized deltas.
+        event.deltaMode = 0;
+
+        // Add event and delta to the front of the arguments
+        args.unshift(event, delta, deltaX, deltaY);
+
+        // Clearout lowestDelta after sometime to better
+        // handle multiple device types that give different
+        // a different lowestDelta
+        // Ex: trackpad = 3 and mouse wheel = 120
+        if (nullLowestDeltaTimeout) { clearTimeout(nullLowestDeltaTimeout); }
+        nullLowestDeltaTimeout = setTimeout(nullLowestDelta, 200);
+
+        return ($.event.dispatch || $.event.handle).apply(this, args);
     }
-});
 
-
-function handler(event) {
-    var orgEvent = event || window.event, args = [].slice.call( arguments, 1 ), delta = 0, returnValue = true, deltaX = 0, deltaY = 0;
-    event = $.event.fix(orgEvent);
-    event.type = "mousewheel";
-    
-    // Old school scrollwheel delta
-    if ( orgEvent.wheelDelta ) { delta = orgEvent.wheelDelta/120; }
-    if ( orgEvent.detail     ) { delta = -orgEvent.detail/3; }
-    
-    // New school multidimensional scroll (touchpads) deltas
-    deltaY = delta;
-    
-    // Gecko
-    if ( orgEvent.axis !== undefined && orgEvent.axis === orgEvent.HORIZONTAL_AXIS ) {
-        deltaY = 0;
-        deltaX = -1*delta;
+    function nullLowestDelta() {
+        lowestDelta = null;
     }
-    
-    // Webkit
-    if ( orgEvent.wheelDeltaY !== undefined ) { deltaY = orgEvent.wheelDeltaY/120; }
-    if ( orgEvent.wheelDeltaX !== undefined ) { deltaX = -1*orgEvent.wheelDeltaX/120; }
-    
-    // Add event and delta to the front of the arguments
-    args.unshift(event, delta, deltaX, deltaY);
-    
-    return ($.event.dispatch || $.event.handle).apply(this, args);
-}
 
-})(jQuery);
+    function shouldAdjustOldDeltas(orgEvent, absDelta) {
+        // If this is an older event and the delta is divisable by 120,
+        // then we are assuming that the browser is treating this as an
+        // older mouse wheel event and that we should divide the deltas
+        // by 40 to try and get a more usable deltaFactor.
+        // Side note, this actually impacts the reported scroll distance
+        // in older browsers and can cause scrolling to be slower than native.
+        // Turn this off by setting $.event.special.mousewheel.settings.adjustOldDeltas to false.
+        return special.settings.adjustOldDeltas && orgEvent.type === 'mousewheel' && absDelta % 120 === 0;
+    }
+
+}));
 
 /*!
  * jQuery UI Widget 1.8.18
@@ -4426,7 +4563,7 @@ $.Widget.prototype = {
       _ieVersion = ( function () {
         var v = 5, div = document.createElement("div"), a = div.all || [];
         do {
-          div.innerHTML = "<!--[if gt IE " + (++v) + "]><br><![endif]-->";
+          div.innerHTML = "<!--[if gt IE " + (++v) + "]><br/><![endif]-->";
         } while ( a[0] );
         return v > 6 ? v : !v;
       }() ),
@@ -4465,7 +4602,7 @@ $.Widget.prototype = {
               src: function (view) {
                 return "//otile" + ((view.index % 4) + 1) + ((location.protocol === 'https:') ? "-s" : "") + ".mqcdn.com/tiles/1.0.0/osm/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
               },
-              attr: "Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='//developer.mapquest.com/content/osm/mq_logo.png'>"
+              attr: 'Tiles Courtesy of <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="//developer.mapquest.com/content/osm/mq_logo.png" />'
             }
           ],
         tilingScheme: {
@@ -4855,6 +4992,7 @@ $.Widget.prototype = {
           break;
 
         case "zoom":
+          this._userGeodetic = this._options["axisLayout"] === "map" && $.geo.proj;
           if ( this._created ) {
             this._setZoom(value, false, refresh);
           } else {
@@ -4895,7 +5033,6 @@ $.Widget.prototype = {
 
           this._centerMax = $.geo.center( bbox );
           this._pixelSizeMax = Math.max( $.geo.width( bbox, true ) / this._contentBounds.width, $.geo.height( bbox, true ) / this._contentBounds.height );
-          this._pixelSizeMin = 1;
           break;
 
         case "services":
@@ -5656,8 +5793,10 @@ $.Widget.prototype = {
           scale = Math.pow( zoomFactor, -zoomDelta ),
           pixelSize = this._pixelSizeInteractive * scale;
 
-      // clamp to min/max pixelSize
-      pixelSize = Math.min( Math.max( pixelSize, this._pixelSizeMin ), this._pixelSizeMax );
+      if ( this._options[ "tilingScheme" ] ) {
+        // clamp to min/max pixelSize
+        pixelSize = Math.min( Math.max( pixelSize, this._pixelSizeMin ), this._pixelSizeMax );
+      }
 
       var zoom = this._getZoom(this._centerInteractive, pixelSize);
 
@@ -6589,19 +6728,12 @@ $.Widget.prototype = {
           case "dragBox":
             if ( dx !== 0 || dy !== 0 ) {
               var minSize = this._pixelSize * 6,
-                  bboxCoords = this._toMap( [ [
-                      Math.min( this._anchor[ 0 ], current[ 0 ] ),
-                      Math.max( this._anchor[ 1 ], current[ 1 ] )
-                    ], [
-                      Math.max( this._anchor[ 0 ], current[ 0 ] ),
-                      Math.min( this._anchor[ 1 ], current[ 1 ] )
-                    ]
-                  ] ),
+                  bboxCoords = this._toMap( [ this._anchor, current ] ),
                   bbox = [
-                    bboxCoords[0][0],
-                    bboxCoords[0][1],
-                    bboxCoords[1][0],
-                    bboxCoords[1][1]
+                    Math.min( bboxCoords[0][0], bboxCoords[1][0] ),
+                    Math.min( bboxCoords[0][1], bboxCoords[1][1] ),
+                    Math.max( bboxCoords[0][0], bboxCoords[1][0] ),
+                    Math.max( bboxCoords[0][1], bboxCoords[1][1] )
                   ];
 
               if ( mode === "zoom" ) {
@@ -6785,7 +6917,7 @@ $.Widget.prototype = {
       }
     },
 
-    _eventTarget_mousewheel: function (e, delta) {
+    _eventTarget_mousewheel: function ( e ) {
       if ( this._options[ "mode" ] === "static" || this._options[ "scroll" ] === "off" ) {
         return;
       }
@@ -6796,20 +6928,15 @@ $.Widget.prototype = {
         return false;
       }
 
-      if (delta !== 0) {
-        var tiledFull = Math.abs( delta ) >= 1;
+      if (e.deltaY !== 0) {
         this._clearInteractiveTimeout( );
 
-        if ( delta > 0 ) {
-          delta = Math.ceil( delta );
-        } else { 
-          delta = Math.floor( delta );
-        }
+        var delta = e.deltaY > 0 ? 1 : -1;
 
         var offset = $(e.currentTarget).offset();
         this._anchor = [e.pageX - offset.left, e.pageY - offset.top];
 
-        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, this._options[ "tilingScheme" ] !== null ? tiledFull : false );
+        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, this._options[ "tilingScheme" ] !== null );
 
         this._setInteractiveCenterAndSize( wheelCenterAndSize.center, wheelCenterAndSize.pixelSize );
         this._interactiveTransform( );
@@ -7010,7 +7137,6 @@ $.Widget.prototype = {
 
                     tileBbox = [bottomLeft[0], bottomLeft[1], topRight[0], topRight[1]],
 
-                    urlProp = ( service.hasOwnProperty( "src" ) ? "src" : "getUrl" ),
                     urlArgs = {
                       bbox: tileBbox,
                       width: tileWidth,
@@ -7022,17 +7148,17 @@ $.Widget.prototype = {
                       },
                       index: Math.abs(y + x)
                     },
-                    isFunc = $.isFunction( service[ urlProp ] ),
+                    isFunc = $.isFunction( service[ 'src' ] ),
                     imageUrl;
 
                 if ( isFunc ) {
-                  imageUrl = service[ urlProp ]( urlArgs );
+                  imageUrl = service[ 'src' ]( urlArgs );
                 } else {
-                  if ( rTmplString.test( service[ urlProp ] ) ) {
-                    $.templates( this._tmplGeoSrcId, service[ urlProp ] );
+                  if ( rTmplString.test( service[ 'src' ] ) ) {
+                    $.templates( this._tmplGeoSrcId, service[ 'src' ] );
                     imageUrl = $.render[ this._tmplGeoSrcId ]( urlArgs );
                   } else {
-                    imageUrl = service[ urlProp ];
+                    imageUrl = service[ 'src' ];
                   }
                 }
 
@@ -7089,11 +7215,15 @@ $.Widget.prototype = {
         var serviceState = $.data( service, "geoServiceState" );
 
         if (serviceState && serviceState.loadCount > 0) {
+          /*
+           * #193 - disabled until we can do this without canceling all AJAX requests
+           *
           if ( window.stop !== undefined ) {
             window.stop();
           } else if( document.execCommand !== undefined ) {
             document.execCommand("Stop", false);
           }
+          */
 
           serviceState.serviceContainer.find("img:hidden").remove();
           while (serviceState.loadCount > 0) {
@@ -7228,8 +7358,10 @@ $.Widget.prototype = {
 
               $img;
 
-          if (opacity < 1 || force) {
+          if (opacity < 1 || force || service.shinglesMax === 1) {
             serviceContainer.find("img").attr("data-keep-alive", "0");
+          } else if ( service.shinglesMax > 1 ) {
+            serviceContainer.find("img").slice( 0, -( service.shinglesMax - 1 ) ).attr("data-keep-alive", "0");
           }
 
           if ( !scaleContainer.size() ) {
@@ -7237,8 +7369,7 @@ $.Widget.prototype = {
             scaleContainer = serviceContainer.children(":last");
           }
 
-          var urlProp = ( service.hasOwnProperty("src") ? "src" : "getUrl" ),
-              urlArgs = {
+          var urlArgs = {
                 bbox: bbox,
                 width: mapWidth,
                 height: mapHeight,
@@ -7246,7 +7377,7 @@ $.Widget.prototype = {
                 tile: null,
                 index: 0
               },
-              isFunc = $.isFunction( service[ urlProp ] ),
+              isFunc = $.isFunction( service[ 'src' ] ),
               imageUrl,
               imagePos = scaleContainer.position( );
 
@@ -7254,13 +7385,13 @@ $.Widget.prototype = {
           imagePos.top = - ( imagePos.top );
 
           if ( isFunc ) {
-            imageUrl = service[ urlProp ]( urlArgs );
+            imageUrl = service[ 'src' ]( urlArgs );
           } else {
-            if ( rTmplString.test( service[ urlProp ] ) ) {
-              $.templates( this._tmplGeoSrcId, service[ urlProp ] );
+            if ( rTmplString.test( service[ 'src' ] ) ) {
+              $.templates( this._tmplGeoSrcId, service[ 'src' ] );
               imageUrl = $.render[ this._tmplGeoSrcId ]( urlArgs );
             } else {
-              imageUrl = service[ urlProp ];
+              imageUrl = service[ 'src' ];
             }
           }
 
@@ -7272,7 +7403,7 @@ $.Widget.prototype = {
 
           if ( typeof imageUrl === "string" ) {
             serviceObj._loadImage( $img, imageUrl, pixelSize, map, serviceState, opacity );
-          } else {
+          } else if ( imageUrl ) {
             // assume Deferred
             imageUrl.done( function( url ) {
               serviceObj._loadImage( $img, url, pixelSize, map, serviceState, opacity );
