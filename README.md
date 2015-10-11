@@ -8,7 +8,7 @@ Using jQuery Geo requires adding one element, including one script (apart from j
 ```html
 <div id="map" style="height: 320px;"></div>
 <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-<script src="http://code.jquerygeo.com/jquery.geo-1.0.0-b2.min.js"></script>
+<script src="http://code.jquerygeo.com/jquery.geo-1.0.0-b3.min.js"></script>
 <script>
   $(function() {
     $( "#map" ).geomap( ); // you've got a map!
@@ -18,8 +18,8 @@ Using jQuery Geo requires adding one element, including one script (apart from j
 
 You can also download the latest release as a [minified JavaScript file][min] or a [full, uncompressed one][max].
 
-[min]: http://code.jquerygeo.com/jquery.geo-1.0.0-b2.min.js
-[max]: http://code.jquerygeo.com/jquery.geo-1.0.0-b2.js
+[min]: http://code.jquerygeo.com/jquery.geo-1.0.0-b3.min.js
+[max]: http://code.jquerygeo.com/jquery.geo-1.0.0-b3.js
 
 ## Documentation
 The latest docs are hosted at: http://docs.jquerygeo.com
@@ -69,7 +69,6 @@ npm install grunt
 npm install grunt-contrib-clean
 npm install grunt-contrib-concat
 npm install grunt-contrib-uglify
-npm install grunt-contrib-qunit
 npm install grunt-contrib-jshint
 ```
 
@@ -82,6 +81,17 @@ grunt
 Unless you have downloaded a tagged release, grunt will create a test version of jQuery Geo: dist/jquery.geo-1.0.0-test.min.js
 
 ## Release History
+
+### 1.0.0-b3 (2015-10-11)
+
+* geomap - touchpad touchiness improved
+* geomap - new shinglesMax property to limit images and better support shingled layers with transparency
+* geomap - image mode improvements
+* geomap - find method returns results "higher" to "lower"
+* geomap - click events during draw & measure modes
+* geomap - refresh performance improvements
+* geomap - W3C pointer events
+* geographics - updates to shape drawing
 
 ### 1.0.0-b2 (2015-02-10)
 * project - update jQuery dependency to 1.9 in package 
