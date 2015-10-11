@@ -4,10 +4,8 @@
   "description": "An interactive mapping widget and geo-spatial API built on open source and open data (*NOT* a wrapper of other APIs, such as Google Maps)",
   "version": "1.0.0-b3",
   "homepage": "http://jquerygeo.com",
-  "docs": "http://docs.jquerygeo.com",
-  "demo": "http://docs.jquerygeo.com",
   "bugs": {
-    "url": "https://github.com/AppGeo/geo/issues"
+    "url": "https://github.com/jQueryGeo/geo/issues"
   },
   "author": {
     "name": "Ryan Westphal",
@@ -17,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/AppGeo/geo.git"
+    "url": "git://github.com/jQueryGeo/geo.git"
   },
   "licenses": [
     {
@@ -37,6 +35,8 @@
     "jquery": "~1.9"
   },
   "keywords": [
+    "jquery-plugin",
+    "ecosystem:jquery",
     "geo",
     "spatial",
     "mapping",

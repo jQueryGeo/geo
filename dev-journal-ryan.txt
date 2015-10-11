@@ -44,7 +44,7 @@ Disease map
 * MBCR: http://www.mbta.com/rider_tools/developers/default.asp?id=21899
 * drag shapes
 * tiled image w/o zoom
-** https://github.com/AppGeo/geo/issues/105
+** https://github.com/jQueryGeo/geo/issues/105
 * ie7 - [bug] floating info div doesn't show up, inputs are alone and on the left
 * redo the jVectorMap demo page using jQuery Geo
 * make OSM editing simple
@@ -312,6 +312,10 @@ Disease map
 * geomap - navigation timing API to help? http://developer.telerik.com/featured/introduction-navigation-timing-api/
 * geographics - WebGL if available
 
+==2015-10-11==
+===b3===
+I think I need to just release this.
+
 ==2015-08-29==
 ===pixelSizeMin===
 So, I can't zoom shingled services in past pixelSize 1...I ask, why not? There must have been a reason to add pixelSizeMin.
@@ -408,7 +412,7 @@ It's updated as of two months ago but...sheesh.
 ===pinch zooming===
 iPads & new mac trackpads (maybe it's just he latest OSX?) overstep the interactive zoom max & min zoom and make things mostly unusable. This needs to be fixes & should be simpler than the graphics blitting/timing issue.
 
-This is GitHub issue #123 BTW: https://github.com/AppGeo/geo/issues/123
+This is GitHub issue #123 BTW: https://github.com/jQueryGeo/geo/issues/123
 
 I think I got it. I'm tracking pixelSizeMin & clamping pixelSize to min/max before clamping to requested zoom level.
 
@@ -1215,7 +1219,7 @@ $("body").on("pagebeforehide", "#home-map", function() {
 ===single cut up image===
 I responded on a GitHub image on ways to display a cut up image as tiles. I hope it works. I should make an example for it.
 
-https://github.com/AppGeo/geo/issues/105
+https://github.com/jQueryGeo/geo/issues/105
 
 ==2012-11-02==
 ===shape functions===

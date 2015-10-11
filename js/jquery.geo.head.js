@@ -14,8 +14,8 @@
 // limitations under the License.
 
 /* 
- * AppGeo/geo 
- * (c) 2007-2011, Applied Geographics, Inc. All rights reserved. 
+ * jQueryGeo/geo 
+ * (c) 2011-2015, jQueryGeo 
  * Dual licensed under the MIT or GPL Version 2 licenses. 
  * http://jquery.org/license 
  */ 
