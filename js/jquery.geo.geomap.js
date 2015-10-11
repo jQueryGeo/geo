@@ -432,6 +432,7 @@
           break;
 
         case "zoom":
+          this._userGeodetic = this._options["axisLayout"] === "map" && $.geo.proj;
           if ( this._created ) {
             this._setZoom(value, false, refresh);
           } else {
