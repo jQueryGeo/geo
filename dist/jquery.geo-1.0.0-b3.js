@@ -1,6 +1,6 @@
-/*! jQuery Geo - v1.0.0-b3 - 2015-10-11
+/*! jQuery Geo - v1.0.0-b3 - 2015-10-17
 * http://jquerygeo.com
-* Copyright (c) 2015 Ryan Westphal; Licensed MIT */
+* Copyright (c) 2015 Ryan Morrison-Westphal; Licensed MIT */
 // Copyright 2006 Google Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");

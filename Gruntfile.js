@@ -13,7 +13,7 @@ module.exports = function(grunt) {
       ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %> */\n',
     // Task configuration.
     clean: {
-      files: ['dist/jquery.<%= pkg.name %>-<%= pkg.version %>.js', 'dist/jquery.<%= pkg.name %>-<%= pkg.version %>.min.js']
+      files: ['dist/<%= pkg.name %>-<%= pkg.version %>.js', 'dist/<%= pkg.name %>-<%= pkg.version %>.min.js']
     },
     concat: {
       options: {
@@ -32,7 +32,7 @@ module.exports = function(grunt) {
           'js/jquery.geo.tiled.js',
           'js/jquery.geo.shingled.js'
         ],
-        dest: 'dist/jquery.<%= pkg.name %>-<%= pkg.version %>.js'
+        dest: 'dist/<%= pkg.name %>-<%= pkg.version %>.js'
       }
     },
     uglify: {
@@ -41,7 +41,7 @@ module.exports = function(grunt) {
       },
       dist: {
         src: '<%= concat.dist.dest %>',
-        dest: 'dist/jquery.<%= pkg.name %>-<%= pkg.version %>.min.js'
+        dest: 'dist/<%= pkg.name %>-<%= pkg.version %>.min.js'
       }
     },
     jshint: {
