@@ -312,6 +312,13 @@ Disease map
 * geomap - navigation timing API to help? http://developer.telerik.com/featured/introduction-navigation-timing-api/
 * geographics - WebGL if available
 
+==2016-01-16==
+===jspm===
+Was asked to add support for this. It seems that I don't need to actually include jspm in this package but, rather, support ES6 module pattern which is another issue in GitHub. It's the projects that want to include jQuery Geo which have to include jspm.
+
+===jquery dependency===
+Regardless, I'm changed the release & dev dependencies for jquery to >=1.9 rather than ~1.9. Since jQueryGeo works with jQuery 2, using a ~ locks it to 1.9.x. Just to note, a dependency of jquery ^1.9 would at least allow 1.12.
+
 ==2015-10-11==
 ===b3===
 I think I need to just release this.
