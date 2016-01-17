@@ -316,6 +316,10 @@ Disease map
 ===jspm===
 Was asked to add support for this. It seems that I don't need to actually include jspm in this package but, rather, support ES6 module pattern which is another issue in GitHub. It's the projects that want to include jQuery Geo which have to include jspm.
 
+As far as I can tell, jspm can load jQueryGeo as a global module. I don't need to reconfigure the whole thing as an ES6 module at the moment. The only thing I'd really like to do (fixed below) is not require jQuery 1.9.x.
+
+Also, I think it's a problem that we don't have a file in dist that matches the npm version. Other projects, upon jspm install, have both a directory and js file in jspm_modules/npm/. Though, possibly, I only need a main directive in package.json.
+
 ===jquery dependency===
 Regardless, I'm changed the release & dev dependencies for jquery to >=1.9 rather than ~1.9. Since jQueryGeo works with jQuery 2, using a ~ locks it to 1.9.x. Just to note, a dependency of jquery ^1.9 would at least allow 1.12.
 
