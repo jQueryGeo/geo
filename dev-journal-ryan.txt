@@ -320,6 +320,10 @@ As far as I can tell, jspm can load jQueryGeo as a global module. I don't need t
 
 Also, I think it's a problem that we don't have a file in dist that matches the npm version. Other projects, upon jspm install, have both a directory and js file in jspm_modules/npm/. Though, possibly, I only need a main directive in package.json.
 
+Rabbit hole. It seems this plugin is a good sample of how to do this properly: https://github.com/flesler/jquery.scrollTo/
+
+Tough choices. I got it to be able to use jQuery, yet jQueryGeo depends on some other components such as jquery.mousewheel, which I'm having trouble to load. Do I release 1.0 without jspm support and then have 1.1 or 2.0 require it or to do I continue and require developers to use a package manager? I suppose, for now I can have the jspm release require that users install mousewheel, etc., and hopefully fix it later? Or have a special build for our CDN (load one global file) release.
+
 ===jquery dependency===
 Regardless, I'm changed the release & dev dependencies for jquery to >=1.9 rather than ~1.9. Since jQueryGeo works with jQuery 2, using a ~ locks it to 1.9.x. Just to note, a dependency of jquery ^1.9 would at least allow 1.12.
 
