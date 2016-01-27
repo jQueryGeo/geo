@@ -4,6 +4,8 @@
   "description": "An interactive mapping widget and geo-spatial API built on open source and open data (*NOT* a wrapper of other APIs, such as Google Maps)",
   "version": "1.0.0-b3.2",
   "main": "dist/jquery.geo-1.0.0-b3.2.js",
+  "registry": "npm",
+  "format": "global",
   "homepage": "http://jquerygeo.com",
   "bugs": {
     "url": "https://github.com/jQueryGeo/geo/issues"

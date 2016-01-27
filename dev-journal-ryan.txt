@@ -312,6 +312,29 @@ Disease map
 * geomap - navigation timing API to help? http://developer.telerik.com/featured/introduction-navigation-timing-api/
 * geographics - WebGL if available
 
+==2016-01-27==
+===jspm===
+There's too much to take in right now if I want to extract just core into a new, propert jspm/SystemJS module. I'm going to leave everything as global and move on. In the future, I see a few modules:
+
+* jsts (JavaScript Topology Suite) - most of core, containing the math to perform all of the shape manipulation and calculation a user wants
+** requires proj4 from npm (but has build-in default for geodetic to projected web mercator?)
+* geomappin - actual map widget without jQuery requirements
+* jQueryGeo - the whole package as one download like the old days; can still use jQuery to support older browsers
+
+==2016-01-22==
+===jspm===
+I'm going to see if I can have just the geo module load into jspm in a more modern way.
+
+Ah, you can override jspm npm and load something local using jspm link in a cloned from GitHub. It's a little tricky. To link, you have to run this in jQueryGeo's project:
+
+$ jspm link npm:jquery.geo
+
+Then, in the project folder, you have to run this:
+
+$ jspm install npm:jquery.geo --link
+
+jspm will then be able to see version updates in the local clone of the project.
+
 ==2016-01-16==
 ===jspm===
 Was asked to add support for this. It seems that I don't need to actually include jspm in this package but, rather, support ES6 module pattern which is another issue in GitHub. It's the projects that want to include jQuery Geo which have to include jspm.

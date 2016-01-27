@@ -3,7 +3,11 @@
 After years of internal development, we are pleased to bring our JavaScript map widget and spatial analysis tools to the open-source world in the form of a jQuery plugin.
 
 ## Getting Started
-Using jQuery Geo requires adding one element, including one script (apart from jQuery itself, version 1.9 or higher required) and calling one function. The following copy-and-paste snippet will help you get started.
+Using jQuery Geo requires, at a minimum, adding one element, including one script (apart from jQuery itself, version 1.9 or higher), and calling one function.
+
+### Load via CDN script
+
+The following copy-and-paste snippet will help you get started.
 
 ```html
 <div id="map" style="height: 320px;"></div>
