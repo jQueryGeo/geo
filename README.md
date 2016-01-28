@@ -5,20 +5,53 @@ After years of internal development, we are pleased to bring our JavaScript map 
 ## Getting Started
 Using jQuery Geo requires, at a minimum, adding one element, including one script (apart from jQuery itself, version 1.9 or higher), and calling one function.
 
+### Load via jspm
+
+$ npm install jspm --save-dev
+$ jspm init
+$ jspm install jquery
+$ jspm install jquery.geo
+
+```js
+// lib/main.js
+import $ from 'jquery';
+import geomap from 'jquery.geo';
+
+$( '#map' ).geomap( );
+```
+
+### Download via npm
+
+$ npm install jquery --save-dev
+$ npm install jquery.geo --save-dev
+
+```html
+<div id="map" style="height: 480px;"></div>
+<script src="node_modules/jquery/dist/jquery.min.js"></script>
+<script src="node_modules/jquery.geo/dist/jquery.geo-1.0.0-b3.min.js"></script>
+<script>
+  $(function() {
+    $( "#map" ).geomap( );
+  });
+</script>
+```
+
 ### Load via CDN script
 
 The following copy-and-paste snippet will help you get started.
 
 ```html
-<div id="map" style="height: 320px;"></div>
-<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<div id="map" style="height: 480px;"></div>
+<script src="http://code.jquery.com/jquery-2.2.0.min.js"></script>
 <script src="http://code.jquerygeo.com/jquery.geo-1.0.0-b3.min.js"></script>
 <script>
   $(function() {
-    $( "#map" ).geomap( ); // you've got a map!
+    $( "#map" ).geomap( );
   });
 </script>
 ```
+
+### Download direct
 
 You can also download the latest release as a [minified JavaScript file][min] or a [full, uncompressed one][max].
 
