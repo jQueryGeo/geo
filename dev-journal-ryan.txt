@@ -312,6 +312,29 @@ Disease map
 * geomap - navigation timing API to help? http://developer.telerik.com/featured/introduction-navigation-timing-api/
 * geographics - WebGL if available
 
+==2016-01-27==
+===jspm===
+There's too much to take in right now if I want to extract just core into a new, propert jspm/SystemJS module. I'm going to leave everything as global and move on. In the future, I see a few modules:
+
+* jsts (JavaScript Topology Suite) - most of core, containing the math to perform all of the shape manipulation and calculation a user wants
+** requires proj4 from npm (but has build-in default for geodetic to projected web mercator?)
+* geomappin - actual map widget without jQuery requirements
+* jQueryGeo - the whole package as one download like the old days; can still use jQuery to support older browsers
+
+==2016-01-22==
+===jspm===
+I'm going to see if I can have just the geo module load into jspm in a more modern way.
+
+Ah, you can override jspm npm and load something local using jspm link in a cloned from GitHub. It's a little tricky. To link, you have to run this in jQueryGeo's project:
+
+$ jspm link npm:jquery.geo
+
+Then, in the project folder, you have to run this:
+
+$ jspm install npm:jquery.geo --link
+
+jspm will then be able to see version updates in the local clone of the project.
+
 ==2016-01-16==
 ===jspm===
 Was asked to add support for this. It seems that I don't need to actually include jspm in this package but, rather, support ES6 module pattern which is another issue in GitHub. It's the projects that want to include jQuery Geo which have to include jspm.
@@ -319,6 +342,10 @@ Was asked to add support for this. It seems that I don't need to actually includ
 As far as I can tell, jspm can load jQueryGeo as a global module. I don't need to reconfigure the whole thing as an ES6 module at the moment. The only thing I'd really like to do (fixed below) is not require jQuery 1.9.x.
 
 Also, I think it's a problem that we don't have a file in dist that matches the npm version. Other projects, upon jspm install, have both a directory and js file in jspm_modules/npm/. Though, possibly, I only need a main directive in package.json.
+
+Rabbit hole. It seems this plugin is a good sample of how to do this properly: https://github.com/flesler/jquery.scrollTo/
+
+Tough choices. I got it to be able to use jQuery, yet jQueryGeo depends on some other components such as jquery.mousewheel, which I'm having trouble to load. Do I release 1.0 without jspm support and then have 1.1 or 2.0 require it or to do I continue and require developers to use a package manager? I suppose, for now I can have the jspm release require that users install mousewheel, etc., and hopefully fix it later? Or have a special build for our CDN (load one global file) release.
 
 ===jquery dependency===
 Regardless, I'm changed the release & dev dependencies for jquery to >=1.9 rather than ~1.9. Since jQueryGeo works with jQuery 2, using a ~ locks it to 1.9.x. Just to note, a dependency of jquery ^1.9 would at least allow 1.12.
