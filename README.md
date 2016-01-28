@@ -7,10 +7,10 @@ Using jQuery Geo requires, at a minimum, adding one element, including one scrip
 
 ### Load via jspm
 
-$ npm install jspm --save-dev
-$ jspm init
-$ jspm install jquery
-$ jspm install jquery.geo
+    $ npm install jspm --save-dev
+    $ jspm init
+    $ jspm install jquery
+    $ jspm install jquery.geo
 
 ```js
 // lib/main.js
@@ -22,8 +22,8 @@ $( '#map' ).geomap( );
 
 ### Download via npm
 
-$ npm install jquery --save-dev
-$ npm install jquery.geo --save-dev
+    $ npm install jquery --save-dev
+    $ npm install jquery.geo --save-dev
 
 ```html
 <div id="map" style="height: 480px;"></div>
