@@ -102,6 +102,7 @@
     _centerInteractive: undefined,
     _pixelSizeInteractive: undefined,
     _timeoutInteractive: null,
+    _timeoutWheel: null,
     _triggerInteractive: false,
 
     _timeoutRefreshShapes: null,
@@ -1612,6 +1613,7 @@
       switch (this._options["mode"]) {
         case "drawLineString":
         case "measureLength":
+          //console.log( '[_eventTarget_dblclick]' );
           if ( this._drawCoords.length > 1 && ! ( this._drawCoords[0][0] === this._drawCoords[1][0] &&
                                                   this._drawCoords[0][1] === this._drawCoords[1][1] ) ) {
               this._drawCoords.length--;
@@ -2364,24 +2366,40 @@
 
       e.preventDefault();
 
+      //console.log( '[_eventTarget_mousewheel] ' + 'deltaY: ' + e.deltaY + ', pageX: ' + e.pageX + ', pageY: ' + e.pageY );
+
       if ( this._mouseDown ) {
         return false;
       }
 
-      if (e.deltaY !== 0) {
-        this._clearInteractiveTimeout( );
+      if ( e.deltaY !== 0 ) {
+        if ( this._timeoutWheel ) {
+          clearTimeout( this._timeoutWheel );
+          this._timeoutWheel = null;
+        }
 
-        var delta = e.deltaY > 0 ? 1 : -1;
+        var geomap = this;
+        var currentTarget = e.currentTarget;
+        var deltaY = e.deltaY;
+        var pageX = e.pageX;
+        var pageY = e.pageY;
 
-        var offset = $(e.currentTarget).offset();
-        this._anchor = [e.pageX - offset.left, e.pageY - offset.top];
+        this._timeoutWheel = setTimeout( function () {
+          geomap._clearInteractiveTimeout( );
 
-        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, this._options[ "tilingScheme" ] !== null );
+          var delta = deltaY > 0 ? 1 : -1;
 
-        this._setInteractiveCenterAndSize( wheelCenterAndSize.center, wheelCenterAndSize.pixelSize );
-        this._interactiveTransform( );
+          var offset = $(currentTarget).offset();
+          geomap._anchor = [pageX - offset.left, pageY - offset.top];
 
-        this._setInteractiveTimeout( true );
+          var wheelCenterAndSize = geomap._getZoomCenterAndSize( geomap._anchor, delta, geomap._options[ "tilingScheme" ] !== null );
+
+          geomap._setInteractiveCenterAndSize( wheelCenterAndSize.center, wheelCenterAndSize.pixelSize );
+          geomap._interactiveTransform( );
+
+          geomap._setInteractiveTimeout( true );
+        }, 30 );
+
       }
 
       return false;
