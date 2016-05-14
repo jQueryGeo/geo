@@ -253,7 +253,7 @@
 
       this._$eventTarget.bind(touchStartEvent, $.proxy(this._eventTarget_touchstart, this));
 
-      var dragTarget = (this._$eventTarget[0].setCapture) ? this._$eventTarget : $(document);
+      var dragTarget = (this._$eventTarget[0].setCapture || this._pointerEvents) ? this._$eventTarget : $(document);
       dragTarget.bind(touchMoveEvent, $.proxy(this._dragTarget_touchmove, this));
       dragTarget.bind(touchStopEvent, $.proxy(this._dragTarget_touchstop, this));
 
@@ -1613,7 +1613,6 @@
       switch (this._options["mode"]) {
         case "drawLineString":
         case "measureLength":
-          //console.log( '[_eventTarget_dblclick]' );
           if ( this._drawCoords.length > 1 && ! ( this._drawCoords[0][0] === this._drawCoords[1][0] &&
                                                   this._drawCoords[0][1] === this._drawCoords[1][1] ) ) {
               this._drawCoords.length--;
@@ -1673,10 +1672,6 @@
         return;
       }
 
-      if ( this._pointerEvents ) {
-        console.log( 'PointerEvent touchstart' );
-      }
-
       var doInteractiveTimeout = this._clearInteractiveTimeout( );
 
       var offset = $(e.currentTarget).offset(),
@@ -1685,12 +1680,7 @@
       if ( this._pointerEvents ) {
         e.currentTarget.setPointerCapture( e.originalEvent.pointerId );
 
-
-
-
-
-
-
+        console.log( '[PointerEvent] ' + e.type + ' pointerId: ' + e.originalEvent.pointerId );
 
         if ( !this._isMultiTouch && this._mouseDown && this._multiTouchAnchor.length > 0 && e.originalEvent.pointerId !== this._multiTouchAnchor[ 0 ].pointerId ) {
           // switch to multitouch
@@ -1837,6 +1827,8 @@
           i;
 
       if ( this._pointerEvents ) {
+        console.log( '[PointerEvent] ' + e.type + ' pointerId: ' + e.originalEvent.pointerId );
+
 
         if ( this._isMultiTouch ) {
 
@@ -2079,7 +2071,7 @@
       }
 
       if ( this._pointerEvents ) {
-        console.log( 'PointerEvent touchstop' );
+        console.log( '[PointerEvent] ' + e.type + ' pointerId: ' + e.originalEvent.pointerId );
       }
 
       if ( !this._mouseDown ) {
@@ -2365,8 +2357,6 @@
       }
 
       e.preventDefault();
-
-      //console.log( '[_eventTarget_mousewheel] ' + 'deltaY: ' + e.deltaY + ', pageX: ' + e.pageX + ', pageY: ' + e.pageY );
 
       if ( this._mouseDown ) {
         return false;
