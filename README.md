@@ -10,7 +10,7 @@ Using jQuery Geo requires, at a minimum, adding one element, including one scrip
     $ npm install jspm --save-dev
     $ jspm init
     $ jspm install jquery
-    $ jspm install jquery.geo
+    $ jspm install npm:jquery.geo
 
 ```js
 // lib/main.js
