@@ -205,7 +205,8 @@
           this._shiftDown =
           this._panning =
           this._isTap =
-          this._isDbltap = false;
+          this._isDbltap = 
+          this._isMultiTouch = false;
 
       this._anchor = [ 0, 0 ]; /* mouse down */
       this._current = [ 0, 0 ]; /* mouse move no matter what */
@@ -1678,19 +1679,16 @@
           touches = e.originalEvent.changedTouches;
 
       if ( this._pointerEvents ) {
+        this._logPointerEvent( 'in', e );
+
         e.currentTarget.setPointerCapture( e.originalEvent.pointerId );
 
-        console.log( '[PointerEvent] ' + e.type + ' pointerId: ' + e.originalEvent.pointerId );
-
-        if ( !this._isMultiTouch && this._mouseDown && this._multiTouchAnchor.length > 0 && e.originalEvent.pointerId !== this._multiTouchAnchor[ 0 ].pointerId ) {
+        if ( !this._isMultiTouch && this._mouseDown && this._multiTouchAnchor.length > 0 ) {
           // switch to multitouch
           this._isMultiTouch = true;
           this._wheelLevel = 0;
 
           this._multiTouchAnchor.push( e.originalEvent );
-
-
-
 
           this._multiTouchCurrentBbox = [
             this._multiTouchCurrentBbox[ 0 ],
@@ -1703,6 +1701,10 @@
 
           this._anchor = $.geo.center( this._multiTouchCurrentBbox, true );
           this._current = $.merge( [], this._anchor );
+
+          if ( this._pointerEvents ) {
+            this._logPointerEvent( 'out', e );
+          }
 
 
           if ( doInteractiveTimeout ) {
@@ -1796,6 +1798,10 @@
         }
       }
 
+      if ( this._pointerEvents ) {
+        this._logPointerEvent( 'out', e );
+      }
+
       e.preventDefault();
 
       if ( doInteractiveTimeout ) {
@@ -1803,6 +1809,12 @@
       }
 
       return false;
+    },
+
+    _logPointerEvent: function( fcnArea, e ) {
+      //console.log( '[PointerEvent] ', e.type, ' pointerId: ', e.originalEvent.pointerId, ', pageX: ', e.originalEvent.pageX, ', pageY: ', e.originalEvent.pageY, ', isMultiTouch: ', this._isMultiTouch, ', mouseDown: ', this._mouseDown );
+      console.log( '[PointerEvent] ', fcnArea, ' ', e.type, ' pointerId: ', e.originalEvent.pointerId, ', isMultiTouch: ', this._isMultiTouch, ', mouseDown: ', this._mouseDown, ', multiTouchAnchor', this._multiTouchAnchor.length, ', _anchor: ', this._anchor, ', _current: ', this._current );
+
     },
 
     _dragTarget_touchmove: function (e) {
@@ -1827,8 +1839,7 @@
           i;
 
       if ( this._pointerEvents ) {
-        console.log( '[PointerEvent] ' + e.type + ' pointerId: ' + e.originalEvent.pointerId );
-
+        this._logPointerEvent( 'in', e );
 
         if ( this._isMultiTouch ) {
 
@@ -1865,7 +1876,7 @@
           doInteractiveTimeout = true;
 
           current = $.geo.center( this._multiTouchCurrentBbox, true );
-        } else {
+        } else if ( this._mouseDown ) {
           this._multiTouchAnchor[ 0 ] = e.originalEvent;
 
           this._multiTouchCurrentBbox = [
@@ -2071,7 +2082,7 @@
       }
 
       if ( this._pointerEvents ) {
-        console.log( '[PointerEvent] ' + e.type + ' pointerId: ' + e.originalEvent.pointerId );
+        this._logPointerEvent( 'in', e );
       }
 
       if ( !this._mouseDown ) {
@@ -2104,12 +2115,9 @@
       }
 
       if ( this._pointerEvents ) {
-        current = [e.pageX - offset.left, e.pageY - offset.top];
+        e.currentTarget.releasePointerCapture( e.originalEvent.pointerId );
 
-        for ( i = 0; i < this._multiTouchAnchor.length; i++ ) {
-          e.currentTarget.releasePointerCapture( this._multiTouchAnchor[ i ].pointerId );
-        }
-
+        current = [e.originalEvent.pageX - offset.left, e.originalEvent.pageY - offset.top];
         this._multiTouchAnchor = [];
         this._inOp = false;
       } else if (this._supportTouch && e.originalEvent.changedTouches) {
@@ -2142,6 +2150,10 @@
         this._isMultiTouch = false;
 
         this._wheelLevel = 0;
+
+        if ( this._pointerEvents ) {
+          this._logPointerEvent( 'out', e );
+        }
 
         if ( doInteractiveTimeout ) {
           this._setInteractiveTimeout( true );
@@ -2339,6 +2351,10 @@
           this._$eventTarget.trigger("dblclick", e);
           return false;
         }
+      }
+
+      if ( this._pointerEvents ) {
+        this._logPointerEvent( 'out', e );
       }
 
       if ( doInteractiveTimeout ) {
