@@ -1679,8 +1679,6 @@
           touches = e.originalEvent.changedTouches;
 
       if ( this._pointerEvents ) {
-        this._logPointerEvent( 'in', e );
-
         e.currentTarget.setPointerCapture( e.originalEvent.pointerId );
 
         if ( !this._isMultiTouch && this._mouseDown && this._multiTouchAnchor.length > 0 ) {
@@ -1701,11 +1699,6 @@
 
           this._anchor = $.geo.center( this._multiTouchCurrentBbox, true );
           this._current = $.merge( [], this._anchor );
-
-          if ( this._pointerEvents ) {
-            this._logPointerEvent( 'out', e );
-          }
-
 
           if ( doInteractiveTimeout ) {
             this._setInteractiveTimeout( true );
@@ -1798,10 +1791,6 @@
         }
       }
 
-      if ( this._pointerEvents ) {
-        this._logPointerEvent( 'out', e );
-      }
-
       e.preventDefault();
 
       if ( doInteractiveTimeout ) {
@@ -1809,12 +1798,6 @@
       }
 
       return false;
-    },
-
-    _logPointerEvent: function( fcnArea, e ) {
-      //console.log( '[PointerEvent] ', e.type, ' pointerId: ', e.originalEvent.pointerId, ', pageX: ', e.originalEvent.pageX, ', pageY: ', e.originalEvent.pageY, ', isMultiTouch: ', this._isMultiTouch, ', mouseDown: ', this._mouseDown );
-      console.log( '[PointerEvent] ', fcnArea, ' ', e.type, ' pointerId: ', e.originalEvent.pointerId, ', isMultiTouch: ', this._isMultiTouch, ', mouseDown: ', this._mouseDown, ', multiTouchAnchor', this._multiTouchAnchor.length, ', _anchor: ', this._anchor, ', _current: ', this._current );
-
     },
 
     _dragTarget_touchmove: function (e) {
@@ -1839,8 +1822,6 @@
           i;
 
       if ( this._pointerEvents ) {
-        this._logPointerEvent( 'in', e );
-
         if ( this._isMultiTouch ) {
 
           if ( e.originalEvent.pointerId === this._multiTouchAnchor[ 0 ].pointerId ) {
@@ -2081,10 +2062,6 @@
         return;
       }
 
-      if ( this._pointerEvents ) {
-        this._logPointerEvent( 'in', e );
-      }
-
       if ( !this._mouseDown ) {
         if ( _ieVersion === 7 ) {
           // ie7 doesn't appear to trigger dblclick on this._$eventTarget,
@@ -2150,10 +2127,6 @@
         this._isMultiTouch = false;
 
         this._wheelLevel = 0;
-
-        if ( this._pointerEvents ) {
-          this._logPointerEvent( 'out', e );
-        }
 
         if ( doInteractiveTimeout ) {
           this._setInteractiveTimeout( true );
@@ -2351,10 +2324,6 @@
           this._$eventTarget.trigger("dblclick", e);
           return false;
         }
-      }
-
-      if ( this._pointerEvents ) {
-        this._logPointerEvent( 'out', e );
       }
 
       if ( doInteractiveTimeout ) {
