@@ -1679,7 +1679,6 @@
           touches = e.originalEvent.changedTouches;
 
       if ( this._pointerEvents ) {
-        //this._logPointerEvent( e, 'in', this._current );
         if ( !this._isMultiTouch && this._mouseDown && this._multiTouchAnchor.length > 0 ) {
           // switch to multitouch
           e.currentTarget.setPointerCapture( e.originalEvent.pointerId );
@@ -1700,8 +1699,6 @@
 
           this._anchor = $.geo.center( this._multiTouchCurrentBbox, true );
           this._current = $.merge( [], this._anchor );
-
-          //this._logPointerEvent( e, 'out (to multitouch)', this._current );
 
           if ( doInteractiveTimeout ) {
             this._setInteractiveTimeout( true );
@@ -1796,8 +1793,6 @@
         }
       }
 
-      //this._logPointerEvent( e, 'out', this._current );
-
       e.preventDefault();
 
       if ( doInteractiveTimeout ) {
@@ -1829,8 +1824,6 @@
           i;
 
       if ( this._pointerEvents ) {
-        //this._logPointerEvent( e, 'in', current );
-
         if ( this._isMultiTouch ) {
           if ( e.originalEvent.pointerId === this._multiTouchAnchor[ 0 ].pointerId ) {
             this._multiTouchCurrentBbox[ 0 ] = e.originalEvent.pageX - offset.left;
@@ -1840,7 +1833,6 @@
             this._multiTouchCurrentBbox[ 3 ] = e.originalEvent.pageY - offset.top;
           } else {
             // untracked pointer
-            //this._logPointerEvent( e, 'out (untracked)', current );
             e.preventDefault();
             if ( doInteractiveTimeout ) {
               this._setInteractiveTimeout( true );
@@ -1951,8 +1943,6 @@
       } else {
         current = [e.pageX - offset.left, e.pageY - offset.top];
       }
-
-      //this._logPointerEvent( e, 'out', current );
 
       if ( current === null ) {
         e.preventDefault();
@@ -2077,10 +2067,6 @@
       }
     },
 
-    _logPointerEvent: function( e, section, current ) { 
-      console.log( '[', e.type, '][', section, '] pointerId: ', e.originalEvent.pointerId, ', current: ' + current, ', _multiTouchAnchor: ', ( this._multiTouchAnchor.length > 0 ? this._multiTouchAnchor[ 0 ].pointerId : 'null' ), ( this._multiTouchAnchor.length > 1 ? this._multiTouchAnchor[ 1 ].pointerId : 'null' ) );
-    },
-
     _dragTarget_touchstop: function (e) {
       if ( this._options[ "mode" ] === "static" ) {
         return;
@@ -2116,25 +2102,15 @@
       }
 
       if ( this._pointerEvents ) {
-        //this._logPointerEvent( e, 'in', current );
-
-
-
         if ( e.originalEvent.pointerId === this._multiTouchAnchor[ 0 ].pointerId || e.originalEvent.pointerId === this._multiTouchAnchor[ 1 ].pointerId ) {
+          e.currentTarget.releasePointerCapture( e.originalEvent.pointerId );
 
+          current = [e.originalEvent.pageX - offset.left, e.originalEvent.pageY - offset.top];
 
-
-        e.currentTarget.releasePointerCapture( e.originalEvent.pointerId );
-
-        current = [e.originalEvent.pageX - offset.left, e.originalEvent.pageY - offset.top];
-
-        this._multiTouchAnchor = [];
-        this._inOp = false;
-
-
+          this._multiTouchAnchor = [];
+          this._inOp = false;
         } else {
           // untracked pointer
-          //this._logPointerEvent( e, 'out (untracked)', current );
           e.preventDefault();
           if ( doInteractiveTimeout ) {
             this._setInteractiveTimeout( true );
@@ -2172,8 +2148,6 @@
         this._isMultiTouch = false;
 
         this._wheelLevel = 0;
-
-        //this._logPointerEvent( e, 'out', current );
 
         if ( doInteractiveTimeout ) {
           this._setInteractiveTimeout( true );
@@ -2373,8 +2347,6 @@
           return false;
         }
       }
-
-      //this._logPointerEvent( e, 'out', current );
 
       if ( doInteractiveTimeout ) {
         this._setInteractiveTimeout( true );
