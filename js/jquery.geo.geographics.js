@@ -442,7 +442,7 @@
       } );
     },
 
-    _canvasImgLoad: function( e ) {
+    _canvasImgLoad: function( ) {
       var geographics = this;
       geographics._$canvasSceneFront = geographics._$canvasSceneDrawn.prependTo( geographics._$elem );
       geographics._$canvasSceneBack = geographics._$canvasSceneStale;
