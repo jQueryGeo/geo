@@ -446,7 +446,7 @@
       var geographics = this;
       geographics._$canvasSceneFront = geographics._$canvasSceneDrawn.prependTo( geographics._$elem );
       geographics._$canvasSceneBack = geographics._$canvasSceneStale;
-      geographics._$canvasSceneBack.detach().prop( 'src', '' );
+      geographics._$canvasSceneBack.detach();
     },
 
     _canvasSceneLoad: function() {
