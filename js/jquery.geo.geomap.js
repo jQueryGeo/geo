@@ -1,11 +1,15 @@
 (function ($, window, undefined) {
   var _widgetIdSeed = 0,
-      _ieVersion = ( function () {
+      _ieVersion = ( function() {
         var v = 5, div = document.createElement("div"), a = div.all || [];
         do {
           div.innerHTML = "<!--[if gt IE " + (++v) + "]><br/><![endif]-->";
         } while ( a[0] );
         return v > 6 ? v : !v;
+      }() ),
+
+      _gecko = ( function() {
+        return ( navigator.userAgent.match( /gecko\/*\d/i ) || [] ).length > 0;
       }() ),
 
       _defaultOptions = {
@@ -175,7 +179,6 @@
         touchAction: 'none'
       } );
         
-
       this._initOptions = options || {};
 
       this._forcePosition(this._$elem);
@@ -276,7 +279,7 @@
       this._$drawContainer.geographics({ style: this._initOptions.drawStyle || {}, doubleBuffer: false });
       this._options["drawStyle"] = this._$drawContainer.geographics("option", "style");
 
-      this._$shapesContainer.geographics( { style: this._initOptions.shapeStyle || { } } );
+      this._$shapesContainer.geographics( { style: this._initOptions.shapeStyle || { }, doubleBuffer: !_gecko } );
       this._createdGraphics = true;
 
       this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
@@ -994,7 +997,7 @@
 
       this._map._$shapesContainers = this._map._$shapesContainers.add( this._$shapesContainer );
 
-      this._$shapesContainer.geographics( );
+      this._$shapesContainer.geographics( { doubleBuffer: !_gecko });
       this._createdGraphics = true;
 
       this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
