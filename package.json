@@ -1,9 +1,9 @@
 {
   "name": "jquery.geo",
   "title": "jQuery Geo",
-  "description": "An interactive mapping widget and geo-spatial API built on open source and open data (*NOT* a wrapper of other APIs, such as Google Maps)",
-  "version": "1.0.0-b3.2",
-  "main": "dist/jquery.geo-1.0.0-b3.2.js",
+  "description": "An interactive mapping widget and geo-spatial API built on open source and open data (NOT a wrapper of other APIs, such as Google Maps)",
+  "version": "1.0.0-rc1",
+  "main": "dist/jquery.geo-1.0.0-rc1.js",
   "registry": "npm",
   "format": "global",
   "homepage": "http://jquerygeo.com",
@@ -12,7 +12,7 @@
   },
   "author": {
     "name": "Ryan Morrison-Westphal",
-    "company": "Berkman Center for Internet and Society",
+    "company": "Tripping the Bits",
     "email": "ryan@trippingthebits.com",
     "url": "http://trippingthebits.com"
   },

@@ -1,11 +1,15 @@
 (function ($, window, undefined) {
   var _widgetIdSeed = 0,
-      _ieVersion = ( function () {
+      _ieVersion = ( function() {
         var v = 5, div = document.createElement("div"), a = div.all || [];
         do {
           div.innerHTML = "<!--[if gt IE " + (++v) + "]><br/><![endif]-->";
         } while ( a[0] );
         return v > 6 ? v : !v;
+      }() ),
+
+      _gecko = ( function() {
+        return ( navigator.userAgent.match( /gecko\/*\d/i ) || [] ).length > 0;
       }() ),
 
       _defaultOptions = {
@@ -102,6 +106,7 @@
     _centerInteractive: undefined,
     _pixelSizeInteractive: undefined,
     _timeoutInteractive: null,
+    _timeoutWheel: null,
     _triggerInteractive: false,
 
     _timeoutRefreshShapes: null,
@@ -174,7 +179,6 @@
         touchAction: 'none'
       } );
         
-
       this._initOptions = options || {};
 
       this._forcePosition(this._$elem);
@@ -204,7 +208,8 @@
           this._shiftDown =
           this._panning =
           this._isTap =
-          this._isDbltap = false;
+          this._isDbltap = 
+          this._isMultiTouch = false;
 
       this._anchor = [ 0, 0 ]; /* mouse down */
       this._current = [ 0, 0 ]; /* mouse move no matter what */
@@ -252,7 +257,7 @@
 
       this._$eventTarget.bind(touchStartEvent, $.proxy(this._eventTarget_touchstart, this));
 
-      var dragTarget = (this._$eventTarget[0].setCapture) ? this._$eventTarget : $(document);
+      var dragTarget = (this._$eventTarget[0].setCapture || this._pointerEvents) ? this._$eventTarget : $(document);
       dragTarget.bind(touchMoveEvent, $.proxy(this._dragTarget_touchmove, this));
       dragTarget.bind(touchStopEvent, $.proxy(this._dragTarget_touchstop, this));
 
@@ -274,7 +279,7 @@
       this._$drawContainer.geographics({ style: this._initOptions.drawStyle || {}, doubleBuffer: false });
       this._options["drawStyle"] = this._$drawContainer.geographics("option", "style");
 
-      this._$shapesContainer.geographics( { style: this._initOptions.shapeStyle || { } } );
+      this._$shapesContainer.geographics( { style: this._initOptions.shapeStyle || { }, doubleBuffer: !_gecko } );
       this._createdGraphics = true;
 
       this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
@@ -992,7 +997,7 @@
 
       this._map._$shapesContainers = this._map._$shapesContainers.add( this._$shapesContainer );
 
-      this._$shapesContainer.geographics( );
+      this._$shapesContainer.geographics( { doubleBuffer: !_gecko });
       this._createdGraphics = true;
 
       this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
@@ -1671,34 +1676,20 @@
         return;
       }
 
-      if ( this._pointerEvents ) {
-        console.log( 'PointerEvent touchstart' );
-      }
-
       var doInteractiveTimeout = this._clearInteractiveTimeout( );
 
       var offset = $(e.currentTarget).offset(),
           touches = e.originalEvent.changedTouches;
 
       if ( this._pointerEvents ) {
-        e.currentTarget.setPointerCapture( e.originalEvent.pointerId );
-
-
-
-
-
-
-
-
-        if ( !this._isMultiTouch && this._mouseDown && this._multiTouchAnchor.length > 0 && e.originalEvent.pointerId !== this._multiTouchAnchor[ 0 ].pointerId ) {
+        if ( !this._isMultiTouch && this._mouseDown && this._multiTouchAnchor.length > 0 ) {
           // switch to multitouch
+          e.currentTarget.setPointerCapture( e.originalEvent.pointerId );
+
           this._isMultiTouch = true;
           this._wheelLevel = 0;
 
           this._multiTouchAnchor.push( e.originalEvent );
-
-
-
 
           this._multiTouchCurrentBbox = [
             this._multiTouchCurrentBbox[ 0 ],
@@ -1712,13 +1703,14 @@
           this._anchor = $.geo.center( this._multiTouchCurrentBbox, true );
           this._current = $.merge( [], this._anchor );
 
-
           if ( doInteractiveTimeout ) {
             this._setInteractiveTimeout( true );
           }
 
           return false;
-        } else {
+        } else if ( this._multiTouchAnchor.length < 2 ) {
+          e.currentTarget.setPointerCapture( e.originalEvent.pointerId );
+
           this._multiTouchAnchor.push( e.originalEvent );
 
           this._multiTouchCurrentBbox = [
@@ -1826,7 +1818,7 @@
       var offset = this._$eventTarget.offset(),
           drawCoordsLen = this._drawCoords.length,
           touches = e.originalEvent.changedTouches,
-          current,
+          current = null,
           anchorDistance,
           currentDistance,
           wheelLevel,
@@ -1835,21 +1827,24 @@
           i;
 
       if ( this._pointerEvents ) {
-
         if ( this._isMultiTouch ) {
-
           if ( e.originalEvent.pointerId === this._multiTouchAnchor[ 0 ].pointerId ) {
             this._multiTouchCurrentBbox[ 0 ] = e.originalEvent.pageX - offset.left;
             this._multiTouchCurrentBbox[ 1 ] = e.originalEvent.pageY - offset.top;
           } else if ( e.originalEvent.pointerId === this._multiTouchAnchor[ 1 ].pointerId ) {
             this._multiTouchCurrentBbox[ 2 ] = e.originalEvent.pageX - offset.left;
             this._multiTouchCurrentBbox[ 3 ] = e.originalEvent.pageY - offset.top;
+          } else {
+            // untracked pointer
+            e.preventDefault();
+            if ( doInteractiveTimeout ) {
+              this._setInteractiveTimeout( true );
+            }
+            return false;
           }
 
           anchorDistance = $.geo._distancePointPoint( [ this._multiTouchAnchorBbox[ 0 ], this._multiTouchAnchorBbox[ 1 ] ], [ this._multiTouchAnchorBbox[ 2 ], this._multiTouchAnchorBbox[ 3 ] ] );
           currentDistance = $.geo._distancePointPoint( [ this._multiTouchCurrentBbox[ 0 ], this._multiTouchCurrentBbox[ 1 ] ], [ this._multiTouchCurrentBbox[ 2 ], this._multiTouchCurrentBbox[ 3 ] ] );
-
-          current = $.geo.center( this._multiTouchCurrentBbox, true );
 
           wheelLevel = ( ( currentDistance - anchorDistance ) / anchorDistance );
 
@@ -1871,7 +1866,8 @@
           doInteractiveTimeout = true;
 
           current = $.geo.center( this._multiTouchCurrentBbox, true );
-        } else {
+
+        } else if ( this._mouseDown ) {
           this._multiTouchAnchor[ 0 ] = e.originalEvent;
 
           this._multiTouchCurrentBbox = [
@@ -1890,9 +1886,6 @@
           this._wheelLevel = 0;
 
           this._multiTouchAnchor.push( touches[ 0 ] );
-
-
-
 
           this._multiTouchCurrentBbox = [
             this._multiTouchCurrentBbox[ 0 ],
@@ -1927,8 +1920,6 @@
           anchorDistance = $.geo._distancePointPoint( [ this._multiTouchAnchorBbox[ 0 ], this._multiTouchAnchorBbox[ 1 ] ], [ this._multiTouchAnchorBbox[ 2 ], this._multiTouchAnchorBbox[ 3 ] ] );
           currentDistance = $.geo._distancePointPoint( [ this._multiTouchCurrentBbox[ 0 ], this._multiTouchCurrentBbox[ 1 ] ], [ this._multiTouchCurrentBbox[ 2 ], this._multiTouchCurrentBbox[ 3 ] ] );
 
-          current = $.geo.center( this._multiTouchCurrentBbox, true );
-
           wheelLevel = ( ( currentDistance - anchorDistance ) / anchorDistance );
 
           if ( wheelLevel > 0 ) {
@@ -1954,6 +1945,14 @@
         }
       } else {
         current = [e.pageX - offset.left, e.pageY - offset.top];
+      }
+
+      if ( current === null ) {
+        e.preventDefault();
+        if ( doInteractiveTimeout ) {
+          this._setInteractiveTimeout( true );
+        }
+        return false;
       }
 
       if (current[0] === this._lastMove[0] && current[1] === this._lastMove[1]) {
@@ -2076,10 +2075,6 @@
         return;
       }
 
-      if ( this._pointerEvents ) {
-        console.log( 'PointerEvent touchstop' );
-      }
-
       if ( !this._mouseDown ) {
         if ( _ieVersion === 7 ) {
           // ie7 doesn't appear to trigger dblclick on this._$eventTarget,
@@ -2100,7 +2095,7 @@
           mode = this._options[ "mode" ],
           shift = this._options[ "shift" ],
           defaultShift = ( mode === "dragBox" ? "dragBox" : "zoom" ),
-          current, i, clickDate,
+          current = null, i, clickDate,
           dx, dy,
           coordBuffer,
           triggerShape;
@@ -2110,14 +2105,22 @@
       }
 
       if ( this._pointerEvents ) {
-        current = [e.pageX - offset.left, e.pageY - offset.top];
+        if ( e.originalEvent.pointerId === this._multiTouchAnchor[ 0 ].pointerId || e.originalEvent.pointerId === this._multiTouchAnchor[ 1 ].pointerId ) {
+          e.currentTarget.releasePointerCapture( e.originalEvent.pointerId );
 
-        for ( i = 0; i < this._multiTouchAnchor.length; i++ ) {
-          e.currentTarget.releasePointerCapture( this._multiTouchAnchor[ i ].pointerId );
+          current = [e.originalEvent.pageX - offset.left, e.originalEvent.pageY - offset.top];
+
+          this._multiTouchAnchor = [];
+          this._inOp = false;
+        } else {
+          // untracked pointer
+          e.preventDefault();
+          if ( doInteractiveTimeout ) {
+            this._setInteractiveTimeout( true );
+          }
+          return;
         }
 
-        this._multiTouchAnchor = [];
-        this._inOp = false;
       } else if (this._supportTouch && e.originalEvent.changedTouches) {
         current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
         this._multiTouchAnchor = [];
@@ -2152,6 +2155,7 @@
         if ( doInteractiveTimeout ) {
           this._setInteractiveTimeout( true );
         }
+
         return;
       }
 
@@ -2368,20 +2372,34 @@
         return false;
       }
 
-      if (e.deltaY !== 0) {
-        this._clearInteractiveTimeout( );
+      if ( e.deltaY !== 0 ) {
+        if ( this._timeoutWheel ) {
+          clearTimeout( this._timeoutWheel );
+          this._timeoutWheel = null;
+        }
 
-        var delta = e.deltaY > 0 ? 1 : -1;
+        var geomap = this;
+        var currentTarget = e.currentTarget;
+        var deltaY = e.deltaY;
+        var pageX = e.pageX;
+        var pageY = e.pageY;
 
-        var offset = $(e.currentTarget).offset();
-        this._anchor = [e.pageX - offset.left, e.pageY - offset.top];
+        this._timeoutWheel = setTimeout( function () {
+          geomap._clearInteractiveTimeout( );
 
-        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, this._options[ "tilingScheme" ] !== null );
+          var delta = deltaY > 0 ? 1 : -1;
 
-        this._setInteractiveCenterAndSize( wheelCenterAndSize.center, wheelCenterAndSize.pixelSize );
-        this._interactiveTransform( );
+          var offset = $(currentTarget).offset();
+          geomap._anchor = [pageX - offset.left, pageY - offset.top];
 
-        this._setInteractiveTimeout( true );
+          var wheelCenterAndSize = geomap._getZoomCenterAndSize( geomap._anchor, delta, geomap._options[ "tilingScheme" ] !== null );
+
+          geomap._setInteractiveCenterAndSize( wheelCenterAndSize.center, wheelCenterAndSize.pixelSize );
+          geomap._interactiveTransform( );
+
+          geomap._setInteractiveTimeout( true );
+        }, 30 );
+
       }
 
       return false;

@@ -21,6 +21,8 @@
 
     _$canvasSceneFront: undefined, //< if _trueCanvas, where canvas images get written (front buffer)
     _$canvasSceneBack: undefined, //< if _trueCanvas, where canvas images get written (back buffer)
+    _$canvasSceneStale: undefined, //< if _trueCanvas, scene to hide next
+    _$canvasSceneDrawn: undefined, //< if _trueCanvas, scene to show next
     _timeoutEnd:  null,
     _requireFlip: false,
 
@@ -100,8 +102,8 @@
 
         // create our front & back buffers
         // though, at any time either one can be in front
-        this._$canvasSceneFront = $( window.toStaticHTML( '<img id="scene0" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ); //.load($.proxy(this._canvasSceneLoad, this));
-        this._$canvasSceneBack = $( window.toStaticHTML( '<img id="scene1" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ); //.load($.proxy(this._canvasSceneLoad, this));
+        this._$canvasSceneFront = $( window.toStaticHTML( '<img id="scene0" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ).on( 'load', $.proxy( this._canvasImgLoad, this ) );
+        this._$canvasSceneBack = $( window.toStaticHTML( '<img id="scene1" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ).on( 'load', $.proxy( this._canvasImgLoad, this ) );
 
       } else if (_ieVersion <= 8) {
         this._trueCanvas = false;
@@ -440,20 +442,25 @@
       } );
     },
 
+    _canvasImgLoad: function( ) {
+      var geographics = this;
+      geographics._$canvasSceneFront = geographics._$canvasSceneDrawn.prependTo( geographics._$elem );
+      geographics._$canvasSceneBack = geographics._$canvasSceneStale;
+      geographics._$canvasSceneBack.detach();
+    },
+
     _canvasSceneLoad: function() {
       var geographics = this;
       if ( geographics._requireFlip ) {
         geographics._requireFlip = false;
-        var oldCanvasScene = geographics._$canvasSceneFront;
+        geographics._$canvasSceneStale = geographics._$canvasSceneFront;
 
-        geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
+        geographics._$canvasSceneDrawn = geographics._$canvasSceneBack.css( {
           left: 0,
           top: 0,
           width: geographics._width,
           height: geographics._height
-        } ).prependTo( geographics._$elem );
-
-        geographics._$canvasSceneBack = oldCanvasScene.prop( "src", "" ).detach();
+        } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) );
       }
     },
 
@@ -466,7 +473,6 @@
       }
 
       if ( geographics._trueCanvas && geographics._options.doubleBuffer && geographics._trueDoubleBuffer ) {
-        geographics._$canvasSceneBack.prop( "src", geographics._$canvas[ 0 ].toDataURL( ) );
         this._canvasSceneLoad( );
       }
 
