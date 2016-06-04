@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0.0-rc1 - 2016-05-29
+/*! jQuery Geo - v1.0.0-rc1 - 2016-06-04
 * http://jquerygeo.com
 * Copyright (c) 2016 Ryan Morrison-Westphal; Licensed MIT */
 // Copyright 2006 Google Inc.
@@ -4391,36 +4391,16 @@ $.Widget.prototype = {
         this._timeoutEnd = null;
       }
 
-      if ( this._trueCanvas ) {
-        if ( this._options.doubleBuffer && this._trueDoubleBuffer ) {
+      if ( this._trueCanvas && this._options.doubleBuffer && this._trueDoubleBuffer ) {
+        this._canvasSceneLoad( );
 
-          var geographics = this;
-
-          if ( this._requireFlip ) {
-            geographics._requireFlip = false;
-
-            var oldCanvasScene = geographics._$canvasSceneFront;
-
-            geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
-              left: 0,
-              top: 0,
-              width: geographics._width,
-              height: geographics._height
-            } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) ).prependTo( geographics._$elem );
-
-            geographics._$canvasSceneBack = oldCanvasScene.prop( "src", ""  ).detach();
-          }
-
-          // transform a finished scene, can assume no drawing during these calls
-          this._$canvasSceneFront.css( {
-            left: Math.round( origin[ 0 ] ),
-            top: Math.round( origin[ 1 ] ),
-            width: this._width * scale,
-            height: this._height * scale
-          } );
-        } else {
-          this._context.clearRect(0, 0, this._width, this._height);
-        }
+        // transform a finished scene, can assume no drawing during these calls
+        this._$canvasSceneFront.css( {
+          left: Math.round( origin[ 0 ] ),
+          top: Math.round( origin[ 1 ] ),
+          width: this._width * scale,
+          height: this._height * scale
+        } );
       } else {
         this._context.clearRect(0, 0, this._width, this._height);
       }
@@ -4467,7 +4447,6 @@ $.Widget.prototype = {
       if ( geographics._trueCanvas && geographics._options.doubleBuffer && geographics._trueDoubleBuffer ) {
         this._canvasSceneLoad( );
       }
-
 
       geographics._$labelsContainerBack.html( window.toStaticHTML( geographics._labelsHtml ) ).find("a").css({
         position: "relative",
@@ -6433,7 +6412,7 @@ $.Widget.prototype = {
 
           current = $.geo.center( this._multiTouchCurrentBbox, true );
 
-        } else if ( this._mouseDown ) {
+        } else {
           this._multiTouchAnchor[ 0 ] = e.originalEvent;
 
           this._multiTouchCurrentBbox = [
