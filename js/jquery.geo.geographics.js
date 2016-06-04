@@ -400,22 +400,7 @@
       }
 
       if ( this._trueCanvas && this._options.doubleBuffer && this._trueDoubleBuffer ) {
-        var geographics = this;
-
-        if ( this._requireFlip ) {
-          geographics._requireFlip = false;
-
-          var oldCanvasScene = geographics._$canvasSceneFront;
-
-          geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
-            left: 0,
-            top: 0,
-            width: geographics._width,
-            height: geographics._height
-          } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) ).prependTo( geographics._$elem );
-
-          geographics._$canvasSceneBack = oldCanvasScene.prop( "src", ""  ).detach();
-        }
+        this._canvasSceneLoad( );
 
         // transform a finished scene, can assume no drawing during these calls
         this._$canvasSceneFront.css( {
@@ -470,7 +455,6 @@
       if ( geographics._trueCanvas && geographics._options.doubleBuffer && geographics._trueDoubleBuffer ) {
         this._canvasSceneLoad( );
       }
-
 
       geographics._$labelsContainerBack.html( window.toStaticHTML( geographics._labelsHtml ) ).find("a").css({
         position: "relative",
