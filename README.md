@@ -64,7 +64,7 @@ You can also download the latest release as a [minified JavaScript file][min] or
 
 The latest docs are hosted at: http://docs.jquerygeo.com
 
-Release and other announcements via @jQueryGeo on Twitter: https://twitter.com/jQueryGeo
+Release and other announcements via @geomappin on Twitter: https://twitter.com/geomappin
 
 News, dev updates, & personal tweets via @ryanttb on Twitter: https://twitter.com/ryanttb
 
