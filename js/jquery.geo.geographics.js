@@ -399,36 +399,31 @@
         this._timeoutEnd = null;
       }
 
-      if ( this._trueCanvas ) {
-        if ( this._options.doubleBuffer && this._trueDoubleBuffer ) {
+      if ( this._trueCanvas && this._options.doubleBuffer && this._trueDoubleBuffer ) {
+        var geographics = this;
 
-          var geographics = this;
+        if ( this._requireFlip ) {
+          geographics._requireFlip = false;
 
-          if ( this._requireFlip ) {
-            geographics._requireFlip = false;
+          var oldCanvasScene = geographics._$canvasSceneFront;
 
-            var oldCanvasScene = geographics._$canvasSceneFront;
+          geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
+            left: 0,
+            top: 0,
+            width: geographics._width,
+            height: geographics._height
+          } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) ).prependTo( geographics._$elem );
 
-            geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
-              left: 0,
-              top: 0,
-              width: geographics._width,
-              height: geographics._height
-            } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) ).prependTo( geographics._$elem );
-
-            geographics._$canvasSceneBack = oldCanvasScene.prop( "src", ""  ).detach();
-          }
-
-          // transform a finished scene, can assume no drawing during these calls
-          this._$canvasSceneFront.css( {
-            left: Math.round( origin[ 0 ] ),
-            top: Math.round( origin[ 1 ] ),
-            width: this._width * scale,
-            height: this._height * scale
-          } );
-        } else {
-          this._context.clearRect(0, 0, this._width, this._height);
+          geographics._$canvasSceneBack = oldCanvasScene.prop( "src", ""  ).detach();
         }
+
+        // transform a finished scene, can assume no drawing during these calls
+        this._$canvasSceneFront.css( {
+          left: Math.round( origin[ 0 ] ),
+          top: Math.round( origin[ 1 ] ),
+          width: this._width * scale,
+          height: this._height * scale
+        } );
       } else {
         this._context.clearRect(0, 0, this._width, this._height);
       }
