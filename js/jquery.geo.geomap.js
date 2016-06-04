@@ -1867,7 +1867,7 @@
 
           current = $.geo.center( this._multiTouchCurrentBbox, true );
 
-        } else if ( this._mouseDown ) {
+        } else {
           this._multiTouchAnchor[ 0 ] = e.originalEvent;
 
           this._multiTouchCurrentBbox = [
