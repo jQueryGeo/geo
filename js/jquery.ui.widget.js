@@ -8,7 +8,7 @@
  * http://docs.jquery.com/UI/Widget
  */
 
-if ( ! $.widget ) {
+if ( ! jQuery.widget ) {
 
 (function( $, undefined ) {
 
