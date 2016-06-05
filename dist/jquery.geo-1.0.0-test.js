@@ -1,6 +1,6 @@
-/*! jQuery Geo - v1.0.0-test - 2015-10-11
+/*! jQuery Geo - v1.0.0-test - 2016-06-05
 * http://jquerygeo.com
-* Copyright (c) 2015 Ryan Westphal; Licensed MIT */
+* Copyright (c) 2016 Ryan Morrison-Westphal; Licensed MIT */
 // Copyright 2006 Google Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -4013,6 +4013,8 @@ $.Widget.prototype = {
 
     _$canvasSceneFront: undefined, //< if _trueCanvas, where canvas images get written (front buffer)
     _$canvasSceneBack: undefined, //< if _trueCanvas, where canvas images get written (back buffer)
+    _$canvasSceneStale: undefined, //< if _trueCanvas, scene to hide next
+    _$canvasSceneDrawn: undefined, //< if _trueCanvas, scene to show next
     _timeoutEnd:  null,
     _requireFlip: false,
 
@@ -4092,8 +4094,8 @@ $.Widget.prototype = {
 
         // create our front & back buffers
         // though, at any time either one can be in front
-        this._$canvasSceneFront = $( window.toStaticHTML( '<img id="scene0" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ); //.load($.proxy(this._canvasSceneLoad, this));
-        this._$canvasSceneBack = $( window.toStaticHTML( '<img id="scene1" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ); //.load($.proxy(this._canvasSceneLoad, this));
+        this._$canvasSceneFront = $( window.toStaticHTML( '<img id="scene0" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ).on( 'load', $.proxy( this._canvasImgLoad, this ) );
+        this._$canvasSceneBack = $( window.toStaticHTML( '<img id="scene1" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ).on( 'load', $.proxy( this._canvasImgLoad, this ) );
 
       } else if (_ieVersion <= 8) {
         this._trueCanvas = false;
@@ -4389,36 +4391,16 @@ $.Widget.prototype = {
         this._timeoutEnd = null;
       }
 
-      if ( this._trueCanvas ) {
-        if ( this._options.doubleBuffer && this._trueDoubleBuffer ) {
+      if ( this._trueCanvas && this._options.doubleBuffer && this._trueDoubleBuffer ) {
+        this._canvasSceneLoad( );
 
-          var geographics = this;
-
-          if ( this._requireFlip ) {
-            geographics._requireFlip = false;
-
-            var oldCanvasScene = geographics._$canvasSceneFront;
-
-            geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
-              left: 0,
-              top: 0,
-              width: geographics._width,
-              height: geographics._height
-            } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) ).prependTo( geographics._$elem );
-
-            geographics._$canvasSceneBack = oldCanvasScene.prop( "src", ""  ).detach();
-          }
-
-          // transform a finished scene, can assume no drawing during these calls
-          this._$canvasSceneFront.css( {
-            left: Math.round( origin[ 0 ] ),
-            top: Math.round( origin[ 1 ] ),
-            width: this._width * scale,
-            height: this._height * scale
-          } );
-        } else {
-          this._context.clearRect(0, 0, this._width, this._height);
-        }
+        // transform a finished scene, can assume no drawing during these calls
+        this._$canvasSceneFront.css( {
+          left: Math.round( origin[ 0 ] ),
+          top: Math.round( origin[ 1 ] ),
+          width: this._width * scale,
+          height: this._height * scale
+        } );
       } else {
         this._context.clearRect(0, 0, this._width, this._height);
       }
@@ -4432,20 +4414,25 @@ $.Widget.prototype = {
       } );
     },
 
+    _canvasImgLoad: function( ) {
+      var geographics = this;
+      geographics._$canvasSceneFront = geographics._$canvasSceneDrawn.prependTo( geographics._$elem );
+      geographics._$canvasSceneBack = geographics._$canvasSceneStale;
+      geographics._$canvasSceneBack.detach();
+    },
+
     _canvasSceneLoad: function() {
       var geographics = this;
       if ( geographics._requireFlip ) {
         geographics._requireFlip = false;
-        var oldCanvasScene = geographics._$canvasSceneFront;
+        geographics._$canvasSceneStale = geographics._$canvasSceneFront;
 
-        geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
+        geographics._$canvasSceneDrawn = geographics._$canvasSceneBack.css( {
           left: 0,
           top: 0,
           width: geographics._width,
           height: geographics._height
-        } ).prependTo( geographics._$elem );
-
-        geographics._$canvasSceneBack = oldCanvasScene.prop( "src", "" ).detach();
+        } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) );
       }
     },
 
@@ -4458,10 +4445,8 @@ $.Widget.prototype = {
       }
 
       if ( geographics._trueCanvas && geographics._options.doubleBuffer && geographics._trueDoubleBuffer ) {
-        geographics._$canvasSceneBack.prop( "src", geographics._$canvas[ 0 ].toDataURL( ) );
         this._canvasSceneLoad( );
       }
-
 
       geographics._$labelsContainerBack.html( window.toStaticHTML( geographics._labelsHtml ) ).find("a").css({
         position: "relative",
@@ -4560,12 +4545,16 @@ $.Widget.prototype = {
 
 (function ($, window, undefined) {
   var _widgetIdSeed = 0,
-      _ieVersion = ( function () {
+      _ieVersion = ( function() {
         var v = 5, div = document.createElement("div"), a = div.all || [];
         do {
           div.innerHTML = "<!--[if gt IE " + (++v) + "]><br/><![endif]-->";
         } while ( a[0] );
         return v > 6 ? v : !v;
+      }() ),
+
+      _gecko = ( function() {
+        return ( navigator.userAgent.match( /gecko\/*\d/i ) || [] ).length > 0;
       }() ),
 
       _defaultOptions = {
@@ -4662,6 +4651,7 @@ $.Widget.prototype = {
     _centerInteractive: undefined,
     _pixelSizeInteractive: undefined,
     _timeoutInteractive: null,
+    _timeoutWheel: null,
     _triggerInteractive: false,
 
     _timeoutRefreshShapes: null,
@@ -4734,7 +4724,6 @@ $.Widget.prototype = {
         touchAction: 'none'
       } );
         
-
       this._initOptions = options || {};
 
       this._forcePosition(this._$elem);
@@ -4764,7 +4753,8 @@ $.Widget.prototype = {
           this._shiftDown =
           this._panning =
           this._isTap =
-          this._isDbltap = false;
+          this._isDbltap = 
+          this._isMultiTouch = false;
 
       this._anchor = [ 0, 0 ]; /* mouse down */
       this._current = [ 0, 0 ]; /* mouse move no matter what */
@@ -4799,7 +4789,7 @@ $.Widget.prototype = {
 
       this._pointerEvents = window.PointerEvent;
       this._supportTouch = ("ontouchend" in document);
-      this._softDblClick = this._supportTouch || _ieVersion === 7;
+      this._softDblClick = this._pointerEvents || this._supportTouch || _ieVersion === 7;
 
       var geomap = this,
           touchStartEvent = this._pointerEvents ? 'pointerdown' : ( this._supportTouch ? "touchstart mousedown" : "mousedown" ),
@@ -4808,11 +4798,15 @@ $.Widget.prototype = {
 
       $(document).keydown($.proxy(this._document_keydown, this));
 
-      this._$eventTarget.dblclick($.proxy(this._eventTarget_dblclick, this));
+      if ( this._softDblClick ) {
+        this._$eventTarget.on( 'softdblclick', $.proxy(this._eventTarget_dblclick, this));
+      } else {
+        this._$eventTarget.dblclick($.proxy(this._eventTarget_dblclick, this));
+      }
 
       this._$eventTarget.bind(touchStartEvent, $.proxy(this._eventTarget_touchstart, this));
 
-      var dragTarget = (this._$eventTarget[0].setCapture) ? this._$eventTarget : $(document);
+      var dragTarget = (this._$eventTarget[0].setCapture || this._pointerEvents) ? this._$eventTarget : $(document);
       dragTarget.bind(touchMoveEvent, $.proxy(this._dragTarget_touchmove, this));
       dragTarget.bind(touchStopEvent, $.proxy(this._dragTarget_touchstop, this));
 
@@ -4834,7 +4828,7 @@ $.Widget.prototype = {
       this._$drawContainer.geographics({ style: this._initOptions.drawStyle || {}, doubleBuffer: false });
       this._options["drawStyle"] = this._$drawContainer.geographics("option", "style");
 
-      this._$shapesContainer.geographics( { style: this._initOptions.shapeStyle || { } } );
+      this._$shapesContainer.geographics( { style: this._initOptions.shapeStyle || { }, doubleBuffer: !_gecko } );
       this._createdGraphics = true;
 
       this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
@@ -5552,7 +5546,7 @@ $.Widget.prototype = {
 
       this._map._$shapesContainers = this._map._$shapesContainers.add( this._$shapesContainer );
 
-      this._$shapesContainer.geographics( );
+      this._$shapesContainer.geographics( { doubleBuffer: !_gecko });
       this._createdGraphics = true;
 
       this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
@@ -6231,34 +6225,20 @@ $.Widget.prototype = {
         return;
       }
 
-      if ( this._pointerEvents ) {
-        console.log( 'PointerEvent touchstart' );
-      }
-
       var doInteractiveTimeout = this._clearInteractiveTimeout( );
 
       var offset = $(e.currentTarget).offset(),
           touches = e.originalEvent.changedTouches;
 
       if ( this._pointerEvents ) {
-        e.currentTarget.setPointerCapture( e.originalEvent.pointerId );
-
-
-
-
-
-
-
-
-        if ( !this._isMultiTouch && this._mouseDown && this._multiTouchAnchor.length > 0 && e.originalEvent.pointerId !== this._multiTouchAnchor[ 0 ].pointerId ) {
+        if ( !this._isMultiTouch && this._mouseDown && this._multiTouchAnchor.length > 0 ) {
           // switch to multitouch
+          e.currentTarget.setPointerCapture( e.originalEvent.pointerId );
+
           this._isMultiTouch = true;
           this._wheelLevel = 0;
 
           this._multiTouchAnchor.push( e.originalEvent );
-
-
-
 
           this._multiTouchCurrentBbox = [
             this._multiTouchCurrentBbox[ 0 ],
@@ -6272,13 +6252,14 @@ $.Widget.prototype = {
           this._anchor = $.geo.center( this._multiTouchCurrentBbox, true );
           this._current = $.merge( [], this._anchor );
 
-
           if ( doInteractiveTimeout ) {
             this._setInteractiveTimeout( true );
           }
 
           return false;
-        } else {
+        } else if ( this._multiTouchAnchor.length < 2 ) {
+          e.currentTarget.setPointerCapture( e.originalEvent.pointerId );
+
           this._multiTouchAnchor.push( e.originalEvent );
 
           this._multiTouchCurrentBbox = [
@@ -6386,7 +6367,7 @@ $.Widget.prototype = {
       var offset = this._$eventTarget.offset(),
           drawCoordsLen = this._drawCoords.length,
           touches = e.originalEvent.changedTouches,
-          current,
+          current = null,
           anchorDistance,
           currentDistance,
           wheelLevel,
@@ -6395,21 +6376,24 @@ $.Widget.prototype = {
           i;
 
       if ( this._pointerEvents ) {
-
         if ( this._isMultiTouch ) {
-
           if ( e.originalEvent.pointerId === this._multiTouchAnchor[ 0 ].pointerId ) {
             this._multiTouchCurrentBbox[ 0 ] = e.originalEvent.pageX - offset.left;
             this._multiTouchCurrentBbox[ 1 ] = e.originalEvent.pageY - offset.top;
           } else if ( e.originalEvent.pointerId === this._multiTouchAnchor[ 1 ].pointerId ) {
             this._multiTouchCurrentBbox[ 2 ] = e.originalEvent.pageX - offset.left;
             this._multiTouchCurrentBbox[ 3 ] = e.originalEvent.pageY - offset.top;
+          } else {
+            // untracked pointer
+            e.preventDefault();
+            if ( doInteractiveTimeout ) {
+              this._setInteractiveTimeout( true );
+            }
+            return false;
           }
 
           anchorDistance = $.geo._distancePointPoint( [ this._multiTouchAnchorBbox[ 0 ], this._multiTouchAnchorBbox[ 1 ] ], [ this._multiTouchAnchorBbox[ 2 ], this._multiTouchAnchorBbox[ 3 ] ] );
           currentDistance = $.geo._distancePointPoint( [ this._multiTouchCurrentBbox[ 0 ], this._multiTouchCurrentBbox[ 1 ] ], [ this._multiTouchCurrentBbox[ 2 ], this._multiTouchCurrentBbox[ 3 ] ] );
-
-          current = $.geo.center( this._multiTouchCurrentBbox, true );
 
           wheelLevel = ( ( currentDistance - anchorDistance ) / anchorDistance );
 
@@ -6431,6 +6415,7 @@ $.Widget.prototype = {
           doInteractiveTimeout = true;
 
           current = $.geo.center( this._multiTouchCurrentBbox, true );
+
         } else {
           this._multiTouchAnchor[ 0 ] = e.originalEvent;
 
@@ -6450,9 +6435,6 @@ $.Widget.prototype = {
           this._wheelLevel = 0;
 
           this._multiTouchAnchor.push( touches[ 0 ] );
-
-
-
 
           this._multiTouchCurrentBbox = [
             this._multiTouchCurrentBbox[ 0 ],
@@ -6487,8 +6469,6 @@ $.Widget.prototype = {
           anchorDistance = $.geo._distancePointPoint( [ this._multiTouchAnchorBbox[ 0 ], this._multiTouchAnchorBbox[ 1 ] ], [ this._multiTouchAnchorBbox[ 2 ], this._multiTouchAnchorBbox[ 3 ] ] );
           currentDistance = $.geo._distancePointPoint( [ this._multiTouchCurrentBbox[ 0 ], this._multiTouchCurrentBbox[ 1 ] ], [ this._multiTouchCurrentBbox[ 2 ], this._multiTouchCurrentBbox[ 3 ] ] );
 
-          current = $.geo.center( this._multiTouchCurrentBbox, true );
-
           wheelLevel = ( ( currentDistance - anchorDistance ) / anchorDistance );
 
           if ( wheelLevel > 0 ) {
@@ -6514,6 +6494,14 @@ $.Widget.prototype = {
         }
       } else {
         current = [e.pageX - offset.left, e.pageY - offset.top];
+      }
+
+      if ( current === null ) {
+        e.preventDefault();
+        if ( doInteractiveTimeout ) {
+          this._setInteractiveTimeout( true );
+        }
+        return false;
       }
 
       if (current[0] === this._lastMove[0] && current[1] === this._lastMove[1]) {
@@ -6636,10 +6624,6 @@ $.Widget.prototype = {
         return;
       }
 
-      if ( this._pointerEvents ) {
-        console.log( 'PointerEvent touchstop' );
-      }
-
       if ( !this._mouseDown ) {
         if ( _ieVersion === 7 ) {
           // ie7 doesn't appear to trigger dblclick on this._$eventTarget,
@@ -6660,7 +6644,7 @@ $.Widget.prototype = {
           mode = this._options[ "mode" ],
           shift = this._options[ "shift" ],
           defaultShift = ( mode === "dragBox" ? "dragBox" : "zoom" ),
-          current, i, clickDate,
+          current = null, i, clickDate,
           dx, dy,
           coordBuffer,
           triggerShape;
@@ -6670,14 +6654,22 @@ $.Widget.prototype = {
       }
 
       if ( this._pointerEvents ) {
-        current = [e.pageX - offset.left, e.pageY - offset.top];
+        if ( e.originalEvent.pointerId === this._multiTouchAnchor[ 0 ].pointerId || e.originalEvent.pointerId === this._multiTouchAnchor[ 1 ].pointerId ) {
+          e.currentTarget.releasePointerCapture( e.originalEvent.pointerId );
 
-        for ( i = 0; i < this._multiTouchAnchor.length; i++ ) {
-          e.currentTarget.releasePointerCapture( this._multiTouchAnchor[ i ].pointerId );
+          current = [e.originalEvent.pageX - offset.left, e.originalEvent.pageY - offset.top];
+
+          this._multiTouchAnchor = [];
+          this._inOp = false;
+        } else {
+          // untracked pointer
+          e.preventDefault();
+          if ( doInteractiveTimeout ) {
+            this._setInteractiveTimeout( true );
+          }
+          return;
         }
 
-        this._multiTouchAnchor = [];
-        this._inOp = false;
       } else if (this._supportTouch && e.originalEvent.changedTouches) {
         current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
         this._multiTouchAnchor = [];
@@ -6712,6 +6704,7 @@ $.Widget.prototype = {
         if ( doInteractiveTimeout ) {
           this._setInteractiveTimeout( true );
         }
+
         return;
       }
 
@@ -6902,7 +6895,7 @@ $.Widget.prototype = {
           if ( doInteractiveTimeout ) {
             this._setInteractiveTimeout( true );
           }
-          this._$eventTarget.trigger("dblclick", e);
+          this._$eventTarget.trigger("softdblclick", e);
           return false;
         }
       }
@@ -6928,20 +6921,34 @@ $.Widget.prototype = {
         return false;
       }
 
-      if (e.deltaY !== 0) {
-        this._clearInteractiveTimeout( );
+      if ( e.deltaY !== 0 ) {
+        if ( this._timeoutWheel ) {
+          clearTimeout( this._timeoutWheel );
+          this._timeoutWheel = null;
+        }
 
-        var delta = e.deltaY > 0 ? 1 : -1;
+        var geomap = this;
+        var currentTarget = e.currentTarget;
+        var deltaY = e.deltaY;
+        var pageX = e.pageX;
+        var pageY = e.pageY;
 
-        var offset = $(e.currentTarget).offset();
-        this._anchor = [e.pageX - offset.left, e.pageY - offset.top];
+        this._timeoutWheel = setTimeout( function () {
+          geomap._clearInteractiveTimeout( );
 
-        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, this._options[ "tilingScheme" ] !== null );
+          var delta = deltaY > 0 ? 1 : -1;
 
-        this._setInteractiveCenterAndSize( wheelCenterAndSize.center, wheelCenterAndSize.pixelSize );
-        this._interactiveTransform( );
+          var offset = $(currentTarget).offset();
+          geomap._anchor = [pageX - offset.left, pageY - offset.top];
 
-        this._setInteractiveTimeout( true );
+          var wheelCenterAndSize = geomap._getZoomCenterAndSize( geomap._anchor, delta, geomap._options[ "tilingScheme" ] !== null );
+
+          geomap._setInteractiveCenterAndSize( wheelCenterAndSize.center, wheelCenterAndSize.pixelSize );
+          geomap._interactiveTransform( );
+
+          geomap._setInteractiveTimeout( true );
+        }, 30 );
+
       }
 
       return false;
