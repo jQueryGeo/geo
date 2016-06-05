@@ -253,9 +253,11 @@
 
       $(document).keydown($.proxy(this._document_keydown, this));
 
-      //if ( !this._softDblClick ) {
+      if ( this._softDblClick ) {
+        this._$eventTarget.on( 'softdblclick', $.proxy(this._eventTarget_dblclick, this));
+      } else {
         this._$eventTarget.dblclick($.proxy(this._eventTarget_dblclick, this));
-      //}
+      }
 
       this._$eventTarget.bind(touchStartEvent, $.proxy(this._eventTarget_touchstart, this));
 
@@ -1658,6 +1660,8 @@
       }
 
       this._inOp = false;
+
+      this._logTap( e, 'x' );
     },
 
     _logTap: function( e, loc ) {
@@ -2362,7 +2366,7 @@
           if ( doInteractiveTimeout ) {
             this._setInteractiveTimeout( true );
           }
-          this._$eventTarget.trigger("dblclick", e);
+          this._$eventTarget.trigger("softdblclick", e);
           return false;
         }
       }
