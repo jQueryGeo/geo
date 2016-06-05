@@ -244,7 +244,7 @@
 
       this._pointerEvents = window.PointerEvent;
       this._supportTouch = ("ontouchend" in document);
-      this._softDblClick = this._supportTouch || _ieVersion === 7;
+      this._softDblClick = this._pointerEvents || this._supportTouch || _ieVersion === 7;
 
       var geomap = this,
           touchStartEvent = this._pointerEvents ? 'pointerdown' : ( this._supportTouch ? "touchstart mousedown" : "mousedown" ),
@@ -253,7 +253,9 @@
 
       $(document).keydown($.proxy(this._document_keydown, this));
 
-      this._$eventTarget.dblclick($.proxy(this._eventTarget_dblclick, this));
+      //if ( !this._softDblClick ) {
+        this._$eventTarget.dblclick($.proxy(this._eventTarget_dblclick, this));
+      //}
 
       this._$eventTarget.bind(touchStartEvent, $.proxy(this._eventTarget_touchstart, this));
 
@@ -1609,6 +1611,8 @@
         return;
       }
 
+      this._logTap( e, 'n' );
+
       if (this._drawTimeout) {
         window.clearTimeout(this._drawTimeout);
         this._drawTimeout = null;
@@ -1656,6 +1660,10 @@
       this._inOp = false;
     },
 
+    _logTap: function( e, loc ) {
+      console.log( $.now(), '[', e.type, loc, '] _isTap: ', this._isTap, ', _isDbltap: ', this._isDbltap );
+    },
+
     _eventTarget_touchstart: function (e) {
       if ( typeof( document.elementFromPoint ) !== "undefined" ) {
         var elFromPt = document.elementFromPoint( e.pageX, e.pageY );
@@ -1675,6 +1683,8 @@
       if ( !this._pointerEvents && !this._supportTouch && e.which !== 1 ) {
         return;
       }
+
+      this._logTap(e, 'n');
 
       var doInteractiveTimeout = this._clearInteractiveTimeout( );
 
@@ -1795,6 +1805,8 @@
           }
         }
       }
+
+      this._logTap( e, 'x' );
 
       e.preventDefault();
 
@@ -2075,6 +2087,8 @@
         return;
       }
 
+      this._logTap( e, 'n' );
+
       if ( !this._mouseDown ) {
         if ( _ieVersion === 7 ) {
           // ie7 doesn't appear to trigger dblclick on this._$eventTarget,
@@ -2340,6 +2354,8 @@
         }
 
         this._clickDate = clickDate;
+
+        this._logTap( e, 'x' );
 
         if (this._softDblClick && this._isDbltap) {
           this._isDbltap = this._isTap = false;
