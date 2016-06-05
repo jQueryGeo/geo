@@ -1,4 +1,4 @@
-/*! jQuery Geo - v1.0.0-rc1 - 2016-06-04
+/*! jQuery Geo - v1.0.0-rc1 - 2016-06-05
 * http://jquerygeo.com
 * Copyright (c) 2016 Ryan Morrison-Westphal; Licensed MIT */
 // Copyright 2006 Google Inc.
@@ -4789,7 +4789,7 @@ $.Widget.prototype = {
 
       this._pointerEvents = window.PointerEvent;
       this._supportTouch = ("ontouchend" in document);
-      this._softDblClick = this._supportTouch || _ieVersion === 7;
+      this._softDblClick = this._pointerEvents || this._supportTouch || _ieVersion === 7;
 
       var geomap = this,
           touchStartEvent = this._pointerEvents ? 'pointerdown' : ( this._supportTouch ? "touchstart mousedown" : "mousedown" ),
@@ -4798,7 +4798,11 @@ $.Widget.prototype = {
 
       $(document).keydown($.proxy(this._document_keydown, this));
 
-      this._$eventTarget.dblclick($.proxy(this._eventTarget_dblclick, this));
+      if ( this._softDblClick ) {
+        this._$eventTarget.on( 'softdblclick', $.proxy(this._eventTarget_dblclick, this));
+      } else {
+        this._$eventTarget.dblclick($.proxy(this._eventTarget_dblclick, this));
+      }
 
       this._$eventTarget.bind(touchStartEvent, $.proxy(this._eventTarget_touchstart, this));
 
@@ -6891,7 +6895,7 @@ $.Widget.prototype = {
           if ( doInteractiveTimeout ) {
             this._setInteractiveTimeout( true );
           }
-          this._$eventTarget.trigger("dblclick", e);
+          this._$eventTarget.trigger("softdblclick", e);
           return false;
         }
       }

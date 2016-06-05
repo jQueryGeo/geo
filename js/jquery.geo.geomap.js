@@ -1613,8 +1613,6 @@
         return;
       }
 
-      this._logTap( e, 'n' );
-
       if (this._drawTimeout) {
         window.clearTimeout(this._drawTimeout);
         this._drawTimeout = null;
@@ -1660,12 +1658,6 @@
       }
 
       this._inOp = false;
-
-      this._logTap( e, 'x' );
-    },
-
-    _logTap: function( e, loc ) {
-      console.log( $.now(), '[', e.type, loc, '] _isTap: ', this._isTap, ', _isDbltap: ', this._isDbltap );
     },
 
     _eventTarget_touchstart: function (e) {
@@ -1687,8 +1679,6 @@
       if ( !this._pointerEvents && !this._supportTouch && e.which !== 1 ) {
         return;
       }
-
-      this._logTap(e, 'n');
 
       var doInteractiveTimeout = this._clearInteractiveTimeout( );
 
@@ -1809,8 +1799,6 @@
           }
         }
       }
-
-      this._logTap( e, 'x' );
 
       e.preventDefault();
 
@@ -2091,8 +2079,6 @@
         return;
       }
 
-      this._logTap( e, 'n' );
-
       if ( !this._mouseDown ) {
         if ( _ieVersion === 7 ) {
           // ie7 doesn't appear to trigger dblclick on this._$eventTarget,
@@ -2358,8 +2344,6 @@
         }
 
         this._clickDate = clickDate;
-
-        this._logTap( e, 'x' );
 
         if (this._softDblClick && this._isDbltap) {
           this._isDbltap = this._isTap = false;
