@@ -1,7 +1,6 @@
-/*! jQuery Geo - v1.0.0-b1.5 - 2013-01-17
- * http://jquerygeo.com
- * Copyright (c) 2013 Ryan Westphal/Applied Geographics, Inc.; Licensed MIT, GPL */
-
+/*! jQuery Geo - v1.0.0-rc1.2 - 2016-07-14
+* http://jquerygeo.com
+* Copyright (c) 2016 Ryan Morrison-Westphal; Licensed MIT */
 // Copyright 2006 Google Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -2268,90 +2267,227 @@ setDelimiters( "{{", "}}" );
 
 })( this );
 
-/*! Copyright (c) 2011 Brandon Aaron (http://brandonaaron.net)
- * Licensed under the MIT License (LICENSE.txt).
+/*!
+ * jQuery Mousewheel 3.1.13
  *
- * Thanks to: http://adomas.org/javascript-mouse-wheel/ for some pointers.
- * Thanks to: Mathias Bank(http://www.mathias-bank.de) for a scope bug fix.
- * Thanks to: Seamus Leahy for adding deltaX and deltaY
- *
- * Version: 3.0.6
- * 
- * Requires: 1.2.2+
+ * Copyright jQuery Foundation and other contributors
+ * Released under the MIT license
+ * http://jquery.org/license
  */
 
-(function($) {
-
-var types = ['DOMMouseScroll', 'mousewheel'];
-
-if ($.event.fixHooks) {
-    for ( var i=types.length; i; ) {
-        $.event.fixHooks[ types[--i] ] = $.event.mouseHooks;
+(function (factory) {
+    if ( typeof define === 'function' && define.amd ) {
+        // AMD. Register as an anonymous module.
+        define(['jquery'], factory);
+    } else if (typeof exports === 'object') {
+        // Node/CommonJS style for Browserify
+        module.exports = factory;
+    } else {
+        // Browser globals
+        factory(jQuery);
     }
-}
+}(function ($) {
 
-$.event.special.mousewheel = {
-    setup: function() {
-        if ( this.addEventListener ) {
-            for ( var i=types.length; i; ) {
-                this.addEventListener( types[--i], handler, false );
-            }
-        } else {
-            this.onmousewheel = handler;
-        }
-    },
-    
-    teardown: function() {
-        if ( this.removeEventListener ) {
-            for ( var i=types.length; i; ) {
-                this.removeEventListener( types[--i], handler, false );
-            }
-        } else {
-            this.onmousewheel = null;
+    var toFix  = ['wheel', 'mousewheel', 'DOMMouseScroll', 'MozMousePixelScroll'],
+        toBind = ( 'onwheel' in document || document.documentMode >= 9 ) ?
+                    ['wheel'] : ['mousewheel', 'DomMouseScroll', 'MozMousePixelScroll'],
+        slice  = Array.prototype.slice,
+        nullLowestDeltaTimeout, lowestDelta;
+
+    if ( $.event.fixHooks ) {
+        for ( var i = toFix.length; i; ) {
+            $.event.fixHooks[ toFix[--i] ] = $.event.mouseHooks;
         }
     }
-};
 
-$.fn.extend({
-    mousewheel: function(fn) {
-        return fn ? this.bind("mousewheel", fn) : this.trigger("mousewheel");
-    },
-    
-    unmousewheel: function(fn) {
-        return this.unbind("mousewheel", fn);
+    var special = $.event.special.mousewheel = {
+        version: '3.1.12',
+
+        setup: function() {
+            if ( this.addEventListener ) {
+                for ( var i = toBind.length; i; ) {
+                    this.addEventListener( toBind[--i], handler, false );
+                }
+            } else {
+                this.onmousewheel = handler;
+            }
+            // Store the line height and page height for this particular element
+            $.data(this, 'mousewheel-line-height', special.getLineHeight(this));
+            $.data(this, 'mousewheel-page-height', special.getPageHeight(this));
+        },
+
+        teardown: function() {
+            if ( this.removeEventListener ) {
+                for ( var i = toBind.length; i; ) {
+                    this.removeEventListener( toBind[--i], handler, false );
+                }
+            } else {
+                this.onmousewheel = null;
+            }
+            // Clean up the data we added to the element
+            $.removeData(this, 'mousewheel-line-height');
+            $.removeData(this, 'mousewheel-page-height');
+        },
+
+        getLineHeight: function(elem) {
+            var $elem = $(elem),
+                $parent = $elem['offsetParent' in $.fn ? 'offsetParent' : 'parent']();
+            if (!$parent.length) {
+                $parent = $('body');
+            }
+            return parseInt($parent.css('fontSize'), 10) || parseInt($elem.css('fontSize'), 10) || 16;
+        },
+
+        getPageHeight: function(elem) {
+            return $(elem).height();
+        },
+
+        settings: {
+            adjustOldDeltas: true, // see shouldAdjustOldDeltas() below
+            normalizeOffset: true  // calls getBoundingClientRect for each event
+        }
+    };
+
+    $.fn.extend({
+        mousewheel: function(fn) {
+            return fn ? this.bind('mousewheel', fn) : this.trigger('mousewheel');
+        },
+
+        unmousewheel: function(fn) {
+            return this.unbind('mousewheel', fn);
+        }
+    });
+
+
+    function handler(event) {
+        var orgEvent   = event || window.event,
+            args       = slice.call(arguments, 1),
+            delta      = 0,
+            deltaX     = 0,
+            deltaY     = 0,
+            absDelta   = 0,
+            offsetX    = 0,
+            offsetY    = 0;
+        event = $.event.fix(orgEvent);
+        event.type = 'mousewheel';
+
+        // Old school scrollwheel delta
+        if ( 'detail'      in orgEvent ) { deltaY = orgEvent.detail * -1;      }
+        if ( 'wheelDelta'  in orgEvent ) { deltaY = orgEvent.wheelDelta;       }
+        if ( 'wheelDeltaY' in orgEvent ) { deltaY = orgEvent.wheelDeltaY;      }
+        if ( 'wheelDeltaX' in orgEvent ) { deltaX = orgEvent.wheelDeltaX * -1; }
+
+        // Firefox < 17 horizontal scrolling related to DOMMouseScroll event
+        if ( 'axis' in orgEvent && orgEvent.axis === orgEvent.HORIZONTAL_AXIS ) {
+            deltaX = deltaY * -1;
+            deltaY = 0;
+        }
+
+        // Set delta to be deltaY or deltaX if deltaY is 0 for backwards compatabilitiy
+        delta = deltaY === 0 ? deltaX : deltaY;
+
+        // New school wheel delta (wheel event)
+        if ( 'deltaY' in orgEvent ) {
+            deltaY = orgEvent.deltaY * -1;
+            delta  = deltaY;
+        }
+        if ( 'deltaX' in orgEvent ) {
+            deltaX = orgEvent.deltaX;
+            if ( deltaY === 0 ) { delta  = deltaX * -1; }
+        }
+
+        // No change actually happened, no reason to go any further
+        if ( deltaY === 0 && deltaX === 0 ) { return; }
+
+        // Need to convert lines and pages to pixels if we aren't already in pixels
+        // There are three delta modes:
+        //   * deltaMode 0 is by pixels, nothing to do
+        //   * deltaMode 1 is by lines
+        //   * deltaMode 2 is by pages
+        if ( orgEvent.deltaMode === 1 ) {
+            var lineHeight = $.data(this, 'mousewheel-line-height');
+            delta  *= lineHeight;
+            deltaY *= lineHeight;
+            deltaX *= lineHeight;
+        } else if ( orgEvent.deltaMode === 2 ) {
+            var pageHeight = $.data(this, 'mousewheel-page-height');
+            delta  *= pageHeight;
+            deltaY *= pageHeight;
+            deltaX *= pageHeight;
+        }
+
+        // Store lowest absolute delta to normalize the delta values
+        absDelta = Math.max( Math.abs(deltaY), Math.abs(deltaX) );
+
+        if ( !lowestDelta || absDelta < lowestDelta ) {
+            lowestDelta = absDelta;
+
+            // Adjust older deltas if necessary
+            if ( shouldAdjustOldDeltas(orgEvent, absDelta) ) {
+                lowestDelta /= 40;
+            }
+        }
+
+        // Adjust older deltas if necessary
+        if ( shouldAdjustOldDeltas(orgEvent, absDelta) ) {
+            // Divide all the things by 40!
+            delta  /= 40;
+            deltaX /= 40;
+            deltaY /= 40;
+        }
+
+        // Get a whole, normalized value for the deltas
+        delta  = Math[ delta  >= 1 ? 'floor' : 'ceil' ](delta  / lowestDelta);
+        deltaX = Math[ deltaX >= 1 ? 'floor' : 'ceil' ](deltaX / lowestDelta);
+        deltaY = Math[ deltaY >= 1 ? 'floor' : 'ceil' ](deltaY / lowestDelta);
+
+        // Normalise offsetX and offsetY properties
+        if ( special.settings.normalizeOffset && this.getBoundingClientRect ) {
+            var boundingRect = this.getBoundingClientRect();
+            offsetX = event.clientX - boundingRect.left;
+            offsetY = event.clientY - boundingRect.top;
+        }
+
+        // Add information to the event object
+        event.deltaX = deltaX;
+        event.deltaY = deltaY;
+        event.deltaFactor = lowestDelta;
+        event.offsetX = offsetX;
+        event.offsetY = offsetY;
+        // Go ahead and set deltaMode to 0 since we converted to pixels
+        // Although this is a little odd since we overwrite the deltaX/Y
+        // properties with normalized deltas.
+        event.deltaMode = 0;
+
+        // Add event and delta to the front of the arguments
+        args.unshift(event, delta, deltaX, deltaY);
+
+        // Clearout lowestDelta after sometime to better
+        // handle multiple device types that give different
+        // a different lowestDelta
+        // Ex: trackpad = 3 and mouse wheel = 120
+        if (nullLowestDeltaTimeout) { clearTimeout(nullLowestDeltaTimeout); }
+        nullLowestDeltaTimeout = setTimeout(nullLowestDelta, 200);
+
+        return ($.event.dispatch || $.event.handle).apply(this, args);
     }
-});
 
-
-function handler(event) {
-    var orgEvent = event || window.event, args = [].slice.call( arguments, 1 ), delta = 0, returnValue = true, deltaX = 0, deltaY = 0;
-    event = $.event.fix(orgEvent);
-    event.type = "mousewheel";
-    
-    // Old school scrollwheel delta
-    if ( orgEvent.wheelDelta ) { delta = orgEvent.wheelDelta/120; }
-    if ( orgEvent.detail     ) { delta = -orgEvent.detail/3; }
-    
-    // New school multidimensional scroll (touchpads) deltas
-    deltaY = delta;
-    
-    // Gecko
-    if ( orgEvent.axis !== undefined && orgEvent.axis === orgEvent.HORIZONTAL_AXIS ) {
-        deltaY = 0;
-        deltaX = -1*delta;
+    function nullLowestDelta() {
+        lowestDelta = null;
     }
-    
-    // Webkit
-    if ( orgEvent.wheelDeltaY !== undefined ) { deltaY = orgEvent.wheelDeltaY/120; }
-    if ( orgEvent.wheelDeltaX !== undefined ) { deltaX = -1*orgEvent.wheelDeltaX/120; }
-    
-    // Add event and delta to the front of the arguments
-    args.unshift(event, delta, deltaX, deltaY);
-    
-    return ($.event.dispatch || $.event.handle).apply(this, args);
-}
 
-})(jQuery);
+    function shouldAdjustOldDeltas(orgEvent, absDelta) {
+        // If this is an older event and the delta is divisable by 120,
+        // then we are assuming that the browser is treating this as an
+        // older mouse wheel event and that we should divide the deltas
+        // by 40 to try and get a more usable deltaFactor.
+        // Side note, this actually impacts the reported scroll distance
+        // in older browsers and can cause scrolling to be slower than native.
+        // Turn this off by setting $.event.special.mousewheel.settings.adjustOldDeltas to false.
+        return special.settings.adjustOldDeltas && orgEvent.type === 'mousewheel' && absDelta % 120 === 0;
+    }
+
+}));
 
 /*!
  * jQuery UI Widget 1.8.18
@@ -2363,7 +2499,7 @@ function handler(event) {
  * http://docs.jquery.com/UI/Widget
  */
 
-if ( ! $.widget ) {
+if ( ! jQuery.widget ) {
 
 (function( $, undefined ) {
 
@@ -2633,6 +2769,8 @@ $.Widget.prototype = {
 
 
 (function ($, window, undefined) {
+  window.toStaticHTML = window.toStaticHTML || function ( x ) { return x; };
+
   var pos_oo = Number.POSITIVE_INFINITY,
       neg_oo = Number.NEGATIVE_INFINITY;
 
@@ -2681,7 +2819,7 @@ $.Widget.prototype = {
 
       while ( $.isArray( coords ) ) {
         if ( coords.length > 1 && ! $.isArray( coords[ 0 ] ) ) {
-          return ( coords[ 0 ] >= -180 && coords[ 0 ] <= 180 && coords[ 1 ] >= -85 && coords[ 1 ] <= 85 );
+          return ( coords[ 0 ] >= -180.001 && coords[ 0 ] <= 180.001 && coords[ 1 ] >= -90.001 && coords[ 1 ] <= 90.001 );
         } else {
           coords = coords[ 0 ];
         }
@@ -2761,7 +2899,9 @@ $.Widget.prototype = {
         value = [ value[ 0 ], value[ 1 ], value[ 0 ], value[ 1 ] ];
       }
 
-      value = $.geo.proj.fromGeodetic( value );
+      if ( $.geo.proj ) {
+        value = $.geo.proj.fromGeodetic( value );
+      }
 
       bbox[0] = Math.min( value[ 0 ], bbox[ 0 ] );
       bbox[1] = Math.min( value[ 1 ], bbox[ 1 ] );
@@ -2918,6 +3058,8 @@ $.Widget.prototype = {
     // centroid
     
     centroid: function( geom, _ignoreGeo /* Internal Use Only */ ) {
+      var c; //< temp storage for any coordinate during centroid op
+
       switch (geom.type) {
         case "Point":
           return $.extend({}, geom);
@@ -2925,10 +3067,11 @@ $.Widget.prototype = {
         case "LineString":
         case "Polygon":
           var a = 0,
-              c = [0, 0],
-              coords = $.merge( [ ], geom.type == "Polygon" ? geom.coordinates[0] : geom.coordinates ),
+              coords = $.merge( [ ], geom.type === "Polygon" ? geom.coordinates[0] : geom.coordinates ),
               i = 1, j, n,
               bbox = [ pos_oo, pos_oo, neg_oo, neg_oo ];
+
+          c = [ 0, 0 ];
 
           var wasGeodetic = false;
           if ( !_ignoreGeo && $.geo.proj && this._isGeodetic( coords ) ) {
@@ -2972,6 +3115,28 @@ $.Widget.prototype = {
           c[1] = Math.min( Math.max( c[1] / a, bbox[ 1 ] ), bbox[ 3 ] );
 
           return { type: "Point", coordinates: wasGeodetic ? $.geo.proj.toGeodetic(c) : c };
+
+        case "MultiPoint":
+          // should return center of mass for point cluster but just return first point for now
+          if ( geom.coordinates.length > 0 ) {
+            c = geom.coordinates[ 0 ];
+            return {
+              type: "Point",
+              coordinates: [ c[ 0 ], c[ 1 ] ]
+            };
+          }
+          break;
+
+        case "MultiLineString":
+        case "MultiPolygon":
+          if ( geom.coordinates.length > 0 ) {
+            return this.centroid( {
+              type: geom.type.substr( 5 ),
+              coordinates: geom.coordinates[ 0 ]
+            }, _ignoreGeo );
+          }
+          break;
+
       }
       return undefined;
     },
@@ -2979,7 +3144,7 @@ $.Widget.prototype = {
     // contains
 
     contains: function (geom1, geom2) {
-      if (geom1.type != "Polygon") {
+      if (geom1.type !== "Polygon") {
         return false;
       }
 
@@ -3023,7 +3188,7 @@ $.Widget.prototype = {
         a = b;
       }
 
-      return rayCross % 2 == 1;
+      return rayCross % 2 === 1;
     },
 
     _containsPolygonLineString: function (polygonCoordinates, lineStringCoordinates) {
@@ -3098,7 +3263,7 @@ $.Widget.prototype = {
             apx = pointCoordinate[0] - a[0],
             apy = pointCoordinate[1] - a[1];
 
-        if (lineStringCoordinates.length == 1) {
+        if (lineStringCoordinates.length === 1) {
           return Math.sqrt(apx * apx + apy * apy);
         } else {
           for (var i = 1; i < lineStringCoordinates.length; i++) {
@@ -3192,8 +3357,39 @@ $.Widget.prototype = {
     // feature
     //
 
-    _flatten: function (geom) {
+    _basic: function( geom ) {
       // return an array of all basic geometries
+      // e.g., MultiPolygons become multiple Polygons
+      // coordinate arrays are kept as references for speed & should not be altered
+      // not in JTS
+      var geometries = [ ];
+      var multiType;
+      var i = 0;
+      var j;
+
+      var flat = this._flatten( geom );
+
+      for ( ; i < flat.length; i++ ) {
+        if ( flat[ i ].type.substring( 0, 5 ) === "Multi" ) {
+          multiType = flat[ i ].type.substring( 5 );
+
+          for ( j = 0; j < flat[ i ].coordinates.length; j++ ) {
+            geometries.push( {
+              type: multiType,
+              coordinates: flat[ i ].coordinates[ j ]
+            } );
+          }
+        } else {
+          geometries.push( flat[ i ] );
+        }
+      }
+
+      return geometries;
+    },
+
+    _flatten: function (geom) {
+      // return an array of only geometries
+      // will extract geometries from Feature, FeatureCollection, & GeometryCollection
       // not in JTS
       var geometries = [],
           curGeom = 0;
@@ -3363,7 +3559,7 @@ $.Widget.prototype = {
     // WKT functions
     //
 
-    _WKT: (function () {
+    WKT: (function () {
       function pointToString(value) {
         return "POINT " + pointToUntaggedString(value.coordinates);
       }
@@ -3559,16 +3755,20 @@ $.Widget.prototype = {
       }
 
       function multiLineStringParseUntagged(wkt) {
-        var lineStringsWkt = wkt.substr( 1, wkt.length - 2 ),
-            lineStrings = lineStringsWkt.split( ")),((" ),
+        var lineStringsWkt = wkt.substr( 2, wkt.length - 4 ),
+            lineString,
+            lineStrings = lineStringsWkt.split( /\),\s*\(/ ),
             i = 0,
             multiLineString = {
               type: "MultiLineString",
-              coordinates: [ ]
+              coordinates: [ ]      
             };
 
         for ( ; i < lineStrings.length; i++ ) {
-          multiLineString.coordinates.push( lineStringParseUntagged( lineStrings[ i ] ).coordinates );
+          lineString = lineStringParseUntagged( "(" + lineStrings[ i ] + ")" );
+          if ( lineString ) {
+            multiLineString.coordinates.push( lineString.coordinates );
+          }     
         }
 
         return multiLineString;
@@ -3576,7 +3776,8 @@ $.Widget.prototype = {
 
       function multiPolygonParseUntagged(wkt) {
         var polygonsWkt = wkt.substr( 1, wkt.length - 2 ),
-            polygons = polygonsWkt.split( ")),((" ),
+            polygon,
+            polygons = polygonsWkt.split( /\),\s*\(/ ),
             i = 0,
             multiPolygon = {
               type: "MultiPolygon",
@@ -3584,7 +3785,10 @@ $.Widget.prototype = {
             };
 
         for ( ; i < polygons.length; i++ ) {
-          multiPolygon.coordinates.push( polygonParseUntagged( polygons[ i ] ).coordinates );
+          polygon = polygonParseUntagged( "(" + polygons[ i ] + ")" );
+          if ( polygon ) {
+            multiPolygon.coordinates.push( polygon.coordinates );
+          }
         }
 
         return multiPolygon;
@@ -3689,7 +3893,7 @@ $.Widget.prototype = {
           var isMultiPointOrLineString = $.isArray(coordinates[ 0 ]),
               fromGeodeticPos = this.fromGeodeticPos;
 
-          if (!isMultiPointOrLineString && coordinates.length == 4) {
+          if (!isMultiPointOrLineString && coordinates.length === 4) {
             // bbox
             var min = fromGeodeticPos([ coordinates[ 0 ], coordinates[ 1 ] ]),
                 max = fromGeodeticPos([ coordinates[ 2 ], coordinates[ 3 ] ]);
@@ -3740,7 +3944,7 @@ $.Widget.prototype = {
           var isMultiPointOrLineString = $.isArray(coordinates[ 0 ]),
               toGeodeticPos = this.toGeodeticPos;
 
-          if (!isMultiPointOrLineString && coordinates.length == 4) {
+          if (!isMultiPointOrLineString && coordinates.length === 4) {
             // bbox
             var min = toGeodeticPos([ coordinates[ 0 ], coordinates[ 1 ] ]),
                 max = toGeodeticPos([ coordinates[ 2 ], coordinates[ 3 ] ]);
@@ -3786,7 +3990,7 @@ $.Widget.prototype = {
   };
 }(jQuery, this));
 
-(function ($, undefined) {
+(function ($, window, undefined) {
   var _ieVersion = ( function () {
     var v = 5, div = document.createElement("div"), a = div.all || [];
     do {
@@ -3809,6 +4013,8 @@ $.Widget.prototype = {
 
     _$canvasSceneFront: undefined, //< if _trueCanvas, where canvas images get written (front buffer)
     _$canvasSceneBack: undefined, //< if _trueCanvas, where canvas images get written (back buffer)
+    _$canvasSceneStale: undefined, //< if _trueCanvas, scene to hide next
+    _$canvasSceneDrawn: undefined, //< if _trueCanvas, scene to show next
     _timeoutEnd:  null,
     _requireFlip: false,
 
@@ -3848,7 +4054,7 @@ $.Widget.prototype = {
         textAlign: "left"
       } );
 
-      if (this._$elem.css("position") == "static") {
+      if (this._$elem.css("position") === "static") {
         this._$elem.css("position", "relative");
       }
 
@@ -3869,9 +4075,7 @@ $.Widget.prototype = {
       this._blitcanvas = document.createElement( "canvas" );
 
       if ( this._blitcanvas.getContext ) {
-        //this._$elem.append('<canvas ' + sizeAttr + ' style="-webkit-transform:translateZ(0);' + posCss + '"></canvas>');
-        //this._$canvas = this._$elem.children(':last');
-        this._$canvas = $('<canvas ' + sizeAttr + ' style="-webkit-transform:translateZ(0);' + posCss + '"></canvas>');
+        this._$canvas = $( window.toStaticHTML( '<canvas ' + sizeAttr + ' style="-webkit-transform:translateZ(0);' + posCss + '"></canvas>' ) );
 
         // test _trueDoubleBuffer
         this._blitcanvas.width = 1;
@@ -3884,14 +4088,14 @@ $.Widget.prototype = {
 
         this._context = this._$canvas[0].getContext("2d");
 
-        //this._blitcanvas = document.createElement( "canvas" );
         this._blitcanvas.width = this._width;
         this._blitcanvas.height = this._height;
         this._blitcontext = this._blitcanvas.getContext("2d");
 
         // create our front & back buffers
-        this._$canvasSceneFront = $('<img id="scene0" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />');
-        this._$canvasSceneBack = $('<img id="scene1" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />');
+        // though, at any time either one can be in front
+        this._$canvasSceneFront = $( window.toStaticHTML( '<img id="scene0" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ).on( 'load', $.proxy( this._canvasImgLoad, this ) );
+        this._$canvasSceneBack = $( window.toStaticHTML( '<img id="scene1" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '" />' ) ).on( 'load', $.proxy( this._canvasImgLoad, this ) );
 
       } else if (_ieVersion <= 8) {
         this._trueCanvas = false;
@@ -3904,12 +4108,12 @@ $.Widget.prototype = {
       }
 
       // create our front & back label containers
-      this._$labelsContainerFront = $('<div class="geo-labels-container" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '"></div>');
-      this._$labelsContainerBack = $('<div class="geo-labels-container" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '"></div>');
+      this._$labelsContainerFront = $( window.toStaticHTML( '<div class="geo-labels-container" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '"></div>' ) );
+      this._$labelsContainerBack = $( window.toStaticHTML( '<div class="geo-labels-container" style="-webkit-transform:translateZ(0);' + posCss + sizeCss + '"></div>' ) );
     },
 
     _setOption: function (key, value) {
-      if (key == "style") {
+      if (key === "style") {
         value = $.extend({}, this._options.style, value);
       }
       $.Widget.prototype._setOption.apply(this, arguments);
@@ -3924,15 +4128,13 @@ $.Widget.prototype = {
     clear: function () {
       this._context.clearRect(0, 0, this._width, this._height);
       this._labelsHtml = "";
-
-          //if ( this._options.doubleBuffer ) console.log("clear:_end " + $.now());
       this._end( );
     },
 
     drawArc: function (coordinates, startAngle, sweepAngle, style) {
       style = this._getGraphicStyle(style);
 
-      if (style.visibility != "hidden" && style.opacity > 0 && style.widthValue > 0 && style.heightValue > 0) {
+      if (style.visibility !== "hidden" && style.opacity > 0 && style.widthValue > 0 && style.heightValue > 0) {
         var r = Math.min(style.widthValue, style.heightValue) / 2;
 
         startAngle = (startAngle * Math.PI / 180);
@@ -3973,15 +4175,14 @@ $.Widget.prototype = {
         }
       }
 
-          //if ( this._options.doubleBuffer ) console.log("drawArc:_end " + $.now());
       this._end( );
     },
 
     drawPoint: function (coordinates, style) {
       style = this._getGraphicStyle(style);
-      if (style.widthValue == style.heightValue && style.heightValue == style.borderRadiusValue) {
+      if (style.widthValue === style.heightValue && style.heightValue === style.borderRadiusValue) {
         this.drawArc(coordinates, 0, 360, style);
-      } else if (style.visibility != "hidden" && style.opacity > 0) {
+      } else if (style.visibility !== "hidden" && style.opacity > 0) {
         style.borderRadiusValue = Math.min(Math.min(style.widthValue, style.heightValue) / 2, style.borderRadiusValue);
         coordinates[0] -= style.widthValue / 2;
         coordinates[1] -= style.heightValue / 2;
@@ -4013,7 +4214,6 @@ $.Widget.prototype = {
           this._context.stroke();
         }
 
-          //if ( this._options.doubleBuffer ) console.log("drawPoint:_end " + $.now());
         this._end( );
       }
     },
@@ -4023,7 +4223,7 @@ $.Widget.prototype = {
     },
 
     drawPolygon: function (coordinates, style) {
-      if ( !this._trueCanvas || coordinates.length == 1 ) {
+      if ( !this._trueCanvas || coordinates.length === 1 ) {
         // either we don't have fancy rendering or there's no need for it (no holes)
         this._drawLines( coordinates, true, style );
       } else {
@@ -4033,10 +4233,11 @@ $.Widget.prototype = {
         }
 
         style = this._getGraphicStyle(style);
+        this._blitcontext.globalCompositeOperation = "copy";
 
         var pixelBbox, i, j;
 
-        if ( style.visibility != "hidden" && style.opacity > 0 ) {
+        if ( style.visibility !== "hidden" && style.opacity > 0 ) {
           this._blitcontext.clearRect(0, 0, this._width, this._height);
 
           if ( style.doFill ) {
@@ -4045,16 +4246,20 @@ $.Widget.prototype = {
               this._blitcontext.globalCompositeOperation = "source-out";
               this._blitcontext.globalAlpha = 1;
 
+              this._blitcontext.beginPath();
+
               for ( i = 1; i < coordinates.length; i++ ) {
-                this._blitcontext.beginPath();
+                // start drawing inner rings, i
                 this._blitcontext.moveTo( coordinates[ i ][ 0 ][ 0 ], coordinates[ i ][ 0 ][ 1 ] );
-                for ( j = 1; j < coordinates[ i ].length; j++ ) {
+
+                for ( j = 0; j < coordinates[ i ].length; j++ ) {
                   this._blitcontext.lineTo( coordinates[ i ][ j ][ 0 ], coordinates[ i ][ j ][ 1 ] );
                 }
-                this._blitcontext.closePath();
-
-                this._blitcontext.fill( );
               }
+
+              this._blitcontext.closePath();
+
+              this._blitcontext.fill( );
             }
           }
 
@@ -4075,7 +4280,6 @@ $.Widget.prototype = {
 
           this._blitcontext.closePath();
 
-          this._blitcontext.globalCompositeOperation = "source-out";
           if ( style.doFill ) {
             // fill outer ring
             this._blitcontext.fillStyle = style.fill;
@@ -4117,7 +4321,6 @@ $.Widget.prototype = {
           if ( pixelBbox[ 0 ] !== pixelBbox[ 2 ] && pixelBbox[ 1 ] !== pixelBbox[ 3 ] ) {
             this._context.drawImage(this._blitcanvas, pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ], pixelBbox[ 0 ], pixelBbox[ 1 ], pixelBbox[ 2 ] - pixelBbox[ 0 ], pixelBbox[ 3 ] - pixelBbox[ 1 ] );
 
-          //if ( this._options.doubleBuffer ) console.log("drawPolygon:_end " + $.now());
             this._end( );
           }
         }
@@ -4138,7 +4341,7 @@ $.Widget.prototype = {
       this._labelsHtml += '<div class="geo-label" style="-webkit-transform:translateZ(0);position:absolute; left:' + ( coordinates[ 0 ] / this._width * 100 ) + '%; top:' + ( coordinates[ 1 ] / this._height * 100 ) + '%;">' + label + '</div>';
     },
 
-    resize: function( ) {
+    resize: function( dx, dy ) {
       this._width = this._$elem.width();
       this._height = this._$elem.height();
 
@@ -4152,8 +4355,8 @@ $.Widget.prototype = {
         this._$canvas[0].height = this._height;
 
         this._$canvasSceneFront.css( {
-          width: this._width,
-          height: this._height
+          left: dx,
+          top: dy
         } );
 
         this._$canvasSceneBack.css( {
@@ -4167,7 +4370,11 @@ $.Widget.prototype = {
         } );
       }
 
+      var labelPositionFront = this._$labelsContainerFront.position();
+
       this._$labelsContainerFront.css( {
+        left: labelPositionFront.left + dx,
+        top: labelPositionFront.top + dy,
         width: this._width,
         height: this._height
       } );
@@ -4184,42 +4391,16 @@ $.Widget.prototype = {
         this._timeoutEnd = null;
       }
 
-      // hide labels for now until they are on the interactive div 
-      //this._$labelsContainerFront.html("");
+      if ( this._trueCanvas && this._options.doubleBuffer && this._trueDoubleBuffer ) {
+        this._canvasSceneLoad( );
 
-      if ( this._trueCanvas ) {
-        if ( this._options.doubleBuffer && this._trueDoubleBuffer ) {
-
-
-          if ( this._requireFlip ) {
-            var geographics = this;
-
-            var oldCanvasScene = geographics._$canvasSceneFront;
-
-            geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
-              left: 0,
-              top: 0,
-              width: geographics._width,
-              height: geographics._height
-            } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) ).prependTo( geographics._$elem );
-
-            geographics._$canvasSceneBack = oldCanvasScene.detach();
-
-            geographics._requireFlip = false;
-          }
-
-
-          //console.log("geographics:interactiveTransform " + this._$canvasSceneFront.prop( "id" ) + ": origin: " + origin.toString() + ", scale: " + scale);
-          // transform a finished scene, can assume no drawing during these calls
-          this._$canvasSceneFront.css( {
-            left: Math.round( origin[ 0 ] ),
-            top: Math.round( origin[ 1 ] ),
-            width: this._width * scale,
-            height: this._height * scale
-          } );
-        } else {
-          this._context.clearRect(0, 0, this._width, this._height);
-        }
+        // transform a finished scene, can assume no drawing during these calls
+        this._$canvasSceneFront.css( {
+          left: Math.round( origin[ 0 ] ),
+          top: Math.round( origin[ 1 ] ),
+          width: this._width * scale,
+          height: this._height * scale
+        } );
       } else {
         this._context.clearRect(0, 0, this._width, this._height);
       }
@@ -4233,6 +4414,61 @@ $.Widget.prototype = {
       } );
     },
 
+    _canvasImgLoad: function( ) {
+      var geographics = this;
+      geographics._$canvasSceneFront = geographics._$canvasSceneDrawn.prependTo( geographics._$elem );
+      geographics._$canvasSceneBack = geographics._$canvasSceneStale;
+      geographics._$canvasSceneBack.detach();
+    },
+
+    _canvasSceneLoad: function() {
+      var geographics = this;
+      if ( geographics._requireFlip ) {
+        geographics._requireFlip = false;
+        geographics._$canvasSceneStale = geographics._$canvasSceneFront;
+
+        geographics._$canvasSceneDrawn = geographics._$canvasSceneBack.css( {
+          left: 0,
+          top: 0,
+          width: geographics._width,
+          height: geographics._height
+        } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) );
+      }
+    },
+
+    _endCallback: function() {
+      var geographics = this;
+
+      if ( !geographics._timeoutEnd ) {
+        // something has canceled the draw
+        return;
+      }
+
+      if ( geographics._trueCanvas && geographics._options.doubleBuffer && geographics._trueDoubleBuffer ) {
+        this._canvasSceneLoad( );
+      }
+
+      geographics._$labelsContainerBack.html( window.toStaticHTML( geographics._labelsHtml ) ).find("a").css({
+        position: "relative",
+        zIndex: 1,
+        display: "inline-block",
+        webkitTransform: "translateZ(0)"
+      });
+
+      var oldLabelsContainer = geographics._$labelsContainerFront;
+
+      geographics._$labelsContainerFront = geographics._$labelsContainerBack.css( {
+        left: 0,
+        top: 0,
+        width: geographics._width,
+        height: geographics._height
+      } ).appendTo( geographics._$elem );
+
+      geographics._$labelsContainerBack = oldLabelsContainer.detach();
+
+      geographics._timeoutEnd = null;
+    },
+
     _end: function( ) {
       // end/finalize a scene
       if ( this._timeoutEnd ) {
@@ -4242,62 +4478,7 @@ $.Widget.prototype = {
 
       this._requireFlip = true;
 
-      var geographics = this;
-
-      function endCallback( ) {
-        if ( !geographics._timeoutEnd ) {
-          // something has canceled the draw
-          return;
-        }
-
-        if ( geographics._trueCanvas && geographics._options.doubleBuffer && geographics._trueDoubleBuffer ) {
-          //console.log("    endCallback...");
-
-          //geographics._$canvasSceneFront = 
-          geographics._$canvasSceneBack.prop( "src", "" ).one( "load", function( e ) {
-            //console.log("    ...flip: show " + geographics._$canvasSceneBack.prop( "id" ) + ", hide " + geographics._$canvasSceneFront.prop("id"));
-            geographics._requireFlip = false;
-            var oldCanvasScene = geographics._$canvasSceneFront;
-
-            geographics._$canvasSceneFront = geographics._$canvasSceneBack.css( {
-              left: 0,
-              top: 0,
-              width: geographics._width,
-              height: geographics._height
-            } ).prependTo( geographics._$elem );
-
-            geographics._$canvasSceneBack = oldCanvasScene.detach();
-          } ).prop( "src", geographics._$canvas[ 0 ].toDataURL( ) );
-        }
-
-
-        geographics._$labelsContainerBack.html( geographics._labelsHtml ).find("a").css({
-          position: "relative",
-          zIndex: 100,
-          display: "inline-block",
-          webkitTransform: "translateZ(0)"
-        });
-
-        var oldLabelsContainer = geographics._$labelsContainerFront;
-
-        geographics._$labelsContainerFront = geographics._$labelsContainerBack.css( {
-          left: 0,
-          top: 0,
-          width: geographics._width,
-          height: geographics._height
-        } ).prependTo( geographics._$elem );
-
-        geographics._$labelsContainerBack = oldLabelsContainer.detach();
-
-
-        geographics._timeoutEnd = null;
-      }
-
-      //if ( this._options.doubleBuffer ) {
-        this._timeoutEnd = setTimeout( endCallback, 20 );
-      //} else {
-        //geographics._$labelsContainerFront.html( geographics._labelsHtml );
-      //}
+      this._timeoutEnd = setTimeout( $.proxy(this._endCallback, this), 20 );
     },
 
     _getGraphicStyle: function (style) {
@@ -4326,7 +4507,7 @@ $.Widget.prototype = {
       var i, j;
       style = this._getGraphicStyle(style);
 
-      if (style.visibility != "hidden" && style.opacity > 0) {
+      if (style.visibility !== "hidden" && style.opacity > 0) {
         this._context.beginPath();
 
         for (i = 0; i < coordinates.length; i++) {
@@ -4355,22 +4536,25 @@ $.Widget.prototype = {
           this._context.stroke();
         }
 
-          //if ( this._options.doubleBuffer ) console.log("_drawLines:_end " + $.now());
         this._end( );
       }
     }
   });
-}(jQuery));
+}(jQuery, window));
 
 
-(function ($, undefined) {
+(function ($, window, undefined) {
   var _widgetIdSeed = 0,
-      _ieVersion = ( function () {
+      _ieVersion = ( function() {
         var v = 5, div = document.createElement("div"), a = div.all || [];
         do {
-          div.innerHTML = "<!--[if gt IE " + (++v) + "]><br><![endif]-->";
+          div.innerHTML = "<!--[if gt IE " + (++v) + "]><br/><![endif]-->";
         } while ( a[0] );
         return v > 6 ? v : !v;
+      }() ),
+
+      _gecko = ( function() {
+        return ( navigator.userAgent.match( /gecko\/*\d/i ) || [] ).length > 0;
       }() ),
 
       _defaultOptions = {
@@ -4380,6 +4564,7 @@ $.Widget.prototype = {
         cursors: {
           "static": "default",
           pan: "url(data:image/vnd.microsoft.icon;base64,AAACAAEAICACAAgACAAwAQAAFgAAACgAAAAgAAAAQAAAAAEAAQAAAAAAAAEAAAAAAAAAAAAAAgAAAAAAAAAAAAAA////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD8AAAA/AAAAfwAAAP+AAAH/gAAB/8AAA//AAAd/wAAGf+AAAH9gAADbYAAA2yAAAZsAAAGbAAAAGAAAAAAAAA//////////////////////////////////////////////////////////////////////////////////////gH///4B///8Af//+AD///AA///wAH//4AB//8AAf//AAD//5AA///gAP//4AD//8AF///AB///5A////5///8=), move",
+          click: "crosshair",
           zoom: "crosshair",
           dragBox: "crosshair",
           dragCircle: "crosshair",
@@ -4404,9 +4589,9 @@ $.Widget.prototype = {
               "class": "osm",
               type: "tiled",
               src: function (view) {
-                return "http://otile" + ((view.index % 4) + 1) + ".mqcdn.com/tiles/1.0.0/osm/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
+                return "//" + String.fromCharCode(97 + (view.index % 3)) + ".tile.openstreetmap.org/" + view.zoom + "/" + view.tile.column + "/" + view.tile.row + ".png";
               },
-              attr: "Tiles Courtesy of <a href='http://www.mapquest.com/' target='_blank'>MapQuest</a> <img src='http://developer.mapquest.com/content/osm/mq_logo.png'>"
+              attr: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
             }
           ],
         tilingScheme: {
@@ -4420,6 +4605,7 @@ $.Widget.prototype = {
         zoom: 0,
         zoomMin: 0,
         zoomMax: Number.POSITIVE_INFINITY,
+        zoomFactor: 2, //< determines what a zoom level means
         pixelSize: 0
       };
 
@@ -4458,22 +4644,21 @@ $.Widget.prototype = {
     _pixelSize: undefined,
     _centerMax: undefined,
     _pixelSizeMax: undefined,
+    _pixelSizeMin: undefined,
 
     _userGeodetic: true,
 
     _centerInteractive: undefined,
     _pixelSizeInteractive: undefined,
     _timeoutInteractive: null,
+    _timeoutWheel: null,
     _triggerInteractive: false,
 
     _timeoutRefreshShapes: null,
 
     _loadCount: 0,
 
-    _wheelTimeout: null,
     _wheelLevel: 0,
-
-    _zoomFactor: 2, //< determines what a zoom level means
 
     _fullZoomFactor: 2, //< interactiveScale factor needed to zoom a whole level
     _partialZoomFactor: 1.18920711500273, //< interactiveScale factor needed to zoom a fraction of a level (the fourth root of 2)
@@ -4497,6 +4682,7 @@ $.Widget.prototype = {
     _velocity: undefined,
     _friction: undefined,
 
+    _pointerEvents: undefined,
     _supportTouch: undefined,
     _softDblClick: undefined,
     _isTap: undefined,
@@ -4529,14 +4715,15 @@ $.Widget.prototype = {
       }
 
       this._widgetId = _widgetIdSeed++;
+      this._serviceIdSeed = 0;
       this._tmplLengthId = "geoMeasureLength" + this._widgetId;
       this._tmplAreaId = "geoMeasureArea" + this._widgetId;
 
       this._$elem.addClass("geo-map").css( {
-        webkitTransform: "translateZ(0)"
+        webkitTransform: "translateZ(0)",
+        touchAction: 'none'
       } );
         
-
       this._initOptions = options || {};
 
       this._forcePosition(this._$elem);
@@ -4558,6 +4745,7 @@ $.Widget.prototype = {
       this._centerInteractive = [ 0, 0 ];
 
       this.options["pixelSize"] = this._pixelSize = this._pixelSizeMax = 156543.03392799936;
+      this._pixelSizeMin = this._pixelSizeMax / Math.pow( 2, 17 );
 
       this._mouseDown =
           this._inOp =
@@ -4565,10 +4753,11 @@ $.Widget.prototype = {
           this._shiftDown =
           this._panning =
           this._isTap =
-          this._isDbltap = false;
+          this._isDbltap = 
+          this._isMultiTouch = false;
 
-      this._anchor = [ 0, 0 ];
-      this._current = [ 0, 0 ];
+      this._anchor = [ 0, 0 ]; /* mouse down */
+      this._current = [ 0, 0 ]; /* mouse move no matter what */
       this._lastMove = [ 0, 0 ];
       this._lastDrag = [ 0, 0 ];
       this._velocity = [ 0, 0 ];
@@ -4598,21 +4787,26 @@ $.Widget.prototype = {
 
       this._map = this;
 
-      this._supportTouch = "ontouchend" in document;
-      this._softDblClick = this._supportTouch || _ieVersion == 7;
+      this._pointerEvents = window.PointerEvent;
+      this._supportTouch = ("ontouchend" in document);
+      this._softDblClick = this._pointerEvents || this._supportTouch || _ieVersion === 7;
 
       var geomap = this,
-          touchStartEvent = this._supportTouch ? "touchstart" : "mousedown",
-          touchStopEvent = this._supportTouch ? "touchend touchcancel" : "mouseup",
-          touchMoveEvent = this._supportTouch ? "touchmove" : "mousemove";
+          touchStartEvent = this._pointerEvents ? 'pointerdown' : ( this._supportTouch ? "touchstart mousedown" : "mousedown" ),
+          touchStopEvent = this._pointerEvents ? 'pointerup pointercancel' : ( this._supportTouch ? "touchend touchcancel mouseup" : "mouseup" ),
+          touchMoveEvent = this._pointerEvents ? 'pointermove' : ( this._supportTouch ? "touchmove mousemove" : "mousemove" );
 
       $(document).keydown($.proxy(this._document_keydown, this));
 
-      this._$eventTarget.dblclick($.proxy(this._eventTarget_dblclick, this));
+      if ( this._softDblClick ) {
+        this._$eventTarget.on( 'softdblclick', $.proxy(this._eventTarget_dblclick, this));
+      } else {
+        this._$eventTarget.dblclick($.proxy(this._eventTarget_dblclick, this));
+      }
 
       this._$eventTarget.bind(touchStartEvent, $.proxy(this._eventTarget_touchstart, this));
 
-      var dragTarget = (this._$eventTarget[0].setCapture) ? this._$eventTarget : $(document);
+      var dragTarget = (this._$eventTarget[0].setCapture || this._pointerEvents) ? this._$eventTarget : $(document);
       dragTarget.bind(touchMoveEvent, $.proxy(this._dragTarget_touchmove, this));
       dragTarget.bind(touchStopEvent, $.proxy(this._dragTarget_touchstop, this));
 
@@ -4634,7 +4828,7 @@ $.Widget.prototype = {
       this._$drawContainer.geographics({ style: this._initOptions.drawStyle || {}, doubleBuffer: false });
       this._options["drawStyle"] = this._$drawContainer.geographics("option", "style");
 
-      this._$shapesContainer.geographics( { style: this._initOptions.shapeStyle || { } } );
+      this._$shapesContainer.geographics( { style: this._initOptions.shapeStyle || { }, doubleBuffer: !_gecko } );
       this._createdGraphics = true;
 
       this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
@@ -4659,6 +4853,11 @@ $.Widget.prototype = {
         if (this._initOptions.zoomMax !== undefined) {
           this._setOption("zoomMax", this._initOptions.zoomMax, false);
         }
+        if (this._initOptions.zoomFactor !== undefined) {
+          this._setOption("zoomFactor", this._initOptions.zoomFactor, false);
+          this._fullZoomFactor = this._initOptions.zoomFactor;
+          this._partialZoomFactor = Math.pow(4, 1 / this._fullZoomFactor); // 4th root of full
+        }
         if (this._initOptions.bbox) {
           this._setOption("bbox", this._initOptions.bbox, false);
         }
@@ -4682,7 +4881,7 @@ $.Widget.prototype = {
     },
 
     _setOption: function (key, value, refresh) {
-      if ( key == "pixelSize" ) {
+      if ( key === "pixelSize" ) {
         return;
       }
 
@@ -4700,7 +4899,7 @@ $.Widget.prototype = {
             this._clearInteractiveTimeout( );
           }
 
-          this._userGeodetic = $.geo.proj && $.geo._isGeodetic( value );
+          this._userGeodetic = this._options["axisLayout"] === "map" && $.geo.proj && $.geo._isGeodetic( value );
           if ( this._userGeodetic ) {
             value = $.geo.proj.fromGeodetic( value );
           }
@@ -4732,7 +4931,7 @@ $.Widget.prototype = {
           break;
 
         case "bboxMax":
-          this._userGeodetic = $.geo.proj && $.geo._isGeodetic( value );
+          this._userGeodetic = this._options["axisLayout"] === "map" && $.geo.proj && $.geo._isGeodetic( value );
           break;
 
         case "center":
@@ -4740,7 +4939,7 @@ $.Widget.prototype = {
             this._clearInteractiveTimeout( );
           }
 
-          this._userGeodetic = $.geo.proj && $.geo._isGeodetic( value );
+          this._userGeodetic = this._options["axisLayout"] === "map" && $.geo.proj && $.geo._isGeodetic( value );
           if ( this._userGeodetic ) {
             value = $.geo.proj.fromGeodetic( value );
           }
@@ -4787,6 +4986,7 @@ $.Widget.prototype = {
           break;
 
         case "zoom":
+          this._userGeodetic = this._options["axisLayout"] === "map" && $.geo.proj;
           if ( this._created ) {
             this._setZoom(value, false, refresh);
           } else {
@@ -4810,6 +5010,7 @@ $.Widget.prototype = {
         case "tilingScheme":
           if ( value !== null ) {
             this._pixelSizeMax = this._getPixelSize( 0 );
+            this._pixelSizeMin = this._getPixelSize( value.pixelSizes ? value.pixelSizes.length - 1 : value.levels - 1 );
             this._centerMax = [
               value.origin[ 0 ] + this._pixelSizeMax * value.tileWidth / 2,
               value.origin[ 1 ] + this._pixelSizeMax * value.tileHeight / 2
@@ -4818,7 +5019,7 @@ $.Widget.prototype = {
           break;
 
         case "bboxMax":
-          if ( $.geo.proj && $.geo._isGeodetic( value ) ) {
+          if ( this._userGeodetic ) {
             bbox = $.geo.proj.fromGeodetic( value );
           } else {
             bbox = value;
@@ -4897,7 +5098,7 @@ $.Widget.prototype = {
         if ( value >= 0 || value <= 1 ) {
           for ( var i = 0; i < this._currentServices.length; i++ ) {
             var service = this._currentServices[ i ];
-            if ( !_serviceContainer || service.serviceContainer[ 0 ] == _serviceContainer[ 0 ] ) {
+            if ( !_serviceContainer || service.serviceContainer[ 0 ] === _serviceContainer[ 0 ] ) {
               service.style.opacity = value;
 
               // update the original service object's style property
@@ -4918,7 +5119,7 @@ $.Widget.prototype = {
         for ( var i = 0; i < this._currentServices.length; i++ ) {
           var service = this._currentServices[ i ];
 
-          if ( !_serviceContainer || service.serviceContainer[ 0 ] == _serviceContainer[ 0 ] ) {
+          if ( !_serviceContainer || service.serviceContainer[ 0 ] === _serviceContainer[ 0 ] ) {
             if ( value === undefined ) {
               // toggle visibility
               value = ( service.style.visibility !== "visible" );
@@ -4946,11 +5147,13 @@ $.Widget.prototype = {
     },
 
     refresh: function ( force, _serviceContainer ) {
-      if ( this._$elem.is( ".geo-service" ) ) {
-        this._$elem.closest( ".geo-map" ).geomap( "refresh", force, this._$elem );
-      } else {
-        this._refresh( force, _serviceContainer );
-        this._refreshAllShapes( );
+      if ( !this._panning ) {
+        if ( this._$elem.is( ".geo-service" ) ) {
+          this._$elem.closest( ".geo-map" ).geomap( "refresh", force, this._$elem );
+        } else {
+          this._refresh( force, _serviceContainer );
+          this._refreshAllShapes( _serviceContainer );
+        }
       }
     },
 
@@ -4973,13 +5176,13 @@ $.Widget.prototype = {
       } );
 
       for (i = 0; i < this._currentServices.length; i++) {
-        $.geo["_serviceTypes"][this._currentServices[i].type].resize(this, this._currentServices[i]);
+        $.geo["_serviceTypes"][this._currentServices[i].type].resize(this, this._currentServices[i], dx, dy);
       }
 
       this._$elem.find( ".geo-graphics" ).css( {
         width: size["width"],
         height: size["height"]
-      }).geographics( "resize" );
+      }).geographics( "resize", dx, dy );
 
       for (i = 0; i < this._drawPixels.length; i++) {
         this._drawPixels[i][0] += dx;
@@ -4989,7 +5192,7 @@ $.Widget.prototype = {
       this._setCenterAndSize(this._center, this._pixelSize, _trigger, true);
     },
 
-    append: function ( shape, style, label, refresh ) {
+    append: function ( shape /* , style, label, refresh */ ) {
       if ( shape && ( $.isPlainObject( shape ) || ( $.isArray( shape ) && shape.length > 0 ) ) ) {
         if ( !this._createdGraphics ) {
           this._createServiceGraphics( );
@@ -4999,7 +5202,7 @@ $.Widget.prototype = {
 
         if ( $.isArray( shape ) ) {
           shapes = shape;
-        } else if ( shape.type == "FeatureCollection" ) {
+        } else if ( shape.type === "FeatureCollection" ) {
           shapes = shape.features;
         } else {
           shapes = [ shape ];
@@ -5008,17 +5211,19 @@ $.Widget.prototype = {
         for ( i = 1; i < arguments.length; i++ ) {
           arg = arguments[ i ];
 
-          if ( typeof arg === "object" ) {
-            realStyle = arg;
-          } else if ( typeof arg === "number" || typeof arg === "string" ) {
-            realLabel = arg;
-          } else if ( typeof arg === "boolean" ) {
-            realRefresh = arg;
+          if ( arg !== null ) {
+            if ( typeof arg === "object" ) {
+              realStyle = arg;
+            } else if ( typeof arg === "number" || typeof arg === "string" ) {
+              realLabel = arg;
+            } else if ( typeof arg === "boolean" ) {
+              realRefresh = arg;
+            }
           }
         }
 
         for ( i = 0; i < shapes.length; i++ ) {
-          if ( shapes[ i ].type != "Point" ) {
+          if ( !$.data( shapes[ i ], "geoBbox" ) ) {
             var bbox = $.geo.bbox( shapes[ i ] );
             if ( $.geo.proj && $.geo._isGeodetic( bbox ) ) {
               bbox = $.geo.proj.fromGeodetic( bbox );
@@ -5045,10 +5250,6 @@ $.Widget.prototype = {
     },
 
     empty: function ( refresh ) {
-      for ( var i = 0; i < this._graphicShapes.length; i++ ) {
-        $.removeData( this._graphicShapes[ i ].shape, "geoBbox" );
-      }
-
       this._graphicShapes = [];
 
       if ( refresh === undefined || refresh ) {
@@ -5062,20 +5263,30 @@ $.Widget.prototype = {
     },
 
     find: function ( selector, pixelTolerance ) {
+      if ( this._timeoutInteractive ) {
+        return [];
+      }
+
       var isPoint = $.isPlainObject( selector ),
-          searchPixel = isPoint ? this._map.toPixel( selector.coordinates ) : undefined,
+          //searchPixel = isPoint ? this._map.toPixel( selector.coordinates ) : undefined,
           mapTol = this._map._pixelSize * pixelTolerance,
           result = [],
           graphicShape,
           geometries,
           curGeom,
-          i = 0;
+          i;
 
-      for ( ; i < this._graphicShapes.length; i++ ) {
+      if ( this._$elem.is( ".geo-map" ) ) {
+        $( this._$elem.find( ".geo-service" ).get().reverse() ).each( function( ) {
+          result = $.merge( result, $( this ).geomap( "find", selector, pixelTolerance ) );
+        } );
+      }
+
+      for ( i = this._graphicShapes.length - 1; i >= 0; i-- ) {
         graphicShape = this._graphicShapes[ i ];
 
         if ( isPoint ) {
-          if ( graphicShape.shape.type == "Point" ) {
+          if ( graphicShape.shape.type === "Point" ) {
             if ( $.geo.distance( graphicShape.shape, selector ) <= mapTol ) {
               result.push( graphicShape.shape );
             }
@@ -5097,7 +5308,7 @@ $.Widget.prototype = {
                 };
 
             if ( $.geo.distance( bboxPolygon, projectedPoint, true ) <= mapTol ) {
-              geometries = $.geo._flatten( graphicShape.shape );
+              geometries = $.geo._basic( graphicShape.shape );
               for ( curGeom = 0; curGeom < geometries.length; curGeom++ ) {
                 if ( $.geo.distance( geometries[ curGeom ], selector ) <= mapTol ) {
                   result.push( graphicShape.shape );
@@ -5111,12 +5322,6 @@ $.Widget.prototype = {
         }
       }
 
-      if ( this._$elem.is( ".geo-map" ) ) {
-        this._$elem.find( ".geo-service" ).each( function( ) {
-          result = $.merge( result, $( this ).geomap( "find", selector, pixelTolerance ) );
-        } );
-      }
-
       return result;
     },
 
@@ -5127,7 +5332,6 @@ $.Widget.prototype = {
 
         for ( var i = 0; i < this._graphicShapes.length; i++ ) {
           if ( $.inArray( this._graphicShapes[ i ].shape, shapes ) >= 0 ) {
-            $.removeData( shape, "geoBbox" );
             rest = this._graphicShapes.slice( i + 1 );
             this._graphicShapes.length = i;
             this._graphicShapes.push.apply( this._graphicShapes, rest );
@@ -5156,7 +5360,7 @@ $.Widget.prototype = {
       return [ center[ 0 ] - halfWidth, center[ 1 ] - halfHeight, center[ 0 ] + halfWidth, center[ 1 ] + halfHeight ];
     },
 
-    _setBbox: function (value, trigger, refresh) {
+    _setBbox: function (value /* , trigger, refresh */ ) {
       var center = [value[0] + (value[2] - value[0]) / 2, value[1] + (value[3] - value[1]) / 2],
           pixelSize = Math.max($.geo.width(value, true) / this._contentBounds.width, $.geo.height(value, true) / this._contentBounds.height),
           zoom = this._getZoom( center, pixelSize );
@@ -5223,11 +5427,11 @@ $.Widget.prototype = {
             bbox = $.geo.reaspect( this._getBbox( center, pixelSize ), ratio, true ),
             bboxMax = $.geo.reaspect(this._getBboxMax(), ratio, true);
 
-        return Math.round( Math.log($.geo.width(bboxMax, true) / $.geo.width(bbox, true)) / Math.log(this._zoomFactor) );
+        return Math.round( Math.log($.geo.width(bboxMax, true) / $.geo.width(bbox, true)) / Math.log(this._fullZoomFactor) );
       }
     },
 
-    _setZoom: function ( value, trigger, refresh ) {
+    _setZoom: function ( value, trigger /* , refresh */ ) {
       // set the map widget's zoom, taking zoomMin and zoomMax into account
       this._clearInteractiveTimeout( );
 
@@ -5251,7 +5455,7 @@ $.Widget.prototype = {
       var contentSizeCss = "width:" + this._contentBounds["width"] + "px; height:" + this._contentBounds["height"] + "px; margin:0; padding:0;",
           contentPosCss = "position:absolute; left:0; top:0;";
 
-      this._$elem.prepend('<div class="geo-event-target geo-content-frame" style="position:absolute; left:' + this._contentBounds.x + 'px; top:' + this._contentBounds.y + 'px;' + contentSizeCss + 'overflow:hidden; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none;" unselectable="on"></div>');
+      this._$elem.prepend( window.toStaticHTML( '<div class="geo-event-target geo-content-frame" style="position:absolute; left:' + this._contentBounds.x + 'px; top:' + this._contentBounds.y + 'px;' + contentSizeCss + 'overflow:hidden; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none;" unselectable="on"></div>' ) );
       this._$eventTarget = this._$contentFrame = this._$elem.children(':first');
 
       this._$contentFrame.append('<div class="geo-services-container" style="' + contentPosCss + contentSizeCss + '"></div>');
@@ -5277,7 +5481,7 @@ $.Widget.prototype = {
       this._$contentFrame.append(this._$existingChildren);
 
       if ( ! $("#geo-measure-style").length ) {
-        $("head").prepend( '<style type="text/css" id="geo-measure-style">.geo-measure-label { margin: 4px 0 0 6px; font-family: sans-serif;' + ( _ieVersion ? 'letter-spacing: 2px; color: #444; filter:progid:DXImageTransform.Microsoft.DropShadow(Color=white, OffX=1, OffY=2, Positive=true);' : 'color: #000; text-shadow: #fff 1px 2px; font-weight: bold;' ) + ' }</style>' );
+        $("head").prepend( window.toStaticHTML( '<style type="text/css" id="geo-measure-style">.geo-measure-label { margin: 4px 0 0 6px; font-family: sans-serif;' + ( _ieVersion ? 'letter-spacing: 2px; color: #444; filter:progid:DXImageTransform.Microsoft.DropShadow(Color=white, OffX=1, OffY=2, Positive=true);' : 'color: #000; text-shadow: #fff 1px 2px; font-weight: bold;' ) + ' }</style>' ) );
       }
     },
 
@@ -5308,9 +5512,9 @@ $.Widget.prototype = {
         var idString = service.id ? ' id="' + service.id + '"' : "",
             classString = 'class="geo-service ' + ( service["class"] ? service["class"] : '' ) + '"',
             scHtml = '<div ' + idString + classString + ' style="-webkit-transform:translateZ(0);position:absolute; left:0; top:0; width:32px; height:32px; margin:0; padding:0; display:' + ( service.style.visibility === "visible" ? "block" : "none" ) + ';"></div>',
-            servicesContainer;
+            serviceContainer;
 
-        this._$servicesContainer.append( scHtml );
+        this._$servicesContainer.append( window.toStaticHTML( scHtml ) );
         serviceContainer = this._$servicesContainer.children( ":last" );
         service.serviceContainer = serviceContainer;
         
@@ -5328,7 +5532,9 @@ $.Widget.prototype = {
 
       this._$attrList.find( "a" ).css( {
         position: "relative",
-        zIndex: 100
+        zIndex: 1,
+        display: "inline-block",
+        webkitTransform: "translateZ(0)"
       } );
     },
 
@@ -5340,7 +5546,7 @@ $.Widget.prototype = {
 
       this._map._$shapesContainers = this._map._$shapesContainers.add( this._$shapesContainer );
 
-      this._$shapesContainer.geographics( );
+      this._$shapesContainer.geographics( { doubleBuffer: !_gecko });
       this._createdGraphics = true;
 
       this._options["shapeStyle"] = this._$shapesContainer.geographics("option", "style");
@@ -5420,7 +5626,7 @@ $.Widget.prototype = {
       this._$measureLabel.hide();
     },
 
-    _refreshAllShapes: function ( ) {
+    _refreshAllShapes: function ( _serviceContainer ) {
       this._timeoutRefreshShapes = null;
 
       var service,
@@ -5429,17 +5635,20 @@ $.Widget.prototype = {
 
       for ( ; i < this._currentServices.length; i++ ) {
         service = this._currentServices[ i ];
-        geoService = service.serviceContainer.data( "geoService" );
 
-        if ( geoService._createdGraphics ) {
-          geoService._$shapesContainer.geographics( "clear" );
-          if ( geoService._graphicShapes.length > 0 ) {
-            geoService._refreshShapes( geoService._$shapesContainer, geoService._graphicShapes, geoService._graphicShapes, geoService._graphicShapes );
+        if ( !_serviceContainer || service.serviceContainer[ 0 ] === _serviceContainer[ 0 ] ) {
+          geoService = service.serviceContainer.data( "geoService" );
+
+          if ( geoService._createdGraphics ) {
+            geoService._$shapesContainer.geographics( "clear" );
+            if ( geoService._graphicShapes.length > 0 ) {
+              geoService._refreshShapes( geoService._$shapesContainer, geoService._graphicShapes, geoService._graphicShapes, geoService._graphicShapes );
+            }
           }
         }
       }
 
-      if ( this._createdGraphics ) {
+      if ( this._createdGraphics && !_serviceContainer ) {
         this._$shapesContainer.geographics( "clear" );
         if ( this._graphicShapes.length > 0 ) {
           this._refreshShapes( this._$shapesContainer, this._graphicShapes, this._graphicShapes, this._graphicShapes );
@@ -5456,13 +5665,9 @@ $.Widget.prototype = {
           label,
           hasLabel,
           labelPixel,
+          centroid,
           bbox = this._map._getBbox(center, pixelSize);
 
-      /*
-      if ( shapes.length > 0 ) {
-        console.log( "_refreshShapes " + $.now() );
-      }
-      */
       for (i = 0; i < shapes.length; i++) {
         shape = shapes[i].shape || shapes[i];
         shape = shape.geometry || shape;
@@ -5476,6 +5681,7 @@ $.Widget.prototype = {
         label = $.isArray(labels) ? labels[i].label : labels;
         hasLabel = ( label !== undefined );
         labelPixel = undefined;
+        centroid = $.geo.centroid( shape );
 
         switch (shape.type) {
           case "Point":
@@ -5490,32 +5696,32 @@ $.Widget.prototype = {
             break;
           case "Polygon":
             this._$shapesContainer.geographics("drawPolygon", this._map.toPixel(shape.coordinates, center, pixelSize), style);
-            if ( hasLabel ) {
-              labelPixel = this._map.toPixel( $.geo.centroid( shape ).coordinates, center, pixelSize );
+            if ( hasLabel && centroid ) {
+              labelPixel = this._map.toPixel( centroid.coordinates, center, pixelSize );
             }
             break;
           case "MultiPoint":
             for (mgi = 0; mgi < shape.coordinates.length; mgi++) {
               this._$shapesContainer.geographics("drawPoint", this._map.toPixel(shape.coordinates[mgi], center, pixelSize), style);
             }
-            if ( hasLabel ) {
-              labelPixel = this._map.toPixel( $.geo.centroid( shape ).coordinates, center, pixelSize );
+            if ( hasLabel && centroid ) {
+              labelPixel = this._map.toPixel( centroid.coordinates, center, pixelSize );
             }
             break;
           case "MultiLineString":
             for (mgi = 0; mgi < shape.coordinates.length; mgi++) {
               this._$shapesContainer.geographics("drawLineString", this._map.toPixel(shape.coordinates[mgi], center, pixelSize), style);
             }
-            if ( hasLabel ) {
-              labelPixel = this._map.toPixel( $.geo.centroid( shape ).coordinates, center, pixelSize );
+            if ( hasLabel && centroid ) {
+              labelPixel = this._map.toPixel( centroid.coordinates, center, pixelSize );
             }
             break;
           case "MultiPolygon":
             for (mgi = 0; mgi < shape.coordinates.length; mgi++) {
               this._$shapesContainer.geographics("drawPolygon", this._map.toPixel(shape.coordinates[mgi], center, pixelSize), style);
             }
-            if ( hasLabel ) {
-              labelPixel = this._map.toPixel( $.geo.centroid( shape ).coordinates, center, pixelSize );
+            if ( hasLabel && centroid ) {
+              labelPixel = this._map.toPixel( centroid.coordinates, center, pixelSize );
             }
             break;
 
@@ -5548,7 +5754,7 @@ $.Widget.prototype = {
 
     _forcePosition: function (elem) {
       var cssPosition = elem.css("position");
-      if (cssPosition != "relative" && cssPosition != "absolute" && cssPosition != "fixed") {
+      if (cssPosition !== "relative" && cssPosition !== "absolute" && cssPosition !== "fixed") {
         elem.css("position", "relative");
       }
     },
@@ -5571,7 +5777,7 @@ $.Widget.prototype = {
           return tilingScheme.basePixelSize / Math.pow(2, zoom);
         }
       } else {
-        var bbox = $.geo.scaleBy( this._getBboxMax(), 1 / Math.pow( this._zoomFactor, zoom ), true );
+        var bbox = $.geo.scaleBy( this._getBboxMax(), 1 / Math.pow( this._fullZoomFactor, zoom ), true );
         return Math.max( $.geo.width( bbox, true ) / this._contentBounds.width, $.geo.height( bbox, true ) / this._contentBounds.height );
       }
     },
@@ -5579,8 +5785,14 @@ $.Widget.prototype = {
     _getZoomCenterAndSize: function ( anchor, zoomDelta, full ) {
       var zoomFactor = ( full ? this._fullZoomFactor : this._partialZoomFactor ),
           scale = Math.pow( zoomFactor, -zoomDelta ),
-          pixelSize = this._pixelSizeInteractive * scale,
-          zoom = this._getZoom(this._centerInteractive, pixelSize);
+          pixelSize = this._pixelSizeInteractive * scale;
+
+      if ( this._options[ "tilingScheme" ] ) {
+        // clamp to min/max pixelSize
+        pixelSize = Math.min( Math.max( pixelSize, this._pixelSizeMin ), this._pixelSizeMax );
+      }
+
+      var zoom = this._getZoom(this._centerInteractive, pixelSize);
 
       // clamp to zoom
       if ( full && this._options[ "tilingScheme" ] ) {
@@ -5601,28 +5813,9 @@ $.Widget.prototype = {
       return { pixelSize: pixelSize, center: scaleCenter };
     },
 
-    _mouseWheelFinish: function ( refresh ) {
-      this._wheelTimeout = null;
-
-      if (this._wheelLevel !== 0) {
-        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, this._wheelLevel, this._options[ "tilingScheme" ] !== null );
-
-        this._wheelLevel = 0;
-      } else if ( refresh ) {
-        this._refresh();
-        this._refreshAllShapes( );
-      }
-    },
-
     _panFinalize: function () {
       if (this._panning) {
         this._velocity = [0, 0];
-
-        var dx = this._current[0] - this._anchor[0],
-            dy = this._current[1] - this._anchor[1],
-            image = this._options[ "axisLayout" ] === "image",
-            dxMap = -dx * this._pixelSize,
-            dyMap = ( image ? -1 : 1 ) * dy * this._pixelSize;
 
         this._$eventTarget.css("cursor", this._options["cursors"][this._options["mode"]]);
 
@@ -5638,10 +5831,7 @@ $.Widget.prototype = {
       }
 
       var dx = this._current[0] - this._lastDrag[0],
-          dy = this._current[1] - this._lastDrag[1],
-          i = 0,
-          service,
-          translateObj;
+          dy = this._current[1] - this._lastDrag[1];
 
       if (this._toolPan || dx > 3 || dx < -3 || dy > 3 || dy < -3) {
         if (!this._toolPan) {
@@ -5684,15 +5874,9 @@ $.Widget.prototype = {
     },
 
     _interactiveTransform: function( ) {
-      var mapWidth = this._contentBounds[ "width" ],
-          mapHeight = this._contentBounds[ "height" ],
+      var service,
 
-          halfWidth = mapWidth / 2,
-          halfHeight = mapHeight / 2,
-
-          bbox = [ this._centerInteractive[ 0 ] - halfWidth, this._centerInteractive[ 1 ] - halfHeight, this._centerInteractive[ 0 ] + halfWidth, this._centerInteractive[ 1 ] + halfHeight ];
-
-      var scalePixelSize = this._pixelSize,
+          scalePixelSize = this._pixelSize,
           scaleRatio = scalePixelSize / this._pixelSizeInteractive;
           
       if ( scalePixelSize > 0 ) {
@@ -5703,36 +5887,7 @@ $.Widget.prototype = {
 
 
         this._$shapesContainers.geographics("interactiveTransform", newPixelPoint, scaleRatio);
-
-        /*
-        $scaleContainer.css( {
-          left: Math.round( newPixelPoint[ 0 ] ),
-          top: Math.round( newPixelPoint[ 1 ] ),
-          width: mapWidth * scaleRatio,
-          height: mapHeight * scaleRatio
-        } );
-        */
-        
       }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
       for ( var i = 0; i < this._currentServices.length; i++ ) {
         service = this._currentServices[ i ];
@@ -5747,7 +5902,7 @@ $.Widget.prototype = {
 
     _interactiveTimeout: function( ) {
       if ( this._isMultiTouch ) {
-        this._timeoutInteractive = setTimeout( $.proxy( interactiveTimeout, this ), 128 );
+        this._timeoutInteractive = setTimeout( $.proxy( this._interactiveTimeout, this ), 128 );
       } else if ( this._created && this._timeoutInteractive ) {
         this._setCenterAndSize( this._centerInteractive, this._pixelSizeInteractive, this._triggerInteractive, true );
         this._timeoutInteractive = null;
@@ -5768,7 +5923,7 @@ $.Widget.prototype = {
 
       for ( ; i < this._currentServices.length; i++ ) {
         service = this._currentServices[ i ];
-        if ( !_serviceContainer || service.serviceContainer[ 0 ] == _serviceContainer[ 0 ] ) {
+        if ( !_serviceContainer || service.serviceContainer[ 0 ] === _serviceContainer[ 0 ] ) {
           $.geo[ "_serviceTypes" ][ service.type ].refresh( this, service, force );
         }
       }
@@ -5796,7 +5951,7 @@ $.Widget.prototype = {
     },
 
     _setCenterAndSize: function (center, pixelSize, trigger, refresh) {
-      if ( ! $.isArray( center ) || center.length != 2 || typeof center[ 0 ] !== "number" || typeof center[ 1 ] !== "number" ) {
+      if ( ! $.isArray( center ) || center.length !== 2 || typeof center[ 0 ] !== "number" || typeof center[ 1 ] !== "number" ) {
         return;
       }
 
@@ -5815,9 +5970,19 @@ $.Widget.prototype = {
         }
       }
 
+      this._centerInteractive[ 0 ] = center[ 0 ];
+      this._centerInteractive[ 1 ] = center[ 1 ];
+
+      if ( this._created ) {
+        // one last interactiveTransform to put pinched map into place
+        this._interactiveTransform( );
+      }
+
+      this._options["pixelSize"] = this._pixelSize = pixelSize;
+
       this._center[ 0 ] = center[ 0 ];
       this._center[ 1 ] = center[ 1 ];
-      this._options["pixelSize"] = this._pixelSize = pixelSize;
+
 
       if ( this._userGeodetic ) {
         this._options["bbox"] = $.geo.proj.toGeodetic( this._getBbox() );
@@ -5953,7 +6118,7 @@ $.Widget.prototype = {
 
     _document_keydown: function (e) {
       var len = this._drawCoords.length;
-      if (len > 0 && e.which == 27) {
+      if (len > 0 && e.which === 27) {
         if (len <= 2) {
           this._resetDrawing();
           this._inOp = false;
@@ -5998,13 +6163,11 @@ $.Widget.prototype = {
         this._drawTimeout = null;
       }
 
-      var offset = $(e.currentTarget).offset();
-
       switch (this._options["mode"]) {
         case "drawLineString":
         case "measureLength":
-          if ( this._drawCoords.length > 1 && ! ( this._drawCoords[0][0] == this._drawCoords[1][0] &&
-                                                  this._drawCoords[0][1] == this._drawCoords[1][1] ) ) {
+          if ( this._drawCoords.length > 1 && ! ( this._drawCoords[0][0] === this._drawCoords[1][0] &&
+                                                  this._drawCoords[0][1] === this._drawCoords[1][1] ) ) {
               this._drawCoords.length--;
               this._trigger( "shape", e, {
                 type: "LineString",
@@ -6018,8 +6181,8 @@ $.Widget.prototype = {
 
         case "drawPolygon":
         case "measureArea":
-          if ( this._drawCoords.length > 1 && ! ( this._drawCoords[0][0] == this._drawCoords[1][0] &&
-                                                  this._drawCoords[0][1] == this._drawCoords[1][1] ) ) {
+          if ( this._drawCoords.length > 1 && ! ( this._drawCoords[0][0] === this._drawCoords[1][0] &&
+                                                  this._drawCoords[0][1] === this._drawCoords[1][1] ) ) {
             var endIndex = this._drawCoords.length - 1;
             if (endIndex > 2) {
               this._drawCoords[endIndex] = $.merge( [], this._drawCoords[0] );
@@ -6043,8 +6206,11 @@ $.Widget.prototype = {
     },
 
     _eventTarget_touchstart: function (e) {
-      if (typeof(document.elementFromPoint) !== "undefined" && document.elementFromPoint(e.pageX, e.pageY).nodeName === "A") {
-        return;
+      if ( typeof( document.elementFromPoint ) !== "undefined" ) {
+        var elFromPt = document.elementFromPoint( e.pageX, e.pageY );
+        if ( elFromPt && elFromPt.nodeName === "A" ) {
+          return;
+        }
       }
 
       var mode = this._options[ "mode" ],
@@ -6055,7 +6221,7 @@ $.Widget.prototype = {
         return;
       }
 
-      if ( !this._supportTouch && e.which != 1 ) {
+      if ( !this._pointerEvents && !this._supportTouch && e.which !== 1 ) {
         return;
       }
 
@@ -6064,7 +6230,48 @@ $.Widget.prototype = {
       var offset = $(e.currentTarget).offset(),
           touches = e.originalEvent.changedTouches;
 
-      if ( this._supportTouch ) {
+      if ( this._pointerEvents ) {
+        if ( !this._isMultiTouch && this._mouseDown && this._multiTouchAnchor.length > 0 ) {
+          // switch to multitouch
+          e.currentTarget.setPointerCapture( e.originalEvent.pointerId );
+
+          this._isMultiTouch = true;
+          this._wheelLevel = 0;
+
+          this._multiTouchAnchor.push( e.originalEvent );
+
+          this._multiTouchCurrentBbox = [
+            this._multiTouchCurrentBbox[ 0 ],
+            this._multiTouchCurrentBbox[ 1 ],
+            this._multiTouchAnchor[1].pageX - offset.left,
+            this._multiTouchAnchor[1].pageY - offset.top
+          ];
+
+          this._multiTouchAnchorBbox = $.merge( [ ], this._multiTouchCurrentBbox );
+
+          this._anchor = $.geo.center( this._multiTouchCurrentBbox, true );
+          this._current = $.merge( [], this._anchor );
+
+          if ( doInteractiveTimeout ) {
+            this._setInteractiveTimeout( true );
+          }
+
+          return false;
+        } else if ( this._multiTouchAnchor.length < 2 ) {
+          e.currentTarget.setPointerCapture( e.originalEvent.pointerId );
+
+          this._multiTouchAnchor.push( e.originalEvent );
+
+          this._multiTouchCurrentBbox = [
+            this._multiTouchAnchor[0].pageX - offset.left,
+            this._multiTouchAnchor[0].pageY - offset.top,
+            NaN,
+            NaN
+          ];
+
+          this._current = [ this._multiTouchAnchor[0].pageX - offset.left, this._multiTouchAnchor[0].pageY - offset.top ];
+        }
+      } else if ( this._supportTouch && touches ) {
         this._multiTouchAnchor = $.merge( [ ], touches );
 
         this._isMultiTouch = this._multiTouchAnchor.length > 1;
@@ -6160,21 +6367,74 @@ $.Widget.prototype = {
       var offset = this._$eventTarget.offset(),
           drawCoordsLen = this._drawCoords.length,
           touches = e.originalEvent.changedTouches,
-          current,
-          service,
-          i = 0;
+          current = null,
+          anchorDistance,
+          currentDistance,
+          wheelLevel,
+          delta,
+          pinchCenterAndSize,
+          i;
 
-      if ( this._supportTouch ) {
+      if ( this._pointerEvents ) {
+        if ( this._isMultiTouch ) {
+          if ( e.originalEvent.pointerId === this._multiTouchAnchor[ 0 ].pointerId ) {
+            this._multiTouchCurrentBbox[ 0 ] = e.originalEvent.pageX - offset.left;
+            this._multiTouchCurrentBbox[ 1 ] = e.originalEvent.pageY - offset.top;
+          } else if ( e.originalEvent.pointerId === this._multiTouchAnchor[ 1 ].pointerId ) {
+            this._multiTouchCurrentBbox[ 2 ] = e.originalEvent.pageX - offset.left;
+            this._multiTouchCurrentBbox[ 3 ] = e.originalEvent.pageY - offset.top;
+          } else {
+            // untracked pointer
+            e.preventDefault();
+            if ( doInteractiveTimeout ) {
+              this._setInteractiveTimeout( true );
+            }
+            return false;
+          }
+
+          anchorDistance = $.geo._distancePointPoint( [ this._multiTouchAnchorBbox[ 0 ], this._multiTouchAnchorBbox[ 1 ] ], [ this._multiTouchAnchorBbox[ 2 ], this._multiTouchAnchorBbox[ 3 ] ] );
+          currentDistance = $.geo._distancePointPoint( [ this._multiTouchCurrentBbox[ 0 ], this._multiTouchCurrentBbox[ 1 ] ], [ this._multiTouchCurrentBbox[ 2 ], this._multiTouchCurrentBbox[ 3 ] ] );
+
+          wheelLevel = ( ( currentDistance - anchorDistance ) / anchorDistance );
+
+          if ( wheelLevel > 0 ) {
+            wheelLevel *= 5;
+          } else {
+            wheelLevel *= 10;
+          }
+
+          delta = wheelLevel - this._wheelLevel;
+
+          this._wheelLevel = wheelLevel;
+
+          pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, false );
+
+          this._setInteractiveCenterAndSize( pinchCenterAndSize.center, pinchCenterAndSize.pixelSize );
+          this._interactiveTransform( );
+
+          doInteractiveTimeout = true;
+
+          current = $.geo.center( this._multiTouchCurrentBbox, true );
+
+        } else {
+          this._multiTouchAnchor[ 0 ] = e.originalEvent;
+
+          this._multiTouchCurrentBbox = [
+            this._multiTouchAnchor[0].pageX - offset.left,
+            this._multiTouchAnchor[0].pageY - offset.top,
+            NaN,
+            NaN
+          ];
+
+          current = [e.originalEvent.pageX - offset.left, e.originalEvent.pageY - offset.top];
+        }
+      } else if ( this._supportTouch && touches ) {
         if ( !this._isMultiTouch && this._mouseDown && this._multiTouchAnchor.length > 0 && touches[ 0 ].identifier !== this._multiTouchAnchor[ 0 ].identifier ) {
           // switch to multitouch
-          this._mouseDown = false;
           this._isMultiTouch = true;
           this._wheelLevel = 0;
 
           this._multiTouchAnchor.push( touches[ 0 ] );
-
-
-
 
           this._multiTouchCurrentBbox = [
             this._multiTouchCurrentBbox[ 0 ],
@@ -6185,7 +6445,6 @@ $.Widget.prototype = {
 
           this._multiTouchAnchorBbox = $.merge( [ ], this._multiTouchCurrentBbox );
 
-          this._mouseDown = true;
           this._anchor = this._current = $.geo.center( this._multiTouchCurrentBbox, true );
 
 
@@ -6197,7 +6456,7 @@ $.Widget.prototype = {
 
         if ( this._isMultiTouch ) {
 
-          for ( ; i < touches.length; i++ ) {
+          for ( i = 0; i < touches.length; i++ ) {
             if ( touches[ i ].identifier === this._multiTouchAnchor[ 0 ].identifier ) {
               this._multiTouchCurrentBbox[ 0 ] = touches[ i ].pageX - offset.left;
               this._multiTouchCurrentBbox[ 1 ] = touches[ i ].pageY - offset.top;
@@ -6207,12 +6466,10 @@ $.Widget.prototype = {
             }
           }
 
-          var anchorDistance = $.geo._distancePointPoint( [ this._multiTouchAnchorBbox[ 0 ], this._multiTouchAnchorBbox[ 1 ] ], [ this._multiTouchAnchorBbox[ 2 ], this._multiTouchAnchorBbox[ 3 ] ] ),
-              currentDistance = $.geo._distancePointPoint( [ this._multiTouchCurrentBbox[ 0 ], this._multiTouchCurrentBbox[ 1 ] ], [ this._multiTouchCurrentBbox[ 2 ], this._multiTouchCurrentBbox[ 3 ] ] );
+          anchorDistance = $.geo._distancePointPoint( [ this._multiTouchAnchorBbox[ 0 ], this._multiTouchAnchorBbox[ 1 ] ], [ this._multiTouchAnchorBbox[ 2 ], this._multiTouchAnchorBbox[ 3 ] ] );
+          currentDistance = $.geo._distancePointPoint( [ this._multiTouchCurrentBbox[ 0 ], this._multiTouchCurrentBbox[ 1 ] ], [ this._multiTouchCurrentBbox[ 2 ], this._multiTouchCurrentBbox[ 3 ] ] );
 
-          current = $.geo.center( this._multiTouchCurrentBbox, true );
-
-          var wheelLevel = ( ( currentDistance - anchorDistance ) / anchorDistance );
+          wheelLevel = ( ( currentDistance - anchorDistance ) / anchorDistance );
 
           if ( wheelLevel > 0 ) {
             wheelLevel *= 5;
@@ -6220,11 +6477,11 @@ $.Widget.prototype = {
             wheelLevel *= 10;
           }
 
-          var delta = wheelLevel - this._wheelLevel;
+          delta = wheelLevel - this._wheelLevel;
 
           this._wheelLevel = wheelLevel;
 
-          var pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, false );
+          pinchCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, false );
 
           this._setInteractiveCenterAndSize( pinchCenterAndSize.center, pinchCenterAndSize.pixelSize );
           this._interactiveTransform( );
@@ -6239,6 +6496,14 @@ $.Widget.prototype = {
         current = [e.pageX - offset.left, e.pageY - offset.top];
       }
 
+      if ( current === null ) {
+        e.preventDefault();
+        if ( doInteractiveTimeout ) {
+          this._setInteractiveTimeout( true );
+        }
+        return false;
+      }
+
       if (current[0] === this._lastMove[0] && current[1] === this._lastMove[1]) {
         if ( this._inOp ) {
           e.preventDefault();
@@ -6246,10 +6511,13 @@ $.Widget.prototype = {
             this._setInteractiveTimeout( true );
           }
           return false;
+        } else {
+          // fixes: [bug] highlight pop
+          return false;
         }
       }
 
-      if ( _ieVersion == 7 ) {
+      if ( _ieVersion === 7 ) {
         this._isDbltap = this._isTap = false;
       }
 
@@ -6357,7 +6625,7 @@ $.Widget.prototype = {
       }
 
       if ( !this._mouseDown ) {
-        if ( _ieVersion == 7 ) {
+        if ( _ieVersion === 7 ) {
           // ie7 doesn't appear to trigger dblclick on this._$eventTarget,
           // we fake regular click here to cause soft dblclick
           this._eventTarget_touchstart(e);
@@ -6376,7 +6644,7 @@ $.Widget.prototype = {
           mode = this._options[ "mode" ],
           shift = this._options[ "shift" ],
           defaultShift = ( mode === "dragBox" ? "dragBox" : "zoom" ),
-          current, i, clickDate,
+          current = null, i, clickDate,
           dx, dy,
           coordBuffer,
           triggerShape;
@@ -6385,7 +6653,24 @@ $.Widget.prototype = {
         mode = ( shift === "default" ? defaultShift : shift );
       }
 
-      if (this._supportTouch) {
+      if ( this._pointerEvents ) {
+        if ( e.originalEvent.pointerId === this._multiTouchAnchor[ 0 ].pointerId || e.originalEvent.pointerId === this._multiTouchAnchor[ 1 ].pointerId ) {
+          e.currentTarget.releasePointerCapture( e.originalEvent.pointerId );
+
+          current = [e.originalEvent.pageX - offset.left, e.originalEvent.pageY - offset.top];
+
+          this._multiTouchAnchor = [];
+          this._inOp = false;
+        } else {
+          // untracked pointer
+          e.preventDefault();
+          if ( doInteractiveTimeout ) {
+            this._setInteractiveTimeout( true );
+          }
+          return;
+        }
+
+      } else if (this._supportTouch && e.originalEvent.changedTouches) {
         current = [e.originalEvent.changedTouches[0].pageX - offset.left, e.originalEvent.changedTouches[0].pageY - offset.top];
         this._multiTouchAnchor = [];
         this._inOp = false;
@@ -6419,6 +6704,7 @@ $.Widget.prototype = {
         if ( doInteractiveTimeout ) {
           this._setInteractiveTimeout( true );
         }
+
         return;
       }
 
@@ -6435,19 +6721,12 @@ $.Widget.prototype = {
           case "dragBox":
             if ( dx !== 0 || dy !== 0 ) {
               var minSize = this._pixelSize * 6,
-                  bboxCoords = this._toMap( [ [
-                      Math.min( this._anchor[ 0 ], current[ 0 ] ),
-                      Math.max( this._anchor[ 1 ], current[ 1 ] )
-                    ], [
-                      Math.max( this._anchor[ 0 ], current[ 0 ] ),
-                      Math.min( this._anchor[ 1 ], current[ 1 ] )
-                    ]
-                  ] ),
+                  bboxCoords = this._toMap( [ this._anchor, current ] ),
                   bbox = [
-                    bboxCoords[0][0],
-                    bboxCoords[0][1],
-                    bboxCoords[1][0],
-                    bboxCoords[1][1]
+                    Math.min( bboxCoords[0][0], bboxCoords[1][0] ),
+                    Math.min( bboxCoords[0][1], bboxCoords[1][1] ),
+                    Math.max( bboxCoords[0][0], bboxCoords[1][0] ),
+                    Math.max( bboxCoords[0][1], bboxCoords[1][1] )
                   ];
 
               if ( mode === "zoom" ) {
@@ -6578,18 +6857,22 @@ $.Widget.prototype = {
             if (wasToolPan) {
               this._panFinalize();
             } else {
-              i = (this._drawCoords.length === 0 ? 0 : this._drawCoords.length - 1);
+              this._trigger("click", e, { type: "Point", coordinates: this.toMap(current) });
 
-              this._drawCoords[i] = this._toMap(current);
-              this._drawPixels[i] = current;
+              if (!e.isDefaultPrevented()) {
+                i = (this._drawCoords.length === 0 ? 0 : this._drawCoords.length - 1);
 
-              if (i < 2 || !(this._drawCoords[i][0] == this._drawCoords[i-1][0] &&
-                             this._drawCoords[i][1] == this._drawCoords[i-1][1])) {
-                this._drawCoords[i + 1] = this._toMap( current, this._centerInteractive, this._pixelSizeInteractive );
-                this._drawPixels[i + 1] = current;
+                this._drawCoords[i] = this._toMap(current);
+                this._drawPixels[i] = current;
+
+                if (i < 2 || !(this._drawCoords[i][0] === this._drawCoords[i-1][0] &&
+                               this._drawCoords[i][1] === this._drawCoords[i-1][1])) {
+                  this._drawCoords[i + 1] = this._toMap( current, this._centerInteractive, this._pixelSizeInteractive );
+                  this._drawPixels[i + 1] = current;
+                }
+
+                this._refreshDrawing();
               }
-
-              this._refreshDrawing();
             }
             break;
 
@@ -6612,7 +6895,7 @@ $.Widget.prototype = {
           if ( doInteractiveTimeout ) {
             this._setInteractiveTimeout( true );
           }
-          this._$eventTarget.trigger("dblclick", e);
+          this._$eventTarget.trigger("softdblclick", e);
           return false;
         }
       }
@@ -6627,7 +6910,7 @@ $.Widget.prototype = {
       }
     },
 
-    _eventTarget_mousewheel: function (e, delta) {
+    _eventTarget_mousewheel: function ( e ) {
       if ( this._options[ "mode" ] === "static" || this._options[ "scroll" ] === "off" ) {
         return;
       }
@@ -6638,39 +6921,56 @@ $.Widget.prototype = {
         return false;
       }
 
-      if (delta !== 0) {
-        this._clearInteractiveTimeout( );
-
-        if ( delta > 0 ) {
-          delta = Math.ceil( delta );
-        } else { 
-          delta = Math.floor( delta );
+      if ( e.deltaY !== 0 ) {
+        if ( this._timeoutWheel ) {
+          clearTimeout( this._timeoutWheel );
+          this._timeoutWheel = null;
         }
 
-        var offset = $(e.currentTarget).offset();
-        this._anchor = [e.pageX - offset.left, e.pageY - offset.top];
+        var geomap = this;
+        var currentTarget = e.currentTarget;
+        var deltaY = e.deltaY;
+        var pageX = e.pageX;
+        var pageY = e.pageY;
 
-        var wheelCenterAndSize = this._getZoomCenterAndSize( this._anchor, delta, this._options[ "tilingScheme" ] !== null ),
-            service,
-            i = 0;
+        this._timeoutWheel = setTimeout( function () {
+          geomap._clearInteractiveTimeout( );
 
-        this._setInteractiveCenterAndSize( wheelCenterAndSize.center, wheelCenterAndSize.pixelSize );
-        this._interactiveTransform( );
+          var delta = deltaY > 0 ? 1 : -1;
 
-        this._setInteractiveTimeout( true );
+          var offset = $(currentTarget).offset();
+          geomap._anchor = [pageX - offset.left, pageY - offset.top];
+
+          var wheelCenterAndSize = geomap._getZoomCenterAndSize( geomap._anchor, delta, geomap._options[ "tilingScheme" ] !== null );
+
+          geomap._setInteractiveCenterAndSize( wheelCenterAndSize.center, wheelCenterAndSize.pixelSize );
+          geomap._interactiveTransform( );
+
+          geomap._setInteractiveTimeout( true );
+        }, 30 );
+
       }
 
       return false;
     }
   }
   );
-}(jQuery));
+}(jQuery, window));
 
 
-(function ($, undefined) {
+(function ($, window, undefined) {
   $.geo._serviceTypes.tiled = (function () {
+    var rTmplString = new RegExp( "<.*>|{{.*}}" );
+
     return {
-      create: function (map, serviceContainer, service, index) {
+      _serviceId: 0,
+      _tmplGeoSrcId: "",
+
+
+      create: function (map, serviceContainer, service /* , index */) {
+        this._serviceId = map._serviceIdSeed++;
+        this._tmplGeoSrcId = "geoSrc" + this._serviceId;
+
         var serviceState = $.data(service, "geoServiceState");
 
         if ( !serviceState ) {
@@ -6681,7 +6981,7 @@ $.Widget.prototype = {
 
           var scHtml = '<div data-geo-service="tiled" style="-webkit-transform:translateZ(0); position:absolute; left:0; top:0; width:8px; height:8px; margin:0; padding:0;"></div>';
 
-          serviceContainer.append(scHtml);
+          serviceContainer.append( window.toStaticHTML( scHtml ) );
 
           serviceState.serviceContainer = serviceContainer.children( ":last" );
 
@@ -6707,7 +7007,7 @@ $.Widget.prototype = {
         if ( serviceState ) {
           this._cancelUnloaded( map, service );
 
-          serviceState.serviceContainer.children( ).each( function ( i ) {
+          serviceState.serviceContainer.children( ).each( function ( ) {
             var $scaleContainer = $(this),
                 scalePixelSize = $scaleContainer.data("pixelSize"),
                 scaleRatio = scalePixelSize / pixelSize;
@@ -6755,10 +7055,6 @@ $.Widget.prototype = {
               serviceObj = this,
               $serviceContainer = serviceState.serviceContainer,
 
-              contentBounds = map._getContentBounds(),
-              mapWidth = contentBounds["width"],
-              mapHeight = contentBounds["height"],
-
               image = map.options[ "axisLayout" ] === "image",
               ySign = image ? +1 : -1,
 
@@ -6793,11 +7089,11 @@ $.Widget.prototype = {
               loadImageDeferredDone = function( url ) {
                 // when a Deferred call is done, add the image to the map
                 // a reference to the correct img element is on the Deferred object itself
-                serviceObj._loadImage( $.data( this, "img" ), url, pixelSize, map, serviceState, opacity );
+                serviceObj._loadImage( this.img, url, pixelSize, map, serviceState, opacity );
               },
 
               loadImageDeferredFail = function( ) {
-                $.data( this, "img" ).remove( );
+                delete this.img;
                 serviceState.loadCount--;
                 map._requestComplete();
               };
@@ -6807,7 +7103,7 @@ $.Widget.prototype = {
           }
 
           if (!scaleContainer.size()) {
-            $serviceContainer.append("<div style='-webkit-transform:translateZ(0);position:absolute; left:" + serviceLeft % tileWidth + "px; top:" + serviceTop % tileHeight + "px; width:" + tileWidth + "px; height:" + tileHeight + "px; margin:0; padding:0;' data-pixel-size='" + pixelSize + "'></div>");
+            $serviceContainer.append( window.toStaticHTML( "<div style='-webkit-transform:translateZ(0);position:absolute; left:" + serviceLeft % tileWidth + "px; top:" + serviceTop % tileHeight + "px; width:" + tileWidth + "px; height:" + tileHeight + "px; margin:0; padding:0;' data-pixel-size='" + pixelSize + "'></div>" ) );
             scaleContainer = $serviceContainer.children(":last").data("scaleOrigin", map._toMap( [ (serviceLeft % tileWidth), (serviceTop % tileHeight) ] ) );
           } else {
             scaleContainer.css({
@@ -6815,10 +7111,9 @@ $.Widget.prototype = {
               top: (serviceTop % tileHeight) + "px"
             }).data("scaleOrigin", map._toMap( [ (serviceLeft % tileWidth), (serviceTop % tileHeight) ] ) );
 
-            scaleContainer.children().each(function (i) {
-              var 
-              $img = $(this),
-              tile = $img.attr("data-tile").split(",");
+            scaleContainer.children().each( function () {
+              var $img = $(this),
+                  tile = $img.attr("data-tile").split(",");
 
               $img.css({
                 left: Math.round(((parseInt(tile[0], 10) - fullXAtScale) * 100) + (serviceLeft - (serviceLeft % tileWidth)) / tileWidth * 100) + "%",
@@ -6828,7 +7123,7 @@ $.Widget.prototype = {
               if (opacity < 1) {
                 $img.fadeTo(0, opacity);
               }
-            });
+            } );
           }
 
           for (x = tileX; x < tileX2; x++) {
@@ -6849,7 +7144,6 @@ $.Widget.prototype = {
 
                     tileBbox = [bottomLeft[0], bottomLeft[1], topRight[0], topRight[1]],
 
-                    urlProp = ( service.hasOwnProperty( "src" ) ? "src" : "getUrl" ),
                     urlArgs = {
                       bbox: tileBbox,
                       width: tileWidth,
@@ -6861,14 +7155,18 @@ $.Widget.prototype = {
                       },
                       index: Math.abs(y + x)
                     },
-                    isFunc = $.isFunction( service[ urlProp ] ),
+                    isFunc = $.isFunction( service[ 'src' ] ),
                     imageUrl;
 
                 if ( isFunc ) {
-                  imageUrl = service[ urlProp ]( urlArgs );
+                  imageUrl = service[ 'src' ]( urlArgs );
                 } else {
-                  $.templates( "geoSrc", service[ urlProp ] );
-                  imageUrl = $.render[ "geoSrc" ]( urlArgs );
+                  if ( rTmplString.test( service[ 'src' ] ) ) {
+                    $.templates( this._tmplGeoSrcId, service[ 'src' ] );
+                    imageUrl = $.render[ this._tmplGeoSrcId ]( urlArgs );
+                  } else {
+                    imageUrl = service[ 'src' ];
+                  }
                 }
 
                 serviceState.loadCount++;
@@ -6883,24 +7181,17 @@ $.Widget.prototype = {
 
                   imgMarkup += "width: 100%; height: 100%;";
 
-                  // #newpanzoom
-                  /*
-                  if ($("body")[0].filters === undefined) {
-                    imgMarkup += "width: 100%; height: 100%;";
-                  }
-                  */
-
                   imgMarkup += "margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;' unselectable='on' data-tile='" + tileStr + "' />";
 
-                  scaleContainer.append(imgMarkup);
+                  scaleContainer.append( window.toStaticHTML( imgMarkup ) );
                   $img = scaleContainer.children(":last");
                 }
 
                 if ( typeof imageUrl === "string" ) {
                   serviceObj._loadImage( $img, imageUrl, pixelSize, map, serviceState, opacity );
-                } else if ( imageUrl ) {
+                } else if ( imageUrl && $.isFunction( imageUrl.promise ) ) {
                   // assume Deferred
-                  $.data( imageUrl, "img", $img );
+                  $.extend( imageUrl.promise( ), { img: $img } );
                   imageUrl.done( loadImageDeferredDone ).fail( loadImageDeferredFail );
                 } else {
                   $img.remove( );
@@ -6914,7 +7205,7 @@ $.Widget.prototype = {
         }
       },
 
-      resize: function (map, service) {
+      resize: function ( /* map, service, dx, dy */ ) {
       },
 
       opacity: function ( map, service ) {
@@ -6931,6 +7222,16 @@ $.Widget.prototype = {
         var serviceState = $.data( service, "geoServiceState" );
 
         if (serviceState && serviceState.loadCount > 0) {
+          /*
+           * #193 - disabled until we can do this without canceling all AJAX requests
+           *
+          if ( window.stop !== undefined ) {
+            window.stop();
+          } else if( document.execCommand !== undefined ) {
+            document.execCommand("Stop", false);
+          }
+          */
+
           serviceState.serviceContainer.find("img:hidden").remove();
           while (serviceState.loadCount > 0) {
             serviceState.loadCount--;
@@ -6969,12 +7270,20 @@ $.Widget.prototype = {
       }
     };
   }());
-}(jQuery));
+}(jQuery, window));
 
-(function ($, undefined) {
+(function ($, window, undefined) {
   $.geo._serviceTypes.shingled = (function () {
+    var rTmplString = new RegExp( "<.*>|{{.*}}" );
+
     return {
-      create: function (map, serviceContainer, service, index) {
+      _serviceId: 0,
+      _tmplGeoSrcId: "",
+
+      create: function ( map, serviceContainer, service /* , index */ ) {
+        this._serviceId = map._serviceIdSeed++;
+        this._tmplGeoSrcId = "geoSrc" + this._serviceId;
+
         var serviceState = $.data(service, "geoServiceState");
 
         if ( !serviceState ) {
@@ -6984,7 +7293,7 @@ $.Widget.prototype = {
 
           var scHtml = '<div data-geo-service="shingled" style="-webkit-transform:translateZ(0);position:absolute; left:0; top:0; width:16px; height:16px; margin:0; padding:0;"></div>';
 
-          serviceContainer.append(scHtml);
+          serviceContainer.append( window.toStaticHTML( scHtml ) );
 
           serviceState.serviceContainer = serviceContainer.children(":last");
           $.data(service, "geoServiceState", serviceState);
@@ -7006,17 +7315,12 @@ $.Widget.prototype = {
 
             contentBounds = map._getContentBounds(),
             mapWidth = contentBounds[ "width" ],
-            mapHeight = contentBounds[ "height" ],
-
-            halfWidth = mapWidth / 2,
-            halfHeight = mapHeight / 2,
-
-            bbox = [ center[ 0 ] - halfWidth, center[ 1 ] - halfHeight, center[ 0 ] + halfWidth, center[ 1 ] + halfHeight ];
+            mapHeight = contentBounds[ "height" ];
 
         if ( serviceState ) {
           this._cancelUnloaded( map, service );
 
-          serviceState.serviceContainer.children( ).each( function ( i ) {
+          serviceState.serviceContainer.children( ).each( function ( ) {
             var $scaleContainer = $(this),
                 scalePixelSize = $scaleContainer.data( "pixelSize" ),
                 scaleRatio = scalePixelSize / pixelSize;
@@ -7038,7 +7342,7 @@ $.Widget.prototype = {
         }
       },
 
-      refresh: function (map, service) {
+      refresh: function (map, service, force) {
         var serviceState = $.data(service, "geoServiceState");
 
         this._cancelUnloaded(map, service);
@@ -7061,17 +7365,18 @@ $.Widget.prototype = {
 
               $img;
 
-          if (opacity < 1) {
+          if (opacity < 1 || force || service.shinglesMax === 1) {
             serviceContainer.find("img").attr("data-keep-alive", "0");
+          } else if ( service.shinglesMax > 1 ) {
+            serviceContainer.find("img").slice( 0, -( service.shinglesMax - 1 ) ).attr("data-keep-alive", "0");
           }
 
           if ( !scaleContainer.size() ) {
-            serviceContainer.append('<div style="-webkit-transform:translateZ(0);position:absolute; left:0px; top: 0px; width:' + mapWidth + 'px; height:' + mapHeight + 'px; margin:0; padding:0;" data-pixel-size="' + pixelSize + '" data-origin="[' + map._toMap( [ 0, 0 ] ) + ']"></div>');
+            serviceContainer.append( window.toStaticHTML( '<div style="-webkit-transform:translateZ(0);position:absolute; left:0px; top: 0px; width:' + mapWidth + 'px; height:' + mapHeight + 'px; margin:0; padding:0;" data-pixel-size="' + pixelSize + '" data-origin="[' + map._toMap( [ 0, 0 ] ) + ']"></div>' ) );
             scaleContainer = serviceContainer.children(":last");
           }
 
-          var urlProp = ( service.hasOwnProperty("src") ? "src" : "getUrl" ),
-              urlArgs = {
+          var urlArgs = {
                 bbox: bbox,
                 width: mapWidth,
                 height: mapHeight,
@@ -7079,7 +7384,7 @@ $.Widget.prototype = {
                 tile: null,
                 index: 0
               },
-              isFunc = $.isFunction( service[ urlProp ] ),
+              isFunc = $.isFunction( service[ 'src' ] ),
               imageUrl,
               imagePos = scaleContainer.position( );
 
@@ -7087,21 +7392,25 @@ $.Widget.prototype = {
           imagePos.top = - ( imagePos.top );
 
           if ( isFunc ) {
-            imageUrl = service[ urlProp ]( urlArgs );
+            imageUrl = service[ 'src' ]( urlArgs );
           } else {
-            $.templates( "geoSrc", service[ urlProp ] );
-            imageUrl = $.render[ "geoSrc" ]( urlArgs );
+            if ( rTmplString.test( service[ 'src' ] ) ) {
+              $.templates( this._tmplGeoSrcId, service[ 'src' ] );
+              imageUrl = $.render[ this._tmplGeoSrcId ]( urlArgs );
+            } else {
+              imageUrl = service[ 'src' ];
+            }
           }
 
           serviceState.loadCount++;
           map._requestQueued();
 
-          scaleContainer.append('<img style="-webkit-transform:translateZ(0);position:absolute; left:' + ( imagePos.left / scaleContainer.width( ) * 100 ) + '%; top:' + ( imagePos.top / scaleContainer.height( ) * 100 ) + '%; width:100%; height:100%; margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;" unselectable="on" />');
+          scaleContainer.append( window.toStaticHTML( '<img style="-webkit-transform:translateZ(0);position:absolute; left:' + ( imagePos.left / scaleContainer.width( ) * 100 ) + '%; top:' + ( imagePos.top / scaleContainer.height( ) * 100 ) + '%; width:100%; height:100%; margin:0; padding:0; -khtml-user-select:none; -moz-user-select:none; -webkit-user-select:none; user-select:none; display:none;" unselectable="on" />' ) );
           $img = scaleContainer.children(":last").data("center", map._center);
 
           if ( typeof imageUrl === "string" ) {
             serviceObj._loadImage( $img, imageUrl, pixelSize, map, serviceState, opacity );
-          } else {
+          } else if ( imageUrl ) {
             // assume Deferred
             imageUrl.done( function( url ) {
               serviceObj._loadImage( $img, url, pixelSize, map, serviceState, opacity );
@@ -7115,7 +7424,7 @@ $.Widget.prototype = {
         }
       },
 
-      resize: function (map, service) {
+      resize: function ( map, service /* , dx, dy */ ) {
         var serviceState = $.data(service, "geoServiceState");
 
         if ( serviceState && service && service.style.visibility === "visible" ) {
@@ -7131,12 +7440,9 @@ $.Widget.prototype = {
 
           scaleContainers.attr("data-pixel-size", "0");
 
-          scaleContainers.each( function ( i ) {
+          scaleContainers.each( function ( ) {
             var $scaleContainer = $(this),
                 position = $scaleContainer.position( );
-
-            var oldMapOrigin = $scaleContainer.data( "origin" ),
-                newPixelPoint = map._toPixel( oldMapOrigin );
 
             $scaleContainer.css( {
               left: position.left + ( mapWidth - $scaleContainer.width( ) ) / 2,
@@ -7144,14 +7450,6 @@ $.Widget.prototype = {
             } );
 
           } );
-            
-
-          /*
-          scaleContainer.css({
-            left: halfWidth + 'px',
-            top: halfHeight + 'px'
-          });
-          */
         }
       },
 
@@ -7221,4 +7519,4 @@ $.Widget.prototype = {
       }
     };
   }());
-}(jQuery));
+}(jQuery, window));
