@@ -3,7 +3,7 @@
   "title": "jQuery Geo",
   "description": "An interactive mapping widget and geo-spatial API built on open source and open data (NOT a wrapper of other APIs, such as Google Maps)",
   "version": "1.0.0-rc1.2",
-  "main": "dist/jquery.geo-1.0.0-rc1.2.js",
+  "main": "dist/jquery.geo.js",
   "registry": "npm",
   "format": "global",
   "homepage": "http://jquerygeo.com",
