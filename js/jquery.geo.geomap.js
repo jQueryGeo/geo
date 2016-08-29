@@ -875,7 +875,7 @@
 
           return 0;
         } else {
-          return Math.round( Math.log( tilingScheme.basePixelSize / pixelSize) / Math.log( 2 ) );
+          return Math.floor( Math.log( tilingScheme.basePixelSize / pixelSize) / Math.log( 2 ) );
         }
       } else {
         var ratio = this._contentBounds["width"] / this._contentBounds["height"],
