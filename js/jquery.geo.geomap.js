@@ -895,6 +895,7 @@
       this._setInteractiveCenterAndSize( this._centerInteractive, this._getPixelSize( value ) );
       this._interactiveTransform( );
       this._setInteractiveTimeout( trigger );
+      this._trigger( "zoomstart", window.event );
     },
 
     _createChildren: function () {
@@ -2383,6 +2384,7 @@
 
       if ( e.deltaY !== 0 ) {
         if ( this._timeoutWheel ) {
+          this._trigger( "zoomstart", window.event );
           clearTimeout( this._timeoutWheel );
           this._timeoutWheel = null;
         }
