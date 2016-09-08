@@ -1306,6 +1306,11 @@
           this._centerInteractive[ 1 ] += ( ( this._options[ "axisLayout" ] === "image" ? -1 : 1 ) * dy * this._pixelSizeInteractive );
           this._setInteractiveCenterAndSize( this._centerInteractive, this._pixelSizeInteractive );
           this._interactiveTransform( );
+          var delta, pixelCenter, pixelInteractiveCenter;
+          pixelCenter = this.toPixel( this._center );
+          pixelInteractiveCenter = this.toPixel( this._centerInteractive );
+          delta = [ Math.round( pixelCenter[0] - pixelInteractiveCenter[0] ), Math.round( pixelCenter[1] - pixelInteractiveCenter[1] ) ];
+          this._trigger( "pan", window.event, { bbox: $.merge( [ ], this._options["bbox"] ), delta: delta } );
         }
       }
     },
