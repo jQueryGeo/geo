@@ -142,7 +142,7 @@
             scaleContainers.find("img").attr("data-dirty", "true");
           }
 
-          if (!scaleContainer.size()) {
+          if (!scaleContainer.length) {
             $serviceContainer.append( window.toStaticHTML( "<div style='-webkit-transform:translateZ(0);position:absolute; left:" + serviceLeft % tileWidth + "px; top:" + serviceTop % tileHeight + "px; width:" + tileWidth + "px; height:" + tileHeight + "px; margin:0; padding:0;' data-pixel-size='" + pixelSize + "'></div>" ) );
             scaleContainer = $serviceContainer.children(":last").data("scaleOrigin", map._toMap( [ (serviceLeft % tileWidth), (serviceTop % tileHeight) ] ) );
           } else {
@@ -171,7 +171,7 @@
               var tileStr = "" + x + "," + y,
                   $img = scaleContainer.children("[data-tile='" + tileStr + "']").removeAttr("data-dirty");
 
-              if ($img.size() === 0 || serviceState.reloadTiles) {
+              if ($img.length === 0 || serviceState.reloadTiles) {
                 var bottomLeft = [
                       tilingScheme.origin[0] + (x * tileWidth) * pixelSize,
                       tilingScheme.origin[1] + ySign * (y * tileHeight) * pixelSize
@@ -212,7 +212,7 @@
                 serviceState.loadCount++;
                 map._requestQueued();
 
-                if (serviceState.reloadTiles && $img.size() > 0) {
+                if (serviceState.reloadTiles && $img.length > 0) {
                   $img.attr("src", imageUrl);
                 } else {
                   var imgMarkup = "<img style='-webkit-transform:translateZ(0);position:absolute; " +
@@ -283,7 +283,7 @@
       _loadImage: function ( $img, url, pixelSize, map, serviceState, opacity ) {
         var serviceContainer = serviceState.serviceContainer;
 
-        $img.load(function (e) {
+        $img.on( 'load', function (e) {
           if (opacity < 1) {
             $(e.target).fadeTo(0, opacity);
           } else {
@@ -297,7 +297,7 @@
             serviceContainer.children(":not([data-pixel-size='" + pixelSize + "'])").remove();
             serviceState.loadCount = 0;
           }
-        }).error(function (e) {
+        }).on( 'error', function (e) {
           $(e.target).remove();
           serviceState.loadCount--;
           map._requestComplete();
