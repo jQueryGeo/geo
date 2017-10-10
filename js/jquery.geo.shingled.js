@@ -97,7 +97,7 @@
             serviceContainer.find("img").slice( 0, -( service.shinglesMax - 1 ) ).attr("data-keep-alive", "0");
           }
 
-          if ( !scaleContainer.size() ) {
+          if ( !scaleContainer.length ) {
             serviceContainer.append( window.toStaticHTML( '<div style="-webkit-transform:translateZ(0);position:absolute; left:0px; top: 0px; width:' + mapWidth + 'px; height:' + mapHeight + 'px; margin:0; padding:0;" data-pixel-size="' + pixelSize + '" data-origin="[' + map._toMap( [ 0, 0 ] ) + ']"></div>' ) );
             scaleContainer = serviceContainer.children(":last");
           }
@@ -204,7 +204,7 @@
       _loadImage: function ( $img, url, pixelSize, map, serviceState, opacity ) {
         var serviceContainer = serviceState.serviceContainer;
 
-        $img.load(function (e) {
+        $img.on( 'load', function (e) {
           if ( !$.contains(document.body, e.target.jquery ? e.target[0] : e.target) ) {
             // this image has been canceled and removed from the DOM
             return;
@@ -227,7 +227,7 @@
 
             serviceState.loadCount = 0;
           }
-        }).error(function (e) {
+        }).on( 'error', function (e) {
           if ( !$.contains(document.body, e.target.jquery ? e.target[0] : e.target) ) {
             // this image has been canceled and removed from the DOM
             return;
