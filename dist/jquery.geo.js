@@ -1,6 +1,6 @@
-/*! jQuery Geo - v1.0.0 - 2017-10-21
+/*! jQuery Geo - v1.1.0 - 2018-10-06
 * http://jquerygeo.com
-* Copyright (c) 2017 Ryan Morrison-Westphal; Licensed MIT */
+* Copyright (c) 2018 Ryan Morrison-Westphal; Licensed MIT */
 // Copyright 2006 Google Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -3775,6 +3775,10 @@ return $.widget;
     },
 
     // buffer
+
+    buffer: function( geom, distance, _ignoreGeo /* Internal Use Only */ ) {
+      return this._buffer( geom, distance, _ignoreGeo );
+    },
 
     _buffer: function( geom, distance, _ignoreGeo /* Internal Use Only */ ) {
       var wasGeodetic = false,

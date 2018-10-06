@@ -550,6 +550,10 @@
 
     // buffer
 
+    buffer: function( geom, distance, _ignoreGeo /* Internal Use Only */ ) {
+      return this._buffer( geom, distance, _ignoreGeo );
+    },
+
     _buffer: function( geom, distance, _ignoreGeo /* Internal Use Only */ ) {
       var wasGeodetic = false,
           coords = geom.coordinates;
