@@ -30,7 +30,7 @@ $( '#map' ).geomap( );
 ```html
 <div id="map" style="height: 480px;"></div>
 <script src="node_modules/jquery/dist/jquery.min.js"></script>
-<script src="node_modules/jquery.geo/dist/jquery.geo-1.1.0.min.js"></script>
+<script src="node_modules/jquery.geo/dist/jquery.geo.min.js"></script>
 <script>
   $(function() {
     $( "#map" ).geomap( );
