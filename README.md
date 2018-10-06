@@ -30,7 +30,7 @@ $( '#map' ).geomap( );
 ```html
 <div id="map" style="height: 480px;"></div>
 <script src="node_modules/jquery/dist/jquery.min.js"></script>
-<script src="node_modules/jquery.geo/dist/jquery.geo-1.0.0-rc1.1.min.js"></script>
+<script src="node_modules/jquery.geo/dist/jquery.geo.min.js"></script>
 <script>
   $(function() {
     $( "#map" ).geomap( );
@@ -44,8 +44,8 @@ The following copy-and-paste snippet will help you get started.
 
 ```html
 <div id="map" style="height: 480px;"></div>
-<script src="http://code.jquery.com/jquery-2.2.4.min.js"></script>
-<script src="http://code.jquerygeo.com/jquery.geo-1.0.0-rc1.1.min.js"></script>
+<script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="http://code.jquerygeo.com/jquery.geo-1.1.0.min.js"></script>
 <script>
   $(function() {
     $( "#map" ).geomap( );
@@ -57,8 +57,8 @@ The following copy-and-paste snippet will help you get started.
 
 You can also download the latest release as a [minified JavaScript file][min] or a [full, uncompressed one][max].
 
-[min]: http://code.jquerygeo.com/jquery.geo-1.0.0-rc1.1.min.js
-[max]: http://code.jquerygeo.com/jquery.geo-1.0.0-rc1.1.js
+[min]: http://code.jquerygeo.com/jquery.geo-1.1.0.min.js
+[max]: http://code.jquerygeo.com/jquery.geo-1.1.0.js
 
 ## Documentation
 

@@ -1197,7 +1197,7 @@
       var size = { width: 0, height: 0 },
         sizeContainer = this._$elem;
 
-      while (sizeContainer.size() && !(size["width"] > 0 && size["height"] > 0)) {
+      while (sizeContainer.length && !(size["width"] > 0 && size["height"] > 0)) {
         size = { width: sizeContainer.width(), height: sizeContainer.height() };
         if (size["width"] <= 0 || size["height"] <= 0) {
           size = { width: parseInt(sizeContainer.css("width"), 10), height: parseInt(sizeContainer.css("height"), 10) };
