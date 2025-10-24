@@ -6,15 +6,12 @@
   "main": "dist/jquery.geo.js",
   "registry": "npm",
   "format": "global",
-  "homepage": "http://jquerygeo.com",
+  "homepage": "https://jquerygeo.github.io/docs/",
   "bugs": {
     "url": "https://github.com/jQueryGeo/geo/issues"
   },
   "author": {
-    "name": "Ryan Morrison-Westphal",
-    "company": "Tripping the Bits",
-    "email": "ryan@trippingthebits.com",
-    "url": "http://trippingthebits.com"
+    "name": "Ryan Morrison-Westphal"
   },
   "repository": {
     "type": "git",
